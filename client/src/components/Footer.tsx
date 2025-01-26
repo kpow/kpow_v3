@@ -1,38 +1,41 @@
+import { Twitter, Instagram, Github } from "lucide-react";
+
 export function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="bg-black bg-opacity-95 text-white py-8">
+    <footer className="bg-black bg-opacity-95 text-white py-6">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-lg font-bold mb-4">About</h3>
-            <p className="text-gray-400">
-              A modern platform for digital content and experiences.
-            </p>
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="flex items-center space-x-6">
+            <a 
+              href="https://twitter.com/kpow" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-blue-400 transition-colors"
+            >
+              <Twitter className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://instagram.com/kpow" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-pink-400 transition-colors"
+            >
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://github.com/kpow" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-gray-400 transition-colors"
+            >
+              <Github className="w-5 h-5" />
+            </a>
           </div>
-          <div>
-            <h3 className="text-lg font-bold mb-4">Connect</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Twitter</a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Instagram</a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Discord</a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold mb-4">Legal</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms</a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a>
-              </li>
-            </ul>
+
+          <div className="text-sm text-gray-400">
+            © {currentYear} KPOW. All rights reserved.
           </div>
         </div>
       </div>
