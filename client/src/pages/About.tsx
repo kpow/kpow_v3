@@ -38,7 +38,7 @@ export default function About() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       {/* Header section */}
-      <div className="bg-white rounded-xl p-8 mb-12 shadow-sm">
+      <div className="bg-white rounded-xl p-8 mb-12 shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
         <h1 className="text-4xl font-slackey mb-4">
           Hi, I'm Kevin
         </h1>
@@ -80,7 +80,7 @@ export default function About() {
 
         <div className="mt-12">
           <img
-            src="/team-photo.jpg"
+            src="/kpow_about.jpg"
             alt="Team photo"
             className="w-full rounded-lg shadow-md"
           />
