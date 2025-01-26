@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { Logo } from "./Logo";
+import { SlideMenu } from "./SlideMenu";
 
 export function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-95 text-white">
       <div className="container mx-auto px-4">
@@ -14,7 +18,11 @@ export function Header() {
             <button className="px-4 py-1 rounded bg-blue-600 hover:bg-blue-700 transition-colors">
               CONTACT
             </button>
-            <button className="p-2">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              aria-label="Toggle menu"
+            >
               <svg
                 viewBox="0 0 24 24"
                 width="24"
@@ -29,6 +37,8 @@ export function Header() {
           </nav>
         </div>
       </div>
+
+      <SlideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </header>
   );
 }
