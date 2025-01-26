@@ -28,15 +28,15 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
   if (!mounted) return null;
 
   const menuItems = [
-    { icon: <Home className="w-5 h-5" />, label: "home", href: "/" },
-    { icon: <Info className="w-5 h-5" />, label: "about kpow", href: "/about" },
-    { icon: <Star className="w-5 h-5" />, label: "star feed", href: "/star-feed" },
-    { icon: <Book className="w-5 h-5" />, label: "book feed", href: "/book-feed" },
-    { icon: <Youtube className="w-5 h-5" />, label: "youtube live", href: "/youtube" },
-    { icon: <Gamepad2 className="w-5 h-5" />, label: "hero battle", href: "/battle" },
-    { icon: <Music className="w-5 h-5" />, label: "pmonk", href: "/pmonk" },
-    { icon: <PlayCircle className="w-5 h-5" />, label: "itunes beta", href: "/itunes" },
-    { icon: <Code className="w-5 h-5" />, label: "gatsby version", href: "/gatsby" }
+    { icon: <Home className="w-4 h-4" />, label: "home", href: "/" },
+    { icon: <Info className="w-4 h-4" />, label: "about kpow", href: "/about" },
+    { icon: <Star className="w-4 h-4" />, label: "star feed", href: "/star-feed" },
+    { icon: <Book className="w-4 h-4" />, label: "book feed", href: "/book-feed" },
+    { icon: <Youtube className="w-4 h-4" />, label: "youtube live", href: "/youtube" },
+    { icon: <Gamepad2 className="w-4 h-4" />, label: "hero battle", href: "/battle" },
+    { icon: <Music className="w-4 h-4" />, label: "pmonk", href: "/pmonk" },
+    { icon: <PlayCircle className="w-4 h-4" />, label: "itunes beta", href: "/itunes" },
+    { icon: <Code className="w-4 h-4" />, label: "gatsby version", href: "/gatsby", className: "text-blue-600" }
   ];
 
   return (
@@ -45,28 +45,31 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       <div 
         onClick={onClose}
         className={cn(
-          "fixed inset-0 bg-black/50 z-40 transition-opacity duration-300",
+          "fixed inset-0 bg-black/20 z-40 transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       />
-      
+
       {/* Menu */}
       <div 
         className={cn(
-          "fixed top-0 right-0 h-full w-64 bg-white z-50 transform transition-transform duration-300 ease-out",
+          "fixed top-0 right-0 h-full w-60 bg-white z-50 transform transition-transform duration-300 ease-out border-l border-gray-200",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
-        <nav className="p-4 space-y-2">
+        <nav className="pt-20 px-4 space-y-1">
           {menuItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className="flex items-center gap-3 p-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              className={cn(
+                "flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors",
+                item.className
+              )}
             >
               {item.icon}
-              <span className="text-sm">{item.label}</span>
+              <span className="text-[13px]">{item.label}</span>
             </Link>
           ))}
         </nav>
