@@ -23,6 +23,14 @@ export interface Setlist {
   position: number;
 }
 
+export interface SetlistResponse {
+  showdate: string;
+  venue: string;
+  location: string;
+  setlistdata: string;
+  setlistnotes: string;
+}
+
 // API Functions
 export async function getAttendedShows(
   username: string,
@@ -89,40 +97,14 @@ export async function getPaginatedVenues(
   };
 }
 
-export async function getSetlist(showId: string): Promise<Setlist[]> {
+export async function getSetlist(showId: string): Promise<SetlistResponse> {
   const response = await fetch(`${API_BASE}/setlists/${showId}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch setlist');
   }
 
-  const data = await response.json();
-  // Transform the setlist text into the expected format
-  const setlistLines = data.setlistdata.split('\n\n');
-  const setlist: Setlist[] = [];
-
-  setlistLines.forEach((line: string) => {
-    if (!line.trim()) return;
-
-    const [setInfo, songs] = line.split(': ');
-    if (!songs) return;
-
-    const set = setInfo.toLowerCase() === 'encore' ? 'e' : setInfo.split(' ')[1];
-    let position = 1;
-
-    songs.split(' ').forEach((song: string) => {
-      if (song.trim()) {
-        setlist.push({
-          showid: showId,
-          set,
-          song: song.replace(/[>,-]$/, '').trim(),
-          position: position++
-        });
-      }
-    });
-  });
-
-  return setlist;
+  return response.json();
 }
 
 export interface SetlistStats {
