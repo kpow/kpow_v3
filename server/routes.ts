@@ -13,7 +13,14 @@ interface ShowData {
   notes?: string;
 }
 
-async function fetchPhishData(endpoint: string) {
+interface SetlistData {
+  showid: string;
+  song: string;
+  set: string;
+  position: number;
+}
+
+async function fetchPhishData(endpoint: string): Promise<any[]> {
   const apiKey = process.env.PHISH_API_KEY;
   if (!apiKey) {
     throw new Error("PHISH_API_KEY is not set");
@@ -35,10 +42,10 @@ export function registerRoutes(app: Express): Server {
       const page = Math.max(1, parseInt(req.query.page as string) || 1);
       const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 10));
 
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
 
       // Sort shows by date descending
-      const sortedShows = shows.sort((a: ShowData, b: ShowData) => 
+      const sortedShows = shows.sort((a, b) => 
         new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
       );
 
@@ -78,10 +85,10 @@ export function registerRoutes(app: Express): Server {
       const page = Math.max(1, parseInt(req.query.page as string) || 1);
       const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 10));
 
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
 
       // Count venues
-      const venueStats = shows.reduce((acc: Record<string, number>, show: ShowData) => {
+      const venueStats = shows.reduce((acc: Record<string, number>, show) => {
         acc[show.venue] = (acc[show.venue] || 0) + 1;
         return acc;
       }, {});
@@ -115,9 +122,9 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/runs/stats", async (_req, res) => {
     try {
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
 
-      const uniqueVenues = new Set(shows.map((show: ShowData) => show.venue)).size;
+      const uniqueVenues = new Set(shows.map(show => show.venue)).size;
       const totalShows = shows.length;
 
       res.json({
@@ -126,6 +133,31 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error("Error in /api/runs/stats:", error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // Songs stats endpoint
+  app.get("/api/songs/stats", async (_req, res) => {
+    try {
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
+      const songs = new Set<string>();
+
+      // Fetch setlist for each show
+      for (const show of shows) {
+        const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`) as SetlistData[];
+        if (Array.isArray(setlist)) {
+          setlist.forEach(entry => {
+            if (entry.song) {
+              songs.add(entry.song);
+            }
+          });
+        }
+      }
+
+      res.json(Array.from(songs));
+    } catch (error) {
+      console.error("Error in /api/songs/stats:", error);
       res.status(500).json({ error: (error as Error).message });
     }
   });

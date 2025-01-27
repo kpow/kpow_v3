@@ -8,7 +8,10 @@ export const queryClient = new QueryClient({
         const res = await fetch(url as string);
 
         if (!res.ok) {
-          throw new Error(`${res.status}: ${await res.text()}`);
+          if (res.status >= 500) {
+            throw new Error('Server error. Please try again later.');
+          }
+          throw new Error(await res.text());
         }
 
         return res.json();
