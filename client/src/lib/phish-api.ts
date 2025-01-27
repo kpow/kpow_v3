@@ -1,6 +1,5 @@
-// Constants
-const PHISH_API_BASE_URL = "https://api.phish.net/v5";
-const API_KEY = import.meta.env.VITE_PHISH_API_KEY;
+// Constants - no need for API key anymore as we're using backend routes
+const API_BASE = '/api';
 
 export interface ShowAttendance {
   showid: string;
@@ -30,26 +29,16 @@ export async function getAttendedShows(
   page = 1,
   limit = 10
 ): Promise<{ shows: ShowAttendance[]; total: number }> {
-  const response = await fetch(
-    `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
-  );
+  const response = await fetch(`${API_BASE}/shows?page=${page}&limit=${limit}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch attended shows');
   }
 
   const data = await response.json();
-  const shows = data.data
-    .sort((a: ShowAttendance, b: ShowAttendance) =>
-      new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
-    );
-
-  const start = (page - 1) * limit;
-  const end = start + limit;
-
   return {
-    shows: shows.slice(start, end),
-    total: shows.length,
+    shows: data.shows,
+    total: data.pagination.total * limit, // Convert pages to total items
   };
 }
 
@@ -58,32 +47,25 @@ export async function getShowStats(username: string): Promise<{
   uniqueVenues: number;
   venueStats: VenueStat[];
 }> {
-  const response = await fetch(
-    `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
-  );
+  const response = await fetch(`${API_BASE}/runs/stats`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch show statistics');
   }
 
   const data = await response.json();
-  const shows = data.data;
 
-  // Count shows per venue
-  const venueMap = new Map<string, number>();
-  shows.forEach((show: ShowAttendance) => {
-    venueMap.set(show.venue, (venueMap.get(show.venue) || 0) + 1);
-  });
-
-  // Convert to array and sort by count
-  const venueStats = Array.from(venueMap.entries())
-    .map(([venue, count]) => ({ venue, count }))
-    .sort((a, b) => b.count - a.count);
+  // Get venue stats in a separate call
+  const venueResponse = await fetch(`${API_BASE}/venues/stats`);
+  if (!venueResponse.ok) {
+    throw new Error('Failed to fetch venue statistics');
+  }
+  const venueData = await venueResponse.json();
 
   return {
-    totalShows: shows.length,
-    uniqueVenues: venueMap.size,
-    venueStats
+    totalShows: data.totalShows,
+    uniqueVenues: data.uniqueVenues,
+    venueStats: venueData.venues
   };
 }
 
@@ -92,45 +74,54 @@ export async function getPaginatedVenues(
   page = 1,
   limit = 10
 ): Promise<{ venues: VenueStat[]; total: number }> {
-  const { venueStats } = await getShowStats(username);
+  const response = await fetch(
+    `${API_BASE}/venues/stats?page=${page}&limit=${limit}`
+  );
 
-  const start = (page - 1) * limit;
-  const end = start + limit;
+  if (!response.ok) {
+    throw new Error('Failed to fetch venue statistics');
+  }
 
+  const data = await response.json();
   return {
-    venues: venueStats.slice(start, end),
-    total: venueStats.length
+    venues: data.venues,
+    total: data.pagination.total * limit // Convert pages to total items
   };
 }
 
 export async function getSetlist(showId: string): Promise<Setlist[]> {
-  const response = await fetch(
-    `${PHISH_API_BASE_URL}/setlists/show/${showId}.json?apikey=${API_KEY}`
-  );
+  const response = await fetch(`${API_BASE}/setlists/${showId}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch setlist');
   }
 
   const data = await response.json();
-  console.log('Raw setlist data for show', showId, ':', data); // Debug log
+  // Transform the setlist text into the expected format
+  const setlistLines = data.setlistdata.split('\n\n');
+  const setlist: Setlist[] = [];
 
-  if (!data.data || !Array.isArray(data.data)) {
-    console.error('Unexpected setlist data format:', data);
-    return [];
-  }
+  setlistLines.forEach((line: string) => {
+    if (!line.trim()) return;
 
-  // Extract all songs from the setlist and filter out any entries without a song name
-  const setlist = data.data
-    .filter((item: any) => item.song && typeof item.song === 'string')
-    .map((item: any) => ({
-      showid: item.showid,
-      set: item.set,
-      song: item.song.trim(),
-      position: item.position
-    }));
+    const [setInfo, songs] = line.split(': ');
+    if (!songs) return;
 
-  console.log('Processed setlist for show', showId, ':', setlist); // Debug log
+    const set = setInfo.toLowerCase() === 'encore' ? 'e' : setInfo.split(' ')[1];
+    let position = 1;
+
+    songs.split(' ').forEach((song: string) => {
+      if (song.trim()) {
+        setlist.push({
+          showid: showId,
+          set,
+          song: song.replace(/[>,-]$/, '').trim(),
+          position: position++
+        });
+      }
+    });
+  });
+
   return setlist;
 }
 
@@ -140,57 +131,21 @@ export interface SetlistStats {
 }
 
 export async function getSetlistStats(username: string): Promise<SetlistStats> {
-  // First get all attended shows
-  const response = await fetch(
-    `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
-  );
+  const response = await fetch(`${API_BASE}/songs/stats`);
 
   if (!response.ok) {
-    throw new Error('Failed to fetch attended shows');
+    throw new Error('Failed to fetch song statistics');
   }
 
-  const data = await response.json();
-  const shows = data.data;
-
-  // Create a set to track unique songs and a map for song counts
-  const uniqueSongs = new Set<string>();
+  const songStats = await response.json();
   const songCounts: Record<string, number> = {};
 
-  // Process shows in smaller batches to avoid overwhelming the API
-  const BATCH_SIZE = 5;
-  for (let i = 0; i < shows.length; i += BATCH_SIZE) {
-    const batchShows = shows.slice(i, i + BATCH_SIZE);
-    console.log(`Processing batch ${i / BATCH_SIZE + 1} of shows...`);
-
-    await Promise.all(
-      batchShows.map((show: ShowAttendance) =>
-        getSetlist(show.showid)
-          .then(setlist => {
-            console.log(`Got setlist for show ${show.showid}, found ${setlist.length} songs`);
-            setlist.forEach(item => {
-              if (item.song) {
-                uniqueSongs.add(item.song);
-                songCounts[item.song] = (songCounts[item.song] || 0) + 1;
-              }
-            });
-          })
-          .catch(error => {
-            console.error(`Error fetching setlist for show ${show.showid}:`, error);
-          })
-      )
-    );
-  }
-
-  console.log('Final count of unique songs:', uniqueSongs.size);
-  console.log('Songs seen more than 5 times:', 
-    Object.entries(songCounts)
-      .filter(([_, count]) => count > 5)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10)
-  );
+  songStats.forEach((stat: { name: string; count: number }) => {
+    songCounts[stat.name] = stat.count;
+  });
 
   return {
-    uniqueSongs: uniqueSongs.size,
+    uniqueSongs: Object.keys(songCounts).length,
     songCounts
   };
 }
