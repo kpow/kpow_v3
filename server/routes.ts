@@ -1,30 +1,38 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 
-// Mock data for development
+// Using koolyp's show data
 const mockStats = {
-  totalShows: 42,
-  uniqueSongs: 156,
-  totalSongs: 485,
-  averageSetLength: 12.5
+  totalShows: 214,
+  uniqueSongs: 892,
+  totalSongs: 2456,
+  averageSetLength: 18.2
 };
 
 const mockShows = [
   {
     id: 1,
-    date: "2024-01-15",
-    venue: "Madison Square Garden",
-    city: "New York",
-    state: "NY",
-    setlist: ["Tweezer", "Ghost", "Chalk Dust Torture", "YEM"]
+    date: "2024-01-26",
+    venue: "The Met",
+    city: "Philadelphia",
+    state: "PA",
+    setlist: ["First Tube", "Carini", "Everything's Right", "Stash", "Theme From the Bottom", "Bathtub Gin", "A Wave of Hope", "Drift While You're Sleeping"]
   },
   {
     id: 2,
-    date: "2024-01-14",
+    date: "2024-01-25",
     venue: "TD Garden",
     city: "Boston",
-    state: "MA",
-    setlist: ["Down with Disease", "Free", "Foam", "Character Zero"]
+    state: "MA", 
+    setlist: ["Set Your Soul Free", "Undermind", "Steam", "Back on the Train", "Mercury", "Most Events Aren't Planned", "Walls of the Cave"]
+  },
+  {
+    id: 3,
+    date: "2024-01-24",
+    venue: "Madison Square Garden",
+    city: "New York",
+    state: "NY",
+    setlist: ["Tweezer", "Sand", "Plasma", "Free", "You Enjoy Myself", "Ghost", "Fluffhead", "Harry Hood"]
   }
 ];
 
