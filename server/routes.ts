@@ -11,20 +11,30 @@ interface VenueCount {
 async function fetchPhishData(endpoint: string) {
   try {
     const apiKey = process.env.PHISH_API_KEY;
+    if (!apiKey) {
+      throw new Error("PHISH_API_KEY is not set in environment variables");
+    }
+
+    console.log(`Fetching data from: ${PHISH_API_BASE}${endpoint}.json`);
     const response = await fetch(
       `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
     );
-    const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to fetch data from Phish.net API",
-      );
+      const errorText = await response.text();
+      console.error(`API Error (${response.status}):`, errorText);
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data || !data.data) {
+      console.error("Invalid API response format:", data);
+      throw new Error("Invalid API response format");
     }
 
     return data.data;
   } catch (error) {
-    console.error("Error fetching from Phish.net:", error);
+    console.error("Error in fetchPhishData:", error);
     throw error;
   }
 }
@@ -42,7 +52,12 @@ export function registerRoutes(app: Express): Server {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
+      console.log("Fetching shows with params:", { page, limit });
       const shows = await fetchPhishData("/attendance/username/koolyp");
+
+      if (!Array.isArray(shows)) {
+        throw new Error("Invalid shows data format");
+      }
 
       const sortedShows = shows.sort(
         (a: any, b: any) =>
@@ -62,6 +77,8 @@ export function registerRoutes(app: Express): Server {
         country: show.country || "US",
         notes: show.notes || ""
       }));
+
+      console.log("Formatted shows sample:", formattedShows[0]);
 
       const total = shows.length;
       const totalPages = Math.ceil(total / limit);
