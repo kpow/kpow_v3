@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 6;
 
 interface SongStat {
@@ -83,69 +83,72 @@ export default function ShowStats() {
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
 
-      {/* Total Shows */}
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="text-center">
-            <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
-            <div className="text-4xl font-bold">
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Total Shows */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
+              <div className="text-4xl font-bold">
+                {isLoading ? (
+                  <Skeleton className="h-12 w-24 mx-auto" />
+                ) : (
+                  showsData?.total || 0
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Run Statistics */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-slackey">Run Statistics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
               {isLoading ? (
-                <Skeleton className="h-12 w-24 mx-auto" />
+                Array.from({ length: VENUES_PER_PAGE }).map((_, i) => (
+                  <div key={i} className="flex justify-between items-center">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                ))
               ) : (
-                showsData?.total || 0
+                venueStats?.venues.map(({ venue, count }) => (
+                  <div key={venue} className="flex justify-between items-center">
+                    <span className="font-medium">{venue}</span>
+                    <span className="text-sm text-muted-foreground">{count}</span>
+                  </div>
+                ))
               )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Run Statistics */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="font-slackey">Run Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {isLoading ? (
-              Array.from({ length: VENUES_PER_PAGE }).map((_, i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-4 w-12" />
-                </div>
-              ))
-            ) : (
-              venueStats?.venues.map(({ venue, count }) => (
-                <div key={venue} className="flex justify-between items-center">
-                  <span className="font-medium">{venue}</span>
-                  <span className="text-sm text-muted-foreground">{count}</span>
-                </div>
-              ))
+            {venueStats && venueStats.total > VENUES_PER_PAGE && (
+              <Pagination className="mt-4">
+                <PaginationContent>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setVenuePage(p => Math.max(1, p - 1))}
+                    disabled={venuePage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setVenuePage(p => p + 1)}
+                    disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
+                  >
+                    Next
+                  </Button>
+                </PaginationContent>
+              </Pagination>
             )}
-          </div>
-          {venueStats && venueStats.total > VENUES_PER_PAGE && (
-            <Pagination className="mt-4">
-              <PaginationContent>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setVenuePage(p => Math.max(1, p - 1))}
-                  disabled={venuePage === 1}
-                >
-                  Previous
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVenuePage(p => p + 1)}
-                  disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
-                >
-                  Next
-                </Button>
-              </PaginationContent>
-            </Pagination>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Shows Grid */}
       <Card className="mb-8">
