@@ -40,7 +40,7 @@ export async function getAttendedShows(
 
   const data = await response.json();
   const shows = data.data
-    .sort((a: ShowAttendance, b: ShowAttendance) => 
+    .sort((a: ShowAttendance, b: ShowAttendance) =>
       new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
     );
 
@@ -114,4 +114,48 @@ export async function getSetlist(showId: string): Promise<Setlist[]> {
 
   const data = await response.json();
   return data.data;
+}
+
+export interface SetlistStats {
+  uniqueSongs: number;
+  songCounts: Record<string, number>;
+}
+
+export async function getSetlistStats(username: string): Promise<SetlistStats> {
+  // First get all attended shows
+  const response = await fetch(
+    `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch attended shows');
+  }
+
+  const data = await response.json();
+  const shows = data.data;
+
+  // Create a set to track unique songs and a map for song counts
+  const uniqueSongs = new Set<string>();
+  const songCounts: Record<string, number> = {};
+
+  // Fetch setlists for each show
+  const setlistPromises = shows.map((show: ShowAttendance) =>
+    getSetlist(show.showid)
+      .then(setlist => {
+        setlist.forEach(item => {
+          uniqueSongs.add(item.song);
+          songCounts[item.song] = (songCounts[item.song] || 0) + 1;
+        });
+      })
+      .catch(error => {
+        console.error(`Error fetching setlist for show ${show.showid}:`, error);
+      })
+  );
+
+  await Promise.all(setlistPromises);
+
+  return {
+    uniqueSongs: uniqueSongs.size,
+    songCounts
+  };
 }

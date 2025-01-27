@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAttendedShows, getShowStats, getPaginatedVenues } from "@/lib/phish-api";
+import { getAttendedShows, getShowStats, getPaginatedVenues, getSetlistStats } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShowCard } from "@/components/show-card";
 import { Button } from "@/components/ui/button";
@@ -14,50 +14,63 @@ export default function ShowStats() {
   const [showsPage, setShowsPage] = useState(1);
   const [venuesPage, setVenuesPage] = useState(1);
 
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/shows/stats", username],
     queryFn: () => getShowStats(username)
   });
 
-  const { data: showsData } = useQuery({
+  const { data: setlistStats, isLoading: setlistStatsLoading } = useQuery({
+    queryKey: ["/api/setlist/stats", username],
+    queryFn: () => getSetlistStats(username)
+  });
+
+  const { data: showsData, isLoading: showsLoading } = useQuery({
     queryKey: ["/api/shows/attended", username, showsPage],
     queryFn: () => getAttendedShows(username, showsPage, SHOWS_PER_PAGE)
   });
 
-  const { data: venuesData } = useQuery({
+  const { data: venuesData, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues/paginated", username, venuesPage],
     queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
-    keepPreviousData: true
+    placeholderData: (previousData) => previousData
   });
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-4xl font-slackey mb-8">Phashboard</h1>
+      <h1 className="text-4xl font-slackey mb-8">Stats and Shows</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         {/* Stats Card - Left Column */}
-        <div className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
-              <div className="text-4xl font-bold">
-                {stats?.totalShows || 0}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
-              <div className="text-4xl font-bold">
-                {stats?.uniqueVenues || 0}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
+            <div className="text-4xl font-bold">
+              {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.totalShows || 0}
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Most Visited Venues - Right Two Columns */}
-        <Card className="md:col-span-2">
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
+            <div className="text-4xl font-bold">
+              {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.uniqueVenues || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
+            <div className="text-4xl font-bold">
+              {setlistStatsLoading ? <Skeleton className="h-10 w-20" /> : setlistStats?.uniqueSongs || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Most Visited Venues - Right Column */}
+        <Card>
           <CardContent className="pt-6">
             <h2 className="text-lg font-slackey mb-4">Most Visited Venues</h2>
             <div className="space-y-3">
@@ -77,7 +90,7 @@ export default function ShowStats() {
                   variant="outline"
                   size="sm"
                   onClick={() => setVenuesPage(p => Math.max(1, p - 1))}
-                  disabled={venuesPage === 1}
+                  disabled={venuesPage === 1 || venuesLoading}
                 >
                   Previous
                 </Button>
@@ -86,7 +99,7 @@ export default function ShowStats() {
                   variant="outline"
                   size="sm"
                   onClick={() => setVenuesPage(p => p + 1)}
-                  disabled={venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0)}
+                  disabled={venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) || venuesLoading}
                 >
                   Next
                 </Button>
@@ -114,7 +127,7 @@ export default function ShowStats() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowsPage(p => Math.max(1, p - 1))}
-                disabled={showsPage === 1}
+                disabled={showsPage === 1 || showsLoading}
               >
                 Previous
               </Button>
@@ -123,7 +136,7 @@ export default function ShowStats() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowsPage(p => p + 1)}
-                disabled={showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0)}
+                disabled={showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) || showsLoading}
               >
                 Next
               </Button>
