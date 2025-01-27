@@ -1,6 +1,6 @@
 # KPOW - Digital Content Platform
 
-A code playground for me and the start of my post-singularity self.
+A comprehensive Phish show statistics and analysis web application that provides deep insights into concert performances using the Phish.net API, enabling fans to explore and understand the band's live music history.
 
 ## Tech Stack
 
@@ -15,6 +15,7 @@ A code playground for me and the start of my post-singularity self.
 
 - **Backend**:
   - Express.js
+  - Secure Phish.net API integration
   - Drizzle ORM with PostgreSQL (optional)
 
 - **APIs**:
@@ -48,7 +49,7 @@ npm install
    - Create a `.env` file in the root directory
    - Add your Phish.net API key:
    ```
-   VITE_PHISH_API_KEY=your_api_key_here
+   PHISH_API_KEY=your_api_key_here
    ```
 
 4. Start the development server:
@@ -60,6 +61,7 @@ The application will be available at `http://localhost:5000`.
 
 ## Features
 
+### Show Statistics Dashboard
 - Comprehensive show statistics
   - Total shows attended
   - Unique venues visited
@@ -69,6 +71,12 @@ The application will be available at `http://localhost:5000`.
 - Responsive grid layout
 - Modern UI with smooth animations
 
+### Backend API Integration
+- Secure handling of Phish.net API calls
+- Proper date formatting and validation
+- Efficient data caching
+- Rate limiting protection
+- Error handling and validation
 
 ## Project Structure
 
@@ -81,25 +89,28 @@ The application will be available at `http://localhost:5000`.
 │       │   ├── show-details-modal.tsx
 │       │   └── ui/       # ShadcN UI components
 │       ├── lib/
-│       │   └── phish-api.ts  # Phish.net API integration
+│       │   └── phish-api.ts  # API client
 │       └── pages/         # Page components
 ├── server/                # Backend code
+│   ├── routes.ts         # API routes
+│   └── index.ts          # Server setup
 └── theme.json            # Theme configuration
 ```
 
 ## API Integration
 
-The application uses the Phish.net API v5 to fetch:
+The application securely integrates with the Phish.net API v5 through a dedicated backend:
 - Show attendance data
 - Venue information
 - Setlist details
 - Song statistics
 
-API calls are handled through the `phish-api.ts` module, which provides:
-- Pagination support for shows and venues
-- Error handling and data validation
+Key features of the API integration:
+- Backend proxy for secure API key handling
+- Proper date formatting using date-fns
+- Efficient data transformation
+- Error handling and fallbacks
 - Rate limiting protection
-- Efficient batching of setlist requests
 
 ## Development Guidelines
 
