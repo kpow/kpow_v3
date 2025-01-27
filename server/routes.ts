@@ -1,6 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 
+if (!process.env.PHISH_API_KEY) {
+  throw new Error("PHISH_API_KEY environment variable is required");
+}
+
 const PHISH_API_BASE = "https://api.phish.net/v5";
 
 interface VenueCount {
