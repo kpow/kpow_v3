@@ -10,7 +10,7 @@ if (!process.env.PHISHNET_API_KEY) {
 
 export function registerRoutes(app: Express): Server {
   // Fetch attended shows for a user
-  app.get("/api/shows/attended/:username", async (req, res) => {
+  app.get("/api/users/:username/shows", async (req, res) => {
     try {
       const { username } = req.params;
       const response = await axios.get(
@@ -39,7 +39,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Fetch setlist for a specific show
-  app.get("/api/shows/:showId/setlist", async (req, res) => {
+  app.get("/api/shows/:showId", async (req, res) => {
     try {
       const { showId } = req.params;
       const response = await axios.get(
@@ -75,8 +75,8 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Get statistics about shows and songs
-  app.get("/api/stats/:username", async (req, res) => {
+  // Get statistics about shows and songs for a user
+  app.get("/api/users/:username/stats", async (req, res) => {
     try {
       const { username } = req.params;
 
