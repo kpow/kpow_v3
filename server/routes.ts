@@ -8,8 +8,21 @@ interface VenueCount {
   count: number;
 }
 
+// Cache for API responses
+const apiCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 async function fetchPhishData(endpoint: string) {
   try {
+    // Check cache first
+    const cacheKey = `${endpoint}`;
+    const cachedData = apiCache.get(cacheKey);
+
+    if (cachedData && Date.now() - cachedData.timestamp < CACHE_TTL) {
+      console.log(`Cache hit for ${endpoint}`);
+      return cachedData.data;
+    }
+
     const apiKey = process.env.PHISH_API_KEY;
     if (!apiKey) {
       throw new Error("PHISH_API_KEY is not set in environment variables");
@@ -32,6 +45,8 @@ async function fetchPhishData(endpoint: string) {
       throw new Error("Invalid API response format");
     }
 
+    // Cache the successful response
+    apiCache.set(cacheKey, { data: data.data, timestamp: Date.now() });
     return data.data;
   } catch (error) {
     console.error("Error in fetchPhishData:", error);
@@ -72,6 +87,9 @@ export function registerRoutes(app: Express): Server {
       const end = Math.min(start + limit, total);
       const paginatedShows = sortedShows.slice(start, end);
 
+      console.log(`Total shows: ${total}, Page: ${page}, Shows per page: ${limit}`);
+      console.log(`Returning shows from index ${start} to ${end}`);
+
       // Format the shows data with safer property access
       const formattedShows = paginatedShows.map((show: any) => ({
         showid: show.showid || '',
@@ -83,16 +101,14 @@ export function registerRoutes(app: Express): Server {
         notes: show.notes || ""
       }));
 
-      console.log("Formatted shows sample:", formattedShows[0]);
-      console.log(`Returning ${formattedShows.length} shows for page ${page}`);
-
       res.json({
         shows: formattedShows,
         pagination: {
           current: page,
           total: totalPages,
           hasMore: page < totalPages,
-          totalItems: total
+          totalItems: total,
+          limit
         },
       });
     } catch (error) {
@@ -136,7 +152,8 @@ export function registerRoutes(app: Express): Server {
           current: page,
           total: totalPages,
           hasMore: page < totalPages,
-          totalItems: total
+          totalItems: total,
+          limit
         },
       });
     } catch (error) {
@@ -144,7 +161,6 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ message: (error as Error).message });
     }
   });
-
   app.get("/api/setlists/:showId", async (req, res) => {
     try {
       const { showId } = req.params;
