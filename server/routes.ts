@@ -44,9 +44,6 @@ export function registerRoutes(app: Express): Server {
 
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      // Debug log to see tour information
-      console.log("First show tour data:", shows[0].tour, typeof shows[0].tour);
-
       const sortedShows = shows.sort(
         (a: any, b: any) =>
           new Date(b.showdate).getTime() - new Date(a.showdate).getTime(),
@@ -57,13 +54,13 @@ export function registerRoutes(app: Express): Server {
       const paginatedShows = sortedShows.slice(start, end);
 
       const formattedShows = paginatedShows.map((show: any) => ({
-        id: show.showid,
-        date: show.showdate,
+        showid: show.showid,
+        showdate: show.showdate,
         venue: show.venue,
-        location: `${show.city}, ${show.state}`,
-        showday: show.showday,
-        tour: show.tourname || "", // Changed from show.tour to show.tourname
-        url: show.permalink,
+        city: show.city,
+        state: show.state,
+        country: show.country || "US",
+        notes: show.notes || ""
       }));
 
       const total = shows.length;
@@ -78,6 +75,7 @@ export function registerRoutes(app: Express): Server {
         },
       });
     } catch (error) {
+      console.error("Error in /api/shows:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
@@ -99,7 +97,7 @@ export function registerRoutes(app: Express): Server {
 
       // Convert to array and sort by count with proper typing
       const sortedVenues: VenueCount[] = Object.entries(venueStats)
-        .map(([venue, count]): VenueCount => ({ venue, count }))
+        .map(([venue, count]): VenueCount => ({ venue, count: Number(count) }))
         .sort((a: VenueCount, b: VenueCount) => b.count - a.count);
 
       const start = (page - 1) * limit;
@@ -118,6 +116,7 @@ export function registerRoutes(app: Express): Server {
         },
       });
     } catch (error) {
+      console.error("Error in /api/venues/stats:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
@@ -128,53 +127,26 @@ export function registerRoutes(app: Express): Server {
       const setlistData = await fetchPhishData(`/setlists/showid/${showId}`);
 
       if (Array.isArray(setlistData) && setlistData.length > 0) {
-        // Group songs by set
-        const setGroups = setlistData.reduce((acc: any, song: any) => {
-          if (!acc[song.set]) {
-            acc[song.set] = [];
-          }
-          acc[song.set].push({
-            name: song.song,
-            transition: song.trans_mark,
-            position: song.position,
-            jamchart: song.isjamchart ? song.jamchart_description : null,
-          });
-          return acc;
-        }, {});
-
-        // Format the setlist text
-        const formatSet = (songs: any[]) => {
-          return songs
-            .sort((a, b) => a.position - b.position)
-            .map((song) => song.name + song.transition)
-            .join(" ")
-            .trim();
-        };
-
-        // Build the complete setlist text
-        let setlistText = "";
-        if (setGroups["1"]) {
-          setlistText += "Set 1: " + formatSet(setGroups["1"]) + "\n\n";
-        }
-        if (setGroups["2"]) {
-          setlistText += "Set 2: " + formatSet(setGroups["2"]) + "\n\n";
-        }
-        if (setGroups["e"]) {
-          setlistText += "Encore: " + formatSet(setGroups["e"]) + "\n\n";
-        }
-
         const firstSong = setlistData[0];
+        const formattedSetlist = setlistData.map((item: any) => ({
+          showid: item.showid,
+          set: item.set,
+          song: item.song,
+          position: item.position
+        }));
+
         res.json({
           showdate: firstSong.showdate,
           venue: firstSong.venue,
           location: `${firstSong.city}, ${firstSong.state}`,
-          setlistdata: setlistText,
+          setlistdata: formattedSetlist,
           setlistnotes: firstSong.setlistnotes || "",
         });
       } else {
         res.status(404).json({ message: "Setlist not found" });
       }
     } catch (error) {
+      console.error("Error in /api/setlists:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
@@ -191,6 +163,7 @@ export function registerRoutes(app: Express): Server {
         uniqueVenues,
       });
     } catch (error) {
+      console.error("Error in /api/runs/stats:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
@@ -220,7 +193,7 @@ export function registerRoutes(app: Express): Server {
 
       res.json(songStats);
     } catch (error) {
-      console.error("Error fetching song stats:", error);
+      console.error("Error in /api/songs/stats:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
@@ -251,7 +224,7 @@ export function registerRoutes(app: Express): Server {
 
       res.json(songOccurrences);
     } catch (error) {
-      console.error("Error fetching song setlist:", error);
+      console.error("Error in /api/setlist/occurrences:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
