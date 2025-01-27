@@ -40,36 +40,8 @@ export default function ShowStats() {
       <h1 className="text-4xl font-slackey mb-8">Stats and Shows</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        {/* Stats Card - Left Column */}
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
-            <div className="text-4xl font-bold">
-              {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.totalShows || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
-            <div className="text-4xl font-bold">
-              {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.uniqueVenues || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
-            <div className="text-4xl font-bold">
-              {setlistStatsLoading ? <Skeleton className="h-10 w-20" /> : setlistStats?.uniqueSongs || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Most Visited Venues - Right Column */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* Most Visited Venues - Left Column */}
         <Card>
           <CardContent className="pt-6">
             <h2 className="text-lg font-slackey mb-4">Most Visited Venues</h2>
@@ -107,6 +79,36 @@ export default function ShowStats() {
             )}
           </CardContent>
         </Card>
+
+        {/* Stats Cards - Right Column */}
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
+              <div className="text-4xl font-bold">
+                {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.totalShows || 0}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
+              <div className="text-4xl font-bold">
+                {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.uniqueVenues || 0}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
+              <div className="text-4xl font-bold">
+                {setlistStatsLoading ? <Skeleton className="h-10 w-20" /> : setlistStats?.uniqueSongs || 0}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Shows Grid */}
