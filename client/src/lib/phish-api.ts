@@ -9,6 +9,7 @@ export interface ShowAttendance {
   city: string;
   state: string;
   country: string;
+  notes?: string;
 }
 
 export interface SetlistSong {
@@ -21,42 +22,95 @@ export interface ShowSetlist {
   showid: string;
   showdate: string;
   venue: string;
+  location: string;
+  notes?: string;
   songs: SetlistSong[];
 }
 
 // API Functions
-export async function getAttendedShows(username: string): Promise<ShowAttendance[]> {
+export async function getAttendedShows(
+  username: string,
+  page = 1,
+  limit = 10
+): Promise<{ shows: ShowAttendance[]; total: number }> {
   const response = await fetch(
     `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
   );
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch attended shows');
   }
-  
+
   const data = await response.json();
-  return data.data;
+  const shows = data.data;
+  const start = (page - 1) * limit;
+  const end = start + limit;
+
+  return {
+    shows: shows.slice(start, end),
+    total: shows.length
+  };
 }
 
 export async function getShowSetlist(showId: string): Promise<ShowSetlist> {
   const response = await fetch(
     `${PHISH_API_BASE_URL}/setlists/showid/${showId}.json?apikey=${API_KEY}`
   );
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch setlist');
   }
-  
+
   const data = await response.json();
+  const showData = data.data[0];
+
   return {
-    showid: data.data[0].showid,
-    showdate: data.data[0].showdate,
-    venue: data.data[0].venue,
-    songs: data.data[0].songs.map((song: any) => ({
+    showid: showData.showid,
+    showdate: showData.showdate,
+    venue: showData.venue,
+    location: `${showData.city}, ${showData.state}, ${showData.country}`,
+    notes: showData.notes || undefined,
+    songs: showData.songs.map((song: any) => ({
       id: song.id,
       name: song.name,
       set: song.set
     }))
+  };
+}
+
+export interface VenueStat {
+  venue: string;
+  count: number;
+  shows: ShowAttendance[];
+}
+
+export function getVenueStats(
+  shows: ShowAttendance[],
+  page = 1,
+  limit = 10
+): { venues: VenueStat[]; total: number } {
+  const venueMap = new Map<string, ShowAttendance[]>();
+
+  shows.forEach(show => {
+    const shows = venueMap.get(show.venue) || [];
+    shows.push(show);
+    venueMap.set(show.venue, shows);
+  });
+
+  const venues = Array.from(venueMap.entries())
+    .map(([venue, shows]) => ({
+      venue,
+      count: shows.length,
+      shows
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const start = (page - 1) * limit;
+  const end = start + limit;
+
+  return {
+    venues: venues.slice(start, end),
+    total: venues.length
   };
 }
 
