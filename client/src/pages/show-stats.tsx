@@ -1,10 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  getAttendedShows,
-  getShowStats,
-  getPaginatedVenues,
-  getSetlistStats,
-} from "@/lib/phish-api";
+import { getAttendedShows, getShowStats, getPaginatedVenues, getSetlistStats } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShowCard } from "@/components/show-card";
 import { Button } from "@/components/ui/button";
@@ -15,55 +10,58 @@ const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
 
 export default function ShowStats() {
-  const username = "koolyp";
   const [showsPage, setShowsPage] = useState(1);
   const [venuesPage, setVenuesPage] = useState(1);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["/api/shows/stats", username],
-    queryFn: () => getShowStats(username),
+    queryKey: ["/api/runs/stats"],
+    queryFn: () => getShowStats(),
   });
 
   const { data: setlistStats, isLoading: setlistStatsLoading } = useQuery({
-    queryKey: ["/api/setlist/stats", username],
-    queryFn: () => getSetlistStats(username),
+    queryKey: ["/api/songs/stats"],
+    queryFn: () => getSetlistStats(),
   });
 
   const { data: showsData, isLoading: showsLoading } = useQuery({
-    queryKey: ["/api/shows/attended", username, showsPage],
-    queryFn: () => getAttendedShows(username, showsPage, SHOWS_PER_PAGE),
+    queryKey: [`/api/shows?page=${showsPage}&limit=${SHOWS_PER_PAGE}`],
+    queryFn: () => getAttendedShows(showsPage, SHOWS_PER_PAGE),
   });
 
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
-    queryKey: ["/api/venues/paginated", username, venuesPage],
-    queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
-    placeholderData: (previousData) => previousData,
+    queryKey: [`/api/venues/stats?page=${venuesPage}&limit=${VENUES_PER_PAGE}`],
+    queryFn: () => getPaginatedVenues(venuesPage, VENUES_PER_PAGE),
   });
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">phashboard</h1>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* Most Visited Venues - Left Column */}
         <Card>
           <CardContent className="pt-6">
             <h2 className="text-lg font-slackey mb-4">venues</h2>
             <div className="space-y-3">
-              {venuesData?.venues.map((venue) => (
-                <div
-                  key={venue.venue}
-                  className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
-                >
-                  <span className="font-medium">{venue.venue}</span>
-                  <span className="text-muted-foreground">
-                    {venue.count} shows
-                  </span>
-                </div>
-              ))}
+              {venuesLoading ? (
+                Array.from({ length: VENUES_PER_PAGE }).map((_, i) => (
+                  <Skeleton key={i} className="h-12" />
+                ))
+              ) : (
+                venuesData?.items.map((venue) => (
+                  <div
+                    key={venue.venue}
+                    className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
+                  >
+                    <span className="font-medium">{venue.venue}</span>
+                    <span className="text-muted-foreground">
+                      {venue.count} shows
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
-            {venuesData && venuesData.total > VENUES_PER_PAGE && (
+            {venuesData?.pagination.hasMore && (
               <div className="mt-4 flex justify-between items-center">
                 <Button
                   variant="outline"
@@ -78,10 +76,7 @@ export default function ShowStats() {
                   variant="outline"
                   size="sm"
                   onClick={() => setVenuesPage((p) => p + 1)}
-                  disabled={
-                    venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) ||
-                    venuesLoading
-                  }
+                  disabled={!venuesData?.pagination.hasMore || venuesLoading}
                 >
                   Next
                 </Button>
@@ -138,11 +133,17 @@ export default function ShowStats() {
         <CardContent className="pt-6">
           <h2 className="text-2xl font-slackey mb-6">shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showsData?.shows.map((show) => (
-              <ShowCard key={show.showid} show={show} />
-            ))}
+            {showsLoading ? (
+              Array.from({ length: SHOWS_PER_PAGE }).map((_, i) => (
+                <Skeleton key={i} className="h-36" />
+              ))
+            ) : (
+              showsData?.items.map((show) => (
+                <ShowCard key={show.showid} show={show} />
+              ))
+            )}
           </div>
-          {showsData && showsData.total > SHOWS_PER_PAGE && (
+          {showsData?.pagination.hasMore && (
             <div className="mt-6 flex justify-between items-center">
               <Button
                 variant="outline"
@@ -157,10 +158,7 @@ export default function ShowStats() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowsPage((p) => p + 1)}
-                disabled={
-                  showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
-                  showsLoading
-                }
+                disabled={!showsData?.pagination.hasMore || showsLoading}
               >
                 Next
               </Button>

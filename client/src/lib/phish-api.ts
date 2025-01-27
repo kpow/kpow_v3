@@ -14,74 +14,70 @@ export interface VenueStat {
   count: number;
 }
 
-export interface Setlist {
-  showid: string;
-  set: string;
-  song: string;
-  position: number;
+export interface PaginatedResponse<T> {
+  items: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+    hasMore: boolean;
+  };
 }
 
-// API Functions
 export async function getAttendedShows(
-  username: string,
   page = 1,
   limit = 10
-): Promise<{ shows: ShowAttendance[]; total: number }> {
-  const response = await fetch(`/api/shows?page=${page}&limit=${limit}`);
+): Promise<PaginatedResponse<ShowAttendance>> {
+  const url = `/api/shows?page=${page}&limit=${limit}`;
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error('Failed to fetch attended shows');
   }
 
-  const data = await response.json();
-  return {
-    shows: data.shows,
-    total: data.pagination.total,
-  };
+  return response.json();
 }
 
-export async function getShowStats(username: string): Promise<{
+export async function getPaginatedVenues(
+  page = 1,
+  limit = 10
+): Promise<PaginatedResponse<VenueStat>> {
+  const url = `/api/venues/stats?page=${page}&limit=${limit}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch venue statistics');
+  }
+
+  return response.json();
+}
+
+export async function getShowStats(): Promise<{
   totalShows: number;
   uniqueVenues: number;
-  venueStats: VenueStat[];
 }> {
-  const response = await fetch(`/api/runs/stats`);
+  const response = await fetch('/api/runs/stats');
 
   if (!response.ok) {
     throw new Error('Failed to fetch show statistics');
   }
 
-  const data = await response.json();
-  const venueResponse = await fetch(`/api/venues/stats?limit=999`);
-
-  if (!venueResponse.ok) {
-    throw new Error('Failed to fetch venue statistics');
-  }
-
-  const venueData = await venueResponse.json();
-
-  return {
-    totalShows: data.totalShows,
-    uniqueVenues: data.uniqueVenues,
-    venueStats: venueData.venues,
-  };
+  return response.json();
 }
 
-export async function getPaginatedVenues(
-  username: string,
-  page = 1,
-  limit = 10
-): Promise<{ venues: VenueStat[]; total: number }> {
-  const response = await fetch(`/api/venues/stats?page=${page}&limit=${limit}`);
+export async function getSetlistStats(): Promise<{
+  uniqueSongs: number;
+}> {
+  const response = await fetch('/api/songs/stats');
 
   if (!response.ok) {
-    throw new Error('Failed to fetch venue statistics');
+    throw new Error('Failed to fetch song statistics');
   }
 
   const data = await response.json();
   return {
-    venues: data.venues,
-    total: data.pagination.total,
+    uniqueSongs: data.length,
   };
 }
 
@@ -101,28 +97,7 @@ export interface SetlistStats {
   songCounts: Record<string, number>;
 }
 
-export async function getSetlistStats(username: string): Promise<SetlistStats> {
-  const response = await fetch(`/api/songs/stats`);
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch song statistics');
-  }
-
-  const data = await response.json();
-
-  // Convert array of song stats to record format
-  const songCounts: Record<string, number> = {};
-  data.forEach((song: { name: string; count: number }) => {
-    songCounts[song.name] = song.count;
-  });
-
-  return {
-    uniqueSongs: Object.keys(songCounts).length,
-    songCounts,
-  };
-}
-
-// New function to get song occurrences
 export async function getSongOccurrences(songName: string): Promise<any[]> {
   const response = await fetch(`/api/setlist/occurrences/${encodeURIComponent(songName)}`);
 
@@ -131,4 +106,11 @@ export async function getSongOccurrences(songName: string): Promise<any[]> {
   }
 
   return response.json();
+}
+
+export interface Setlist {
+  showid: string;
+  set: string;
+  song: string;
+  position: number;
 }
