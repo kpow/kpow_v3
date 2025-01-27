@@ -1,25 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAttendedShows } from "@/lib/phish-api";
+import { getAttendedShows, getShowStats, getPaginatedVenues } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShowCard } from "@/components/show-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 
-const ITEMS_PER_PAGE = 6;
+const SHOWS_PER_PAGE = 6;
+const VENUES_PER_PAGE = 5;
 
 export default function ShowStats() {
   const username = "koolyp";
-  const [page, setPage] = useState(1);
+  const [showsPage, setShowsPage] = useState(1);
+  const [venuesPage, setVenuesPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["/api/shows/attended", username, page],
-    queryFn: () => getAttendedShows(username, page, ITEMS_PER_PAGE)
+  const { data: stats } = useQuery({
+    queryKey: ["/api/shows/stats", username],
+    queryFn: () => getShowStats(username)
+  });
+
+  const { data: showsData, isLoading: showsLoading } = useQuery({
+    queryKey: ["/api/shows/attended", username, showsPage],
+    queryFn: () => getAttendedShows(username, showsPage, SHOWS_PER_PAGE)
+  });
+
+  const { data: venuesData, isLoading: venuesLoading } = useQuery({
+    queryKey: ["/api/venues/paginated", username, venuesPage],
+    queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE)
   });
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
+      <h1 className="text-4xl font-slackey mb-8">Phashboard</h1>
 
       {/* Stats Card */}
       <Card className="mb-8">
@@ -28,21 +40,13 @@ export default function ShowStats() {
             <div className="text-center">
               <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
               <div className="text-4xl font-bold">
-                {isLoading ? (
-                  <Skeleton className="h-12 w-24 mx-auto" />
-                ) : (
-                  data?.total || 0
-                )}
+                {stats?.totalShows || 0}
               </div>
             </div>
             <div className="text-center">
               <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
               <div className="text-4xl font-bold">
-                {isLoading ? (
-                  <Skeleton className="h-12 w-24 mx-auto" />
-                ) : (
-                  data?.uniqueVenues || 0
-                )}
+                {stats?.uniqueVenues || 0}
               </div>
             </div>
           </div>
@@ -50,40 +54,90 @@ export default function ShowStats() {
       </Card>
 
       {/* Shows Grid */}
-      <Card>
+      <Card className="mb-8">
         <CardContent className="pt-6">
-          {isLoading ? (
+          <h2 className="text-2xl font-slackey mb-6">Recent Shows</h2>
+          {showsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+              {Array.from({ length: SHOWS_PER_PAGE }).map((_, i) => (
                 <Skeleton key={i} className="h-48" />
               ))}
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {data?.shows.map((show) => (
+                {showsData?.shows.map((show) => (
                   <ShowCard
                     key={show.showid}
                     show={show}
                   />
                 ))}
               </div>
-              {data && data.total > ITEMS_PER_PAGE && (
+              {showsData && showsData.total > SHOWS_PER_PAGE && (
                 <div className="mt-6 flex justify-between items-center">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
+                    onClick={() => setShowsPage(p => Math.max(1, p - 1))}
+                    disabled={showsPage === 1}
                   >
                     Previous
                   </Button>
-                  <span className="text-sm">Page {page}</span>
+                  <span className="text-sm">Page {showsPage}</span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPage(p => p + 1)}
-                    disabled={page * ITEMS_PER_PAGE >= (data?.total || 0)}
+                    onClick={() => setShowsPage(p => p + 1)}
+                    disabled={showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Venues List */}
+      <Card>
+        <CardContent className="pt-6">
+          <h2 className="text-2xl font-slackey mb-6">Most Visited Venues</h2>
+          {venuesLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: VENUES_PER_PAGE }).map((_, i) => (
+                <Skeleton key={i} className="h-12" />
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="space-y-4">
+                {venuesData?.venues.map((venue) => (
+                  <div
+                    key={venue.venue}
+                    className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
+                  >
+                    <span className="font-medium">{venue.venue}</span>
+                    <span className="text-muted-foreground">{venue.count} shows</span>
+                  </div>
+                ))}
+              </div>
+              {venuesData && venuesData.total > VENUES_PER_PAGE && (
+                <div className="mt-6 flex justify-between items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setVenuesPage(p => Math.max(1, p - 1))}
+                    disabled={venuesPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm">Page {venuesPage}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setVenuesPage(p => p + 1)}
+                    disabled={venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0)}
                   >
                     Next
                   </Button>
