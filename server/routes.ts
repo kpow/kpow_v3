@@ -16,48 +16,35 @@ interface ShowData {
   state: string;
   country?: string;
   notes?: string;
-  venueid?: string; // Added to handle venueid in /api/runs/stats
 }
 
 async function fetchPhishData(endpoint: string) {
-  try {
-    const apiKey = process.env.PHISH_API_KEY;
-    if (!apiKey) {
-      throw new Error("PHISH_API_KEY is not set in environment variables");
-    }
-
-    const response = await fetch(
-      `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
-    );
-
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (!data || !data.data) {
-      throw new Error("Invalid API response format");
-    }
-
-    return data.data;
-  } catch (error) {
-    console.error("Error in fetchPhishData:", error);
-    throw error;
+  const apiKey = process.env.PHISH_API_KEY;
+  if (!apiKey) {
+    throw new Error("PHISH_API_KEY is not set");
   }
-}
 
-function formatSongUrl(songName: string): string {
-  return `https://phish.net/song/${songName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")}`;
+  const response = await fetch(
+    `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`API request failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data || !data.data) {
+    throw new Error("Invalid API response format");
+  }
+
+  return data.data;
 }
 
 export function registerRoutes(app: Express): Server {
   app.get("/api/shows", async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 10));
 
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
@@ -65,19 +52,15 @@ export function registerRoutes(app: Express): Server {
         throw new Error("Invalid shows data format");
       }
 
-      // Sort shows by date in descending order
       const sortedShows = (shows as ShowData[]).sort(
         (a, b) => new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
       );
 
-      // Calculate pagination
       const total = sortedShows.length;
-      const totalPages = Math.ceil(total / limit);
       const start = (page - 1) * limit;
       const end = Math.min(start + limit, total);
       const paginatedShows = sortedShows.slice(start, end);
 
-      // Format the shows data
       const formattedShows = paginatedShows.map((show: ShowData) => ({
         showid: show.showid,
         showdate: show.showdate,
@@ -92,8 +75,8 @@ export function registerRoutes(app: Express): Server {
         shows: formattedShows,
         pagination: {
           current: page,
-          total: totalPages,
-          hasMore: page < totalPages,
+          total: Math.ceil(total / limit),
+          hasMore: end < total,
           totalItems: total,
           limit
         },
@@ -106,24 +89,21 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/venues/stats", async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 10));
+
       const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
 
-      // Count shows per venue
       const venueStats = shows.reduce((acc: { [key: string]: number }, show: ShowData) => {
         acc[show.venue] = (acc[show.venue] || 0) + 1;
         return acc;
       }, {});
 
-      // Convert to array and sort by count
       const sortedVenues: VenueCount[] = Object.entries(venueStats)
         .map(([venue, count]): VenueCount => ({ venue, count }))
         .sort((a, b) => b.count - a.count);
 
-      // Calculate pagination
       const total = sortedVenues.length;
-      const totalPages = Math.ceil(total / limit);
       const start = (page - 1) * limit;
       const end = Math.min(start + limit, total);
       const paginatedVenues = sortedVenues.slice(start, end);
@@ -132,8 +112,8 @@ export function registerRoutes(app: Express): Server {
         venues: paginatedVenues,
         pagination: {
           current: page,
-          total: totalPages,
-          hasMore: page < totalPages,
+          total: Math.ceil(total / limit),
+          hasMore: end < total,
           totalItems: total,
           limit
         },
@@ -177,7 +157,7 @@ export function registerRoutes(app: Express): Server {
     try {
       const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
 
-      const uniqueVenues = new Set(shows.map((show: ShowData) => show.venueid)).size;
+      const uniqueVenues = new Set(shows.map((show: ShowData) => show.venue)).size;
       const totalShows = shows.length;
 
       res.json({
@@ -238,7 +218,10 @@ export function registerRoutes(app: Express): Server {
               date: show.showdate,
               venue: show.venue,
               setlist: `Set ${songInSetlist.set}: ${songInSetlist.song}${songInSetlist.trans_mark || ""}`,
-              url: formatSongUrl(songName),
+              url: `https://phish.net/song/${songName
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "")}`,
             });
           }
         }
@@ -250,6 +233,13 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ message: (error as Error).message });
     }
   });
+
+  function formatSongUrl(songName: string): string {
+    return `https://phish.net/song/${songName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")}`;
+  }
 
   const httpServer = createServer(app);
   return httpServer;

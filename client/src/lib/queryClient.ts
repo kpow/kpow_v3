@@ -18,7 +18,7 @@ export const queryClient = new QueryClient({
         return res.json();
       },
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: false,
     },
     mutations: {
       retry: false,
@@ -35,6 +35,5 @@ export const prefetchNextPage = async (baseKey: string, currentPage: number, lim
   const nextPage = currentPage + 1;
   await queryClient.prefetchQuery({
     queryKey: getPaginationQueryKey(baseKey, nextPage, limit),
-    // staleTime: 5 * 60 * 1000, // 5 minutes - Removed as per edited code simplification
   });
 };
