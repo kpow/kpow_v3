@@ -1,6 +1,6 @@
 # KPOW - Digital Content Platform
 
-A modern web application for digital content and experiences, featuring a responsive design with interactive cards and dynamic content sections.
+A comprehensive Phish show statistics and analysis web application that provides deep insights into concert performances using the Phish.net API, enabling fans to explore and understand the band's live music history.
 
 ## Tech Stack
 
@@ -10,16 +10,26 @@ A modern web application for digital content and experiences, featuring a respon
   - ShadcN UI components
   - React Query for data fetching
   - Wouter for routing
+  - Date-fns for date formatting
+  - Recharts for data visualizations
 
 - **Backend**:
   - Express.js
   - Drizzle ORM with PostgreSQL (optional)
+
+- **APIs**:
+  - Phish.net API v5 for show data and setlists
+    - Show attendance information
+    - Venue statistics
+    - Setlist data
+    - Song statistics
 
 ## Prerequisites
 
 - Node.js (v18 or higher)
 - npm (v8 or higher)
 - PostgreSQL database (optional, only if using database features)
+- Phish.net API key (required for show data)
 
 ## Local Development Setup
 
@@ -34,12 +44,12 @@ cd kpow
 npm install
 ```
 
-3. Set up images:
-   - Create a `public` directory in the `client` folder if it doesn't exist
-   - Copy the following images to `client/public/`:
-     - battle.jpg
-     - tunes.jpg
-     - pmonk.jpg
+3. Set up environment variables:
+   - Create a `.env` file in the root directory
+   - Add your Phish.net API key:
+   ```
+   VITE_PHISH_API_KEY=your_api_key_here
+   ```
 
 4. Start the development server:
 ```bash
@@ -48,6 +58,18 @@ npm run dev
 
 The application will be available at `http://localhost:5000`.
 
+## Features
+
+- Comprehensive show statistics
+  - Total shows attended
+  - Unique venues visited
+  - Unique songs heard
+- Interactive show cards with modal details
+- Most visited venues tracking
+- Responsive grid layout
+- Modern UI with smooth animations
+
+
 ## Project Structure
 
 ```
@@ -55,26 +77,29 @@ The application will be available at `http://localhost:5000`.
 │   ├── public/            # Static assets
 │   └── src/
 │       ├── components/    # React components
-│       ├── hooks/         # Custom React hooks
-│       ├── lib/           # Utility functions
+│       │   ├── show-card.tsx
+│       │   ├── show-details-modal.tsx
+│       │   └── ui/       # ShadcN UI components
+│       ├── lib/
+│       │   └── phish-api.ts  # Phish.net API integration
 │       └── pages/         # Page components
 ├── server/                # Backend code
-│   ├── routes.ts         # API routes
-│   └── vite.ts           # Vite server configuration
-├── db/                    # Database schemas and configurations
 └── theme.json            # Theme configuration
 ```
 
-## Features
+## API Integration
 
-- Responsive grid layout
-- Interactive card components with hover effects
-- Dynamic content sections
-- Image carousels and galleries
-- Modern UI with smooth animations
-- TypeScript for type safety
-- Integrated backend API
-- Database support (optional)
+The application uses the Phish.net API v5 to fetch:
+- Show attendance data
+- Venue information
+- Setlist details
+- Song statistics
+
+API calls are handled through the `phish-api.ts` module, which provides:
+- Pagination support for shows and venues
+- Error handling and data validation
+- Rate limiting protection
+- Efficient batching of setlist requests
 
 ## Development Guidelines
 
