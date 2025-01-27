@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Layout } from "@/components/Layout";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
+import PhishStats from "@/pages/PhishStats";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,6 +14,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
+        <Route path="/phish-stats" component={PhishStats} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
