@@ -42,7 +42,11 @@ export async function getAttendedShows(
   }
 
   const data = await response.json();
-  const shows = data.data;
+  if (!data.response.data) {
+    return { shows: [], total: 0 };
+  }
+
+  const shows = data.response.data;
   const start = (page - 1) * limit;
   const end = start + limit;
 
@@ -62,7 +66,11 @@ export async function getShowSetlist(showId: string): Promise<ShowSetlist> {
   }
 
   const data = await response.json();
-  const showData = data.data[0];
+  if (!data.response.data || !data.response.data[0]) {
+    throw new Error('No setlist data found');
+  }
+
+  const showData = data.response.data[0];
 
   return {
     showid: showData.showid,
@@ -70,7 +78,7 @@ export async function getShowSetlist(showId: string): Promise<ShowSetlist> {
     venue: showData.venue,
     location: `${showData.city}, ${showData.state}, ${showData.country}`,
     notes: showData.notes || undefined,
-    songs: showData.songs.map((song: any) => ({
+    songs: (showData.songs || []).map((song: any) => ({
       id: song.id,
       name: song.name,
       set: song.set

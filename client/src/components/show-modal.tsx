@@ -17,6 +17,7 @@ interface ShowModalProps {
 export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
   if (!show) return null;
 
+  // Group songs by set
   const sets = show.songs.reduce((acc: Record<string, typeof show.songs>, song) => {
     if (!acc[song.set]) {
       acc[song.set] = [];
@@ -32,18 +33,18 @@ export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-slackey">{show.venue}</DialogTitle>
           <div className="text-sm text-muted-foreground">
             {show.location} - {format(new Date(show.showdate), 'PPP')}
           </div>
         </DialogHeader>
-        <ScrollArea className="max-h-[60vh] px-4">
-          <div className="space-y-6">
+        <ScrollArea className="flex-grow mt-4">
+          <div className="space-y-6 pr-4">
             {Object.entries(sets).map(([setName, songs]) => (
-              <div key={setName}>
-                <h3 className="font-slackey mb-2">Set {setName}</h3>
+              <div key={setName} className="space-y-2">
+                <h3 className="font-slackey">Set {setName}</h3>
                 <div className="space-y-1">
                   {songs.map((song, i) => (
                     <div key={`${song.id}-${i}`} className="text-sm">
@@ -54,8 +55,8 @@ export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
               </div>
             ))}
             {show.notes && (
-              <div className="mt-6">
-                <h3 className="font-slackey mb-2">Show Notes</h3>
+              <div className="space-y-2">
+                <h3 className="font-slackey">Show Notes</h3>
                 <p className="text-sm text-muted-foreground">{show.notes}</p>
               </div>
             )}

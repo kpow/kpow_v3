@@ -14,16 +14,17 @@ export default function ShowStats() {
   const [showPage, setShowPage] = useState(1);
   const [selectedShowId, setSelectedShowId] = useState<string | null>(null);
 
-  // Query for attended shows with pagination
+  // Query for all shows first (no pagination) to calculate totals
+  const { data: allShowsData, isLoading: allShowsLoading } = useQuery({
+    queryKey: ["/api/shows/attended/all", username],
+    queryFn: () => getAttendedShows(username, 1, 1000),
+    staleTime: Infinity // Prevent unnecessary refetches
+  });
+
+  // Query for paginated shows for display
   const { data: showsData, isLoading: showsLoading } = useQuery({
     queryKey: ["/api/shows/attended", username, showPage],
     queryFn: () => getAttendedShows(username, showPage, ITEMS_PER_PAGE)
-  });
-
-  // Query for all shows to calculate totals
-  const { data: allShowsData } = useQuery({
-    queryKey: ["/api/shows/attended/all", username],
-    queryFn: () => getAttendedShows(username, 1, 1000)
   });
 
   // Query for selected show's setlist
@@ -31,76 +32,66 @@ export default function ShowStats() {
     queryKey: ["/api/shows/setlist", selectedShowId],
     queryFn: async () => {
       if (!selectedShowId) throw new Error("No show selected");
-      console.log("Fetching setlist for show:", selectedShowId);
-      const result = await getShowSetlist(selectedShowId);
-      console.log("Fetched setlist:", result);
-      return result;
+      return await getShowSetlist(selectedShowId);
     },
     enabled: !!selectedShowId
   });
 
-  const isLoading = showsLoading || !allShowsData;
+  // Query for all setlists to calculate total unique songs
+  // Using only first 20 shows to avoid too many API calls
+  const { data: allSetlists } = useQuery({
+    queryKey: ["/api/shows/setlists/all"],
+    queryFn: async () => {
+      if (!allShowsData?.shows) return [];
+      const showsToFetch = allShowsData.shows.slice(0, 20); // limit to first 20 shows
+      return Promise.all(
+        showsToFetch.map(show => getShowSetlist(show.showid))
+      );
+    },
+    enabled: !!allShowsData?.shows,
+    staleTime: Infinity // Prevent unnecessary refetches
+  });
 
-  // Calculate totals
+  const isLoading = allShowsLoading || showsLoading;
+
+  // Calculate totals from the complete dataset (not paginated)
   const totalShows = allShowsData?.total || 0;
   const totalVenues = allShowsData ? new Set(allShowsData.shows.map(show => show.venue)).size : 0;
-  const totalUniqueSongs = selectedShow ? new Set(selectedShow.songs.map(song => song.name)).size : 0;
+  const totalUniqueSongs = allSetlists ? new Set(
+    allSetlists.flatMap(setlist => setlist.songs.map(song => song.name))
+  ).size : 0;
 
   const handleShowClick = (showId: string) => {
-    console.log("Show clicked:", showId);
     setSelectedShowId(showId);
-  };
-
-  const handleCloseModal = () => {
-    console.log("Closing modal");
-    setSelectedShowId(null);
   };
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
 
-      {/* Stats Row */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Total Shows */}
+        {/* Total Stats Card */}
         <Card>
           <CardContent className="pt-6">
-            <div className="text-center">
-              <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
-              <div className="text-4xl font-bold">
-                {isLoading ? (
-                  <Skeleton className="h-12 w-24 mx-auto" />
-                ) : (
-                  totalShows
-                )}
+            <div className="text-center space-y-4">
+              <div>
+                <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
+                <div className="text-4xl font-bold">
+                  {isLoading ? <Skeleton className="h-12 w-24 mx-auto" /> : totalShows}
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Total Venues */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
-              <div className="text-4xl font-bold">
-                {isLoading ? (
-                  <Skeleton className="h-12 w-24 mx-auto" />
-                ) : totalVenues}
+              <div>
+                <h2 className="text-lg font-slackey mb-2">Total Venues</h2>
+                <div className="text-4xl font-bold">
+                  {isLoading ? <Skeleton className="h-12 w-24 mx-auto" /> : totalVenues}
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Unique Songs */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
-              <div className="text-4xl font-bold">
-                {isLoading ? (
-                  <Skeleton className="h-12 w-24 mx-auto" />
-                ) : totalUniqueSongs}
+              <div>
+                <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
+                <div className="text-4xl font-bold">
+                  {isLoading ? <Skeleton className="h-12 w-24 mx-auto" /> : totalUniqueSongs}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -160,7 +151,7 @@ export default function ShowStats() {
       <ShowModal
         show={selectedShow || null}
         isOpen={!!selectedShowId}
-        onClose={handleCloseModal}
+        onClose={() => setSelectedShowId(null)}
       />
     </div>
   );
