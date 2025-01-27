@@ -30,19 +30,21 @@ export default function PhishStats() {
   const [year, setYear] = useState<string>("2024");
   const years = Array.from({ length: 2025 - 1983 }, (_, i) => (2024 - i).toString());
 
-  const { data: stats, isLoading } = useQuery<Stats>({
+  const { data: stats, isLoading: statsLoading } = useQuery<Stats>({
     queryKey: [`/api/phish/stats/${year}`],
   });
 
-  const { data: shows } = useQuery<Show[]>({
+  const { data: shows, isLoading: showsLoading } = useQuery<Show[]>({
     queryKey: [`/api/phish/shows/${year}`],
   });
 
+  const isLoading = statsLoading || showsLoading;
+
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold font-slackey">Phish Stats Hub</h1>
+          <h1 className="text-3xl font-bold">Phish Stats Hub</h1>
           <Select 
             value={year} 
             onValueChange={setYear}
