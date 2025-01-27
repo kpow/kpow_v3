@@ -3,128 +3,187 @@ import { createServer, type Server } from "http";
 
 const PHISH_API_BASE = "https://api.phish.net/v5";
 
-interface ShowData {
-  showid: string;
-  showdate: string;
+interface VenueCount {
   venue: string;
-  city: string;
-  state: string;
-  country?: string;
-  notes?: string;
+  count: number;
 }
 
-interface SetlistData {
-  showid: string;
-  song: string;
-  set: string;
-  position: number;
+async function fetchPhishData(endpoint: string) {
+  try {
+    const apiKey = process.env.PHISH_API_KEY;
+    const response = await fetch(
+      `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to fetch data from Phish.net API",
+      );
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching from Phish.net:", error);
+    throw error;
+  }
 }
 
-async function fetchPhishData(endpoint: string): Promise<any[]> {
-  const apiKey = process.env.PHISH_API_KEY;
-  if (!apiKey) {
-    throw new Error("PHISH_API_KEY is not set");
-  }
-
-  const response = await fetch(`${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`);
-  if (!response.ok) {
-    throw new Error(`API request failed with status ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.data;
+function formatSongUrl(songName: string): string {
+  return `https://phish.net/song/${songName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")}`;
 }
 
 export function registerRoutes(app: Express): Server {
-  // Shows endpoint with pagination
   app.get("/api/shows", async (req, res) => {
     try {
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 10));
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
 
-      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
+      const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      // Sort shows by date descending
-      const sortedShows = shows.sort((a, b) => 
-        new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
+      // Debug log to see tour information
+      console.log("First show tour data:", shows[0].tour, typeof shows[0].tour);
+
+      const sortedShows = shows.sort(
+        (a: any, b: any) =>
+          new Date(b.showdate).getTime() - new Date(a.showdate).getTime(),
       );
 
-      // Calculate pagination
-      const total = sortedShows.length;
       const start = (page - 1) * limit;
-      const end = Math.min(start + limit, total);
-      const items = sortedShows.slice(start, end).map(show => ({
-        showid: show.showid,
-        showdate: show.showdate,
+      const end = start + limit;
+      const paginatedShows = sortedShows.slice(start, end);
+
+      const formattedShows = paginatedShows.map((show: any) => ({
+        id: show.showid,
+        date: show.showdate,
         venue: show.venue,
-        city: show.city,
-        state: show.state,
-        country: show.country || "US",
-        notes: show.notes || ""
+        location: `${show.city}, ${show.state}`,
+        showday: show.showday,
+        tour: show.tourname || "", // Changed from show.tour to show.tourname
+        url: show.permalink,
       }));
 
+      const total = shows.length;
+      const totalPages = Math.ceil(total / limit);
+
       res.json({
-        items,
+        shows: formattedShows,
         pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
-          hasMore: end < total
-        }
+          current: page,
+          total: totalPages,
+          hasMore: page < totalPages,
+        },
       });
     } catch (error) {
-      console.error("Error in /api/shows:", error);
-      res.status(500).json({ error: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
     }
   });
 
-  // Venues endpoint with pagination
   app.get("/api/venues/stats", async (req, res) => {
     try {
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 10));
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
+      const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
+      // Count shows per venue
+      const venueStats = shows.reduce(
+        (acc: { [key: string]: number }, show: any) => {
+          acc[show.venue] = (acc[show.venue] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
 
-      // Count venues
-      const venueStats = shows.reduce((acc: Record<string, number>, show) => {
-        acc[show.venue] = (acc[show.venue] || 0) + 1;
-        return acc;
-      }, {});
+      // Convert to array and sort by count with proper typing
+      const sortedVenues: VenueCount[] = Object.entries(venueStats)
+        .map(([venue, count]): VenueCount => ({ venue, count }))
+        .sort((a: VenueCount, b: VenueCount) => b.count - a.count);
 
-      // Convert to array and sort by count
-      const venues = Object.entries(venueStats)
-        .map(([venue, count]) => ({ venue, count }))
-        .sort((a, b) => b.count - a.count);
-
-      // Apply pagination
-      const total = venues.length;
       const start = (page - 1) * limit;
-      const end = Math.min(start + limit, total);
-      const items = venues.slice(start, end);
+      const end = start + limit;
+      const paginatedVenues = sortedVenues.slice(start, end);
+
+      const total = sortedVenues.length;
+      const totalPages = Math.ceil(total / limit);
 
       res.json({
-        items,
+        venues: paginatedVenues,
         pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
-          hasMore: end < total
-        }
+          current: page,
+          total: totalPages,
+          hasMore: page < totalPages,
+        },
       });
     } catch (error) {
-      console.error("Error in /api/venues/stats:", error);
-      res.status(500).json({ error: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  app.get("/api/setlists/:showId", async (req, res) => {
+    try {
+      const { showId } = req.params;
+      const setlistData = await fetchPhishData(`/setlists/showid/${showId}`);
+
+      if (Array.isArray(setlistData) && setlistData.length > 0) {
+        // Group songs by set
+        const setGroups = setlistData.reduce((acc: any, song: any) => {
+          if (!acc[song.set]) {
+            acc[song.set] = [];
+          }
+          acc[song.set].push({
+            name: song.song,
+            transition: song.trans_mark,
+            position: song.position,
+            jamchart: song.isjamchart ? song.jamchart_description : null,
+          });
+          return acc;
+        }, {});
+
+        // Format the setlist text
+        const formatSet = (songs: any[]) => {
+          return songs
+            .sort((a, b) => a.position - b.position)
+            .map((song) => song.name + song.transition)
+            .join(" ")
+            .trim();
+        };
+
+        // Build the complete setlist text
+        let setlistText = "";
+        if (setGroups["1"]) {
+          setlistText += "Set 1: " + formatSet(setGroups["1"]) + "\n\n";
+        }
+        if (setGroups["2"]) {
+          setlistText += "Set 2: " + formatSet(setGroups["2"]) + "\n\n";
+        }
+        if (setGroups["e"]) {
+          setlistText += "Encore: " + formatSet(setGroups["e"]) + "\n\n";
+        }
+
+        const firstSong = setlistData[0];
+        res.json({
+          showdate: firstSong.showdate,
+          venue: firstSong.venue,
+          location: `${firstSong.city}, ${firstSong.state}`,
+          setlistdata: setlistText,
+          setlistnotes: firstSong.setlistnotes || "",
+        });
+      } else {
+        res.status(404).json({ message: "Setlist not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
     }
   });
 
   app.get("/api/runs/stats", async (_req, res) => {
     try {
-      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
+      const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      const uniqueVenues = new Set(shows.map(show => show.venue)).size;
+      const uniqueVenues = new Set(shows.map((show: any) => show.venueid)).size;
       const totalShows = shows.length;
 
       res.json({
@@ -132,33 +191,68 @@ export function registerRoutes(app: Express): Server {
         uniqueVenues,
       });
     } catch (error) {
-      console.error("Error in /api/runs/stats:", error);
-      res.status(500).json({ error: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
     }
   });
 
-  // Songs stats endpoint
   app.get("/api/songs/stats", async (_req, res) => {
     try {
-      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
-      const songs = new Set<string>();
+      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const songCounts = new Map<string, number>();
 
       // Fetch setlist for each show
       for (const show of shows) {
-        const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`) as SetlistData[];
+        const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`);
         if (Array.isArray(setlist)) {
-          setlist.forEach(entry => {
-            if (entry.song) {
-              songs.add(entry.song);
+          setlist.forEach((entry: any) => {
+            const songName = entry.song;
+            if (songName) {
+              songCounts.set(songName, (songCounts.get(songName) || 0) + 1);
             }
           });
         }
       }
 
-      res.json(Array.from(songs));
+      // Convert to array and sort by count
+      const songStats = Array.from(songCounts.entries())
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      res.json(songStats);
     } catch (error) {
-      console.error("Error in /api/songs/stats:", error);
-      res.status(500).json({ error: (error as Error).message });
+      console.error("Error fetching song stats:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  app.get("/api/setlist/occurrences/:songName", async (req, res) => {
+    try {
+      const { songName } = req.params;
+      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const songOccurrences = [];
+
+      // Fetch setlist for each show and find occurrences of the song
+      for (const show of shows) {
+        const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`);
+        if (Array.isArray(setlist)) {
+          const songInSetlist = setlist.find(
+            (entry: any) => entry.song === songName,
+          );
+          if (songInSetlist) {
+            songOccurrences.push({
+              date: show.showdate,
+              venue: show.venue,
+              setlist: `Set ${songInSetlist.set}: ${songInSetlist.song}${songInSetlist.trans_mark || ""}`,
+              url: formatSongUrl(songName),
+            });
+          }
+        }
+      }
+
+      res.json(songOccurrences);
+    } catch (error) {
+      console.error("Error fetching song setlist:", error);
+      res.status(500).json({ message: (error as Error).message });
     }
   });
 
