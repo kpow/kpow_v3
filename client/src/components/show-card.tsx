@@ -10,29 +10,24 @@ interface ShowCardProps {
 
 export function ShowCard({ show, onClick }: ShowCardProps) {
   return (
-    <button 
-      onClick={onClick}
-      className="w-full text-left"
-    >
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <h3 className="font-slackey text-lg">{show.venue}</h3>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <MapPin className="mr-1 h-4 w-4" />
-                  <span>{show.city}, {show.state}</span>
-                </div>
+    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={onClick}>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <h3 className="font-slackey text-lg">{show.venue}</h3>
+              <div className="flex items-center text-sm text-muted-foreground">
+                <MapPin className="mr-1 h-4 w-4" />
+                <span>{show.city}, {show.state}</span>
               </div>
             </div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <CalendarDays className="mr-1 h-4 w-4" />
-              <span>{format(new Date(show.showdate), 'PPP')}</span>
-            </div>
           </div>
-        </CardContent>
-      </Card>
-    </button>
+          <div className="flex items-center text-sm text-muted-foreground">
+            <CalendarDays className="mr-1 h-4 w-4" />
+            <span>{format(new Date(show.showdate), 'PPP')}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
