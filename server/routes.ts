@@ -8,45 +8,37 @@ interface VenueCount {
   count: number;
 }
 
-// Cache for API responses
-const apiCache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+interface ShowData {
+  showid: string;
+  showdate: string;
+  venue: string;
+  city: string;
+  state: string;
+  country?: string;
+  notes?: string;
+  venueid?: string; // Added to handle venueid in /api/runs/stats
+}
 
 async function fetchPhishData(endpoint: string) {
   try {
-    // Check cache first
-    const cacheKey = `${endpoint}`;
-    const cachedData = apiCache.get(cacheKey);
-
-    if (cachedData && Date.now() - cachedData.timestamp < CACHE_TTL) {
-      console.log(`Cache hit for ${endpoint}`);
-      return cachedData.data;
-    }
-
     const apiKey = process.env.PHISH_API_KEY;
     if (!apiKey) {
       throw new Error("PHISH_API_KEY is not set in environment variables");
     }
 
-    console.log(`Fetching data from: ${PHISH_API_BASE}${endpoint}.json`);
     const response = await fetch(
       `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API Error (${response.status}):`, errorText);
       throw new Error(`API request failed with status ${response.status}`);
     }
 
     const data = await response.json();
     if (!data || !data.data) {
-      console.error("Invalid API response format:", data);
       throw new Error("Invalid API response format");
     }
 
-    // Cache the successful response
-    apiCache.set(cacheKey, { data: data.data, timestamp: Date.now() });
     return data.data;
   } catch (error) {
     console.error("Error in fetchPhishData:", error);
@@ -67,7 +59,6 @@ export function registerRoutes(app: Express): Server {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      console.log("Fetching shows with params:", { page, limit });
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
       if (!Array.isArray(shows)) {
@@ -75,28 +66,24 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Sort shows by date in descending order
-      const sortedShows = shows.sort(
-        (a: any, b: any) =>
-          new Date(b.showdate).getTime() - new Date(a.showdate).getTime(),
+      const sortedShows = (shows as ShowData[]).sort(
+        (a, b) => new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
       );
 
       // Calculate pagination
-      const total = shows.length;
+      const total = sortedShows.length;
       const totalPages = Math.ceil(total / limit);
       const start = (page - 1) * limit;
       const end = Math.min(start + limit, total);
       const paginatedShows = sortedShows.slice(start, end);
 
-      console.log(`Total shows: ${total}, Page: ${page}, Shows per page: ${limit}`);
-      console.log(`Returning shows from index ${start} to ${end}`);
-
-      // Format the shows data with safer property access
-      const formattedShows = paginatedShows.map((show: any) => ({
-        showid: show.showid || '',
-        showdate: show.showdate || '',
-        venue: show.venue || 'Unknown Venue',
-        city: show.city || 'Unknown City',
-        state: show.state || '',
+      // Format the shows data
+      const formattedShows = paginatedShows.map((show: ShowData) => ({
+        showid: show.showid,
+        showdate: show.showdate,
+        venue: show.venue,
+        city: show.city,
+        state: show.state,
         country: show.country || "US",
         notes: show.notes || ""
       }));
@@ -120,31 +107,26 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/venues/stats", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 5;
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const limit = parseInt(req.query.limit as string) || 10;
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
 
       // Count shows per venue
-      const venueStats = shows.reduce(
-        (acc: { [key: string]: number }, show: any) => {
-          acc[show.venue] = (acc[show.venue] || 0) + 1;
-          return acc;
-        },
-        {},
-      );
+      const venueStats = shows.reduce((acc: { [key: string]: number }, show: ShowData) => {
+        acc[show.venue] = (acc[show.venue] || 0) + 1;
+        return acc;
+      }, {});
 
-      // Convert to array and sort by count with proper typing
+      // Convert to array and sort by count
       const sortedVenues: VenueCount[] = Object.entries(venueStats)
-        .map(([venue, count]): VenueCount => ({ venue, count: Number(count) }))
-        .sort((a: VenueCount, b: VenueCount) => b.count - a.count);
+        .map(([venue, count]): VenueCount => ({ venue, count }))
+        .sort((a, b) => b.count - a.count);
 
-      const start = (page - 1) * limit;
-      const end = Math.min(start + limit, sortedVenues.length);
-      const paginatedVenues = sortedVenues.slice(start, end);
-
+      // Calculate pagination
       const total = sortedVenues.length;
       const totalPages = Math.ceil(total / limit);
-
-      console.log(`Returning ${paginatedVenues.length} venues for page ${page}`);
+      const start = (page - 1) * limit;
+      const end = Math.min(start + limit, total);
+      const paginatedVenues = sortedVenues.slice(start, end);
 
       res.json({
         venues: paginatedVenues,
@@ -193,9 +175,9 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/runs/stats", async (_req, res) => {
     try {
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
 
-      const uniqueVenues = new Set(shows.map((show: any) => show.venueid)).size;
+      const uniqueVenues = new Set(shows.map((show: ShowData) => show.venueid)).size;
       const totalShows = shows.length;
 
       res.json({
@@ -210,7 +192,7 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/songs/stats", async (_req, res) => {
     try {
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
       const songCounts = new Map<string, number>();
 
       // Fetch setlist for each show
@@ -241,7 +223,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/setlist/occurrences/:songName", async (req, res) => {
     try {
       const { songName } = req.params;
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      const shows = await fetchPhishData("/attendance/username/koolyp") as ShowData[];
       const songOccurrences = [];
 
       // Fetch setlist for each show and find occurrences of the song
