@@ -16,29 +16,25 @@ export default function ShowStats() {
 
   // Query for all shows first (no pagination) to calculate totals
   const { data: allShowsData, isLoading: allShowsLoading } = useQuery({
-    queryKey: ["attended-shows-all"],
+    queryKey: [`/api/shows/attended/${DEFAULT_USERNAME}`],
     queryFn: () => getAttendedShows(DEFAULT_USERNAME, 1, 1000),
-    staleTime: Infinity,
-    retry: 3
+    staleTime: Infinity
   });
 
   // Query for paginated shows for display
   const { data: showsData, isLoading: showsLoading } = useQuery({
-    queryKey: ["attended-shows", showPage],
-    queryFn: () => getAttendedShows(DEFAULT_USERNAME, showPage, ITEMS_PER_PAGE),
-    keepPreviousData: true,
-    retry: 3
+    queryKey: [`/api/shows/page/${showPage}`],
+    queryFn: () => getAttendedShows(DEFAULT_USERNAME, showPage, ITEMS_PER_PAGE)
   });
 
   // Query for selected show's setlist
   const { data: selectedShow, isLoading: setlistLoading } = useQuery<ShowSetlist>({
-    queryKey: ["setlist", selectedShowId],
+    queryKey: [`/api/setlist/${selectedShowId}`],
     queryFn: () => {
       if (!selectedShowId) throw new Error("No show selected");
       return getShowSetlist(selectedShowId);
     },
-    enabled: !!selectedShowId,
-    retry: 3
+    enabled: !!selectedShowId
   });
 
   const isInitialLoading = allShowsLoading || showsLoading;
@@ -122,7 +118,7 @@ export default function ShowStats() {
 
       {/* Show Modal */}
       <ShowModal
-        show={selectedShow}
+        show={selectedShow || null}
         isOpen={!!selectedShowId}
         onClose={() => setSelectedShowId(null)}
         isLoading={setlistLoading}

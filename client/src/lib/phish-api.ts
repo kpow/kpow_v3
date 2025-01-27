@@ -31,7 +31,6 @@ export interface ShowSetlist {
   songs: SetlistSong[];
 }
 
-// API Functions
 export async function getAttendedShows(
   username: string,
   page = 1,
@@ -39,7 +38,7 @@ export async function getAttendedShows(
 ): Promise<{ shows: ShowAttendance[]; total: number }> {
   try {
     const response = await fetch(
-      `${PHISH_API_BASE_URL}/attendance/user/${username}?apikey=${API_KEY}`
+      `${PHISH_API_BASE_URL}/attendance/user.json?apikey=${API_KEY}&username=${username}`
     );
 
     if (!response.ok) {
@@ -68,7 +67,7 @@ export async function getAttendedShows(
 export async function getShowSetlist(showId: string): Promise<ShowSetlist> {
   try {
     const response = await fetch(
-      `${PHISH_API_BASE_URL}/setlists/get?showid=${showId}&apikey=${API_KEY}`
+      `${PHISH_API_BASE_URL}/setlists/get.json?apikey=${API_KEY}&showid=${showId}`
     );
 
     if (!response.ok) {
