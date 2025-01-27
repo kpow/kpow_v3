@@ -9,15 +9,19 @@ export interface ShowAttendance {
   city: string;
   state: string;
   country: string;
-  rating?: number;
-  setlistnotes?: string;
-  location?: string;
-  setlist?: string[];
+  notes?: string;
 }
 
 export interface VenueStat {
   venue: string;
   count: number;
+}
+
+export interface Setlist {
+  showid: string;
+  set: string;
+  song: string;
+  position: number;
 }
 
 // API Functions
@@ -99,19 +103,94 @@ export async function getPaginatedVenues(
   };
 }
 
-// This is a simplified version that just returns a placeholder count
-export async function getSetlistStats(username: string) {
+export async function getSetlist(showId: string): Promise<Setlist[]> {
+  const response = await fetch(
+    `${PHISH_API_BASE_URL}/setlists/show/${showId}.json?apikey=${API_KEY}`
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch setlist');
+  }
+
+  const data = await response.json();
+  console.log('Raw setlist data for show', showId, ':', data); // Debug log
+
+  if (!data.data || !Array.isArray(data.data)) {
+    console.error('Unexpected setlist data format:', data);
+    return [];
+  }
+
+  // Extract all songs from the setlist and filter out any entries without a song name
+  const setlist = data.data
+    .filter((item: any) => item.song && typeof item.song === 'string')
+    .map((item: any) => ({
+      showid: item.showid,
+      set: item.set,
+      song: item.song.trim(),
+      position: item.position
+    }));
+
+  console.log('Processed setlist for show', showId, ':', setlist); // Debug log
+  return setlist;
+}
+
+export interface SetlistStats {
+  uniqueSongs: number;
+  songCounts: Record<string, number>;
+}
+
+export async function getSetlistStats(username: string): Promise<SetlistStats> {
+  // First get all attended shows
   const response = await fetch(
     `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
   );
 
   if (!response.ok) {
-    throw new Error('Failed to fetch show statistics');
+    throw new Error('Failed to fetch attended shows');
   }
 
-  // For now, return an estimated number since we can't efficiently get all setlists
+  const data = await response.json();
+  const shows = data.data;
+
+  // Create a set to track unique songs and a map for song counts
+  const uniqueSongs = new Set<string>();
+  const songCounts: Record<string, number> = {};
+
+  // Process shows in smaller batches to avoid overwhelming the API
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < shows.length; i += BATCH_SIZE) {
+    const batchShows = shows.slice(i, i + BATCH_SIZE);
+    console.log(`Processing batch ${i / BATCH_SIZE + 1} of shows...`);
+
+    await Promise.all(
+      batchShows.map((show: ShowAttendance) =>
+        getSetlist(show.showid)
+          .then(setlist => {
+            console.log(`Got setlist for show ${show.showid}, found ${setlist.length} songs`);
+            setlist.forEach(item => {
+              if (item.song) {
+                uniqueSongs.add(item.song);
+                songCounts[item.song] = (songCounts[item.song] || 0) + 1;
+              }
+            });
+          })
+          .catch(error => {
+            console.error(`Error fetching setlist for show ${show.showid}:`, error);
+          })
+      )
+    );
+  }
+
+  console.log('Final count of unique songs:', uniqueSongs.size);
+  console.log('Songs seen more than 5 times:', 
+    Object.entries(songCounts)
+      .filter(([_, count]) => count > 5)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+  );
+
   return {
-    uniqueSongs: 200, // Placeholder value
-    songCounts: {}
+    uniqueSongs: uniqueSongs.size,
+    songCounts
   };
 }

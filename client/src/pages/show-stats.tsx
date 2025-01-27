@@ -31,25 +31,22 @@ export default function ShowStats() {
 
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues/paginated", username, venuesPage],
-    queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE)
+    queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
+    placeholderData: (previousData) => previousData
   });
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">Stats and Shows</h1>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-        {/* Most Visited Venues - Takes 2 columns */}
-        <Card className="lg:col-span-2 h-full">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* Most Visited Venues - Left Column */}
+        <Card>
           <CardContent className="pt-6">
             <h2 className="text-lg font-slackey mb-4">Most Visited Venues</h2>
             <div className="space-y-3">
-              {venuesLoading ? (
-                Array(5).fill(0).map((_, i) => (
-                  <Skeleton key={i} className="h-12" />
-                ))
-              ) : venuesData?.venues.map((venue) => (
+              {venuesData?.venues.map((venue) => (
                 <div
                   key={venue.venue}
                   className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
@@ -83,24 +80,35 @@ export default function ShowStats() {
           </CardContent>
         </Card>
 
-        {/* Stats Cards - Takes 1 column each */}
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
-            <div className="text-4xl font-bold">
-              {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.totalShows || 0}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Stats Cards - Right Column */}
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
+              <div className="text-4xl font-bold">
+                {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.totalShows || 0}
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
-            <div className="text-4xl font-bold">
-              {setlistStatsLoading ? <Skeleton className="h-10 w-20" /> : setlistStats?.uniqueSongs || 0}
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
+              <div className="text-4xl font-bold">
+                {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.uniqueVenues || 0}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
+              <div className="text-4xl font-bold">
+                {setlistStatsLoading ? <Skeleton className="h-10 w-20" /> : setlistStats?.uniqueSongs || 0}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Shows Grid */}
@@ -108,18 +116,12 @@ export default function ShowStats() {
         <CardContent className="pt-6">
           <h2 className="text-2xl font-slackey mb-6">Recent Shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showsLoading ? (
-              Array(SHOWS_PER_PAGE).fill(0).map((_, i) => (
-                <Skeleton key={i} className="h-32" />
-              ))
-            ) : (
-              showsData?.shows.map((show) => (
-                <ShowCard
-                  key={show.showid}
-                  show={show}
-                />
-              ))
-            )}
+            {showsData?.shows.map((show) => (
+              <ShowCard
+                key={show.showid}
+                show={show}
+              />
+            ))}
           </div>
           {showsData && showsData.total > SHOWS_PER_PAGE && (
             <div className="mt-6 flex justify-between items-center">
