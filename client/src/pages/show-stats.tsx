@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAttendedShows, getShowStats, getPaginatedVenues, getSetlistStats } from "@/lib/phish-api";
+import {
+  getAttendedShows,
+  getShowStats,
+  getPaginatedVenues,
+  getSetlistStats,
+} from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShowCard } from "@/components/show-card";
 import { Button } from "@/components/ui/button";
@@ -16,35 +21,35 @@ export default function ShowStats() {
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/shows/stats", username],
-    queryFn: () => getShowStats(username)
+    queryFn: () => getShowStats(username),
   });
 
   const { data: setlistStats, isLoading: setlistStatsLoading } = useQuery({
     queryKey: ["/api/setlist/stats", username],
-    queryFn: () => getSetlistStats(username)
+    queryFn: () => getSetlistStats(username),
   });
 
   const { data: showsData, isLoading: showsLoading } = useQuery({
     queryKey: ["/api/shows/attended", username, showsPage],
-    queryFn: () => getAttendedShows(username, showsPage, SHOWS_PER_PAGE)
+    queryFn: () => getAttendedShows(username, showsPage, SHOWS_PER_PAGE),
   });
 
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues/paginated", username, venuesPage],
     queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
-    placeholderData: (previousData) => previousData
+    placeholderData: (previousData) => previousData,
   });
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-4xl font-slackey mb-8">Stats and Shows</h1>
+      <h1 className="text-4xl font-slackey mb-8">phashboard</h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* Most Visited Venues - Left Column */}
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-4">Most Visited Venues</h2>
+            <h2 className="text-lg font-slackey mb-4">venues</h2>
             <div className="space-y-3">
               {venuesData?.venues.map((venue) => (
                 <div
@@ -52,7 +57,9 @@ export default function ShowStats() {
                   className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
                 >
                   <span className="font-medium">{venue.venue}</span>
-                  <span className="text-muted-foreground">{venue.count} shows</span>
+                  <span className="text-muted-foreground">
+                    {venue.count} shows
+                  </span>
                 </div>
               ))}
             </div>
@@ -61,7 +68,7 @@ export default function ShowStats() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setVenuesPage(p => Math.max(1, p - 1))}
+                  onClick={() => setVenuesPage((p) => Math.max(1, p - 1))}
                   disabled={venuesPage === 1 || venuesLoading}
                 >
                   Previous
@@ -70,8 +77,11 @@ export default function ShowStats() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setVenuesPage(p => p + 1)}
-                  disabled={venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) || venuesLoading}
+                  onClick={() => setVenuesPage((p) => p + 1)}
+                  disabled={
+                    venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) ||
+                    venuesLoading
+                  }
                 >
                   Next
                 </Button>
@@ -84,27 +94,39 @@ export default function ShowStats() {
         <div className="space-y-4">
           <Card>
             <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
+              <h2 className="text-lg font-slackey mb-2">total shows</h2>
               <div className="text-4xl font-bold">
-                {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.totalShows || 0}
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-20" />
+                ) : (
+                  stats?.totalShows || 0
+                )}
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
+              <h2 className="text-lg font-slackey mb-2">total venues</h2>
               <div className="text-4xl font-bold">
-                {statsLoading ? <Skeleton className="h-10 w-20" /> : stats?.uniqueVenues || 0}
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-20" />
+                ) : (
+                  stats?.uniqueVenues || 0
+                )}
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
+              <h2 className="text-lg font-slackey mb-2">total songs</h2>
               <div className="text-4xl font-bold">
-                {setlistStatsLoading ? <Skeleton className="h-10 w-20" /> : setlistStats?.uniqueSongs || 0}
+                {setlistStatsLoading ? (
+                  <Skeleton className="h-10 w-20" />
+                ) : (
+                  setlistStats?.uniqueSongs || 0
+                )}
               </div>
             </CardContent>
           </Card>
@@ -114,13 +136,10 @@ export default function ShowStats() {
       {/* Shows Grid */}
       <Card>
         <CardContent className="pt-6">
-          <h2 className="text-2xl font-slackey mb-6">Recent Shows</h2>
+          <h2 className="text-2xl font-slackey mb-6">shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {showsData?.shows.map((show) => (
-              <ShowCard
-                key={show.showid}
-                show={show}
-              />
+              <ShowCard key={show.showid} show={show} />
             ))}
           </div>
           {showsData && showsData.total > SHOWS_PER_PAGE && (
@@ -128,7 +147,7 @@ export default function ShowStats() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowsPage(p => Math.max(1, p - 1))}
+                onClick={() => setShowsPage((p) => Math.max(1, p - 1))}
                 disabled={showsPage === 1 || showsLoading}
               >
                 Previous
@@ -137,8 +156,11 @@ export default function ShowStats() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowsPage(p => p + 1)}
-                disabled={showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) || showsLoading}
+                onClick={() => setShowsPage((p) => p + 1)}
+                disabled={
+                  showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
+                  showsLoading
+                }
               >
                 Next
               </Button>
