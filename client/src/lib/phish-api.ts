@@ -104,16 +104,23 @@ export async function getPaginatedVenues(
 }
 
 export async function getSetlist(showId: string): Promise<Setlist[]> {
+  if (!showId) {
+    console.error('No showId provided to getSetlist');
+    return [];
+  }
+
+  console.log('Fetching setlist for show:', showId);
   const response = await fetch(
     `${PHISH_API_BASE_URL}/setlists/show/${showId}.json?apikey=${API_KEY}`
   );
 
   if (!response.ok) {
+    console.error(`Failed to fetch setlist for show ${showId}:`, response.status, response.statusText);
     throw new Error('Failed to fetch setlist');
   }
 
   const data = await response.json();
-  console.log('Raw setlist data for show', showId, ':', data); // Debug log
+  console.log('Raw setlist data for show', showId, ':', data);
 
   if (!data.data || !Array.isArray(data.data)) {
     console.error('Unexpected setlist data format:', data);
@@ -122,7 +129,13 @@ export async function getSetlist(showId: string): Promise<Setlist[]> {
 
   // Extract all songs from the setlist and filter out any entries without a song name
   const setlist = data.data
-    .filter((item: any) => item.song && typeof item.song === 'string')
+    .filter((item: any) => {
+      if (!item.song || typeof item.song !== 'string') {
+        console.log('Filtered out invalid setlist item:', item);
+        return false;
+      }
+      return true;
+    })
     .map((item: any) => ({
       showid: item.showid,
       set: item.set,
@@ -130,7 +143,7 @@ export async function getSetlist(showId: string): Promise<Setlist[]> {
       position: item.position
     }));
 
-  console.log('Processed setlist for show', showId, ':', setlist); // Debug log
+  console.log('Processed setlist for show', showId, ':', setlist);
   return setlist;
 }
 
@@ -182,7 +195,7 @@ export async function getSetlistStats(username: string): Promise<SetlistStats> {
   }
 
   console.log('Final count of unique songs:', uniqueSongs.size);
-  console.log('Songs seen more than 5 times:', 
+  console.log('Songs seen more than 5 times:',
     Object.entries(songCounts)
       .filter(([_, count]) => count > 5)
       .sort((a, b) => b[1] - a[1])
