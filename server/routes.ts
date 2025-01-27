@@ -59,29 +59,32 @@ export function registerRoutes(app: Express): Server {
         throw new Error("Invalid shows data format");
       }
 
+      // Sort shows by date in descending order
       const sortedShows = shows.sort(
         (a: any, b: any) =>
           new Date(b.showdate).getTime() - new Date(a.showdate).getTime(),
       );
 
+      // Calculate pagination
+      const total = shows.length;
+      const totalPages = Math.ceil(total / limit);
       const start = (page - 1) * limit;
-      const end = start + limit;
+      const end = Math.min(start + limit, total);
       const paginatedShows = sortedShows.slice(start, end);
 
+      // Format the shows data with safer property access
       const formattedShows = paginatedShows.map((show: any) => ({
-        showid: show.showid,
-        showdate: show.showdate,
-        venue: show.venue,
-        city: show.city,
-        state: show.state,
+        showid: show.showid || '',
+        showdate: show.showdate || '',
+        venue: show.venue || 'Unknown Venue',
+        city: show.city || 'Unknown City',
+        state: show.state || '',
         country: show.country || "US",
         notes: show.notes || ""
       }));
 
       console.log("Formatted shows sample:", formattedShows[0]);
-
-      const total = shows.length;
-      const totalPages = Math.ceil(total / limit);
+      console.log(`Returning ${formattedShows.length} shows for page ${page}`);
 
       res.json({
         shows: formattedShows,
@@ -89,6 +92,7 @@ export function registerRoutes(app: Express): Server {
           current: page,
           total: totalPages,
           hasMore: page < totalPages,
+          totalItems: total
         },
       });
     } catch (error) {
@@ -118,11 +122,13 @@ export function registerRoutes(app: Express): Server {
         .sort((a: VenueCount, b: VenueCount) => b.count - a.count);
 
       const start = (page - 1) * limit;
-      const end = start + limit;
+      const end = Math.min(start + limit, sortedVenues.length);
       const paginatedVenues = sortedVenues.slice(start, end);
 
       const total = sortedVenues.length;
       const totalPages = Math.ceil(total / limit);
+
+      console.log(`Returning ${paginatedVenues.length} venues for page ${page}`);
 
       res.json({
         venues: paginatedVenues,
@@ -130,6 +136,7 @@ export function registerRoutes(app: Express): Server {
           current: page,
           total: totalPages,
           hasMore: page < totalPages,
+          totalItems: total
         },
       });
     } catch (error) {
