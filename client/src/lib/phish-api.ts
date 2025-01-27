@@ -2,6 +2,10 @@
 const PHISH_API_BASE_URL = "https://api.phish.net/v5";
 const API_KEY = import.meta.env.VITE_PHISH_API_KEY;
 
+if (!API_KEY) {
+  throw new Error("VITE_PHISH_API_KEY is required");
+}
+
 export interface ShowAttendance {
   showid: string;
   showdate: string;
@@ -33,57 +37,67 @@ export async function getAttendedShows(
   page = 1,
   limit = 10
 ): Promise<{ shows: ShowAttendance[]; total: number }> {
-  const response = await fetch(
-    `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
-  );
+  try {
+    const response = await fetch(
+      `${PHISH_API_BASE_URL}/attendance/user/${username}?apikey=${API_KEY}`
+    );
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch attended shows');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch attended shows: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (!data.response?.data) {
+      return { shows: [], total: 0 };
+    }
+
+    const shows = data.response.data;
+    const start = (page - 1) * limit;
+    const end = start + limit;
+
+    return {
+      shows: shows.slice(start, end),
+      total: shows.length
+    };
+  } catch (error) {
+    console.error("Error fetching attended shows:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  if (!data.response.data) {
-    return { shows: [], total: 0 };
-  }
-
-  const shows = data.response.data;
-  const start = (page - 1) * limit;
-  const end = start + limit;
-
-  return {
-    shows: shows.slice(start, end),
-    total: shows.length
-  };
 }
 
 export async function getShowSetlist(showId: string): Promise<ShowSetlist> {
-  const response = await fetch(
-    `${PHISH_API_BASE_URL}/setlists/showid/${showId}.json?apikey=${API_KEY}`
-  );
+  try {
+    const response = await fetch(
+      `${PHISH_API_BASE_URL}/setlists/get?showid=${showId}&apikey=${API_KEY}`
+    );
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch setlist');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch setlist: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (!data.response?.data?.[0]) {
+      throw new Error('No setlist data found');
+    }
+
+    const showData = data.response.data[0];
+
+    return {
+      showid: showData.showid,
+      showdate: showData.showdate,
+      venue: showData.venue,
+      location: `${showData.city}, ${showData.state}, ${showData.country}`,
+      notes: showData.notes || undefined,
+      songs: (showData.songs || []).map((song: any) => ({
+        id: song.id,
+        name: song.song,
+        set: song.set
+      }))
+    };
+  } catch (error) {
+    console.error("Error fetching setlist:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  if (!data.response.data || !data.response.data[0]) {
-    throw new Error('No setlist data found');
-  }
-
-  const showData = data.response.data[0];
-
-  return {
-    showid: showData.showid,
-    showdate: showData.showdate,
-    venue: showData.venue,
-    location: `${showData.city}, ${showData.state}, ${showData.country}`,
-    notes: showData.notes || undefined,
-    songs: (showData.songs || []).map((song: any) => ({
-      id: song.id,
-      name: song.name,
-      set: song.set
-    }))
-  };
 }
 
 export interface VenueStat {

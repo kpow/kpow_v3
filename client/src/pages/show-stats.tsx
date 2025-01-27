@@ -16,55 +16,48 @@ export default function ShowStats() {
 
   // Query for all shows first (no pagination) to calculate totals
   const { data: allShowsData, isLoading: allShowsLoading } = useQuery({
-    queryKey: ["/api/shows/attended/all"],
+    queryKey: ["attended-shows-all"],
     queryFn: () => getAttendedShows(DEFAULT_USERNAME, 1, 1000),
-    staleTime: Infinity
+    staleTime: Infinity,
+    retry: 3
   });
 
   // Query for paginated shows for display
   const { data: showsData, isLoading: showsLoading } = useQuery({
-    queryKey: ["/api/shows/attended", showPage],
-    queryFn: () => getAttendedShows(DEFAULT_USERNAME, showPage, ITEMS_PER_PAGE)
+    queryKey: ["attended-shows", showPage],
+    queryFn: () => getAttendedShows(DEFAULT_USERNAME, showPage, ITEMS_PER_PAGE),
+    keepPreviousData: true,
+    retry: 3
   });
 
   // Query for selected show's setlist
-  const { data: selectedShow } = useQuery<ShowSetlist>({
-    queryKey: ["/api/shows/setlist", selectedShowId],
-    queryFn: async () => {
+  const { data: selectedShow, isLoading: setlistLoading } = useQuery<ShowSetlist>({
+    queryKey: ["setlist", selectedShowId],
+    queryFn: () => {
       if (!selectedShowId) throw new Error("No show selected");
       return getShowSetlist(selectedShowId);
     },
-    enabled: !!selectedShowId
+    enabled: !!selectedShowId,
+    retry: 3
   });
 
-  const isLoading = allShowsLoading || showsLoading;
+  const isInitialLoading = allShowsLoading || showsLoading;
   const totalShows = allShowsData?.total || 0;
   const totalVenues = allShowsData?.shows ? new Set(allShowsData.shows.map(show => show.venue)).size : 0;
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-8">
-        <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Skeleton className="h-48" />
-          <Skeleton className="h-48" />
-          <Skeleton className="h-48" />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
               <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
-              <div className="text-4xl font-bold">{totalShows}</div>
+              <div className="text-4xl font-bold">
+                {isInitialLoading ? <Skeleton className="h-12 w-24 mx-auto" /> : totalShows}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -73,7 +66,9 @@ export default function ShowStats() {
           <CardContent className="pt-6">
             <div className="text-center">
               <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
-              <div className="text-4xl font-bold">{totalVenues}</div>
+              <div className="text-4xl font-bold">
+                {isInitialLoading ? <Skeleton className="h-12 w-24 mx-auto" /> : totalVenues}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -86,14 +81,21 @@ export default function ShowStats() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showsData?.shows.map((show) => (
-              <ShowCard
-                key={show.showid}
-                show={show}
-                onClick={() => setSelectedShowId(show.showid)}
-              />
-            ))}
+            {isInitialLoading ? (
+              Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                <Skeleton key={i} className="h-48" />
+              ))
+            ) : (
+              showsData?.shows.map((show) => (
+                <ShowCard
+                  key={show.showid}
+                  show={show}
+                  onClick={() => setSelectedShowId(show.showid)}
+                />
+              ))
+            )}
           </div>
+
           {showsData && showsData.total > ITEMS_PER_PAGE && (
             <div className="mt-6 flex justify-between items-center">
               <Button
@@ -120,9 +122,10 @@ export default function ShowStats() {
 
       {/* Show Modal */}
       <ShowModal
-        show={selectedShow || null}
+        show={selectedShow}
         isOpen={!!selectedShowId}
         onClose={() => setSelectedShowId(null)}
+        isLoading={setlistLoading}
       />
     </div>
   );
