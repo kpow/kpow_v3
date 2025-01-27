@@ -5,12 +5,11 @@ import { format } from "date-fns";
 
 interface ShowCardProps {
   show: ShowAttendance;
-  onClick: () => void;
 }
 
-export function ShowCard({ show, onClick }: ShowCardProps) {
+export function ShowCard({ show }: ShowCardProps) {
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={onClick}>
+    <Card>
       <CardContent className="p-6">
         <div className="space-y-4">
           <div className="flex items-start justify-between">
