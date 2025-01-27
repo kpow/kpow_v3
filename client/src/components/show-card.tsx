@@ -9,8 +9,17 @@ interface ShowCardProps {
 }
 
 export function ShowCard({ show, onClick }: ShowCardProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("ShowCard clicked for show:", show.showid);
+    onClick();
+  };
+
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={onClick}>
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer" 
+      onClick={handleClick}
+    >
       <CardContent className="p-6">
         <div className="space-y-4">
           <div className="flex items-start justify-between">

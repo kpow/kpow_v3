@@ -26,7 +26,12 @@ export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
   }, {});
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-slackey">{show.venue}</DialogTitle>

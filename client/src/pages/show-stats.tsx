@@ -1,87 +1,60 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAttendedShows, getShowSetlist, getVenueStats, type ShowSetlist } from "@/lib/phish-api";
+import { getAttendedShows, getShowSetlist, type ShowSetlist } from "@/lib/phish-api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShowCard } from "@/components/show-card";
 import { ShowModal } from "@/components/show-modal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const ITEMS_PER_PAGE = 6;
-const VENUES_PER_PAGE = 6;
 
 export default function ShowStats() {
   const username = "koolyp";
   const [showPage, setShowPage] = useState(1);
-  const [venuePage, setVenuePage] = useState(1);
   const [selectedShowId, setSelectedShowId] = useState<string | null>(null);
 
+  // Query for attended shows with pagination
   const { data: showsData, isLoading: showsLoading } = useQuery({
     queryKey: ["/api/shows/attended", username, showPage],
     queryFn: () => getAttendedShows(username, showPage, ITEMS_PER_PAGE)
   });
 
+  // Query for all shows to calculate totals
   const { data: allShowsData } = useQuery({
     queryKey: ["/api/shows/attended/all", username],
     queryFn: () => getAttendedShows(username, 1, 1000)
   });
 
+  // Query for selected show's setlist
   const { data: selectedShow, isLoading: setlistLoading } = useQuery<ShowSetlist>({
     queryKey: ["/api/shows/setlist", selectedShowId],
     queryFn: async () => {
       if (!selectedShowId) throw new Error("No show selected");
-      return await getShowSetlist(selectedShowId);
+      console.log("Fetching setlist for show:", selectedShowId);
+      const result = await getShowSetlist(selectedShowId);
+      console.log("Fetched setlist:", result);
+      return result;
     },
-    enabled: !!selectedShowId,
-    retry: false
+    enabled: !!selectedShowId
   });
 
-  const { data: venueStats, isLoading: venuesLoading } = useQuery({
-    queryKey: ["/api/venues", allShowsData?.shows, venuePage],
-    queryFn: () => {
-      if (!allShowsData?.shows) return { venues: [], total: 0 };
-      return getVenueStats(allShowsData.shows, venuePage, VENUES_PER_PAGE);
-    },
-    enabled: !!allShowsData?.shows
-  });
+  const isLoading = showsLoading || !allShowsData;
 
-  const { data: songStats = [], isLoading: songsLoading } = useQuery({
-    queryKey: ["/api/songs", showsData?.shows],
-    queryFn: async () => {
-      if (!showsData?.shows) return [];
-      const setlists = await Promise.all(
-        showsData.shows.map(show => getShowSetlist(show.showid))
-      );
+  // Calculate totals
+  const totalShows = allShowsData?.total || 0;
+  const totalVenues = allShowsData ? new Set(allShowsData.shows.map(show => show.venue)).size : 0;
+  const totalUniqueSongs = selectedShow ? new Set(selectedShow.songs.map(song => song.name)).size : 0;
 
-      const songCounts = new Map<string, number>();
-      let totalSongs = 0;
+  const handleShowClick = (showId: string) => {
+    console.log("Show clicked:", showId);
+    setSelectedShowId(showId);
+  };
 
-      setlists.forEach(setlist => {
-        setlist.songs.forEach(song => {
-          const count = songCounts.get(song.name) || 0;
-          songCounts.set(song.name, count + 1);
-          totalSongs++;
-        });
-      });
-
-      return Array.from(songCounts.entries())
-        .map(([name, count]) => ({
-          name,
-          count,
-          percentage: (count / totalSongs) * 100
-        }))
-        .sort((a, b) => b.count - a.count);
-    },
-    enabled: !!showsData?.shows
-  });
-
-  const isLoading = showsLoading || venuesLoading || songsLoading || setlistLoading;
-
-  // Calculate total venues and songs
-  const totalVenues = venueStats?.venues.reduce((sum, venue) => sum + venue.count, 0) || 0;
-  const totalSongs = songStats.reduce((sum, song) => sum + song.count, 0) || 0;
+  const handleCloseModal = () => {
+    console.log("Closing modal");
+    setSelectedShowId(null);
+  };
 
   return (
     <div className="container mx-auto p-8">
@@ -98,7 +71,7 @@ export default function ShowStats() {
                 {isLoading ? (
                   <Skeleton className="h-12 w-24 mx-auto" />
                 ) : (
-                  allShowsData?.total || 0
+                  totalShows
                 )}
               </div>
             </div>
@@ -109,7 +82,7 @@ export default function ShowStats() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <h2 className="text-lg font-slackey mb-2">Total Venues</h2>
+              <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
               <div className="text-4xl font-bold">
                 {isLoading ? (
                   <Skeleton className="h-12 w-24 mx-auto" />
@@ -119,15 +92,15 @@ export default function ShowStats() {
           </CardContent>
         </Card>
 
-        {/* Total Songs */}
+        {/* Unique Songs */}
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <h2 className="text-lg font-slackey mb-2">Total Songs</h2>
+              <h2 className="text-lg font-slackey mb-2">Unique Songs</h2>
               <div className="text-4xl font-bold">
                 {isLoading ? (
                   <Skeleton className="h-12 w-24 mx-auto" />
-                ) : totalSongs}
+                ) : totalUniqueSongs}
               </div>
             </div>
           </CardContent>
@@ -153,7 +126,7 @@ export default function ShowStats() {
                   <ShowCard
                     key={show.showid}
                     show={show}
-                    onClick={() => setSelectedShowId(show.showid)}
+                    onClick={() => handleShowClick(show.showid)}
                   />
                 ))}
               </div>
@@ -183,50 +156,11 @@ export default function ShowStats() {
         </CardContent>
       </Card>
 
-      {/* Song Statistics */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-slackey">Song Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[400px] mb-8">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={songStats.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  interval={0}
-                  fontSize={12}
-                />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="hsl(var(--primary))" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="space-y-4">
-            {songStats.slice(0, 10).map(stat => (
-              <div key={stat.name} className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium">{stat.name}</span>
-                  <span className="text-muted-foreground">{stat.count} times</span>
-                </div>
-                <Progress value={stat.percentage} className="h-2" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Show Modal */}
       <ShowModal
         show={selectedShow || null}
         isOpen={!!selectedShowId}
-        onClose={() => setSelectedShowId(null)}
+        onClose={handleCloseModal}
       />
     </div>
   );
