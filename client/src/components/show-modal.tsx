@@ -34,8 +34,8 @@ export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
             {show.location} - {format(new Date(show.showdate), 'PPP')}
           </div>
         </DialogHeader>
-        <ScrollArea className="max-h-[60vh]">
-          <div className="space-y-6 p-4">
+        <ScrollArea className="max-h-[60vh] px-4">
+          <div className="space-y-6">
             {Object.entries(sets).map(([setName, songs]) => (
               <div key={setName}>
                 <h3 className="font-slackey mb-2">Set {setName}</h3>

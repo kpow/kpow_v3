@@ -28,18 +28,14 @@ export default function ShowStats() {
     queryFn: () => getAttendedShows(username, 1, 1000)
   });
 
-  const { data: selectedShow } = useQuery<ShowSetlist | null>({
+  const { data: selectedShow, isLoading: setlistLoading } = useQuery<ShowSetlist>({
     queryKey: ["/api/shows/setlist", selectedShowId],
     queryFn: async () => {
-      if (!selectedShowId) return null;
-      try {
-        return await getShowSetlist(selectedShowId);
-      } catch (error) {
-        console.error('Error fetching setlist:', error);
-        return null;
-      }
+      if (!selectedShowId) throw new Error("No show selected");
+      return await getShowSetlist(selectedShowId);
     },
-    enabled: !!selectedShowId
+    enabled: !!selectedShowId,
+    retry: false
   });
 
   const { data: venueStats, isLoading: venuesLoading } = useQuery({
@@ -81,14 +77,18 @@ export default function ShowStats() {
     enabled: !!showsData?.shows
   });
 
-  const isLoading = showsLoading || venuesLoading || songsLoading;
+  const isLoading = showsLoading || venuesLoading || songsLoading || setlistLoading;
+
+  // Calculate total venues and songs
+  const totalVenues = venueStats?.venues.reduce((sum, venue) => sum + venue.count, 0) || 0;
+  const totalSongs = songStats.reduce((sum, song) => sum + song.count, 0) || 0;
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Total Shows */}
         <Card>
           <CardContent className="pt-6">
@@ -105,50 +105,31 @@ export default function ShowStats() {
           </CardContent>
         </Card>
 
-        {/* Run Statistics */}
+        {/* Total Venues */}
         <Card>
-          <CardHeader>
-            <CardTitle className="font-slackey">Run Statistics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {isLoading ? (
-                Array.from({ length: VENUES_PER_PAGE }).map((_, i) => (
-                  <div key={i} className="flex justify-between items-center">
-                    <Skeleton className="h-4 w-48" />
-                    <Skeleton className="h-4 w-12" />
-                  </div>
-                ))
-              ) : (
-                venueStats?.venues.map(({ venue, count }) => (
-                  <div key={venue} className="flex justify-between items-center">
-                    <span className="font-medium">{venue}</span>
-                    <span className="text-sm text-muted-foreground">{count} shows</span>
-                  </div>
-                ))
-              )}
-            </div>
-            {venueStats && venueStats.total > VENUES_PER_PAGE && (
-              <div className="mt-4 flex justify-between items-center">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setVenuePage(p => Math.max(1, p - 1))}
-                  disabled={venuePage === 1}
-                >
-                  Previous
-                </Button>
-                <span className="text-sm">Page {venuePage}</span>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVenuePage(p => p + 1)}
-                  disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
-                >
-                  Next
-                </Button>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <h2 className="text-lg font-slackey mb-2">Total Venues</h2>
+              <div className="text-4xl font-bold">
+                {isLoading ? (
+                  <Skeleton className="h-12 w-24 mx-auto" />
+                ) : totalVenues}
               </div>
-            )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Total Songs */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <h2 className="text-lg font-slackey mb-2">Total Songs</h2>
+              <div className="text-4xl font-bold">
+                {isLoading ? (
+                  <Skeleton className="h-12 w-24 mx-auto" />
+                ) : totalSongs}
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -243,7 +224,7 @@ export default function ShowStats() {
 
       {/* Show Modal */}
       <ShowModal
-        show={selectedShow}
+        show={selectedShow || null}
         isOpen={!!selectedShowId}
         onClose={() => setSelectedShowId(null)}
       />
