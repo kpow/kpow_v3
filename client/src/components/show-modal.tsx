@@ -29,7 +29,7 @@ export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl">{show.venue}</DialogTitle>
+          <DialogTitle className="text-xl font-slackey">{show.venue}</DialogTitle>
           <div className="text-sm text-muted-foreground">
             {show.location} - {format(new Date(show.showdate), 'PPP')}
           </div>
@@ -38,7 +38,7 @@ export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
           <div className="space-y-6 p-4">
             {Object.entries(sets).map(([setName, songs]) => (
               <div key={setName}>
-                <h3 className="font-semibold mb-2">Set {setName}</h3>
+                <h3 className="font-slackey mb-2">Set {setName}</h3>
                 <div className="space-y-1">
                   {songs.map((song, i) => (
                     <div key={`${song.id}-${i}`} className="text-sm">
@@ -50,7 +50,7 @@ export function ShowModal({ show, isOpen, onClose }: ShowModalProps) {
             ))}
             {show.notes && (
               <div className="mt-6">
-                <h3 className="font-semibold mb-2">Show Notes</h3>
+                <h3 className="font-slackey mb-2">Show Notes</h3>
                 <p className="text-sm text-muted-foreground">{show.notes}</p>
               </div>
             )}

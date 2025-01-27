@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const ITEMS_PER_PAGE = 12;
+const VENUES_PER_PAGE = 6;
 
 interface SongStat {
   name: string;
@@ -42,7 +43,7 @@ export default function ShowStats() {
 
   const { data: venueStats, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues", showsData?.shows],
-    queryFn: () => getVenueStats(showsData?.shows || [], venuePage, 5),
+    queryFn: () => getVenueStats(showsData?.shows || [], venuePage, VENUES_PER_PAGE),
     enabled: !!showsData?.shows
   });
 
@@ -80,13 +81,13 @@ export default function ShowStats() {
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-8">Show Statistics</h1>
+      <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
 
       {/* Total Shows */}
       <Card className="mb-8">
         <CardContent className="pt-6">
           <div className="text-center">
-            <h2 className="text-lg font-semibold mb-2">Total Shows</h2>
+            <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
             <div className="text-4xl font-bold">
               {isLoading ? (
                 <Skeleton className="h-12 w-24 mx-auto" />
@@ -101,12 +102,12 @@ export default function ShowStats() {
       {/* Run Statistics */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Run Statistics</CardTitle>
+          <CardTitle className="font-slackey">Run Statistics</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
+              Array.from({ length: VENUES_PER_PAGE }).map((_, i) => (
                 <div key={i} className="flex justify-between items-center">
                   <Skeleton className="h-4 w-48" />
                   <Skeleton className="h-4 w-12" />
@@ -121,7 +122,7 @@ export default function ShowStats() {
               ))
             )}
           </div>
-          {venueStats && venueStats.total > 5 && (
+          {venueStats && venueStats.total > VENUES_PER_PAGE && (
             <Pagination className="mt-4">
               <PaginationContent>
                 <Button 
@@ -136,7 +137,7 @@ export default function ShowStats() {
                   variant="outline"
                   size="sm"
                   onClick={() => setVenuePage(p => p + 1)}
-                  disabled={venuePage * 5 >= (venueStats?.total || 0)}
+                  disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
                 >
                   Next
                 </Button>
@@ -149,7 +150,7 @@ export default function ShowStats() {
       {/* Shows Grid */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Shows</CardTitle>
+          <CardTitle className="font-slackey">Shows</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -215,7 +216,7 @@ export default function ShowStats() {
       {/* Song Statistics */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Song Statistics</CardTitle>
+          <CardTitle className="font-slackey">Song Statistics</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[400px] mb-8">
