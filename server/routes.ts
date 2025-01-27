@@ -33,13 +33,6 @@ async function fetchPhishData(endpoint: string) {
   }
 }
 
-function formatSongUrl(songName: string): string {
-  return `https://phish.net/song/${songName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")}`;
-}
-
 export function registerRoutes(app: Express): Server {
   app.get("/api/shows", async (req, res) => {
     try {
@@ -47,9 +40,6 @@ export function registerRoutes(app: Express): Server {
       const limit = parseInt(req.query.limit as string) || 10;
 
       const shows = await fetchPhishData("/attendance/username/koolyp");
-
-      // Debug log to see tour information
-      console.log("First show tour data:", shows[0].tour, typeof shows[0].tour);
 
       const sortedShows = shows.sort(
         (a: any, b: any) =>
@@ -61,13 +51,13 @@ export function registerRoutes(app: Express): Server {
       const paginatedShows = sortedShows.slice(start, end);
 
       const formattedShows = paginatedShows.map((show: any) => ({
-        id: show.showid,
-        date: show.showdate,
+        showid: show.showid,
+        showdate: show.showdate, // Already in YYYY-MM-DD format
         venue: show.venue,
-        location: `${show.city}, ${show.state}`,
-        showday: show.showday,
-        tour: show.tourname || "", // Changed from show.tour to show.tourname
-        url: show.permalink,
+        city: show.city,
+        state: show.state,
+        country: show.country,
+        notes: show.notes
       }));
 
       const total = shows.length;
@@ -262,4 +252,11 @@ export function registerRoutes(app: Express): Server {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+function formatSongUrl(songName: string): string {
+  return `https://phish.net/song/${songName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")}`;
 }

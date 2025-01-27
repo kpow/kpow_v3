@@ -1,7 +1,7 @@
 import { ShowAttendance } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, MapPin } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ShowDetailsModal } from "./show-details-modal";
 import { useState } from "react";
 import { Button } from "./ui/button";
@@ -12,6 +12,15 @@ interface ShowCardProps {
 
 export function ShowCard({ show }: ShowCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const formatShowDate = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), 'PPP');
+    } catch (error) {
+      console.error('Error formatting date:', dateString, error);
+      return dateString; // Fallback to original date string if parsing fails
+    }
+  };
 
   return (
     <>
@@ -29,7 +38,7 @@ export function ShowCard({ show }: ShowCardProps) {
             </div>
             <div className="flex items-center text-sm text-muted-foreground">
               <CalendarDays className="mr-1 h-4 w-4" />
-              <span>{format(new Date(show.showdate), 'PPP')}</span>
+              <span>{formatShowDate(show.showdate)}</span>
             </div>
           </div>
         </CardContent>
