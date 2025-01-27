@@ -21,17 +21,29 @@ export default function ShowStats() {
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">Show Statistics</h1>
 
-      {/* Basic Stats Card */}
+      {/* Stats Card */}
       <Card className="mb-8">
         <CardContent className="pt-6">
-          <div className="text-center">
-            <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
-            <div className="text-4xl font-bold">
-              {isLoading ? (
-                <Skeleton className="h-12 w-24 mx-auto" />
-              ) : (
-                data?.total || 0
-              )}
+          <div className="grid grid-cols-2 gap-8">
+            <div className="text-center">
+              <h2 className="text-lg font-slackey mb-2">Total Shows</h2>
+              <div className="text-4xl font-bold">
+                {isLoading ? (
+                  <Skeleton className="h-12 w-24 mx-auto" />
+                ) : (
+                  data?.total || 0
+                )}
+              </div>
+            </div>
+            <div className="text-center">
+              <h2 className="text-lg font-slackey mb-2">Unique Venues</h2>
+              <div className="text-4xl font-bold">
+                {isLoading ? (
+                  <Skeleton className="h-12 w-24 mx-auto" />
+                ) : (
+                  data?.uniqueVenues || 0
+                )}
+              </div>
             </div>
           </div>
         </CardContent>

@@ -17,7 +17,7 @@ export async function getAttendedShows(
   username: string,
   page = 1,
   limit = 10
-): Promise<{ shows: ShowAttendance[]; total: number }> {
+): Promise<{ shows: ShowAttendance[]; total: number; uniqueVenues: number }> {
   const response = await fetch(
     `${PHISH_API_BASE_URL}/attendance/username/${username}.json?apikey=${API_KEY}`
   );
@@ -27,12 +27,20 @@ export async function getAttendedShows(
   }
 
   const data = await response.json();
-  const shows = data.data;
+  const shows = data.data
+    .sort((a: ShowAttendance, b: ShowAttendance) => 
+      new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
+    );
+
+  // Calculate unique venues
+  const uniqueVenues = new Set(shows.map((show: ShowAttendance) => show.venue)).size;
+
   const start = (page - 1) * limit;
   const end = start + limit;
 
   return {
     shows: shows.slice(start, end),
-    total: shows.length
+    total: shows.length,
+    uniqueVenues
   };
 }
