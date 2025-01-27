@@ -89,6 +89,10 @@ export function getVenueStats(
   page = 1,
   limit = 6
 ): { venues: VenueStat[]; total: number } {
+  if (!shows || !shows.length) {
+    return { venues: [], total: 0 };
+  }
+
   // Group shows by venue
   const venueMap = new Map<string, ShowAttendance[]>();
 
@@ -99,7 +103,7 @@ export function getVenueStats(
   });
 
   // Convert to array and sort by show count
-  const venues = Array.from(venueMap.entries())
+  const allVenues = Array.from(venueMap.entries())
     .map(([venue, shows]) => ({
       venue,
       count: shows.length,
@@ -111,8 +115,8 @@ export function getVenueStats(
   const end = start + limit;
 
   return {
-    venues: venues.slice(start, end),
-    total: venues.length
+    venues: allVenues.slice(start, end),
+    total: allVenues.length
   };
 }
 

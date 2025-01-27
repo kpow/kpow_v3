@@ -3,12 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getAttendedShows, getShowSetlist, getVenueStats, type ShowSetlist } from "@/lib/phish-api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-} from "@/components/ui/pagination";
 import { ShowCard } from "@/components/show-card";
 import { ShowModal } from "@/components/show-modal";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,12 +11,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const ITEMS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 6;
-
-interface SongStat {
-  name: string;
-  count: number;
-  percentage: number;
-}
 
 export default function ShowStats() {
   const username = "koolyp";
@@ -40,19 +28,30 @@ export default function ShowStats() {
     queryFn: () => getAttendedShows(username, 1, 1000)
   });
 
-  const { data: selectedShow, isLoading: setlistLoading } = useQuery({
+  const { data: selectedShow } = useQuery<ShowSetlist | null>({
     queryKey: ["/api/shows/setlist", selectedShowId],
-    queryFn: () => (selectedShowId ? getShowSetlist(selectedShowId) : null),
+    queryFn: async () => {
+      if (!selectedShowId) return null;
+      try {
+        return await getShowSetlist(selectedShowId);
+      } catch (error) {
+        console.error('Error fetching setlist:', error);
+        return null;
+      }
+    },
     enabled: !!selectedShowId
   });
 
   const { data: venueStats, isLoading: venuesLoading } = useQuery({
-    queryKey: ["/api/venues", allShowsData?.shows],
-    queryFn: () => getVenueStats(allShowsData?.shows || [], venuePage, VENUES_PER_PAGE),
+    queryKey: ["/api/venues", allShowsData?.shows, venuePage],
+    queryFn: () => {
+      if (!allShowsData?.shows) return { venues: [], total: 0 };
+      return getVenueStats(allShowsData.shows, venuePage, VENUES_PER_PAGE);
+    },
     enabled: !!allShowsData?.shows
   });
 
-  const { data: songStats = [], isLoading: songsLoading } = useQuery<SongStat[]>({
+  const { data: songStats = [], isLoading: songsLoading } = useQuery({
     queryKey: ["/api/songs", showsData?.shows],
     queryFn: async () => {
       if (!showsData?.shows) return [];
@@ -82,7 +81,7 @@ export default function ShowStats() {
     enabled: !!showsData?.shows
   });
 
-  const isLoading = showsLoading || venuesLoading || setlistLoading || songsLoading;
+  const isLoading = showsLoading || venuesLoading || songsLoading;
 
   return (
     <div className="container mx-auto p-8">
@@ -130,42 +129,24 @@ export default function ShowStats() {
               )}
             </div>
             {venueStats && venueStats.total > VENUES_PER_PAGE && (
-              <div className="mt-4 flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setVenuePage(p => Math.max(1, p - 1))}
-                        disabled={venuePage === 1}
-                      >
-                        Previous
-                      </Button>
-                    </PaginationItem>
-                    {Array.from({ length: Math.min(3, Math.ceil(venueStats.total / VENUES_PER_PAGE)) })
-                      .map((_, i) => (
-                        <PaginationItem key={i}>
-                          <PaginationLink
-                            onClick={() => setVenuePage(i + 1)}
-                            isActive={venuePage === i + 1}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                    <PaginationItem>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setVenuePage(p => p + 1)}
-                        disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
-                      >
-                        Next
-                      </Button>
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+              <div className="mt-4 flex justify-between items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setVenuePage(p => Math.max(1, p - 1))}
+                  disabled={venuePage === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm">Page {venuePage}</span>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVenuePage(p => p + 1)}
+                  disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
+                >
+                  Next
+                </Button>
               </div>
             )}
           </CardContent>
@@ -196,42 +177,24 @@ export default function ShowStats() {
                 ))}
               </div>
               {showsData && showsData.total > ITEMS_PER_PAGE && (
-                <div className="mt-6 flex justify-center">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowPage(p => Math.max(1, p - 1))}
-                          disabled={showPage === 1}
-                        >
-                          Previous
-                        </Button>
-                      </PaginationItem>
-                      {Array.from({ length: Math.min(3, Math.ceil(showsData.total / ITEMS_PER_PAGE)) })
-                        .map((_, i) => (
-                          <PaginationItem key={i}>
-                            <PaginationLink
-                              onClick={() => setShowPage(i + 1)}
-                              isActive={showPage === i + 1}
-                            >
-                              {i + 1}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                      <PaginationItem>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowPage(p => p + 1)}
-                          disabled={showPage * ITEMS_PER_PAGE >= (showsData?.total || 0)}
-                        >
-                          Next
-                        </Button>
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+                <div className="mt-6 flex justify-between items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPage(p => Math.max(1, p - 1))}
+                    disabled={showPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm">Page {showPage}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPage(p => p + 1)}
+                    disabled={showPage * ITEMS_PER_PAGE >= (showsData?.total || 0)}
+                  >
+                    Next
+                  </Button>
                 </div>
               )}
             </>
@@ -240,7 +203,7 @@ export default function ShowStats() {
       </Card>
 
       {/* Song Statistics */}
-      <Card className="mb-8">
+      <Card>
         <CardHeader>
           <CardTitle className="font-slackey">Song Statistics</CardTitle>
         </CardHeader>
@@ -278,6 +241,7 @@ export default function ShowStats() {
         </CardContent>
       </Card>
 
+      {/* Show Modal */}
       <ShowModal
         show={selectedShow}
         isOpen={!!selectedShowId}
