@@ -35,6 +35,11 @@ export default function ShowStats() {
     queryFn: () => getAttendedShows(username, showPage, ITEMS_PER_PAGE)
   });
 
+  const { data: allShowsData } = useQuery({
+    queryKey: ["/api/shows/attended/all", username],
+    queryFn: () => getAttendedShows(username, 1, 1000)
+  });
+
   const { data: selectedShow, isLoading: setlistLoading } = useQuery({
     queryKey: ["/api/shows/setlist", selectedShowId],
     queryFn: () => (selectedShowId ? getShowSetlist(selectedShowId) : null),
@@ -42,9 +47,9 @@ export default function ShowStats() {
   });
 
   const { data: venueStats, isLoading: venuesLoading } = useQuery({
-    queryKey: ["/api/venues", showsData?.shows],
-    queryFn: () => getVenueStats(showsData?.shows || [], venuePage, VENUES_PER_PAGE),
-    enabled: !!showsData?.shows
+    queryKey: ["/api/venues", allShowsData?.shows],
+    queryFn: () => getVenueStats(allShowsData?.shows || [], venuePage, VENUES_PER_PAGE),
+    enabled: !!allShowsData?.shows
   });
 
   const { data: songStats = [], isLoading: songsLoading } = useQuery<SongStat[]>({
@@ -94,7 +99,7 @@ export default function ShowStats() {
                 {isLoading ? (
                   <Skeleton className="h-12 w-24 mx-auto" />
                 ) : (
-                  showsData?.total || 0
+                  allShowsData?.total || 0
                 )}
               </div>
             </div>
@@ -119,32 +124,49 @@ export default function ShowStats() {
                 venueStats?.venues.map(({ venue, count }) => (
                   <div key={venue} className="flex justify-between items-center">
                     <span className="font-medium">{venue}</span>
-                    <span className="text-sm text-muted-foreground">{count}</span>
+                    <span className="text-sm text-muted-foreground">{count} shows</span>
                   </div>
                 ))
               )}
             </div>
             {venueStats && venueStats.total > VENUES_PER_PAGE && (
-              <Pagination className="mt-4">
-                <PaginationContent>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setVenuePage(p => Math.max(1, p - 1))}
-                    disabled={venuePage === 1}
-                  >
-                    Previous
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setVenuePage(p => p + 1)}
-                    disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
-                  >
-                    Next
-                  </Button>
-                </PaginationContent>
-              </Pagination>
+              <div className="mt-4 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setVenuePage(p => Math.max(1, p - 1))}
+                        disabled={venuePage === 1}
+                      >
+                        Previous
+                      </Button>
+                    </PaginationItem>
+                    {Array.from({ length: Math.min(3, Math.ceil(venueStats.total / VENUES_PER_PAGE)) })
+                      .map((_, i) => (
+                        <PaginationItem key={i}>
+                          <PaginationLink
+                            onClick={() => setVenuePage(i + 1)}
+                            isActive={venuePage === i + 1}
+                          >
+                            {i + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                    <PaginationItem>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setVenuePage(p => p + 1)}
+                        disabled={venuePage * VENUES_PER_PAGE >= (venueStats?.total || 0)}
+                      >
+                        Next
+                      </Button>
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -174,42 +196,43 @@ export default function ShowStats() {
                 ))}
               </div>
               {showsData && showsData.total > ITEMS_PER_PAGE && (
-                <Pagination className="mt-6">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowPage(p => Math.max(1, p - 1))}
-                        disabled={showPage === 1}
-                      >
-                        Previous
-                      </Button>
-                    </PaginationItem>
-                    {Array.from({ length: Math.ceil(showsData.total / ITEMS_PER_PAGE) })
-                      .slice(Math.max(0, showPage - 2), showPage + 1)
-                      .map((_, i) => (
-                        <PaginationItem key={i}>
-                          <PaginationLink
-                            onClick={() => setShowPage(i + 1)}
-                            isActive={showPage === i + 1}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                    <PaginationItem>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowPage(p => p + 1)}
-                        disabled={showPage * ITEMS_PER_PAGE >= (showsData?.total || 0)}
-                      >
-                        Next
-                      </Button>
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+                <div className="mt-6 flex justify-center">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowPage(p => Math.max(1, p - 1))}
+                          disabled={showPage === 1}
+                        >
+                          Previous
+                        </Button>
+                      </PaginationItem>
+                      {Array.from({ length: Math.min(3, Math.ceil(showsData.total / ITEMS_PER_PAGE)) })
+                        .map((_, i) => (
+                          <PaginationItem key={i}>
+                            <PaginationLink
+                              onClick={() => setShowPage(i + 1)}
+                              isActive={showPage === i + 1}
+                            >
+                              {i + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                      <PaginationItem>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowPage(p => p + 1)}
+                          disabled={showPage * ITEMS_PER_PAGE >= (showsData?.total || 0)}
+                        >
+                          Next
+                        </Button>
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
               )}
             </>
           )}
@@ -226,10 +249,10 @@ export default function ShowStats() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={songStats.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
-                  angle={-45} 
-                  textAnchor="end" 
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
                   height={100}
                   interval={0}
                   fontSize={12}
@@ -256,7 +279,7 @@ export default function ShowStats() {
       </Card>
 
       <ShowModal
-        show={selectedShow || null}
+        show={selectedShow}
         isOpen={!!selectedShowId}
         onClose={() => setSelectedShowId(null)}
       />

@@ -87,8 +87,9 @@ export interface VenueStat {
 export function getVenueStats(
   shows: ShowAttendance[],
   page = 1,
-  limit = 10
+  limit = 6
 ): { venues: VenueStat[]; total: number } {
+  // Group shows by venue
   const venueMap = new Map<string, ShowAttendance[]>();
 
   shows.forEach(show => {
@@ -97,6 +98,7 @@ export function getVenueStats(
     venueMap.set(show.venue, shows);
   });
 
+  // Convert to array and sort by show count
   const venues = Array.from(venueMap.entries())
     .map(([venue, shows]) => ({
       venue,
