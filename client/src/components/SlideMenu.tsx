@@ -10,7 +10,8 @@ import {
   Gamepad2,
   Music,
   PlayCircle,
-  Code
+  Code,
+  Fish
 } from "lucide-react";
 
 interface SlideMenuProps {
@@ -30,6 +31,7 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
   const menuItems = [
     { icon: <Home className="w-4 h-4" />, label: "home", href: "/" },
     { icon: <Info className="w-4 h-4" />, label: "about kpow", href: "/about" },
+    { icon: <Fish className="w-4 h-4" />, label: "phish stats", href: "/stats" },
     { icon: <Star className="w-4 h-4" />, label: "star feed", href: "/star-feed" },
     { icon: <Book className="w-4 h-4" />, label: "book feed", href: "/book-feed" },
     { icon: <Youtube className="w-4 h-4" />, label: "youtube live", href: "/youtube" },

@@ -17,6 +17,13 @@ export interface VenueStat {
   count: number;
 }
 
+export interface Setlist {
+  showid: string;
+  set: string;
+  song: string;
+  position: number;
+}
+
 // API Functions
 export async function getAttendedShows(
   username: string,
@@ -94,4 +101,17 @@ export async function getPaginatedVenues(
     venues: venueStats.slice(start, end),
     total: venueStats.length
   };
+}
+
+export async function getSetlist(showId: string): Promise<Setlist[]> {
+  const response = await fetch(
+    `${PHISH_API_BASE_URL}/setlists/get.json?showid=${showId}&apikey=${API_KEY}`
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch setlist');
+  }
+
+  const data = await response.json();
+  return data.data;
 }
