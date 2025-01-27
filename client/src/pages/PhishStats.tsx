@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { phishNetApi } from "@/lib/phishnet-api";
+import { phishNetApi, type Show } from "@/lib/phishnet-api";
 
-function ShowsSection({ shows = [] }: { shows: any[] }) {
+function ShowsSection({ shows = [] }: { shows: Show[] }) {
   return (
     <div className="bg-black/5 rounded-lg p-6">
       <h2 className="text-xl font-bold mb-4">Shows</h2>
@@ -36,7 +36,7 @@ function ShowsSection({ shows = [] }: { shows: any[] }) {
   );
 }
 
-function RunStatistics({ shows = [] }: { shows: any[] }) {
+function RunStatistics({ shows = [] }: { shows: Show[] }) {
   const uniqueVenues = new Set(shows.map(show => show.venue)).size;
   const venueStats = shows.reduce((acc, show) => {
     acc[show.venue] = (acc[show.venue] || 0) + 1;
@@ -44,7 +44,7 @@ function RunStatistics({ shows = [] }: { shows: any[] }) {
   }, {} as Record<string, number>);
 
   const sortedVenues = Object.entries(venueStats)
-    .sort(([, a], [, b]) => b - a)
+    .sort(([, a], [, b]) => (b as number) - (a as number))
     .slice(0, 5);
 
   return (

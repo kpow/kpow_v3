@@ -13,11 +13,11 @@ const ShowsResponseSchema = z.object({
   })
 });
 
-type Show = z.infer<typeof ShowSchema>;
+export type Show = z.infer<typeof ShowSchema>;
 
 export class PhishNetApi {
   private readonly baseUrl = "https://api.phish.net/v5";
-  private readonly apiKey: string;
+  private readonly apiKey: string = "";
 
   constructor() {
     const apiKey = import.meta.env.VITE_PHISHNET_APIKEY;
