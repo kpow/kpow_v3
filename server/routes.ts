@@ -36,11 +36,11 @@ async function fetchLastFmData(method: string, params: Record<string, string>) {
     });
 
     const url = `${LASTFM_API_BASE}?${queryParams.toString()}`;
-    console.log("Fetching Last.fm data from:", url);
+    //console.log("Fetching Last.fm data from:", url);
 
     const response = await fetch(url);
     const data = await response.json();
-    console.log("Raw Last.fm response:", JSON.stringify(data, null, 2));
+    //console.log("Raw Last.fm response:", JSON.stringify(data, null, 2));
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to fetch data from Last.fm API");
@@ -291,7 +291,7 @@ export function registerRoutes(app: Express): Server {
         page: "1",
       });
 
-      console.log("Last.fm data before transformation:", data);
+     // console.log("Last.fm data before transformation:", data);
 
       if (!data.recenttracks?.track) {
         throw new Error("No tracks found in Last.fm response");
@@ -309,7 +309,7 @@ export function registerRoutes(app: Express): Server {
         nowPlaying: !!track["@attr"]?.nowplaying,
       }));
 
-      console.log("Transformed tracks:", tracks);
+      //console.log("Transformed tracks:", tracks);
 
       res.json({ tracks });
     } catch (error) {
