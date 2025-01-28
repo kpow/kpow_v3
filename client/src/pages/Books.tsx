@@ -90,7 +90,7 @@ export default function Books() {
       <div className="container mx-auto p-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
-            <Skeleton key={i} className="h-[400px] w-full" />
+            <Skeleton key={i} className="h-[280px] w-full" />
           ))}
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function Books() {
   const handlePageChange = (newPage: number) => {
     console.log(`Changing to page ${newPage}`);
     setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -129,7 +129,7 @@ export default function Books() {
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <span className="text-sm">
-          Page {currentPage} of {totalPages} ({totalBooks} books)
+          {currentPage} of {totalPages} ({totalBooks} books)
         </span>
         <Button
           variant="outline"

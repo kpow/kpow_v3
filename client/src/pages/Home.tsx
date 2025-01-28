@@ -3,6 +3,7 @@ import { RecentPlays } from "@/components/RecentPlays";
 import { BookFeed } from "@/components/BookFeed";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
 
 interface Author {
   name: string[];
@@ -38,17 +39,17 @@ export default function Home() {
   // Debug logs to trace data flow
   const reviews = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
   const firstBook = reviews[0]?.book;
-  console.log('First Book:', firstBook);
+  console.log("First Book:", firstBook);
 
   // Extract values from arrays
   const firstBookTitle = firstBook?.title_without_series?.[0];
   const firstBookAuthor = firstBook?.authors?.[0]?.author?.[0]?.name?.[0];
   const firstBookRating = firstBook?.average_rating?.[0];
 
-  console.log('Extracted Values:', {
+  console.log("Extracted Values:", {
     title: firstBookTitle,
     author: firstBookAuthor,
-    rating: firstBookRating
+    rating: firstBookRating,
   });
 
   const mainSections = [
@@ -56,20 +57,20 @@ export default function Home() {
       title: "battle",
       subtitle: "PLAY",
       imageSrc: "/battle.jpg",
-      type: 'main' as const
+      type: "main" as const,
     },
     {
       title: "tunes",
       subtitle: "LISTEN",
       imageSrc: "/tunes.jpg",
-      type: 'main' as const
+      type: "main" as const,
     },
     {
       title: "pmonk",
       subtitle: "CREDIT",
       imageSrc: "/pmonk.jpg",
-      type: 'main' as const
-    }
+      type: "main" as const,
+    },
   ];
 
   if (isLoading) {
@@ -87,18 +88,19 @@ export default function Home() {
       title: firstBook?.title_without_series?.[0] ?? "Untitled",
       subtitle: `by ${firstBook?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
       imageSrc: firstBook?.image_url?.[0] ?? "/placeholder-book.png",
-      type: 'book' as const,
+      type: "book" as const,
       rating: parseFloat(firstBook?.average_rating?.[0] ?? "0"),
-      description: firstBook?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
+      description: firstBook?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "",
     },
     {
       title: reviews[1]?.book?.title_without_series?.[0] ?? "Untitled",
       subtitle: `by ${reviews[1]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
       imageSrc: reviews[1]?.book?.image_url?.[0] ?? "/placeholder-book.png",
-      type: 'book' as const,
+      type: "book" as const,
       rating: parseFloat(reviews[1]?.book?.average_rating?.[0] ?? "0"),
-      description: reviews[1]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
-    }
+      description:
+        reviews[1]?.book?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "",
+    },
   ];
 
   const starFeed = [
@@ -108,7 +110,7 @@ export default function Home() {
       author: "Tech Research",
       date: "Jan 24",
       imageSrc: "/placeholder-star.png",
-      type: 'star' as const
+      type: "star" as const,
     },
     {
       title: "The Future of Lead Generation",
@@ -116,7 +118,7 @@ export default function Home() {
       author: "Marketing Insights",
       date: "Jan 23",
       imageSrc: "/placeholder-star.png",
-      type: 'star' as const
+      type: "star" as const,
     },
     {
       title: "Understanding API WebSockets",
@@ -124,18 +126,15 @@ export default function Home() {
       author: "Dev Community",
       date: "Jan 22",
       imageSrc: "/placeholder-star.png",
-      type: 'star' as const
-    }
+      type: "star" as const,
+    },
   ];
 
   return (
     <div className="space-y-12">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {mainSections.map((section) => (
-          <ContentSection
-            key={section.title}
-            {...section}
-          />
+          <ContentSection key={section.title} {...section} />
         ))}
       </div>
 
@@ -148,7 +147,11 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">book feed</h2>
-          <button className="text-sm text-gray-500 hover:text-gray-700">SEE MORE</button>
+          <Link key="BookFeed" href="books">
+            <button className="text-sm text-gray-500 hover:text-gray-700">
+              SEE MORE
+            </button>
+          </Link>
         </div>
         <BookFeed />
       </div>
@@ -158,14 +161,13 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">star feed</h2>
-          <button className="text-sm text-gray-500 hover:text-gray-700">SEE MORE</button>
+          <button className="text-sm text-gray-500 hover:text-gray-700">
+            SEE MORE
+          </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {starFeed.map((star) => (
-            <ContentSection
-              key={star.title}
-              {...star}
-            />
+            <ContentSection key={star.title} {...star} />
           ))}
         </div>
       </div>

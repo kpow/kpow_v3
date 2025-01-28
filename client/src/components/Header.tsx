@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Logo } from "./Logo";
 import { SlideMenu } from "./SlideMenu";
+import { Link } from "wouter";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,11 +10,12 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-95 text-white">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <Logo />
-            <div className="font-slackey text-1xl sm:text-2xl">kpow</div>
-          </div>
-
+          <Link key="Home" href="/">
+            <div className="flex items-center gap-2">
+              <Logo />
+              <div className="font-slackey text-1xl sm:text-2xl">kpow</div>
+            </div>
+          </Link>
           <nav className="flex items-center gap-4">
             <button className="font-slackey px-4 py-1 rounded bg-blue-600 hover:bg-blue-700 transition-colors">
               contact
