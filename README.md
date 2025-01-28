@@ -1,6 +1,6 @@
 # KPOW - Digital Content Platform
 
-A comprehensive Phish show statistics and analysis web application that provides deep insights into concert performances using the Phish.net API, enabling fans to explore and understand the band's live music history.
+My coding playground and the begining of my post-singularity self.
 
 ## Tech Stack
 
