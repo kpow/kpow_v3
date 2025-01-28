@@ -112,18 +112,18 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {mainSections.map((section) => (
           <ContentSection key={section.title} {...section} />
         ))}
       </div>
 
-      <div className="h-px bg-gray-200 my-8" />
+      <div className="h-px bg-gray-200 my-4" />
 
       <RecentPlays />
 
-      <div className="h-px bg-gray-200 my-8" />
+      <div className="h-px bg-gray-200 my-4" />
 
       <div>
         <div className="flex items-center justify-between mb-6">
@@ -137,7 +137,7 @@ export default function Home() {
         <BookFeed />
       </div>
 
-      <div className="h-px bg-gray-200 my-8" />
+      <div className="h-px bg-gray-200 my-4" />
 
       <div>
         <div className="flex items-center justify-between mb-6">
