@@ -80,30 +80,6 @@ export function ContentSection({
     );
   }
 
-  if (type === 'star') {
-    return (
-      <div className="group relative">
-        <div className="aspect-[16/9] overflow-hidden rounded-lg bg-gray-100">
-          <img
-            src={imageSrc}
-            alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        </div>
-        <div className="mt-4">
-          {author && (
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-gray-600">{author}</span>
-              {date && <span className="text-sm text-gray-400">• {date}</span>}
-            </div>
-          )}
-          <h3 className="text-base font-bold line-clamp-2">{title}</h3>
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2">{subtitle}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="group relative">
       <div 
@@ -115,6 +91,13 @@ export function ContentSection({
         <div className="h-full w-full bg-gray-300 transition-transform duration-300 group-hover:scale-105" />
       </div>
       <div className={`mt-4 ${type === 'recent' ? 'text-sm' : ''}`}>
+        {type === 'star' && author && (
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-6 w-6 rounded-full bg-gray-300" />
+            <span className="text-sm text-gray-600">{author}</span>
+            {date && <span className="text-sm text-gray-400">• {date}</span>}
+          </div>
+        )}
         <h3 className="text-base font-bold">{title}</h3>
         <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
       </div>

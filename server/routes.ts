@@ -410,32 +410,19 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
-      // Log the complete first article for debugging
-      if (response.data.length > 0) {
-        console.log("Complete article data structure:", JSON.stringify(response.data[0], null, 2));
-      }
-
       // Transform the data with default values
-      const articles = response.data.map((article: any) => {
-        const transformedArticle = {
-          id: article?.id ?? 0,
-          title: article?.title ?? 'Untitled Article',
-          author: article?.author ?? 'Unknown Author',
-          summary: article?.summary ?? article?.content ?? 'No content available',
-          url: article?.url ?? '#',
-          published: article?.published ?? new Date().toISOString(),
-          screenshot: article?.url 
-            ? `https://proxy.feedbinusercontent.com/v3/screenshot?url=${encodeURIComponent(article.url)}`
-            : '/placeholder-star.png',
-          feed: {
-            title: article?.feed?.title ?? 'Unknown Feed',
-            url: article?.feed?.feed_url ?? '#'
-          }
-        };
-
-        console.log("Transformed article with screenshot URL:", transformedArticle);
-        return transformedArticle;
-      });
+      const articles = response.data.map((article: any) => ({
+        id: article?.id ?? 0,
+        title: article?.title ?? 'Untitled Article',
+        author: article?.author ?? 'Unknown Author',
+        summary: article?.summary ?? article?.content ?? 'No content available',
+        url: article?.url ?? '#',
+        published: article?.published ?? new Date().toISOString(),
+        feed: {
+          title: article?.feed?.title ?? 'Unknown Feed',
+          url: article?.feed?.feed_url ?? '#'
+        }
+      }));
 
       res.json({
         articles,
