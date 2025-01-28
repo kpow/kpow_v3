@@ -70,9 +70,9 @@ export function BookFeed() {
                 <img
                   src={imageUrl}
                   alt={title}
-                  className="w-24 h-36 object-cover"
+                  className="w-36 h-48 object-cover"
                 />
-                <div>
+                <div className="flex-1">
                   <h3 className="font-semibold text-lg">{title}</h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     by {author}
@@ -87,7 +87,7 @@ export function BookFeed() {
                       </span>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-3 mt-2">
+                  <p className="text-sm text-muted-foreground line-clamp-6 mt-2">
                     {description}
                   </p>
                   <a
