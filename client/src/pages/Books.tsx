@@ -52,9 +52,12 @@ export default function Books() {
     queryKey: ["/api/books", currentPage, BOOKS_PER_PAGE],
     queryFn: async () => {
       console.log(`Fetching page ${currentPage} of books...`);
-      const response = await fetch(`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`,
+        {
+          credentials: "include",
+        },
+      );
       if (!response.ok) {
         throw new Error(`${response.status}: ${await response.text()}`);
       }
@@ -71,8 +74,12 @@ export default function Books() {
     return (
       <div className="container mx-auto p-4">
         <div className="text-center py-8">
-          <h1 className="text-2xl font-bold text-red-500 mb-4">Error loading books</h1>
-          <p className="text-gray-600">{error instanceof Error ? error.message : 'Please try again later'}</p>
+          <h1 className="text-2xl font-bold text-red-500 mb-4">
+            Error loading books
+          </h1>
+          <p className="text-gray-600">
+            {error instanceof Error ? error.message : "Please try again later"}
+          </p>
         </div>
       </div>
     );
@@ -81,7 +88,7 @@ export default function Books() {
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
             <Skeleton key={i} className="h-[400px] w-full" />
           ))}
@@ -104,7 +111,7 @@ export default function Books() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">My Books</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
         {books.map((review, index) => (
           <BookCard key={`${currentPage}-${index}`} review={review} />
         ))}
@@ -126,7 +133,9 @@ export default function Books() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+          onClick={() =>
+            handlePageChange(Math.min(currentPage + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />
