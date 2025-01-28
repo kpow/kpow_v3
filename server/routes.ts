@@ -5,11 +5,49 @@ if (!process.env.PHISH_API_KEY) {
   throw new Error("PHISH_API_KEY environment variable is required");
 }
 
+if (!process.env.LASTFM_API_KEY) {
+  throw new Error("LASTFM_API_KEY environment variable is required");
+}
+
 const PHISH_API_BASE = "https://api.phish.net/v5";
+const LASTFM_API_BASE = "https://ws.audioscrobbler.com/2.0/";
 
 interface VenueCount {
   venue: string;
   count: number;
+}
+
+async function fetchLastFmData(method: string, params: Record<string, string>) {
+  try {
+    const apiKey = process.env.LASTFM_API_KEY;
+    if (!apiKey) {
+      throw new Error("Last.fm API key is not set");
+    }
+
+    const queryParams = new URLSearchParams();
+    queryParams.append("method", method);
+    queryParams.append("api_key", apiKey);
+    queryParams.append("format", "json");
+    Object.entries(params).forEach(([key, value]) => {
+      queryParams.append(key, value);
+    });
+
+    const response = await fetch(
+      `${LASTFM_API_BASE}?${queryParams.toString()}`
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to fetch data from Last.fm API"
+      );
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching from Last.fm:", error);
+    throw error;
+  }
 }
 
 async function fetchPhishData(endpoint: string) {
@@ -52,7 +90,7 @@ export function registerRoutes(app: Express): Server {
 
       const formattedShows = paginatedShows.map((show: any) => ({
         showid: show.showid,
-        showdate: show.showdate, // Already in YYYY-MM-DD format
+        showdate: show.showdate, 
         venue: show.venue,
         city: show.city,
         state: show.state,
@@ -82,7 +120,6 @@ export function registerRoutes(app: Express): Server {
       const limit = parseInt(req.query.limit as string) || 5;
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      // Count shows per venue
       const venueStats = shows.reduce(
         (acc: { [key: string]: number }, show: any) => {
           acc[show.venue] = (acc[show.venue] || 0) + 1;
@@ -91,10 +128,9 @@ export function registerRoutes(app: Express): Server {
         {},
       );
 
-      // Convert to array and sort by count with proper typing
-      const sortedVenues: VenueCount[] = Object.entries(venueStats)
-        .map(([venue, count]): VenueCount => ({ venue, count }))
-        .sort((a: VenueCount, b: VenueCount) => b.count - a.count);
+      const sortedVenues = Object.entries(venueStats)
+        .map(([venue, count]) => ({ venue, count: Number(count) }))
+        .sort((a, b) => b.count - a.count);
 
       const start = (page - 1) * limit;
       const end = start + limit;
@@ -122,7 +158,6 @@ export function registerRoutes(app: Express): Server {
       const setlistData = await fetchPhishData(`/setlists/showid/${showId}`);
 
       if (Array.isArray(setlistData) && setlistData.length > 0) {
-        // Group songs by set
         const setGroups = setlistData.reduce((acc: any, song: any) => {
           if (!acc[song.set]) {
             acc[song.set] = [];
@@ -136,7 +171,6 @@ export function registerRoutes(app: Express): Server {
           return acc;
         }, {});
 
-        // Format the setlist text
         const formatSet = (songs: any[]) => {
           return songs
             .sort((a, b) => a.position - b.position)
@@ -145,7 +179,6 @@ export function registerRoutes(app: Express): Server {
             .trim();
         };
 
-        // Build the complete setlist text
         let setlistText = "";
         if (setGroups["1"]) {
           setlistText += "Set 1: " + formatSet(setGroups["1"]) + "\n\n";
@@ -194,7 +227,6 @@ export function registerRoutes(app: Express): Server {
       const shows = await fetchPhishData("/attendance/username/koolyp");
       const songCounts = new Map<string, number>();
 
-      // Fetch setlist for each show
       for (const show of shows) {
         const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`);
         if (Array.isArray(setlist)) {
@@ -207,7 +239,6 @@ export function registerRoutes(app: Express): Server {
         }
       }
 
-      // Convert to array and sort by count
       const songStats = Array.from(songCounts.entries())
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count);
@@ -225,7 +256,6 @@ export function registerRoutes(app: Express): Server {
       const shows = await fetchPhishData("/attendance/username/koolyp");
       const songOccurrences = [];
 
-      // Fetch setlist for each show and find occurrences of the song
       for (const show of shows) {
         const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`);
         if (Array.isArray(setlist)) {
@@ -246,6 +276,29 @@ export function registerRoutes(app: Express): Server {
       res.json(songOccurrences);
     } catch (error) {
       console.error("Error fetching song setlist:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  app.get("/api/lastfm/recent-tracks", async (req, res) => {
+    try {
+      const data = await fetchLastFmData("user.getrecenttracks", {
+        user: "kpow",
+        limit: "10",
+      });
+
+      const tracks = data.recenttracks.track.map((track: any) => ({
+        name: track.name,
+        artist: track.artist["#text"],
+        album: track.album["#text"],
+        image: track.image.find((img: any) => img.size === "large")["#text"],
+        url: track.url,
+        date: track.date?.uts ? new Date(Number(track.date.uts) * 1000).toISOString() : null,
+        nowPlaying: !!track["@attr"]?.nowplaying,
+      }));
+
+      res.json({ tracks });
+    } catch (error) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
