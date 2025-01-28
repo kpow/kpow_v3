@@ -48,7 +48,8 @@ export function BookFeed() {
     <div className="space-y-4">
 
       {readBooks?.map((review, index) => {
-        console.log('Review:', review);
+        console.log('Review Book:', review.book);
+        console.log('Review Shelves:', review.shelves);
         return (
           <Card key={index} className="overflow-hidden">
             <CardContent className="p-4">
