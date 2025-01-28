@@ -5,11 +5,6 @@ if (!process.env.PHISH_API_KEY) {
   throw new Error("PHISH_API_KEY environment variable is required");
 }
 
-if (!process.env.LASTFM_API_KEY) {
-  throw new Error("LASTFM_API_KEY environment variable is required");
-}
-
-const PHISH_API_BASE = "https://api.phish.net/v5";
 const LASTFM_API_BASE = "http://ws.audioscrobbler.com/2.0";
 
 interface VenueCount {
@@ -42,6 +37,10 @@ export function registerRoutes(app: Express): Server {
   // Last.fm API endpoint
   app.get("/api/lastfm/recent-tracks", async (_req, res) => {
     try {
+      if (!process.env.LASTFM_API_KEY) {
+        throw new Error("LASTFM_API_KEY environment variable is required");
+      }
+
       const response = await fetch(
         `${LASTFM_API_BASE}/?method=user.getrecenttracks&user=kpow&api_key=${process.env.LASTFM_API_KEY}&format=json&limit=10`
       );
@@ -107,19 +106,20 @@ export function registerRoutes(app: Express): Server {
       const limit = parseInt(req.query.limit as string) || 5;
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      // Count shows per venue
-      const venueStats = shows.reduce(
-        (acc: { [key: string]: number }, show: any) => {
-          acc[show.venue] = (acc[show.venue] || 0) + 1;
+      // Count shows per venue with type safety
+      const venueStats: Record<string, number> = shows.reduce(
+        (acc: Record<string, number>, show: any) => {
+          const venueName = show.venue as string;
+          acc[venueName] = (acc[venueName] || 0) + 1;
           return acc;
         },
-        {},
+        {}
       );
 
-      // Convert to array and sort by count with proper typing
+      // Convert to array and sort by count
       const sortedVenues: VenueCount[] = Object.entries(venueStats)
-        .map(([venue, count]): VenueCount => ({ venue, count }))
-        .sort((a: VenueCount, b: VenueCount) => b.count - a.count);
+        .map(([venue, count]) => ({ venue, count }))
+        .sort((a, b) => b.count - a.count);
 
       const start = (page - 1) * limit;
       const end = start + limit;
@@ -285,3 +285,5 @@ function formatSongUrl(songName: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")}`;
 }
+
+const PHISH_API_BASE = "https://api.phish.net/v5";
