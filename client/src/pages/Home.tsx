@@ -1,6 +1,7 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Book {
   book: {
@@ -25,14 +26,8 @@ interface GoodreadsResponse {
 }
 
 export default function Home() {
-  const { data: bookData } = useQuery<GoodreadsResponse>({
+  const { data: bookData, isLoading } = useQuery<GoodreadsResponse>({
     queryKey: ["/api/books"],
-  });
-
-  console.log('Debug Book Data:', {
-    fullData: bookData,
-    reviews: bookData?.GoodreadsResponse?.reviews,
-    specificBook: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]
   });
 
   const mainSections = [
@@ -56,22 +51,32 @@ export default function Home() {
     }
   ];
 
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 space-y-4">
+        {[...Array(6)].map((_, i) => (
+          <Skeleton key={i} className="h-[200px] w-full" />
+        ))}
+      </div>
+    );
+  }
+
   const bookFeed = [
     {
-      title: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.title_without_series?.[0] ?? "Untitled",
-      subtitle: `by ${bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
-      imageSrc: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.image_url?.[0] ?? "/placeholder-book.png",
+      title: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.title_without_series[0] ?? "Untitled",
+      subtitle: `by ${bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.authors[0]?.author[0]?.name[0] ?? "Unknown"}`,
+      imageSrc: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.image_url[0] ?? "/placeholder-book.png",
       type: 'book' as const,
-      rating: parseFloat(bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.average_rating?.[0] ?? "0"),
-      description: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
+      rating: parseFloat(bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.average_rating[0] ?? "0"),
+      description: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.description[0]?.replace(/<[^>]*>/g, '') ?? ""
     },
     {
-      title: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.title_without_series?.[0] ?? "Untitled",
-      subtitle: `by ${bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
-      imageSrc: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.image_url?.[0] ?? "/placeholder-book.png",
+      title: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.title_without_series[0] ?? "Untitled",
+      subtitle: `by ${bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.authors[0]?.author[0]?.name[0] ?? "Unknown"}`,
+      imageSrc: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.image_url[0] ?? "/placeholder-book.png",
       type: 'book' as const,
-      rating: parseFloat(bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.average_rating?.[0] ?? "0"),
-      description: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
+      rating: parseFloat(bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.average_rating[0] ?? "0"),
+      description: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.description[0]?.replace(/<[^>]*>/g, '') ?? ""
     }
   ];
 
