@@ -321,7 +321,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/books", async (req, res) => {
     try {
       const page = req.query.page || "1";
-      const perPage = req.query.per_page || "2";
+      const perPage = req.query.per_page || "10";
 
       const url = `${GOODREADS_API_BASE}/review/list/${GOODREADS_USER_ID}.xml`;
       console.log("Fetching from Goodreads URL:", url);
