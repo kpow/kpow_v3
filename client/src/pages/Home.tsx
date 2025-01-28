@@ -35,12 +35,20 @@ export default function Home() {
   });
 
   // Debug logs to trace data flow
-  console.log('Raw Book Data:', bookData);
   const reviews = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
   const firstBook = reviews[0]?.book;
   console.log('First Book:', firstBook);
-  console.log('First Book Title:', firstBook?.title_without_series?.[0]);
-  console.log('First Book Author:', firstBook?.authors?.[0]?.author?.[0]?.name?.[0]);
+
+  // Extract values from arrays
+  const firstBookTitle = firstBook?.title_without_series?.[0];
+  const firstBookAuthor = firstBook?.authors?.[0]?.author?.[0]?.name?.[0];
+  const firstBookRating = firstBook?.average_rating?.[0];
+
+  console.log('Extracted Values:', {
+    title: firstBookTitle,
+    author: firstBookAuthor,
+    rating: firstBookRating
+  });
 
   const mainSections = [
     {
@@ -118,7 +126,6 @@ export default function Home() {
       type: 'star' as const
     }
   ];
-
 
   return (
     <div className="space-y-12">
