@@ -4,6 +4,7 @@ import { BookFeed } from "@/components/BookFeed";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
+import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
 
 interface Author {
   name: string[];
@@ -32,25 +33,18 @@ interface GoodreadsResponse {
 }
 
 export default function Home() {
-  const { data: bookData, isLoading } = useQuery<GoodreadsResponse>({
+  const { data: bookData, isLoading: isLoadingBooks } = useQuery<GoodreadsResponse>({
     queryKey: ["/api/books"],
   });
 
-  // Debug logs to trace data flow
+  const { data: starredData, isLoading: isLoadingStarred } = useStarredArticles();
+
   const reviews = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
   const firstBook = reviews[0]?.book;
-  console.log("First Book:", firstBook);
 
-  // Extract values from arrays
   const firstBookTitle = firstBook?.title_without_series?.[0];
   const firstBookAuthor = firstBook?.authors?.[0]?.author?.[0]?.name?.[0];
   const firstBookRating = firstBook?.average_rating?.[0];
-
-  console.log("Extracted Values:", {
-    title: firstBookTitle,
-    author: firstBookAuthor,
-    rating: firstBookRating,
-  });
 
   const mainSections = [
     {
@@ -73,16 +67,6 @@ export default function Home() {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-4 space-y-4">
-        {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} className="h-[200px] w-full" />
-        ))}
-      </div>
-    );
-  }
-
   const bookFeed = [
     {
       title: firstBook?.title_without_series?.[0] ?? "Untitled",
@@ -103,32 +87,26 @@ export default function Home() {
     },
   ];
 
-  const starFeed = [
+  const starFeed = starredData?.articles ?? [
     {
-      title: "AI-Generated Disinformation",
-      subtitle: "Understanding its Impact and Implications",
-      author: "Tech Research",
-      date: "Jan 24",
+      title: "Loading...",
+      subtitle: "Please wait",
+      author: "Loading",
+      date: "Loading",
       imageSrc: "/placeholder-star.png",
       type: "star" as const,
-    },
-    {
-      title: "The Future of Lead Generation",
-      subtitle: "Why First Party Data Will Define 2025",
-      author: "Marketing Insights",
-      date: "Jan 23",
-      imageSrc: "/placeholder-star.png",
-      type: "star" as const,
-    },
-    {
-      title: "Understanding API WebSockets",
-      subtitle: "How They Work, Benefits, and Best Practices",
-      author: "Dev Community",
-      date: "Jan 22",
-      imageSrc: "/placeholder-star.png",
-      type: "star" as const,
-    },
+    }
   ];
+
+  if (isLoadingBooks || isLoadingStarred) {
+    return (
+      <div className="container mx-auto p-4 space-y-4">
+        {[...Array(6)].map((_, i) => (
+          <Skeleton key={i} className="h-[200px] w-full" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12">
@@ -166,9 +144,21 @@ export default function Home() {
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {starFeed.map((star) => (
-            <ContentSection key={star.title} {...star} />
-          ))}
+          {isLoadingStarred ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="space-y-4">
+                <Skeleton className="h-48 w-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))
+          ) : (
+            starFeed.map((star) => (
+              <ContentSection key={star.title} {...star} />
+            ))
+          )}
         </div>
       </div>
     </div>

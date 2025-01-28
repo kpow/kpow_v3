@@ -387,6 +387,66 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.get("/api/starred-articles", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 20;
+
+      if (!process.env.FEEDBIN_KEY) {
+        throw new Error("FEEDBIN_KEY environment variable is required");
+      }
+
+      const API_ENDPOINT = `https://api.feedbin.com/v2/entries.json`;
+
+      const response = await axios.get(API_ENDPOINT, {
+        params: {
+          starred: true,
+          per_page: perPage,
+          page: page
+        },
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+        }
+      });
+
+      // Transform the data with default values
+      const articles = response.data.map((article: any) => ({
+        id: article?.id ?? 0,
+        title: article?.title ?? 'Untitled Article',
+        author: article?.author ?? 'Unknown Author',
+        summary: article?.summary ?? article?.content ?? 'No content available',
+        url: article?.url ?? '#',
+        published: article?.published ?? new Date().toISOString(),
+        feed: {
+          title: article?.feed?.title ?? 'Unknown Feed',
+          url: article?.feed?.feed_url ?? '#'
+        }
+      }));
+
+      res.json({
+        articles,
+        pagination: {
+          current_page: page,
+          per_page: perPage,
+          total: response.headers['total-count'] ? parseInt(response.headers['total-count']) : articles.length,
+        }
+      });
+
+    } catch (error) {
+      console.error("Error fetching starred articles:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch starred articles",
+        articles: [],
+        pagination: {
+          current_page: 1,
+          per_page: 20,
+          total: 0
+        }
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
