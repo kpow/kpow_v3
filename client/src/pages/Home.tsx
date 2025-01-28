@@ -8,11 +8,11 @@ interface GoodreadsBook {
     image_url: string[];
     description: string[];
     average_rating: string[];
-    authors: {
+    authors: Array<{
       author: Array<{
         name: string[];
       }>;
-    }[];
+    }>;
   };
 }
 
@@ -50,16 +50,22 @@ export default function Home() {
     }
   ];
 
-  const bookFeed = bookData?.GoodreadsResponse?.reviews[1]?.review
+  const bookFeed = bookData?.GoodreadsResponse?.reviews?.[1]?.review
     ?.slice(0, 2)
     .map(reviewData => ({
-      title: reviewData.book.title_without_series[0],
-      subtitle: `by ${reviewData.book.authors[0].author[0].name[0]}`,
-      imageSrc: reviewData.book.image_url[0],
+      title: reviewData?.book?.title_without_series?.[0] ?? "Untitled Book",
+      subtitle: `by ${reviewData?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author"}`,
+      imageSrc: reviewData?.book?.image_url?.[0] ?? "/placeholder-book.png",
       type: 'book' as const,
-      rating: parseFloat(reviewData.book.average_rating[0]),
-      description: reviewData.book.description[0]
+      rating: parseFloat(reviewData?.book?.average_rating?.[0] ?? "0"),
+      description: reviewData?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? "No description available"
     })) || [];
+
+  console.log('Book Data:', {
+    rawResponse: bookData,
+    reviews: bookData?.GoodreadsResponse?.reviews,
+    bookFeed
+  });
 
   const starFeed = [
     {
@@ -114,9 +120,9 @@ export default function Home() {
           <button className="text-sm text-gray-500 hover:text-gray-700">SEE MORE</button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {bookFeed.map((book) => (
+          {bookFeed?.map((book, index) => (
             <ContentSection
-              key={book.title}
+              key={`${book.title}-${index}`}
               {...book}
             />
           ))}
