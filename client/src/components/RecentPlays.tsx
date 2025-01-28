@@ -65,7 +65,7 @@ export function RecentPlays() {
       >
         <CarouselContent>
           {data.tracks.map((track, index) => (
-            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/4">
               <a
                 href={track.url}
                 target="_blank"
@@ -73,27 +73,29 @@ export function RecentPlays() {
                 className="block"
               >
                 <Card>
-                  <CardContent className="flex flex-col p-4">
-                    <div className="relative aspect-square mb-3">
-                      <img
-                        src={track.image}
-                        alt={`${track.album} cover`}
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                      {track.nowPlaying && (
-                        <span className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs">
-                          Now Playing
-                        </span>
-                      )}
+                  <CardContent className="p-0">
+                    <div className="relative w-full">
+                      <div className="relative aspect-square">
+                        <img
+                          src={track.image}
+                          alt={`${track.album} cover`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                          <div className="absolute bottom-0 p-3 text-white">
+                            <p className="font-semibold text-sm">{track.artist}</p>
+                            <p className="text-xs opacity-80">{track.album}</p>
+                          </div>
+                        </div>
+                        {track.nowPlaying && (
+                          <span className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs">
+                            Now Playing
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <h3 className="font-semibold truncate">{track.name}</h3>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {track.artist}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {track.album}
-                      </p>
+                    <div className="p-2">
+                      <h3 className="text-sm font-medium truncate">{track.name}</h3>
                     </div>
                   </CardContent>
                 </Card>
