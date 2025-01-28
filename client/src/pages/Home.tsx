@@ -3,6 +3,10 @@ import { RecentPlays } from "@/components/RecentPlays";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface Author {
+  name: string[];
+}
+
 interface Book {
   book: {
     title_without_series: string[];
@@ -10,9 +14,7 @@ interface Book {
     image_url: string[];
     link: string[];
     authors: Array<{
-      author: Array<{
-        name: string[];
-      }>;
+      author: Array<Author>;
     }>;
     average_rating: string[];
   };
@@ -21,6 +23,7 @@ interface Book {
 interface GoodreadsResponse {
   GoodreadsResponse: {
     reviews: Array<{
+      $: { start: string; end: string; total: string };
       review: Book[];
     }>;
   };
@@ -33,9 +36,11 @@ export default function Home() {
 
   // Debug logs to trace data flow
   console.log('Raw Book Data:', bookData);
-  console.log('Reviews:', bookData?.GoodreadsResponse?.reviews);
-  console.log('Reviews Array:', bookData?.GoodreadsResponse?.reviews?.[0]?.review);
-  console.log('First Review Object:', bookData?.GoodreadsResponse?.reviews?.[0]?.review?.[0]);
+  const reviews = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
+  const firstBook = reviews[0]?.book;
+  console.log('First Book:', firstBook);
+  console.log('First Book Title:', firstBook?.title_without_series?.[0]);
+  console.log('First Book Author:', firstBook?.authors?.[0]?.author?.[0]?.name?.[0]);
 
   const mainSections = [
     {
@@ -68,24 +73,22 @@ export default function Home() {
     );
   }
 
-  const books = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
-
   const bookFeed = [
     {
-      title: books[0]?.book?.title_without_series?.[0] ?? "Untitled",
-      subtitle: `by ${books[0]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
-      imageSrc: books[0]?.book?.image_url?.[0] ?? "/placeholder-book.png",
+      title: firstBook?.title_without_series?.[0] ?? "Untitled",
+      subtitle: `by ${firstBook?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
+      imageSrc: firstBook?.image_url?.[0] ?? "/placeholder-book.png",
       type: 'book' as const,
-      rating: parseFloat(books[0]?.book?.average_rating?.[0] ?? "0"),
-      description: books[0]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
+      rating: parseFloat(firstBook?.average_rating?.[0] ?? "0"),
+      description: firstBook?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
     },
     {
-      title: books[1]?.book?.title_without_series?.[0] ?? "Untitled",
-      subtitle: `by ${books[1]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
-      imageSrc: books[1]?.book?.image_url?.[0] ?? "/placeholder-book.png",
+      title: reviews[1]?.book?.title_without_series?.[0] ?? "Untitled",
+      subtitle: `by ${reviews[1]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
+      imageSrc: reviews[1]?.book?.image_url?.[0] ?? "/placeholder-book.png",
       type: 'book' as const,
-      rating: parseFloat(books[1]?.book?.average_rating?.[0] ?? "0"),
-      description: books[1]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
+      rating: parseFloat(reviews[1]?.book?.average_rating?.[0] ?? "0"),
+      description: reviews[1]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
     }
   ];
 
@@ -115,6 +118,7 @@ export default function Home() {
       type: 'star' as const
     }
   ];
+
 
   return (
     <div className="space-y-12">
