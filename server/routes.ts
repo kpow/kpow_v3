@@ -321,7 +321,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/books", async (req, res) => {
     try {
       const page = req.query.page || "1";
-      const perPage = req.query.per_page || "10";
+      const perPage = req.query.per_page || "20"; 
 
       const url = `${GOODREADS_API_BASE}/review/list/${GOODREADS_USER_ID}.xml`;
       console.log("Fetching from Goodreads URL:", url);
@@ -332,16 +332,49 @@ export function registerRoutes(app: Express): Server {
           v: "2",
           per_page: perPage,
           page: page,
-          shelf: "read"
+          shelf: "read",
+          sort: "date_read",
+          order: "d"
         }
       });
 
       console.log("Raw XML response received");
+      console.log("Params:", { page, perPage });
 
-      const result = await parseXMLAsync(response.data);
-      console.log("Books response:", JSON.stringify(result.GoodreadsResponse.reviews[0].review, null, 2));
+      const result = await parseXMLAsync(response.data) as {
+        GoodreadsResponse: {
+          reviews: Array<{
+            $: { total: string; start: string; end: string };
+            review: Array<any>;
+          }>;
+        };
+      };
 
-      res.json(result);
+      const reviews = result.GoodreadsResponse.reviews[0];
+
+      // Extract pagination metadata
+      const total = parseInt(reviews.$.total);
+      const start = parseInt(reviews.$.start);
+      const end = parseInt(reviews.$.end);
+      const currentPage = parseInt(page as string);
+      const totalPages = Math.ceil(total / parseInt(perPage as string));
+
+      console.log("Pagination:", { total, start, end, currentPage, totalPages });
+
+      // Construct a properly typed response object
+      const responseData = {
+        GoodreadsResponse: result.GoodreadsResponse,
+        pagination: {
+          total,
+          start,
+          end,
+          currentPage,
+          totalPages,
+          hasMore: currentPage < totalPages
+        }
+      };
+
+      res.json(responseData);
     } catch (error) {
       console.error("Error fetching books from Goodreads:", error);
       res.status(500).json({ 

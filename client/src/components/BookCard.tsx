@@ -44,17 +44,22 @@ export function BookCard({ review }: BookCardProps) {
   }
 
   // Safely access properties with optional chaining and default values
-  const title = review?.book?.title?.[0] ?? 'Untitled Book';
-  const imageUrl = review?.book?.image_url?.[0] ?? 'https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png';
-  const authorName = review?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? 'Unknown Author';
-  const description = review?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? 'No description available';
-  const bookLink = review?.book?.link?.[0] ?? '#';
+  const title = review?.book[0]?.title?.[0] ?? "Untitled Book";
+  const imageUrl =
+    review?.book[0]?.image_url?.[0] ??
+    "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
+  const authorName =
+    review?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
+  const description =
+    review?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ??
+    "No description available";
+  const bookLink = review?.book[0]?.link?.[0] ?? "#";
 
   return (
     <Card className="overflow-hidden h-full hover:shadow-lg transition-shadow">
       <CardContent className="p-4">
         <div className="flex flex-col">
-          <img 
+          <img
             src={imageUrl}
             alt={title}
             className="w-full h-48 object-cover mb-4"
@@ -67,9 +72,9 @@ export function BookCard({ review }: BookCardProps) {
             <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
               {description}
             </p>
-            <a 
+            <a
               href={bookLink}
-              target="_blank" 
+              target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-blue-600 hover:underline mt-2 inline-block"
             >
