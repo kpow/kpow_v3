@@ -1,5 +1,6 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
+import { BookFeed } from "@/components/BookFeed";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -149,14 +150,7 @@ export default function Home() {
           <h2 className="text-2xl font-bold font-slackey">book feed</h2>
           <button className="text-sm text-gray-500 hover:text-gray-700">SEE MORE</button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {bookFeed.map((book, index) => (
-            <ContentSection
-              key={`${book.title}-${index}`}
-              {...book}
-            />
-          ))}
-        </div>
+        <BookFeed />
       </div>
 
       <div className="h-px bg-gray-200 my-8" />
