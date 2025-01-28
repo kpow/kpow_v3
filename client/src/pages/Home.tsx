@@ -30,22 +30,12 @@ export default function Home() {
     queryKey: ["/api/books"],
   });
 
-  // Debug log to see the actual values
-  console.log('Book Data Values:', {
-    // First book values
-    book1Title: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.title_without_series[0],
-    book1Image: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.image_url[0],
-    book1Desc: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.description[0],
-    book1Author: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.authors[0]?.author[0]?.name[0],
-    book1Rating: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.average_rating[0],
+  // Debug logs to trace data flow
+  console.log('Raw Book Data:', bookData);
+  console.log('Reviews:', bookData?.GoodreadsResponse?.reviews);
+  console.log('First Review:', bookData?.GoodreadsResponse?.reviews?.[1]);
+  console.log('Books in First Review:', bookData?.GoodreadsResponse?.reviews?.[1]?.review);
 
-    // Second book values
-    book2Title: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.title_without_series[0],
-    book2Image: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.image_url[0],
-    book2Desc: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.description[0],
-    book2Author: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.authors[0]?.author[0]?.name[0],
-    book2Rating: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.average_rating[0]
-  });
 
   const mainSections = [
     {
@@ -126,7 +116,6 @@ export default function Home() {
 
   return (
     <div className="space-y-12">
-      {/* Main sections */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {mainSections.map((section) => (
           <ContentSection
@@ -138,12 +127,10 @@ export default function Home() {
 
       <div className="h-px bg-gray-200 my-8" />
 
-      {/* Recently Played */}
       <RecentPlays />
 
       <div className="h-px bg-gray-200 my-8" />
 
-      {/* Book Feed */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">book feed</h2>
@@ -161,7 +148,6 @@ export default function Home() {
 
       <div className="h-px bg-gray-200 my-8" />
 
-      {/* Star Feed */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">star feed</h2>
