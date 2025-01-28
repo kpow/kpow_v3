@@ -410,19 +410,25 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
-      // Transform the data with default values
+      // Log the complete response for debugging
+      console.log("Complete Feedbin Response:", JSON.stringify(response.data, null, 2));
+
+      // Transform the data with default values and include extracted_content_url
       const articles = response.data.map((article: any) => ({
         id: article?.id ?? 0,
         title: article?.title ?? 'Untitled Article',
         author: article?.author ?? 'Unknown Author',
         summary: article?.summary ?? article?.content ?? 'No content available',
         url: article?.url ?? '#',
+        extracted_content_url: article?.extracted_content_url,
         published: article?.published ?? new Date().toISOString(),
         feed: {
           title: article?.feed?.title ?? 'Unknown Feed',
           url: article?.feed?.feed_url ?? '#'
         }
       }));
+
+      console.log("Transformed Articles:", JSON.stringify(articles, null, 2));
 
       res.json({
         articles,
