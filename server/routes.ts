@@ -5,7 +5,12 @@ if (!process.env.PHISH_API_KEY) {
   throw new Error("PHISH_API_KEY environment variable is required");
 }
 
+if (!process.env.LASTFM_API_KEY) {
+  throw new Error("LASTFM_API_KEY environment variable is required");
+}
+
 const PHISH_API_BASE = "https://api.phish.net/v5";
+const LASTFM_API_BASE = "http://ws.audioscrobbler.com/2.0";
 
 interface VenueCount {
   venue: string;
@@ -34,6 +39,26 @@ async function fetchPhishData(endpoint: string) {
 }
 
 export function registerRoutes(app: Express): Server {
+  // Last.fm API endpoint
+  app.get("/api/lastfm/recent-tracks", async (_req, res) => {
+    try {
+      const response = await fetch(
+        `${LASTFM_API_BASE}/?method=user.getrecenttracks&user=kpow&api_key=${process.env.LASTFM_API_KEY}&format=json&limit=10`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch from Last.fm API");
+      }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching from Last.fm:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  // Existing Phish API endpoints
   app.get("/api/shows", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
@@ -52,7 +77,7 @@ export function registerRoutes(app: Express): Server {
 
       const formattedShows = paginatedShows.map((show: any) => ({
         showid: show.showid,
-        showdate: show.showdate, // Already in YYYY-MM-DD format
+        showdate: show.showdate,
         venue: show.venue,
         city: show.city,
         state: show.state,

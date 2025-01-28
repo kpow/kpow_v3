@@ -1,4 +1,5 @@
 import { ContentSection } from "@/components/ContentSection";
+import RecentlyPlayed from "@/components/RecentlyPlayed";
 
 export default function Home() {
   const mainSections = [
@@ -21,13 +22,6 @@ export default function Home() {
       type: 'main' as const
     }
   ];
-
-  const recentlyPlayed = Array(5).fill({
-    title: "Recently Played Track",
-    subtitle: "Artist Name",
-    imageSrc: "/placeholder-track.png",
-    type: 'recent' as const
-  });
 
   const bookFeed = [
     {
@@ -90,20 +84,7 @@ export default function Home() {
       <div className="h-px bg-gray-200 my-8" />
 
       {/* Recently Played */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">recently played . . .</h2>
-          <button className="text-sm text-gray-500 hover:text-gray-700">SEE MORE</button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {recentlyPlayed.map((track, index) => (
-            <ContentSection
-              key={`${track.title}-${index}`}
-              {...track}
-            />
-          ))}
-        </div>
-      </div>
+      <RecentlyPlayed />
 
       <div className="h-px bg-gray-200 my-8" />
 
