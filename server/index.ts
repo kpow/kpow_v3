@@ -6,7 +6,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -37,35 +36,30 @@ app.use((req, res, next) => {
   next();
 });
 
-// Global error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  log(`Error: ${err.message}`);
-  res.status(500).json({ error: err.message });
-});
+(async () => {
+  const server = registerRoutes(app);
 
-async function startServer() {
-  try {
-    log("Starting server...");
-    const server = registerRoutes(app);
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
 
-    // Set up Vite or static serving based on environment
-    if (app.get("env") === "development") {
-      log("Setting up Vite development server...");
-      await setupVite(app, server);
-    } else {
-      log("Setting up static file serving...");
-      serveStatic(app);
-    }
+    res.status(status).json({ message });
+    throw err;
+  });
 
-    const PORT = 5000;
-    server.listen(PORT, "0.0.0.0", () => {
-      log(`Server started successfully on port ${PORT}`);
-    });
-  } catch (error) {
-    log(`Fatal error starting server: ${(error as Error).message}`);
-    process.exit(1);
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
   }
-}
 
-// Start the server
-startServer();
+  // ALWAYS serve the app on port 5000
+  // this serves both the API and the client
+  const PORT = 5000;
+  server.listen(PORT, "0.0.0.0", () => {
+    log(`serving on port ${PORT}`);
+  });
+})();
