@@ -12,11 +12,6 @@ if (!process.env.LASTFM_API_KEY) {
 const PHISH_API_BASE = "https://api.phish.net/v5";
 const LASTFM_API_BASE = "https://ws.audioscrobbler.com/2.0/";
 
-interface VenueCount {
-  venue: string;
-  count: number;
-}
-
 async function fetchLastFmData(method: string, params: Record<string, string>) {
   try {
     const apiKey = process.env.LASTFM_API_KEY;
@@ -32,15 +27,15 @@ async function fetchLastFmData(method: string, params: Record<string, string>) {
       queryParams.append(key, value);
     });
 
-    const response = await fetch(
-      `${LASTFM_API_BASE}?${queryParams.toString()}`
-    );
+    const url = `${LASTFM_API_BASE}?${queryParams.toString()}`;
+    console.log("Fetching Last.fm data from:", url);
+
+    const response = await fetch(url);
     const data = await response.json();
+    console.log("Raw Last.fm response:", JSON.stringify(data, null, 2));
 
     if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to fetch data from Last.fm API"
-      );
+      throw new Error(data.message || "Failed to fetch data from Last.fm API");
     }
 
     return data;
@@ -280,12 +275,18 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/lastfm/recent-tracks", async (req, res) => {
+  app.get("/api/lastfm/recent-tracks", async (_req, res) => {
     try {
       const data = await fetchLastFmData("user.getrecenttracks", {
         user: "kpow",
         limit: "10",
       });
+
+      console.log("Last.fm data before transformation:", data);
+
+      if (!data.recenttracks?.track) {
+        throw new Error("No tracks found in Last.fm response");
+      }
 
       const tracks = data.recenttracks.track.map((track: any) => ({
         name: track.name,
@@ -297,8 +298,11 @@ export function registerRoutes(app: Express): Server {
         nowPlaying: !!track["@attr"]?.nowplaying,
       }));
 
+      console.log("Transformed tracks:", tracks);
+
       res.json({ tracks });
     } catch (error) {
+      console.error("Error in /api/lastfm/recent-tracks:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
