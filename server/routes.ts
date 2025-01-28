@@ -6,72 +6,8 @@ if (!process.env.GOODREADS_API_KEY) {
   throw new Error("GOODREADS_API_KEY environment variable is required");
 }
 
-if (!process.env.PHISH_API_KEY) {
-  throw new Error("PHISH_API_KEY environment variable is required");
-}
-
-if (!process.env.LASTFM_API_KEY) {
-  throw new Error("LASTFM_API_KEY environment variable is required");
-}
-
-const PHISH_API_BASE = "https://api.phish.net/v5";
-const LASTFM_API_BASE = "https://ws.audioscrobbler.com/2.0/";
 const GOODREADS_API_BASE = "https://www.goodreads.com";
 const GOODREADS_USER_ID = "457389";
-
-async function fetchLastFmData(method: string, params: Record<string, string>) {
-  try {
-    const apiKey = process.env.LASTFM_API_KEY;
-    if (!apiKey) {
-      throw new Error("Last.fm API key is not set");
-    }
-
-    const queryParams = new URLSearchParams();
-    queryParams.append("method", method);
-    queryParams.append("api_key", apiKey);
-    queryParams.append("format", "json");
-    Object.entries(params).forEach(([key, value]) => {
-      queryParams.append(key, value);
-    });
-
-    const url = `${LASTFM_API_BASE}?${queryParams.toString()}`;
-    console.log("Fetching Last.fm data from:", url);
-
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log("Raw Last.fm response:", JSON.stringify(data, null, 2));
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch data from Last.fm API");
-    }
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching from Last.fm:", error);
-    throw error;
-  }
-}
-
-async function fetchPhishData(endpoint: string) {
-  try {
-    const apiKey = process.env.PHISH_API_KEY;
-    const response = await fetch(
-      `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
-    );
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to fetch data from Phish.net API",
-      );
-    }
-
-    return data.data;
-  } catch (error) {
-    console.error("Error fetching from Phish.net:", error);
-    throw error;
-  }
-}
 
 async function fetchGoodreadsData(endpoint: string, params: Record<string, string> = {}) {
   try {
@@ -87,6 +23,8 @@ async function fetchGoodreadsData(endpoint: string, params: Record<string, strin
     });
 
     const url = `${GOODREADS_API_BASE}${endpoint}?${queryParams}`;
+    console.log("Fetching from Goodreads:", url);
+
     const response = await fetch(url);
     const xmlData = await response.text();
 
@@ -99,7 +37,10 @@ async function fetchGoodreadsData(endpoint: string, params: Record<string, strin
       attributeNamePrefix: "_",
     });
 
-    return parser.parse(xmlData);
+    const result = parser.parse(xmlData);
+    console.log("Parsed Goodreads response:", JSON.stringify(result, null, 2));
+
+    return result;
   } catch (error) {
     console.error("Error fetching from Goodreads:", error);
     throw error;
@@ -356,6 +297,8 @@ export function registerRoutes(app: Express): Server {
       const limit = parseInt(req.query.limit as string) || 10;
       const shelf = (req.query.shelf as string) || "read";
 
+      console.log(`Fetching books. Page: ${page}, Limit: ${limit}, Shelf: ${shelf}`);
+
       const data = await fetchGoodreadsData(`/review/list/${GOODREADS_USER_ID}.xml`, {
         per_page: limit.toString(),
         page: page.toString(),
@@ -387,6 +330,8 @@ export function registerRoutes(app: Express): Server {
       const total = parseInt(data.GoodreadsResponse.reviews._total) || 0;
       const totalPages = Math.ceil(total / limit);
 
+      console.log(`Found ${books.length} books. Total books: ${total}, Total pages: ${totalPages}`);
+
       res.json({
         books,
         pagination: {
@@ -405,6 +350,64 @@ export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
   return httpServer;
 }
+
+async function fetchLastFmData(method: string, params: Record<string, string>) {
+  try {
+    const apiKey = process.env.LASTFM_API_KEY;
+    if (!apiKey) {
+      throw new Error("Last.fm API key is not set");
+    }
+
+    const queryParams = new URLSearchParams();
+    queryParams.append("method", method);
+    queryParams.append("api_key", apiKey);
+    queryParams.append("format", "json");
+    Object.entries(params).forEach(([key, value]) => {
+      queryParams.append(key, value);
+    });
+
+    const url = `${LASTFM_API_BASE}?${queryParams.toString()}`;
+    console.log("Fetching Last.fm data from:", url);
+
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Raw Last.fm response:", JSON.stringify(data, null, 2));
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch data from Last.fm API");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching from Last.fm:", error);
+    throw error;
+  }
+}
+
+async function fetchPhishData(endpoint: string) {
+  try {
+    const apiKey = process.env.PHISH_API_KEY;
+    const response = await fetch(
+      `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to fetch data from Phish.net API",
+      );
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching from Phish.net:", error);
+    throw error;
+  }
+}
+
+const PHISH_API_BASE = "https://api.phish.net/v5";
+const LASTFM_API_BASE = "https://ws.audioscrobbler.com/2.0/";
+
 
 function formatSongUrl(songName: string): string {
   return `https://phish.net/song/${songName
