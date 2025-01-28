@@ -46,35 +46,37 @@ export function BookFeed() {
 
   return (
     <div className="space-y-4">
-      
-      {readBooks?.map((review, index) => (
-      {console.log(review)}
-        <Card key={index} className="overflow-hidden">
-          <CardContent className="p-4">
-            <div className="flex gap-4">
-              <img 
-                src={review.book.image_url[0]} 
-                alt={review.book.title[0]}
-                className="w-24 h-36 object-cover"
-              />
-              <div>
-                <h3 className="font-semibold text-lg">{review.book.title[0]}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {review.book.description[0]?.replace(/<[^>]*>/g, '')}
-                </p>
-                <a 
-                  href={review.book.link[0]} 
-                  target="_blank"
-                  rel="noopener noreferrer" 
-                  className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-                >
-                  View on Goodreads →
-                </a>
+
+      {readBooks?.map((review, index) => {
+        console.log('Review:', review);
+        return (
+          <Card key={index} className="overflow-hidden">
+            <CardContent className="p-4">
+              <div className="flex gap-4">
+                <img 
+                  src={review.book.image_url[0]} 
+                  alt={review.book.title[0]}
+                  className="w-24 h-36 object-cover"
+                />
+                <div>
+                  <h3 className="font-semibold text-lg">{review.book.title[0]}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {review.book.description[0]?.replace(/<[^>]*>/g, '')}
+                  </p>
+                  <a 
+                    href={review.book.link[0]} 
+                    target="_blank"
+                    rel="noopener noreferrer" 
+                    className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                  >
+                    View on Goodreads →
+                  </a>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }
