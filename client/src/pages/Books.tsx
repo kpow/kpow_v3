@@ -106,6 +106,7 @@ export default function Books() {
   const handlePageChange = (newPage: number) => {
     console.log(`Changing to page ${newPage}`);
     setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
