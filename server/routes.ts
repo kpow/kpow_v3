@@ -85,12 +85,12 @@ export function registerRoutes(app: Express): Server {
 
       const formattedShows = paginatedShows.map((show: any) => ({
         showid: show.showid,
-        showdate: show.showdate, 
+        showdate: show.showdate,
         venue: show.venue,
         city: show.city,
         state: show.state,
         country: show.country,
-        notes: show.notes
+        notes: show.notes,
       }));
 
       const total = shows.length;
@@ -279,8 +279,8 @@ export function registerRoutes(app: Express): Server {
     try {
       const data = await fetchLastFmData("user.getrecenttracks", {
         user: "krakap",
-        limit: "50",
-        page: "1"
+        limit: "100",
+        page: "1",
       });
 
       console.log("Last.fm data before transformation:", data);
@@ -295,7 +295,9 @@ export function registerRoutes(app: Express): Server {
         album: track.album["#text"],
         image: track.image.find((img: any) => img.size === "large")["#text"],
         url: track.url,
-        date: track.date?.uts ? new Date(Number(track.date.uts) * 1000).toISOString() : null,
+        date: track.date?.uts
+          ? new Date(Number(track.date.uts) * 1000).toISOString()
+          : null,
         nowPlaying: !!track["@attr"]?.nowplaying,
       }));
 

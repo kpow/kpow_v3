@@ -50,7 +50,7 @@ export function RecentPlays() {
   }
 
   return (
-    <div className="w-full px-6 py-4">
+    <div className="w-full px-2 py-0">
       <div className="flex items-center gap-2 mb-4">
         <SiLastdotfm className="h-5 w-5" />
         <h2 className="text-2xl font-bold">Recently Played</h2>
@@ -65,7 +65,7 @@ export function RecentPlays() {
       >
         <CarouselContent>
           {data.tracks.map((track, index) => (
-            <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/4">
+            <CarouselItem key={index} className="md:basis-1/4 lg:basis-1/5">
               <a
                 href={track.url}
                 target="_blank"
@@ -83,7 +83,9 @@ export function RecentPlays() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
                           <div className="absolute bottom-0 p-3 text-white">
-                            <p className="font-semibold text-sm">{track.artist}</p>
+                            <p className="font-semibold text-sm">
+                              {track.artist}
+                            </p>
                             <p className="text-xs opacity-80">{track.album}</p>
                           </div>
                         </div>
@@ -95,7 +97,9 @@ export function RecentPlays() {
                       </div>
                     </div>
                     <div className="p-2">
-                      <h3 className="text-sm font-medium truncate">{track.name}</h3>
+                      <h3 className="text-sm font-medium truncate">
+                        {track.name}
+                      </h3>
                     </div>
                   </CardContent>
                 </Card>
