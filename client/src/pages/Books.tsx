@@ -81,7 +81,7 @@ export default function Books() {
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
             <Skeleton key={i} className="h-[400px] w-full" />
           ))}
