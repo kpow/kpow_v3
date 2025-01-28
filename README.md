@@ -15,22 +15,84 @@ My coding playground and the begining of my post-singularity self.
 
 - **Backend**:
   - Express.js
-  - Secure Phish.net API integration
+  - Secure API integrations:
+    - Phish.net API
+    - Last.fm API
+    - Goodreads API
+    - Feedbin API
   - Drizzle ORM with PostgreSQL (optional)
 
-- **APIs**:
-  - Phish.net API v5 for show data and setlists
-    - Show attendance information
-    - Venue statistics
-    - Setlist data
-    - Song statistics
+## Features
+
+### Show Statistics Dashboard
+- Comprehensive show statistics
+  - Total shows attended
+  - Unique venues visited
+  - Unique songs heard
+- Interactive show cards with modal details
+- Most visited venues tracking
+- Responsive grid layout
+- Modern UI with smooth animations
+
+### Book Feed Integration
+- Goodreads API integration
+- Display of recently read books
+- Book details including:
+  - Cover images
+  - Titles and authors
+  - Ratings and reviews
+  - Book descriptions
+- Direct links to Goodreads pages
+- Responsive book card layout
+- Automatic HTML stripping from descriptions
+
+### Star Feed (Articles)
+- Feedbin API integration
+- Display of starred articles
+- Article features:
+  - Lead images
+  - Titles and authors
+  - Publication dates
+  - Article excerpts
+  - Source favicons
+- Clickable cards linking to original articles
+- Clean, modern card layout
+- Responsive grid design
+
+### Recent Plays Integration
+- Last.fm API integration
+- Real-time music tracking
+- Recently played tracks display
+- Track information including:
+  - Song titles
+  - Artist names
+  - Album artwork
+  - Timestamps
+
+### API Integrations
+The application securely integrates with multiple APIs:
+- Phish.net API v5 for show data and setlists
+- Goodreads API for book tracking
+- Feedbin API for article management
+- Last.fm API for music tracking
+
+Key features of the API integrations:
+- Backend proxy for secure API key handling
+- Proper date formatting using date-fns
+- Efficient data transformation
+- Error handling and fallbacks
+- Rate limiting protection
 
 ## Prerequisites
 
 - Node.js (v18 or higher)
 - npm (v8 or higher)
-- PostgreSQL database (optional, only if using database features)
-- Phish.net API key (required for show data)
+- PostgreSQL database (optional)
+- API keys for:
+  - Phish.net
+  - Goodreads
+  - Last.fm
+  - Feedbin
 
 ## Local Development Setup
 
@@ -46,10 +108,12 @@ npm install
 ```
 
 3. Set up environment variables:
-   - Create a `.env` file in the root directory
-   - Add your Phish.net API key:
+   Create a `.env` file in the root directory and add your API keys:
    ```
-   PHISH_API_KEY=your_api_key_here
+   PHISH_API_KEY=your_phish_api_key
+   LASTFM_API_KEY=your_lastfm_api_key
+   GOODREADS_API_KEY=your_goodreads_api_key
+   FEEDBIN_KEY=your_feedbin_key
    ```
 
 4. Start the development server:
@@ -59,25 +123,6 @@ npm run dev
 
 The application will be available at `http://localhost:5000`.
 
-## Features
-
-### Show Statistics Dashboard
-- Comprehensive show statistics
-  - Total shows attended
-  - Unique venues visited
-  - Unique songs heard
-- Interactive show cards with modal details
-- Most visited venues tracking
-- Responsive grid layout
-- Modern UI with smooth animations
-
-### Backend API Integration
-- Secure handling of Phish.net API calls
-- Proper date formatting and validation
-- Efficient data caching
-- Rate limiting protection
-- Error handling and validation
-
 ## Project Structure
 
 ```
@@ -85,32 +130,19 @@ The application will be available at `http://localhost:5000`.
 │   ├── public/            # Static assets
 │   └── src/
 │       ├── components/    # React components
-│       │   ├── show-card.tsx
-│       │   ├── show-details-modal.tsx
+│       │   ├── BookCard.tsx
+│       │   ├── BookFeed.tsx
+│       │   ├── ContentSection.tsx
+│       │   ├── RecentPlays.tsx
 │       │   └── ui/       # ShadcN UI components
 │       ├── lib/
-│       │   └── phish-api.ts  # API client
-│       └── pages/         # Page components
+│       │   └── hooks/    # Custom hooks
+│       └── pages/        # Page components
 ├── server/                # Backend code
 │   ├── routes.ts         # API routes
 │   └── index.ts          # Server setup
 └── theme.json            # Theme configuration
 ```
-
-## API Integration
-
-The application securely integrates with the Phish.net API v5 through a dedicated backend:
-- Show attendance data
-- Venue information
-- Setlist details
-- Song statistics
-
-Key features of the API integration:
-- Backend proxy for secure API key handling
-- Proper date formatting using date-fns
-- Efficient data transformation
-- Error handling and fallbacks
-- Rate limiting protection
 
 ## Development Guidelines
 
