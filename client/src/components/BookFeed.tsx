@@ -3,30 +3,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookData {
-  id: Array<{
-    _: string;
-    $: { type: string };
-  }>;
-  title: Array<string>;
-  description: Array<string>;
-  image_url: Array<string>;
-  small_image_url: Array<string>;
-  large_image_url: Array<string>;
-  link: Array<string>;
+  title_without_series: string[];
+  image_url: string[];
+  average_rating: string[];
+  description: string[];
   authors: Array<{
     author: Array<{
-      name: Array<string>;
+      name: string[];
     }>;
-  }>;
-  isbn: Array<{
-    $: { nil: string };
-  }>;
-  isbn13: Array<{
-    $: { nil: string };
-  }>;
-  text_reviews_count: Array<{
-    _: string;
-    $: { type: string };
   }>;
 }
 
@@ -76,27 +60,20 @@ export function BookFeed() {
     );
   }
 
-  // Helper function to get the best available image URL
-  const getBestImageUrl = (book: BookData): string => {
-    return (
-      book.large_image_url?.[0] ||
-      book.image_url?.[0] ||
-      book.small_image_url?.[0] ||
-      ''
-    ).trim();
-  };
-
   return (
     <div className="space-y-4">
       {reviews.slice(0, 2).map((review, index) => {
         const book = review.book;
         console.log("Processing book:", book); // Debug log for each book
 
-        const title = book.title?.[0] || 'Untitled';
-        const imageUrl = getBestImageUrl(book);
+        const title = book.title_without_series?.[0] || 'Untitled';
+        const imageUrl = book.image_url?.[0] || '';
         const authorName = book.authors?.[0]?.author?.[0]?.name?.[0];
+        const rating = book.average_rating?.[0] || '0';
         const description = book.description?.[0]?.replace(/<[^>]*>/g, '') || '';
-        const link = book.link?.[0] || '#';
+
+        const stars = '★'.repeat(Math.round(parseFloat(rating)));
+        const emptyStars = '☆'.repeat(5 - Math.round(parseFloat(rating)));
 
         return (
           <Card key={index} className="overflow-hidden">
@@ -120,13 +97,16 @@ export function BookFeed() {
                       by {authorName}
                     </p>
                   )}
+                  <div className="text-yellow-500 text-sm mt-1">
+                    {stars}{emptyStars} ({rating})
+                  </div>
                   {description && (
                     <p className="text-sm text-muted-foreground line-clamp-3 mt-2">
                       {description}
                     </p>
                   )}
                   <a 
-                    href={link}
+                    href="#"
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:underline mt-2 inline-block"
