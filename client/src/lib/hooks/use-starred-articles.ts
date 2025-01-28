@@ -1,5 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 
+export interface StarredArticle {
+  title: string;
+  subtitle: string;
+  author: string;
+  date: string;
+  imageSrc: string;
+  type: 'star';
+  url: string;
+}
+
 export function useStarredArticles(page = 1, perPage = 6) {
   return useQuery({
     queryKey: [`/api/starred-articles?page=${page}&per_page=${perPage}`],
@@ -12,7 +22,7 @@ export function useStarredArticles(page = 1, perPage = 6) {
           month: 'short',
           day: 'numeric'
         }),
-        imageSrc: "/placeholder-star.png", // Default image for articles
+        imageSrc: article?.lead_image_url ?? "/placeholder-star.png",
         type: "star" as const,
         url: article?.url ?? '#'
       })),
