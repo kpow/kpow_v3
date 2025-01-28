@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Book {
@@ -61,9 +60,14 @@ export function BookFeed() {
                 <p className="text-sm text-muted-foreground line-clamp-3">
                   {review.book.description[0]?.replace(/<[^>]*>/g, '')}
                 </p>
-                <Link href="/books" className="text-sm text-blue-600 hover:underline mt-2 inline-block">
-                  View all books →
-                </Link>
+                <a 
+                  href={review.book.link[0]} 
+                  target="_blank"
+                  rel="noopener noreferrer" 
+                  className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                >
+                  View on Goodreads →
+                </a>
               </div>
             </div>
           </CardContent>

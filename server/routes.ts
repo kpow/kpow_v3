@@ -332,13 +332,14 @@ export function registerRoutes(app: Express): Server {
           v: "2",
           per_page: perPage,
           page: page,
+          shelf: "read"
         }
       });
 
       console.log("Raw XML response received");
 
       const result = await parseXMLAsync(response.data);
-      console.log("Transformed JSON:", JSON.stringify(result, null, 2));
+      console.log("Books response:", JSON.stringify(result.GoodreadsResponse.reviews[0].review, null, 2));
 
       res.json(result);
     } catch (error) {
