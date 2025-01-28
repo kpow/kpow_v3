@@ -1,7 +1,34 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
+import { useQuery } from "@tanstack/react-query";
+
+interface GoodreadsBook {
+  book: {
+    title_without_series: string[];
+    image_url: string[];
+    description: string[];
+    average_rating: string[];
+    authors: {
+      author: Array<{
+        name: string[];
+      }>;
+    }[];
+  };
+}
+
+interface GoodreadsResponse {
+  GoodreadsResponse: {
+    reviews: Array<{
+      review: GoodreadsBook[];
+    }>;
+  };
+}
 
 export default function Home() {
+  const { data: bookData } = useQuery<GoodreadsResponse>({
+    queryKey: ["/api/books"],
+  });
+
   const mainSections = [
     {
       title: "battle",
@@ -23,24 +50,16 @@ export default function Home() {
     }
   ];
 
-  const bookFeed = [
-    {
-      title: "How to Live Safely in a Science Fictional Universe",
-      subtitle: "by Charles Yu",
-      imageSrc: "/placeholder-book.png",
+  const bookFeed = bookData?.GoodreadsResponse?.reviews[1]?.review
+    ?.slice(0, 2)
+    .map(reviewData => ({
+      title: reviewData.book.title_without_series[0],
+      subtitle: `by ${reviewData.book.authors[0].author[0].name[0]}`,
+      imageSrc: reviewData.book.image_url[0],
       type: 'book' as const,
-      rating: 4,
-      description: "A story of a son searching for his father ... through quantum space-time."
-    },
-    {
-      title: "The Society of Unknowable Objects",
-      subtitle: "by Neil Gaiman",
-      imageSrc: "/placeholder-book.png",
-      type: 'book' as const,
-      rating: 5,
-      description: "From the author of the internationally bestselling The Book of Doors, another fantastical journey into a world where the boundaries between everyday people are members of a secret society tasked with finding and protecting hidden magical objects."
-    }
-  ];
+      rating: parseFloat(reviewData.book.average_rating[0]),
+      description: reviewData.book.description[0]
+    })) || [];
 
   const starFeed = [
     {
