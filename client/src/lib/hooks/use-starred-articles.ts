@@ -8,6 +8,7 @@ export interface StarredArticle {
   imageSrc: string;
   type: 'star';
   url: string;
+  excerpt?: string;
 }
 
 export function useStarredArticles(page = 1, perPage = 6) {
@@ -24,7 +25,8 @@ export function useStarredArticles(page = 1, perPage = 6) {
         }),
         imageSrc: article?.lead_image_url ?? "/placeholder-star.png",
         type: "star" as const,
-        url: article?.url ?? '#'
+        url: article?.url ?? '#',
+        excerpt: article?.excerpt ?? article?.summary ?? 'No excerpt available'
       })),
       pagination: data.pagination
     })

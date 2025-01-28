@@ -100,11 +100,11 @@ export function ContentSection({
               {date && <span className="text-sm text-gray-400">• {date}</span>}
             </div>
           )}
-          <h3 className="text-base font-bold">{title}</h3>
-          <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
           {excerpt && (
             <p className="mt-2 text-sm text-gray-600 line-clamp-3">{excerpt}</p>
           )}
+          <h3 className="text-base font-bold mt-3">{title}</h3>
+          <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
         </div>
       </div>
     );
