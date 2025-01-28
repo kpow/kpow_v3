@@ -46,7 +46,9 @@ export function BookFeed() {
 
   return (
     <div className="space-y-4">
+      
       {readBooks?.map((review, index) => (
+      {console.log(review)}
         <Card key={index} className="overflow-hidden">
           <CardContent className="p-4">
             <div className="flex gap-4">
