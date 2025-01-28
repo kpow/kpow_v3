@@ -23,7 +23,7 @@ interface LastFmResponse {
   tracks: Track[];
 }
 
-export default function RecentPlays() {
+export function RecentPlays() {
   const { data, isLoading, error } = useQuery<LastFmResponse>({
     queryKey: ["/api/lastfm/recent-tracks"],
   });
