@@ -337,10 +337,10 @@ export function registerRoutes(app: Express): Server {
       });
 
       console.log("Raw XML response received");
-      const result = await parseXMLAsync(response.data);
-      console.log("Parsed response:", JSON.stringify(result, null, 2));
 
-      // Return the parsed response directly
+      const result = await parseXMLAsync(response.data);
+      console.log("Books response:", JSON.stringify(result.GoodreadsResponse.reviews[0].review, null, 2));
+
       res.json(result);
     } catch (error) {
       console.error("Error fetching books from Goodreads:", error);
