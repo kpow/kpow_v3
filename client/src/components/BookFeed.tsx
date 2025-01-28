@@ -2,24 +2,30 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface Book {
-  book: {
-    title?: string[];
-    description?: string[];
-    image_url?: string[];
-    link?: string[];
-    authors?: Array<{
-      author?: Array<{
-        name?: string[];
-      }>;
+interface BookData {
+  id: Array<{
+    _: string;
+    $: { type: string };
+  }>;
+  title: string[];
+  description: string[];
+  image_url: string[];
+  link: string[];
+  authors: Array<{
+    author: Array<{
+      name: string[];
     }>;
-  };
+  }>;
+}
+
+interface Review {
+  book: BookData;
 }
 
 interface GoodreadsResponse {
-  GoodreadsResponse?: {
-    reviews?: Array<{
-      review?: Book[];
+  GoodreadsResponse: {
+    reviews: Array<{
+      review: Review[];
     }>;
   };
 }
@@ -29,7 +35,7 @@ export function BookFeed() {
     queryKey: ["/api/books"],
   });
 
-  const books = data?.GoodreadsResponse?.reviews?.[0]?.review?.slice(0, 2) || [];
+  console.log("Books data:", data); // Keep this for debugging
 
   if (isLoading) {
     return (
@@ -48,7 +54,9 @@ export function BookFeed() {
     );
   }
 
-  if (!books?.length) {
+  const reviews = data?.GoodreadsResponse?.reviews[0]?.review || [];
+
+  if (!reviews.length) {
     return (
       <div className="text-sm text-muted-foreground">
         No books found.
@@ -58,12 +66,13 @@ export function BookFeed() {
 
   return (
     <div className="space-y-4">
-      {books.map((review, index) => {
-        const title = review?.book?.title?.[0] || 'Untitled';
-        const imageUrl = review?.book?.image_url?.[0] || '';
-        const authorName = review?.book?.authors?.[0]?.author?.[0]?.name?.[0];
-        const description = review?.book?.description?.[0]?.replace(/<[^>]*>/g, '') || '';
-        const link = review?.book?.link?.[0] || '#';
+      {reviews.slice(0, 2).map((review, index) => {
+        const book = review.book;
+        const title = book.title?.[0] || 'Untitled';
+        const imageUrl = book.image_url?.[0];
+        const authorName = book.authors?.[0]?.author?.[0]?.name?.[0];
+        const description = book.description?.[0]?.replace(/<[^>]*>/g, '') || '';
+        const link = book.link?.[0] || '#';
 
         return (
           <Card key={index} className="overflow-hidden">
@@ -73,11 +82,14 @@ export function BookFeed() {
                   <img 
                     src={imageUrl}
                     alt={title}
-                    className="w-24 h-36 object-cover"
+                    className="w-24 h-36 object-cover rounded-md"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 )}
-                <div>
-                  <h3 className="font-semibold text-lg">{title}</h3>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg truncate">{title}</h3>
                   {authorName && (
                     <p className="text-sm text-muted-foreground mt-1">
                       by {authorName}
