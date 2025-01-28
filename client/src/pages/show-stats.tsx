@@ -32,7 +32,6 @@ export default function ShowStats() {
   const { data: showsData, isLoading: showsLoading } = useQuery({
     queryKey: ["/api/shows/attended", username, showsPage],
     queryFn: () => getAttendedShows(username, showsPage, SHOWS_PER_PAGE),
-    placeholderData: (previousData) => previousData,
   });
 
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
@@ -52,11 +51,6 @@ export default function ShowStats() {
       <ShowCard key={show.showid} show={show} />
     ));
   };
-
-  // Calculate total shows for pagination (use cached data if available)
-  const totalShows = showsData?.total ?? 0;
-  const totalPages = Math.ceil(totalShows / SHOWS_PER_PAGE);
-  const hasNextPage = showsPage * SHOWS_PER_PAGE < totalShows;
 
   return (
     <div className="container mx-auto p-8">
@@ -158,24 +152,24 @@ export default function ShowStats() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {renderShowsContent()}
           </div>
-          {/* Always render pagination controls */}
           <div className="mt-6 flex justify-between items-center">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowsPage((p) => Math.max(1, p - 1))}
-              disabled={showsPage === 1}
+              disabled={showsPage === 1 || showsLoading}
             >
               Previous
             </Button>
-            <span className="text-sm">
-              Page {showsPage} {totalShows > 0 && `of ${totalPages}`}
-            </span>
+            <span className="text-sm">Page {showsPage}</span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowsPage((p) => p + 1)}
-              disabled={!hasNextPage}
+              disabled={
+                showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
+                showsLoading
+              }
             >
               Next
             </Button>
