@@ -33,11 +33,13 @@ interface GoodreadsResponse {
 }
 
 export default function Home() {
-  const { data: bookData, isLoading: isLoadingBooks } = useQuery<GoodreadsResponse>({
-    queryKey: ["/api/books"],
-  });
+  const { data: bookData, isLoading: isLoadingBooks } =
+    useQuery<GoodreadsResponse>({
+      queryKey: ["/api/books"],
+    });
 
-  const { data: starredData, isLoading: isLoadingStarred } = useStarredArticles();
+  const { data: starredData, isLoading: isLoadingStarred } =
+    useStarredArticles();
 
   const reviews = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
   const firstBook = reviews[0]?.book;
@@ -96,7 +98,7 @@ export default function Home() {
       imageSrc: "/placeholder-star.png",
       type: "star" as const,
       excerpt: "Loading content...",
-    }
+    },
   ];
 
   if (isLoadingBooks || isLoadingStarred) {
@@ -144,22 +146,24 @@ export default function Home() {
             SEE MORE
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {isLoadingStarred ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="space-y-4">
-                <Skeleton className="h-48 w-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {isLoadingStarred
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="space-y-4">
+                  <Skeleton className="h-48 w-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            starFeed.map((star) => (
-              <ContentSection key={star.title} {...star} excerpt={star.excerpt} />
-            ))
-          )}
+              ))
+            : starFeed.map((star) => (
+                <ContentSection
+                  key={star.title}
+                  {...star}
+                  excerpt={star.excerpt}
+                />
+              ))}
         </div>
       </div>
     </div>
