@@ -89,14 +89,14 @@ export function ContentSection({
 
   if (type === "star") {
     return (
-      <div className="group relative">
+      <div className="group relative border rounded-lg shadow-sm">
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           className="block"
         >
-          <div className="overflow-hidden rounded-lg bg-gray-200 aspect-[3/2]">
+          <div className="overflow-hidden rounded-t-lg bg-gray-200 aspect-[3/2]">
             <img
               src={imageSrc}
               alt={title}
