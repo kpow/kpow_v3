@@ -1,7 +1,33 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
+
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  image_url: string;
+  link: string;
+  rating: string;
+  date_read: string;
+  review_text: string;
+}
+
+interface BooksResponse {
+  books: Book[];
+  pagination: {
+    current: number;
+    total: number;
+    hasMore: boolean;
+  };
+}
 
 export default function Home() {
+  const { data: booksData } = useQuery<BooksResponse>({
+    queryKey: ['/api/books?limit=2'],
+  });
+
   const mainSections = [
     {
       title: "battle",
@@ -20,25 +46,6 @@ export default function Home() {
       subtitle: "CREDIT",
       imageSrc: "/pmonk.jpg",
       type: 'main' as const
-    }
-  ];
-
-  const bookFeed = [
-    {
-      title: "How to Live Safely in a Science Fictional Universe",
-      subtitle: "by Charles Yu",
-      imageSrc: "/placeholder-book.png",
-      type: 'book' as const,
-      rating: 4,
-      description: "A story of a son searching for his father ... through quantum space-time."
-    },
-    {
-      title: "The Society of Unknowable Objects",
-      subtitle: "by Neil Gaiman",
-      imageSrc: "/placeholder-book.png",
-      type: 'book' as const,
-      rating: 5,
-      description: "From the author of the internationally bestselling The Book of Doors, another fantastical journey into a world where the boundaries between everyday people are members of a secret society tasked with finding and protecting hidden magical objects."
     }
   ];
 
@@ -69,6 +76,16 @@ export default function Home() {
     }
   ];
 
+  const bookFeed = booksData?.books.map(book => ({
+    title: book.title,
+    subtitle: `by ${book.author}`,
+    imageSrc: book.image_url,
+    type: 'book' as const,
+    rating: Number(book.rating),
+    description: book.review_text,
+    link: book.link
+  })) || [];
+
   return (
     <div className="space-y-12">
       {/* Main sections */}
@@ -92,7 +109,9 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">book feed</h2>
-          <button className="text-sm text-gray-500 hover:text-gray-700">SEE MORE</button>
+          <Link href="/book-feed" className="text-sm text-gray-500 hover:text-gray-700">
+            SEE MORE
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {bookFeed.map((book) => (

@@ -1,5 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { XMLParser } from "fast-xml-parser";
+
+if (!process.env.GOODREADS_API_KEY) {
+  throw new Error("GOODREADS_API_KEY environment variable is required");
+}
 
 if (!process.env.PHISH_API_KEY) {
   throw new Error("PHISH_API_KEY environment variable is required");
@@ -11,6 +16,8 @@ if (!process.env.LASTFM_API_KEY) {
 
 const PHISH_API_BASE = "https://api.phish.net/v5";
 const LASTFM_API_BASE = "https://ws.audioscrobbler.com/2.0/";
+const GOODREADS_API_BASE = "https://www.goodreads.com";
+const GOODREADS_USER_ID = "457389";
 
 async function fetchLastFmData(method: string, params: Record<string, string>) {
   try {
@@ -62,6 +69,39 @@ async function fetchPhishData(endpoint: string) {
     return data.data;
   } catch (error) {
     console.error("Error fetching from Phish.net:", error);
+    throw error;
+  }
+}
+
+async function fetchGoodreadsData(endpoint: string, params: Record<string, string> = {}) {
+  try {
+    const apiKey = process.env.GOODREADS_API_KEY;
+    if (!apiKey) {
+      throw new Error("Goodreads API key is not set");
+    }
+
+    const queryParams = new URLSearchParams({
+      key: apiKey,
+      v: "2",
+      ...params
+    });
+
+    const url = `${GOODREADS_API_BASE}${endpoint}?${queryParams}`;
+    const response = await fetch(url);
+    const xmlData = await response.text();
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data from Goodreads API: ${response.statusText}`);
+    }
+
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: "_",
+    });
+
+    return parser.parse(xmlData);
+  } catch (error) {
+    console.error("Error fetching from Goodreads:", error);
     throw error;
   }
 }
@@ -306,6 +346,58 @@ export function registerRoutes(app: Express): Server {
       res.json({ tracks });
     } catch (error) {
       console.error("Error in /api/lastfm/recent-tracks:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  app.get("/api/books", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const shelf = (req.query.shelf as string) || "read";
+
+      const data = await fetchGoodreadsData(`/review/list/${GOODREADS_USER_ID}.xml`, {
+        per_page: limit.toString(),
+        page: page.toString(),
+        shelf,
+        sort: "date_read",
+        order: "d"
+      });
+
+      if (!data.GoodreadsResponse?.reviews?.review) {
+        throw new Error("No books found in Goodreads response");
+      }
+
+      const reviews = Array.isArray(data.GoodreadsResponse.reviews.review) 
+        ? data.GoodreadsResponse.reviews.review 
+        : [data.GoodreadsResponse.reviews.review];
+
+      const books = reviews.map((review: any) => ({
+        id: review.book.id,
+        title: review.book.title,
+        author: review.book.authors.author.name,
+        image_url: review.book.image_url,
+        link: review.book.link,
+        rating: review.rating,
+        date_read: review.read_at,
+        review_text: review.body,
+        shelves: review.shelves?.shelf?.map((s: any) => s._name).join(", ") || ""
+      }));
+
+      const total = parseInt(data.GoodreadsResponse.reviews._total) || 0;
+      const totalPages = Math.ceil(total / limit);
+
+      res.json({
+        books,
+        pagination: {
+          current: page,
+          total: totalPages,
+          hasMore: page < totalPages,
+          totalBooks: total
+        }
+      });
+    } catch (error) {
+      console.error("Error in /api/books:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
