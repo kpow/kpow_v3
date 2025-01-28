@@ -278,8 +278,9 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/lastfm/recent-tracks", async (_req, res) => {
     try {
       const data = await fetchLastFmData("user.getrecenttracks", {
-        user: "kpow",
-        limit: "10",
+        user: "krakap",
+        limit: "50",
+        page: "1"
       });
 
       console.log("Last.fm data before transformation:", data);
