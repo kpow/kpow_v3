@@ -40,7 +40,7 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     {
       icon: <Book className="w-4 h-4" />,
       label: "book feed",
-      href: "/book-feed",
+      href: "/books",
     },
     {
       icon: <Youtube className="w-4 h-4" />,
