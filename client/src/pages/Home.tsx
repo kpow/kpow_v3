@@ -39,7 +39,7 @@ export default function Home() {
     });
 
   const { data: starredData, isLoading: isLoadingStarred } =
-    useStarredArticles();
+    useStarredArticles(1, 3);
 
   const reviews = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
   const firstBook = reviews[0]?.book;
