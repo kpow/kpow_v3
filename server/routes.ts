@@ -16,11 +16,7 @@ const PHISH_API_BASE = "https://api.phish.net/v5";
 const LASTFM_API_BASE = "https://ws.audioscrobbler.com/2.0/";
 const GOODREADS_API_BASE = "https://www.goodreads.com";
 const GOODREADS_USER_ID = "457389";
-
-// Move API key to environment variable
-if (!process.env.GOODREADS_API_KEY) {
-  throw new Error("GOODREADS_API_KEY environment variable is required");
-}
+const GOODREADS_API_KEY = "ajR4uV5s4lLmYZUWI2SKXw";
 
 const parseXMLAsync = promisify(parseString);
 
@@ -332,7 +328,7 @@ export function registerRoutes(app: Express): Server {
 
       const response = await axios.get(url, {
         params: {
-          key: process.env.GOODREADS_API_KEY,
+          key: GOODREADS_API_KEY,
           v: "2",
           per_page: perPage,
           page: page,
@@ -342,7 +338,14 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
-      const result = await parseXMLAsync(response.data);
+      const result = await parseXMLAsync(response.data) as {
+        GoodreadsResponse: {
+          reviews: Array<{
+            $: { total: string; start: string; end: string };
+            review: Array<any>;
+          }>;
+        };
+      };
 
       const reviews = result.GoodreadsResponse.reviews[0];
 
@@ -362,13 +365,9 @@ export function registerRoutes(app: Express): Server {
         reviewCount: reviews.review?.length
       });
 
-      // Return only the necessary data to the client
+      // Construct a properly typed response object
       const responseData = {
-        books: reviews.review.map((review: any) => ({
-          id: review.id[0],
-          book: review.book,
-          shelves: review.shelves
-        })),
+        GoodreadsResponse: result.GoodreadsResponse,
         pagination: {
           total,
           start,

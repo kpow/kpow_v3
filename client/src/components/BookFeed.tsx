@@ -14,7 +14,7 @@ interface Book {
       }>;
     }>;
     average_rating: string[];
-  }[];
+  };
 }
 
 interface GoodreadsResponse {
@@ -31,7 +31,8 @@ export function BookFeed() {
   });
 
   const reviews = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
-  console.log("inside comp first Book:", reviews[0]?.book);
+  const firstBook = reviews[0]?.book;
+  console.log("inside comp first Book:", firstBook);
 
   if (isLoading) {
     return (
@@ -45,16 +46,22 @@ export function BookFeed() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {reviews.slice(0, 2).map((review, index) => {
-        // Get values from the nested array structure with proper type safety
-        const title = review?.book?.[0]?.title_without_series?.[0] ?? "Untitled";
+        console.log("inside comp review:", review);
+        console.log("inside comp review,book:", review.book);
+        console.log(
+          "inside comp review,book.description[0]:",
+          review.book[0].description[0],
+        );
+        // Get values from the nested array structure
+        const title = review.book[0].title_without_series?.[0] ?? "Untitled";
         const description =
-          review?.book?.[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "";
+          review.book[0].description[0]?.replace(/<[^>]*>/g, "") ?? "";
         const imageUrl =
-          review?.book?.[0]?.image_url?.[0] ?? "/placeholder-book.png";
-        const link = review?.book?.[0]?.link?.[0] ?? "#";
+          review.book[0].image_url?.[0] ?? "/placeholder-book.png";
+        const link = review.book[0].link?.[0] ?? "#";
         const author =
-          review?.book?.[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown";
-        const rating = parseFloat(review?.book?.[0]?.average_rating?.[0] ?? "0");
+          review.book[0].authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown";
+        const rating = parseFloat(review.book[0].average_rating?.[0] ?? "0");
 
         return (
           <Card key={index} className="overflow-hidden">

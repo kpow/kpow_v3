@@ -5,21 +5,18 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { BookCard } from "@/components/BookCard";
 
-interface Author {
-  name: string[];
-}
-
 interface Book {
-  id: string;
-  book: Array<{
+  book: {
     title: string[];
     description: string[];
     image_url: string[];
     link: string[];
     authors: Array<{
-      author: Array<Author>;
+      author: Array<{
+        name: string[];
+      }>;
     }>;
-  }>;
+  };
   shelves: {
     shelf: Array<{
       $: {
@@ -29,8 +26,13 @@ interface Book {
   };
 }
 
-interface BooksResponse {
-  books: Book[];
+interface GoodreadsResponse {
+  GoodreadsResponse: {
+    reviews: Array<{
+      $: { start: string; end: string; total: string };
+      review: Book[];
+    }>;
+  };
   pagination: {
     total: number;
     start: number;
@@ -41,23 +43,28 @@ interface BooksResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 20;
+const BOOKS_PER_PAGE = 20; // Match with backend
 
 export default function Books() {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data, isLoading, error } = useQuery<BooksResponse>({
-    queryKey: ["/api/books", currentPage],
+  const { data, isLoading, error } = useQuery<GoodreadsResponse>({
+    queryKey: ["/api/books", currentPage, BOOKS_PER_PAGE],
     queryFn: async () => {
       console.log(`Fetching page ${currentPage} of books...`);
-      const response = await fetch(`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`);
+      const response = await fetch(`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`, {
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error(`${response.status}: ${await response.text()}`);
       }
-      return response.json();
+      const data = await response.json();
+      console.log(`Received data for page ${currentPage}:`, data);
+      return data;
     },
+    // Ensure query is refetched when page changes
     staleTime: 0,
-    gcTime: 1000 * 60 * 5, // Cache for 5 minutes
+    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   if (error) {
@@ -83,7 +90,8 @@ export default function Books() {
     );
   }
 
-  const books = data?.books ?? [];
+  // Safely access books array with optional chaining and default to empty array
+  const books = data?.GoodreadsResponse?.reviews?.[0]?.review ?? [];
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
   const totalBooks = pagination?.total ?? 0;
@@ -91,15 +99,14 @@ export default function Books() {
   const handlePageChange = (newPage: number) => {
     console.log(`Changing to page ${newPage}`);
     setCurrentPage(newPage);
-    window.scrollTo(0, 0);
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">My Books</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        {books.map((book, index) => (
-          <BookCard key={`${currentPage}-${index}`} review={book} />
+        {books.map((review, index) => (
+          <BookCard key={`${currentPage}-${index}`} review={review} />
         ))}
       </div>
 
