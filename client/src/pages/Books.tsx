@@ -10,6 +10,7 @@ interface Author {
 }
 
 interface Book {
+  id: string;
   book: Array<{
     title: string[];
     description: string[];
@@ -46,16 +47,14 @@ export default function Books() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, error } = useQuery<BooksResponse>({
-    queryKey: ["/api/books", currentPage, BOOKS_PER_PAGE],
+    queryKey: ["/api/books", currentPage],
     queryFn: async () => {
       console.log(`Fetching page ${currentPage} of books...`);
       const response = await fetch(`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`);
       if (!response.ok) {
         throw new Error(`${response.status}: ${await response.text()}`);
       }
-      const data = await response.json();
-      console.log(`Received data for page ${currentPage}:`, data);
-      return data;
+      return response.json();
     },
     staleTime: 0,
     gcTime: 1000 * 60 * 5, // Cache for 5 minutes
@@ -92,6 +91,7 @@ export default function Books() {
   const handlePageChange = (newPage: number) => {
     console.log(`Changing to page ${newPage}`);
     setCurrentPage(newPage);
+    window.scrollTo(0, 0);
   };
 
   return (

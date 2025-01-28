@@ -5,6 +5,7 @@ interface Author {
 }
 
 interface Book {
+  id: string;
   book: Array<{
     title: string[];
     description: string[];
@@ -45,7 +46,6 @@ export function BookCard({ review }: BookCardProps) {
     );
   }
 
-  // Safely access properties with optional chaining and default values
   const title = review?.book?.[0]?.title?.[0] ?? "Untitled Book";
   const imageUrl =
     review?.book?.[0]?.image_url?.[0] ??
