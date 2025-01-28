@@ -52,6 +52,8 @@ export default function ShowStats() {
     ));
   };
 
+  const totalShowPages = showsData ? Math.ceil(showsData.total / SHOWS_PER_PAGE) : 0;
+
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-slackey mb-8">phashboard</h1>
@@ -145,7 +147,7 @@ export default function ShowStats() {
         </div>
       </div>
 
-      {/* Shows Grid */}
+      {/* Shows Grid with stable pagination */}
       <Card>
         <CardContent className="pt-6">
           <h2 className="text-2xl font-slackey mb-6">shows</h2>
@@ -161,14 +163,21 @@ export default function ShowStats() {
             >
               Previous
             </Button>
-            <span className="text-sm">Page {showsPage}</span>
+            <span className="text-sm">
+              {showsLoading ? (
+                <Skeleton className="h-4 w-16 inline-block" />
+              ) : (
+                `Page ${showsPage}`
+              )}
+            </span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowsPage((p) => p + 1)}
               disabled={
-                showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
-                showsLoading
+                showsLoading ||
+                !showsData ||
+                showsPage >= totalShowPages
               }
             >
               Next
