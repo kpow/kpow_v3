@@ -90,7 +90,12 @@ export function ContentSection({
   if (type === "star") {
     return (
       <div className="group relative">
-        <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+        >
           <div className="overflow-hidden rounded-lg bg-gray-200 aspect-[3/2]">
             <img
               src={imageSrc}
@@ -103,16 +108,20 @@ export function ContentSection({
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-6 w-6 rounded-full bg-gray-300" />
                 <span className="text-sm text-gray-600">{author}</span>
-                {date && <span className="text-sm text-gray-400">• {date}</span>}
+                {date && (
+                  <span className="text-sm text-gray-400">• {date}</span>
+                )}
               </div>
-            )}
-            {excerpt && (
-              <p className="mt-2 text-sm text-gray-600 line-clamp-3">{excerpt}</p>
             )}
             <h3 className="text-base font-bold mt-3 group-hover:text-blue-600 transition-colors">
               {title}
             </h3>
-            <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+            {/* <p className="mt-1 text-sm text-gray-500">{subtitle}</p> */}
+            {excerpt && (
+              <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+                {excerpt}
+              </p>
+            )}
           </div>
         </a>
       </div>
