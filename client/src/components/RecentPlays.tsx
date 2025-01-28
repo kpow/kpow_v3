@@ -60,6 +60,9 @@ export function RecentPlays() {
         opts={{
           align: "start",
           loop: true,
+          slidesToScroll: "auto",
+          skipSnaps: true,
+          dragFree: false,
         }}
         className="w-full"
       >
