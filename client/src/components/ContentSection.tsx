@@ -9,6 +9,7 @@ interface ContentSectionProps {
   date?: string;
   author?: string;
   description?: string;
+  excerpt?: string;
 }
 
 export function ContentSection({ 
@@ -19,7 +20,8 @@ export function ContentSection({
   rating,
   date,
   author,
-  description
+  description,
+  excerpt
 }: ContentSectionProps) {
   const renderStars = (rating: number) => {
     return (
@@ -80,6 +82,34 @@ export function ContentSection({
     );
   }
 
+  if (type === 'star') {
+    return (
+      <div className="group relative">
+        <div className="overflow-hidden rounded-lg bg-gray-200 aspect-[3/2]">
+          <img
+            src={imageSrc}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+        <div className="mt-4">
+          {author && (
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-6 w-6 rounded-full bg-gray-300" />
+              <span className="text-sm text-gray-600">{author}</span>
+              {date && <span className="text-sm text-gray-400">• {date}</span>}
+            </div>
+          )}
+          <h3 className="text-base font-bold">{title}</h3>
+          <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+          {excerpt && (
+            <p className="mt-2 text-sm text-gray-600 line-clamp-3">{excerpt}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="group relative">
       <div 
@@ -91,13 +121,6 @@ export function ContentSection({
         <div className="h-full w-full bg-gray-300 transition-transform duration-300 group-hover:scale-105" />
       </div>
       <div className={`mt-4 ${type === 'recent' ? 'text-sm' : ''}`}>
-        {type === 'star' && author && (
-          <div className="flex items-center gap-2 mb-2">
-            <div className="h-6 w-6 rounded-full bg-gray-300" />
-            <span className="text-sm text-gray-600">{author}</span>
-            {date && <span className="text-sm text-gray-400">• {date}</span>}
-          </div>
-        )}
         <h3 className="text-base font-bold">{title}</h3>
         <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
       </div>

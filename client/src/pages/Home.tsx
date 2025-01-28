@@ -95,6 +95,7 @@ export default function Home() {
       date: "Loading",
       imageSrc: "/placeholder-star.png",
       type: "star" as const,
+      excerpt: "Loading content...",
     }
   ];
 
@@ -156,7 +157,7 @@ export default function Home() {
             ))
           ) : (
             starFeed.map((star) => (
-              <ContentSection key={star.title} {...star} />
+              <ContentSection key={star.title} {...star} excerpt={star.excerpt} />
             ))
           )}
         </div>
