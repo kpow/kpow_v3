@@ -1,17 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
 
+interface Author {
+  name: string[];
+}
+
 interface Book {
-  book: {
+  book: Array<{
     title: string[];
     description: string[];
     image_url: string[];
     link: string[];
     authors: Array<{
-      author: Array<{
-        name: string[];
-      }>;
+      author: Array<Author>;
     }>;
-  };
+  }>;
   shelves: {
     shelf: Array<{
       $: {
@@ -26,7 +28,7 @@ interface BookCardProps {
 }
 
 export function BookCard({ review }: BookCardProps) {
-  if (!review || !review.book) {
+  if (!review?.book?.[0]) {
     return (
       <Card className="overflow-hidden h-full hover:shadow-lg transition-shadow">
         <CardContent className="p-4">
@@ -44,16 +46,16 @@ export function BookCard({ review }: BookCardProps) {
   }
 
   // Safely access properties with optional chaining and default values
-  const title = review?.book[0]?.title?.[0] ?? "Untitled Book";
+  const title = review?.book?.[0]?.title?.[0] ?? "Untitled Book";
   const imageUrl =
-    review?.book[0]?.image_url?.[0] ??
+    review?.book?.[0]?.image_url?.[0] ??
     "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
   const authorName =
-    review?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
+    review?.book?.[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
   const description =
-    review?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ??
+    review?.book?.[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ??
     "No description available";
-  const bookLink = review?.book[0]?.link?.[0] ?? "#";
+  const bookLink = review?.book?.[0]?.link?.[0] ?? "#";
 
   return (
     <Card className="overflow-hidden h-full hover:shadow-lg transition-shadow">
