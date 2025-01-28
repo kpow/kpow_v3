@@ -31,9 +31,7 @@ export function BookFeed() {
     queryKey: ["/api/books"],
   });
 
-  const readBooks = data?.GoodreadsResponse?.reviews?.[0]?.review
-    .filter(book => book.shelves.shelf.some(s => s.$.name === "read"))
-    .slice(0, 2);
+  const books = data?.GoodreadsResponse?.reviews?.[0]?.review?.slice(0, 2);
 
   if (isLoading) {
     return (
@@ -47,7 +45,7 @@ export function BookFeed() {
   return (
     <div className="space-y-4">
 
-      {readBooks?.map((review, index) => {
+      {books?.map((review, index) => {
         console.log('Review Book:', review.book);
         console.log('Review Shelves:', review.shelves);
         return (
