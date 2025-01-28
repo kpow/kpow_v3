@@ -324,7 +324,7 @@ export function registerRoutes(app: Express): Server {
       const perPage = req.query.per_page || "20"; 
 
       const url = `${GOODREADS_API_BASE}/review/list/${GOODREADS_USER_ID}.xml`;
-      console.log("Fetching from Goodreads URL:", url);
+      console.log(`Fetching books page ${page} with ${perPage} items per page from Goodreads`);
 
       const response = await axios.get(url, {
         params: {
@@ -337,9 +337,6 @@ export function registerRoutes(app: Express): Server {
           order: "d"
         }
       });
-
-      console.log("Raw XML response received");
-      console.log("Params:", { page, perPage });
 
       const result = await parseXMLAsync(response.data) as {
         GoodreadsResponse: {
@@ -359,7 +356,14 @@ export function registerRoutes(app: Express): Server {
       const currentPage = parseInt(page as string);
       const totalPages = Math.ceil(total / parseInt(perPage as string));
 
-      console.log("Pagination:", { total, start, end, currentPage, totalPages });
+      console.log("Pagination data:", {
+        total,
+        start,
+        end,
+        currentPage,
+        totalPages,
+        reviewCount: reviews.review?.length
+      });
 
       // Construct a properly typed response object
       const responseData = {

@@ -47,8 +47,24 @@ const BOOKS_PER_PAGE = 20; // Match with backend
 
 export default function Books() {
   const [currentPage, setCurrentPage] = useState(1);
+
   const { data, isLoading, error } = useQuery<GoodreadsResponse>({
-    queryKey: ["/api/books", { page: currentPage, per_page: BOOKS_PER_PAGE }],
+    queryKey: ["/api/books", currentPage, BOOKS_PER_PAGE],
+    queryFn: async () => {
+      console.log(`Fetching page ${currentPage} of books...`);
+      const response = await fetch(`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${await response.text()}`);
+      }
+      const data = await response.json();
+      console.log(`Received data for page ${currentPage}:`, data);
+      return data;
+    },
+    // Ensure query is refetched when page changes
+    staleTime: 0,
+    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   if (error) {
@@ -56,7 +72,7 @@ export default function Books() {
       <div className="container mx-auto p-4">
         <div className="text-center py-8">
           <h1 className="text-2xl font-bold text-red-500 mb-4">Error loading books</h1>
-          <p className="text-gray-600">Please try again later</p>
+          <p className="text-gray-600">{error instanceof Error ? error.message : 'Please try again later'}</p>
         </div>
       </div>
     );
@@ -80,6 +96,11 @@ export default function Books() {
   const totalPages = pagination?.totalPages ?? 1;
   const totalBooks = pagination?.total ?? 0;
 
+  const handlePageChange = (newPage: number) => {
+    console.log(`Changing to page ${newPage}`);
+    setCurrentPage(newPage);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">My Books</h1>
@@ -94,7 +115,7 @@ export default function Books() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
           disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -105,7 +126,7 @@ export default function Books() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
           disabled={currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />
