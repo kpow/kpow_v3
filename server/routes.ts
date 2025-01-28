@@ -5,7 +5,7 @@ if (!process.env.PHISH_API_KEY) {
   throw new Error("PHISH_API_KEY environment variable is required");
 }
 
-const LASTFM_API_BASE = "http://ws.audioscrobbler.com/2.0";
+const PHISH_API_BASE = "https://api.phish.net/v5";
 
 interface VenueCount {
   venue: string;
@@ -34,30 +34,6 @@ async function fetchPhishData(endpoint: string) {
 }
 
 export function registerRoutes(app: Express): Server {
-  // Last.fm API endpoint
-  app.get("/api/lastfm/recent-tracks", async (_req, res) => {
-    try {
-      if (!process.env.LASTFM_API_KEY) {
-        throw new Error("LASTFM_API_KEY environment variable is required");
-      }
-
-      const response = await fetch(
-        `${LASTFM_API_BASE}/?method=user.getrecenttracks&user=kpow&api_key=${process.env.LASTFM_API_KEY}&format=json&limit=10`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch from Last.fm API");
-      }
-
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      console.error("Error fetching from Last.fm:", error);
-      res.status(500).json({ message: (error as Error).message });
-    }
-  });
-
-  // Existing Phish API endpoints
   app.get("/api/shows", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
@@ -76,7 +52,7 @@ export function registerRoutes(app: Express): Server {
 
       const formattedShows = paginatedShows.map((show: any) => ({
         showid: show.showid,
-        showdate: show.showdate,
+        showdate: show.showdate, // Already in YYYY-MM-DD format
         venue: show.venue,
         city: show.city,
         state: show.state,
@@ -106,20 +82,19 @@ export function registerRoutes(app: Express): Server {
       const limit = parseInt(req.query.limit as string) || 5;
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      // Count shows per venue with type safety
-      const venueStats: Record<string, number> = shows.reduce(
-        (acc: Record<string, number>, show: any) => {
-          const venueName = show.venue as string;
-          acc[venueName] = (acc[venueName] || 0) + 1;
+      // Count shows per venue
+      const venueStats = shows.reduce(
+        (acc: { [key: string]: number }, show: any) => {
+          acc[show.venue] = (acc[show.venue] || 0) + 1;
           return acc;
         },
-        {}
+        {},
       );
 
-      // Convert to array and sort by count
+      // Convert to array and sort by count with proper typing
       const sortedVenues: VenueCount[] = Object.entries(venueStats)
-        .map(([venue, count]) => ({ venue, count }))
-        .sort((a, b) => b.count - a.count);
+        .map(([venue, count]): VenueCount => ({ venue, count }))
+        .sort((a: VenueCount, b: VenueCount) => b.count - a.count);
 
       const start = (page - 1) * limit;
       const end = start + limit;
@@ -285,5 +260,3 @@ function formatSongUrl(songName: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")}`;
 }
-
-const PHISH_API_BASE = "https://api.phish.net/v5";
