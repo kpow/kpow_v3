@@ -38,17 +38,20 @@ const BOOKS_PER_PAGE = 8;
 
 export default function Books() {
   const [currentPage, setCurrentPage] = useState(1);
-  const { data, isLoading } = useQuery<GoodreadsResponse>({
+  const { data, isLoading, error } = useQuery<GoodreadsResponse>({
     queryKey: ["/api/books"],
   });
 
-  const books = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
-  const totalPages = Math.ceil(books.length / BOOKS_PER_PAGE);
-
-  // Get current page's books
-  const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
-  const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
-  const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
+  if (error) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center py-8">
+          <h1 className="text-2xl font-bold text-red-500 mb-4">Error loading books</h1>
+          <p className="text-gray-600">Please try again later</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -61,6 +64,20 @@ export default function Books() {
       </div>
     );
   }
+
+  // Safely access books array with optional chaining and default to empty array
+  const books = data?.GoodreadsResponse?.reviews?.[0]?.review ?? [];
+  const totalPages = Math.max(1, Math.ceil(books.length / BOOKS_PER_PAGE));
+
+  // Ensure currentPage stays within bounds when data changes
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
+
+  // Get current page's books
+  const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
+  const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
+  const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
 
   return (
     <div className="container mx-auto p-4">
