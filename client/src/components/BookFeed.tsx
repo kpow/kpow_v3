@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface BookData {
+interface Book {
   title_without_series: string[];
   image_url: string[];
   average_rating: string[];
@@ -15,14 +15,16 @@ interface BookData {
 }
 
 interface Review {
-  book: BookData;
+  book: Book;
+}
+
+interface Reviews {
+  review: Review[];
 }
 
 interface GoodreadsResponse {
   GoodreadsResponse: {
-    reviews: Array<{
-      review: Review[];
-    }>;
+    reviews: Reviews[];
   };
 }
 
@@ -66,11 +68,12 @@ export function BookFeed() {
         const book = review.book;
         console.log("Processing book:", book); // Debug log for each book
 
-        const title = book.title_without_series?.[0] || 'Untitled';
-        const imageUrl = book.image_url?.[0] || '';
-        const authorName = book.authors?.[0]?.author?.[0]?.name?.[0];
-        const rating = book.average_rating?.[0] || '0';
-        const description = book.description?.[0]?.replace(/<[^>]*>/g, '') || '';
+        // Safely access nested properties with optional chaining
+        const title = book?.title_without_series?.[0] || 'Untitled';
+        const imageUrl = book?.image_url?.[0];
+        const authorName = book?.authors?.[0]?.author?.[0]?.name?.[0];
+        const rating = book?.average_rating?.[0] || '0';
+        const description = book?.description?.[0]?.replace(/<[^>]*>/g, '') || '';
 
         const stars = '★'.repeat(Math.round(parseFloat(rating)));
         const emptyStars = '☆'.repeat(5 - Math.round(parseFloat(rating)));
