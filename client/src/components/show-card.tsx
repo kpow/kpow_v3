@@ -5,9 +5,35 @@ import { format, parseISO } from "date-fns";
 import { ShowDetailsModal } from "./show-details-modal";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ShowCardProps {
   show: ShowAttendance;
+}
+
+// Add ShowCardSkeleton component
+export function ShowCardSkeleton() {
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-48" /> {/* Venue name */}
+              <div className="flex items-center">
+                <MapPin className="mr-1 h-4 w-4 text-muted-foreground" />
+                <Skeleton className="h-4 w-32" /> {/* Location */}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <CalendarDays className="mr-1 h-4 w-4 text-muted-foreground" />
+            <Skeleton className="h-4 w-24" /> {/* Date */}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export function ShowCard({ show }: ShowCardProps) {

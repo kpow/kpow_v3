@@ -6,7 +6,7 @@ import {
   getSetlistStats,
 } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShowCard } from "@/components/show-card";
+import { ShowCard, ShowCardSkeleton } from "@/components/show-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
@@ -39,6 +39,18 @@ export default function ShowStats() {
     queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
     placeholderData: (previousData) => previousData,
   });
+
+  // Function to render show cards or skeletons
+  const renderShowsContent = () => {
+    if (showsLoading) {
+      return Array.from({ length: SHOWS_PER_PAGE }).map((_, index) => (
+        <ShowCardSkeleton key={`skeleton-${index}`} />
+      ));
+    }
+    return showsData?.shows.map((show) => (
+      <ShowCard key={show.showid} show={show} />
+    ));
+  };
 
   return (
     <div className="container mx-auto p-8">
@@ -138,34 +150,30 @@ export default function ShowStats() {
         <CardContent className="pt-6">
           <h2 className="text-2xl font-slackey mb-6">shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showsData?.shows.map((show) => (
-              <ShowCard key={show.showid} show={show} />
-            ))}
+            {renderShowsContent()}
           </div>
-          {showsData && showsData.total > SHOWS_PER_PAGE && (
-            <div className="mt-6 flex justify-between items-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowsPage((p) => Math.max(1, p - 1))}
-                disabled={showsPage === 1 || showsLoading}
-              >
-                Previous
-              </Button>
-              <span className="text-sm">Page {showsPage}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowsPage((p) => p + 1)}
-                disabled={
-                  showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
-                  showsLoading
-                }
-              >
-                Next
-              </Button>
-            </div>
-          )}
+          <div className="mt-6 flex justify-between items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowsPage((p) => Math.max(1, p - 1))}
+              disabled={showsPage === 1 || showsLoading}
+            >
+              Previous
+            </Button>
+            <span className="text-sm">Page {showsPage}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowsPage((p) => p + 1)}
+              disabled={
+                showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
+                showsLoading
+              }
+            >
+              Next
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
