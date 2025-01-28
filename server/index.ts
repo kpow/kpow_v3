@@ -1,7 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { createServer } from "net";
 
 const app = express();
 app.use(express.json());
@@ -58,33 +57,10 @@ async function startServer() {
       serveStatic(app);
     }
 
-    // Try ports starting from 5000
-    for (let port = 5000; port < 5100; port++) {
-      try {
-        await new Promise((resolve, reject) => {
-          server.listen(port, "0.0.0.0")
-            .once('listening', () => {
-              log(`Server started successfully on port ${port}`);
-              resolve(true);
-            })
-            .once('error', (err) => {
-              if ((err as NodeJS.ErrnoException).code === 'EADDRINUSE') {
-                log(`Port ${port} is in use, trying next port...`);
-                resolve(false);
-              } else {
-                reject(err);
-              }
-            });
-        });
-
-        // If we get here, the server started successfully
-        return;
-      } catch (err) {
-        log(`Failed to start server on port ${port}: ${(err as Error).message}`);
-      }
-    }
-
-    throw new Error('Could not find an available port');
+    const PORT = 5000;
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`Server started successfully on port ${PORT}`);
+    });
   } catch (error) {
     log(`Fatal error starting server: ${(error as Error).message}`);
     process.exit(1);
