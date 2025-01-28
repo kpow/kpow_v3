@@ -2,24 +2,25 @@ import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
 import { useQuery } from "@tanstack/react-query";
 
-interface GoodreadsBook {
+interface Book {
   book: {
     title_without_series: string[];
-    image_url: string[];
     description: string[];
-    average_rating: string[];
+    image_url: string[];
+    link: string[];
     authors: Array<{
       author: Array<{
         name: string[];
       }>;
     }>;
+    average_rating: string[];
   };
 }
 
 interface GoodreadsResponse {
   GoodreadsResponse: {
     reviews: Array<{
-      review: GoodreadsBook[];
+      review: Book[];
     }>;
   };
 }
@@ -50,22 +51,24 @@ export default function Home() {
     }
   ];
 
-  const bookFeed = bookData?.GoodreadsResponse?.reviews?.[1]?.review
-    ?.slice(0, 2)
-    .map(reviewData => ({
-      title: reviewData?.book?.title_without_series?.[0] ?? "Untitled Book",
-      subtitle: `by ${reviewData?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author"}`,
-      imageSrc: reviewData?.book?.image_url?.[0] ?? "/placeholder-book.png",
+  const bookFeed = [
+    {
+      title: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.title_without_series?.[0] ?? "Untitled",
+      subtitle: `by ${bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
+      imageSrc: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.image_url?.[0] ?? "/placeholder-book.png",
       type: 'book' as const,
-      rating: parseFloat(reviewData?.book?.average_rating?.[0] ?? "0"),
-      description: reviewData?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? "No description available"
-    })) || [];
-
-  console.log('Book Data:', {
-    rawResponse: bookData,
-    reviews: bookData?.GoodreadsResponse?.reviews,
-    bookFeed
-  });
+      rating: parseFloat(bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.average_rating?.[0] ?? "0"),
+      description: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[0]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
+    },
+    {
+      title: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.title_without_series?.[0] ?? "Untitled",
+      subtitle: `by ${bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown"}`,
+      imageSrc: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.image_url?.[0] ?? "/placeholder-book.png",
+      type: 'book' as const,
+      rating: parseFloat(bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.average_rating?.[0] ?? "0"),
+      description: bookData?.GoodreadsResponse?.reviews?.[1]?.review?.[1]?.book?.description?.[0]?.replace(/<[^>]*>/g, '') ?? ""
+    }
+  ];
 
   const starFeed = [
     {
@@ -120,7 +123,7 @@ export default function Home() {
           <button className="text-sm text-gray-500 hover:text-gray-700">SEE MORE</button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {bookFeed?.map((book, index) => (
+          {bookFeed.map((book, index) => (
             <ContentSection
               key={`${book.title}-${index}`}
               {...book}
