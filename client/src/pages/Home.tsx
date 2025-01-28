@@ -30,6 +30,23 @@ export default function Home() {
     queryKey: ["/api/books"],
   });
 
+  // Debug log to see the actual values
+  console.log('Book Data Values:', {
+    // First book values
+    book1Title: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.title_without_series[0],
+    book1Image: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.image_url[0],
+    book1Desc: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.description[0],
+    book1Author: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.authors[0]?.author[0]?.name[0],
+    book1Rating: bookData?.GoodreadsResponse?.reviews[1]?.review[0]?.book?.average_rating[0],
+
+    // Second book values
+    book2Title: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.title_without_series[0],
+    book2Image: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.image_url[0],
+    book2Desc: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.description[0],
+    book2Author: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.authors[0]?.author[0]?.name[0],
+    book2Rating: bookData?.GoodreadsResponse?.reviews[1]?.review[1]?.book?.average_rating[0]
+  });
+
   const mainSections = [
     {
       title: "battle",
