@@ -1,5 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import axios from "axios";
+import { parseString } from "xml2js";
+import { promisify } from "util";
 
 if (!process.env.PHISH_API_KEY) {
   throw new Error("PHISH_API_KEY environment variable is required");
@@ -11,6 +14,11 @@ if (!process.env.LASTFM_API_KEY) {
 
 const PHISH_API_BASE = "https://api.phish.net/v5";
 const LASTFM_API_BASE = "https://ws.audioscrobbler.com/2.0/";
+const GOODREADS_API_BASE = "https://www.goodreads.com";
+const GOODREADS_USER_ID = "457389";
+const GOODREADS_API_KEY = "ajR4uV5s4lLmYZUWI2SKXw";
+
+const parseXMLAsync = promisify(parseString);
 
 async function fetchLastFmData(method: string, params: Record<string, string>) {
   try {
@@ -307,6 +315,37 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Error in /api/lastfm/recent-tracks:", error);
       res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  app.get("/api/books", async (req, res) => {
+    try {
+      const page = req.query.page || "1";
+      const perPage = req.query.per_page || "2";
+
+      const url = `${GOODREADS_API_BASE}/review/list/${GOODREADS_USER_ID}.xml`;
+      console.log("Fetching from Goodreads URL:", url);
+
+      const response = await axios.get(url, {
+        params: {
+          key: GOODREADS_API_KEY,
+          v: "2",
+          per_page: perPage,
+          page: page,
+        }
+      });
+
+      console.log("Raw XML response received");
+
+      const result = await parseXMLAsync(response.data);
+      console.log("Transformed JSON:", JSON.stringify(result, null, 2));
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching books from Goodreads:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch books"
+      });
     }
   });
 
