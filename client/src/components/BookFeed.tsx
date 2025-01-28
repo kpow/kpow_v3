@@ -7,14 +7,26 @@ interface BookData {
     _: string;
     $: { type: string };
   }>;
-  title: string[];
-  description: string[];
-  image_url: string[];
-  link: string[];
+  title: Array<string>;
+  description: Array<string>;
+  image_url: Array<string>;
+  small_image_url: Array<string>;
+  large_image_url: Array<string>;
+  link: Array<string>;
   authors: Array<{
     author: Array<{
-      name: string[];
+      name: Array<string>;
     }>;
+  }>;
+  isbn: Array<{
+    $: { nil: string };
+  }>;
+  isbn13: Array<{
+    $: { nil: string };
+  }>;
+  text_reviews_count: Array<{
+    _: string;
+    $: { type: string };
   }>;
 }
 
@@ -35,7 +47,7 @@ export function BookFeed() {
     queryKey: ["/api/books"],
   });
 
-  console.log("Books data:", data); // Keep this for debugging
+  console.log("Raw Books data:", data?.GoodreadsResponse?.reviews[0]?.review); // Debug log
 
   if (isLoading) {
     return (
@@ -64,12 +76,24 @@ export function BookFeed() {
     );
   }
 
+  // Helper function to get the best available image URL
+  const getBestImageUrl = (book: BookData): string => {
+    return (
+      book.large_image_url?.[0] ||
+      book.image_url?.[0] ||
+      book.small_image_url?.[0] ||
+      ''
+    ).trim();
+  };
+
   return (
     <div className="space-y-4">
       {reviews.slice(0, 2).map((review, index) => {
         const book = review.book;
+        console.log("Processing book:", book); // Debug log for each book
+
         const title = book.title?.[0] || 'Untitled';
-        const imageUrl = book.image_url?.[0];
+        const imageUrl = getBestImageUrl(book);
         const authorName = book.authors?.[0]?.author?.[0]?.name?.[0];
         const description = book.description?.[0]?.replace(/<[^>]*>/g, '') || '';
         const link = book.link?.[0] || '#';
@@ -84,6 +108,7 @@ export function BookFeed() {
                     alt={title}
                     className="w-24 h-36 object-cover rounded-md"
                     onError={(e) => {
+                      console.log("Image failed to load:", imageUrl);
                       e.currentTarget.style.display = 'none';
                     }}
                   />
