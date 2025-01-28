@@ -32,12 +32,15 @@ interface GoodreadsResponse {
 }
 
 export function BookFeed() {
-  const { data, isLoading } = useQuery<GoodreadsResponse>({
+  const { data, isLoading, error } = useQuery<GoodreadsResponse>({
     queryKey: ["/api/books"],
   });
 
-  const readBooks = data?.GoodreadsResponse?.reviews?.[0]?.review
-    .filter(book => book.shelves.shelf.some(s => s.$.name === "read"))
+  const books = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
+  const readBooks = books
+    .filter(book => 
+      book.shelves?.shelf?.some(s => s.$?.name === "read") ?? false
+    )
     .slice(0, 2);
 
   if (isLoading) {
@@ -49,9 +52,25 @@ export function BookFeed() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-sm text-red-500">
+        Failed to load books. Please try again later.
+      </div>
+    );
+  }
+
+  if (!readBooks?.length) {
+    return (
+      <div className="text-sm text-muted-foreground">
+        No recently read books found.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {readBooks?.map((review, index) => (
+      {readBooks.map((review, index) => (
         <Card key={index} className="overflow-hidden">
           <CardContent className="p-4">
             <div className="flex gap-4">
