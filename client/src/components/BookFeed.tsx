@@ -3,23 +3,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Book {
-  book: {
-    title_without_series: string[];
-    image_url: string[];
-    average_rating: string[];
-    description: string[];
-    authors: Array<{
-      author: Array<{
-        name: string[];
-      }>;
+  title_without_series: string[];
+  image_url: string[];
+  average_rating: string[];
+  description: string[];
+  authors: Array<{
+    author: Array<{
+      name: string[];
     }>;
-  };
+  }>;
 }
 
 interface GoodreadsResponse {
   GoodreadsResponse: {
     reviews: Array<{
-      review: Book[];
+      review: Array<{
+        book: Book;
+      }>;
     }>;
   };
 }
@@ -28,8 +28,6 @@ export function BookFeed() {
   const { data, isLoading, error } = useQuery<GoodreadsResponse>({
     queryKey: ["/api/books"],
   });
-
-  console.log("Raw Books data:", data?.GoodreadsResponse?.reviews[0]?.review); // Debug log
 
   if (isLoading) {
     return (
@@ -48,7 +46,7 @@ export function BookFeed() {
     );
   }
 
-  const reviews = data?.GoodreadsResponse?.reviews[0]?.review || [];
+  const reviews = data?.GoodreadsResponse?.reviews[1]?.review || [];
 
   if (!reviews.length) {
     return (
@@ -61,49 +59,32 @@ export function BookFeed() {
   return (
     <div className="space-y-4">
       {reviews.slice(0, 2).map((review, index) => {
-        const book = review.book;
-        console.log("Processing book:", book); // Debug log for each book
-
-        // Safely access nested properties with optional chaining
-        const title = book?.book?.title_without_series?.[0] || "Untitled";
-        const imageUrl = book?.book?.image_url?.[0];
-        const authorName = book?.book?.authors?.[0]?.author?.[0]?.name?.[0];
-        const rating = book?.book?.average_rating?.[0] || "0";
-        const description = book?.book?.description?.[0]?.replace(/<[^>]*>/g, "") || "";
-
-        const stars = "★".repeat(Math.round(parseFloat(rating)));
-        const emptyStars = "☆".repeat(5 - Math.round(parseFloat(rating)));
+        const { book } = review;
 
         return (
           <Card key={index} className="overflow-hidden">
             <CardContent className="p-4">
               <div className="flex gap-4">
-                {imageUrl && (
-                  <img 
-                    src={imageUrl}
-                    alt={title}
-                    className="w-24 h-36 object-cover rounded-md"
-                    onError={(e) => {
-                      console.log("Image failed to load:", imageUrl);
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                )}
+                <img 
+                  src={book.image_url[0]} 
+                  alt={book.title_without_series[0]}
+                  className="w-24 h-36 object-cover rounded-md"
+                />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg truncate">{title}</h3>
-                  {authorName && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      by {authorName}
-                    </p>
-                  )}
+                  <h3 className="font-semibold text-lg truncate">
+                    {book.title_without_series[0]}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    by {book.authors[0].author[0].name[0]}
+                  </p>
                   <div className="text-yellow-500 text-sm mt-1">
-                    {stars}{emptyStars} ({rating})
+                    {"★".repeat(Math.round(parseFloat(book.average_rating[0])))}
+                    {"☆".repeat(5 - Math.round(parseFloat(book.average_rating[0])))}
+                    ({book.average_rating[0]})
                   </div>
-                  {description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3 mt-2">
-                      {description}
-                    </p>
-                  )}
+                  <p className="text-sm text-muted-foreground line-clamp-3 mt-2">
+                    {book.description[0]?.replace(/<[^>]*>/g, "")}
+                  </p>
                   <a 
                     href="#"
                     target="_blank" 
