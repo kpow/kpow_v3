@@ -410,6 +410,11 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
+      // Log a sample article to see the full data structure
+      if (response.data.length > 0) {
+        console.log("Sample Feedbin article data:", JSON.stringify(response.data[0], null, 2));
+      }
+
       // Transform the data with default values
       const articles = response.data.map((article: any) => ({
         id: article?.id ?? 0,
@@ -418,11 +423,16 @@ export function registerRoutes(app: Express): Server {
         summary: article?.summary ?? article?.content ?? 'No content available',
         url: article?.url ?? '#',
         published: article?.published ?? new Date().toISOString(),
+        screenshot: article?.url 
+          ? `https://proxy.feedbinusercontent.com/v3/screenshot?url=${encodeURIComponent(article.url)}`
+          : '/placeholder-star.png',
         feed: {
           title: article?.feed?.title ?? 'Unknown Feed',
           url: article?.feed?.feed_url ?? '#'
         }
       }));
+
+      console.log("First transformed article:", articles[0]);
 
       res.json({
         articles,
