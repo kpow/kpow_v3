@@ -3,28 +3,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Book {
-  title_without_series: string[];
-  image_url: string[];
-  average_rating: string[];
-  description: string[];
-  authors: Array<{
-    author: Array<{
-      name: string[];
+  book: {
+    title_without_series: string[];
+    image_url: string[];
+    average_rating: string[];
+    description: string[];
+    authors: Array<{
+      author: Array<{
+        name: string[];
+      }>;
     }>;
-  }>;
-}
-
-interface Review {
-  book: Book;
-}
-
-interface Reviews {
-  review: Review[];
+  };
 }
 
 interface GoodreadsResponse {
   GoodreadsResponse: {
-    reviews: Reviews[];
+    reviews: Array<{
+      review: Book[];
+    }>;
   };
 }
 
@@ -69,14 +65,14 @@ export function BookFeed() {
         console.log("Processing book:", book); // Debug log for each book
 
         // Safely access nested properties with optional chaining
-        const title = book?.title_without_series?.[0] || 'Untitled';
-        const imageUrl = book?.image_url?.[0];
-        const authorName = book?.authors?.[0]?.author?.[0]?.name?.[0];
-        const rating = book?.average_rating?.[0] || '0';
-        const description = book?.description?.[0]?.replace(/<[^>]*>/g, '') || '';
+        const title = book?.book?.title_without_series?.[0] || "Untitled";
+        const imageUrl = book?.book?.image_url?.[0];
+        const authorName = book?.book?.authors?.[0]?.author?.[0]?.name?.[0];
+        const rating = book?.book?.average_rating?.[0] || "0";
+        const description = book?.book?.description?.[0]?.replace(/<[^>]*>/g, "") || "";
 
-        const stars = '★'.repeat(Math.round(parseFloat(rating)));
-        const emptyStars = '☆'.repeat(5 - Math.round(parseFloat(rating)));
+        const stars = "★".repeat(Math.round(parseFloat(rating)));
+        const emptyStars = "☆".repeat(5 - Math.round(parseFloat(rating)));
 
         return (
           <Card key={index} className="overflow-hidden">
@@ -89,7 +85,7 @@ export function BookFeed() {
                     className="w-24 h-36 object-cover rounded-md"
                     onError={(e) => {
                       console.log("Image failed to load:", imageUrl);
-                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 )}
