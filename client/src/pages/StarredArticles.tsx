@@ -24,15 +24,17 @@ export default function StarredArticles() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading } = useQuery<StarredResponse>({
-    queryKey: [`/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`],
-    onSuccess: (data) => {
-      // Log the articles' dates to verify ordering
-      console.log('Received articles with dates:', 
-        data.articles.map(article => ({
-          title: article.title,
-          published: new Date(article.published).toLocaleString()
-        }))
+    queryKey: ['/api/starred-articles', currentPage, ARTICLES_PER_PAGE],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`,
+        { credentials: "include" }
       );
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const data: StarredResponse = await response.json();
+      return data;
     }
   });
 
@@ -72,7 +74,7 @@ export default function StarredArticles() {
     );
   }
 
-  const articles = data?.articles.map(article => ({
+  const articles = data?.articles.map((article: StarredArticle) => ({
     title: article.title ?? 'Untitled Article',
     subtitle: `by ${article.author ?? 'Unknown Author'}`,
     author: article.author ?? 'Unknown Author',
@@ -113,16 +115,14 @@ export default function StarredArticles() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {articles.map((article, index) => (
+        {articles.map((article) => (
           <ContentSection
-            key={`${currentPage}-${index}`}
+            key={article.url}
             {...article}
             excerpt={article.excerpt}
           />
         ))}
       </div>
-
-
     </div>
   );
 }
