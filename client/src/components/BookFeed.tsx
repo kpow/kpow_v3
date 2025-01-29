@@ -70,7 +70,7 @@ export function BookFeed() {
                 <img
                   src={imageUrl}
                   alt={title}
-                  className="w-full md:w-36 h-48 object-cover"
+                  className="w-full md:w-40 h-54 object-cover"
                 />
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">{title}</h3>
