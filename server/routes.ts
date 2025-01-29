@@ -396,26 +396,26 @@ export function registerRoutes(app: Express): Server {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
 
-      // First, get all starred entry IDs
-      const starredResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
+      // First, get total count
+      const countResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
+        params: {
+          starred: true,
+          per_page: 1
+        },
         headers: {
           Accept: 'application/json',
           Authorization: `Basic ${process.env.FEEDBIN_KEY}`
         }
       });
 
-      const totalCount = starredResponse.data.length;
-      const totalPages = Math.ceil(totalCount / perPage);
+      const totalCount = parseInt(countResponse.headers['total-count'] || '0');
 
-      // Calculate the slice of IDs for the current page
-      const start = (page - 1) * perPage;
-      const end = start + perPage;
-      const pageEntryIds = starredResponse.data.slice(start, end);
-
-      // Then get the actual entries for the current page
-      const entriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
+      // Then get paginated data
+      const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
         params: {
-          ids: pageEntryIds.join(',')
+          starred: true,
+          per_page: perPage,
+          page: page
         },
         headers: {
           Accept: 'application/json',
@@ -425,7 +425,7 @@ export function registerRoutes(app: Express): Server {
 
       // Fetch content details for each article
       const articlesWithDetails = await Promise.all(
-        entriesResponse.data.map(async (article: any) => {
+        response.data.map(async (article: any) => {
           try {
             if (article.extracted_content_url) {
               const contentResponse = await axios.get(article.extracted_content_url);
@@ -456,6 +456,8 @@ export function registerRoutes(app: Express): Server {
           url: article?.feed?.feed_url ?? '#'
         }
       }));
+
+      const totalPages = Math.ceil(totalCount / perPage);
 
       res.json({
         articles,
