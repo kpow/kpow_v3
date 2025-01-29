@@ -410,8 +410,7 @@ export function registerRoutes(app: Express): Server {
       // Calculate the slice of IDs for the current page
       const start = (page - 1) * perPage;
       const end = start + perPage;
-      // Reverse the array to get newest entries first
-      const pageEntryIds = [...starredResponse.data].reverse().slice(start, end);
+      const pageEntryIds = starredResponse.data.slice(start, end);
 
       // Then get the actual entries for the current page
       const entriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
@@ -444,12 +443,7 @@ export function registerRoutes(app: Express): Server {
         })
       );
 
-      // Sort articles by published date in descending order
-      const sortedArticles = articlesWithDetails.sort((a: any, b: any) => {
-        return new Date(b.published).getTime() - new Date(a.published).getTime();
-      });
-
-      const articles = sortedArticles.map((article: any) => ({
+      const articles = articlesWithDetails.map((article: any) => ({
         id: article?.id ?? 0,
         title: article?.title ?? 'Untitled Article',
         author: article?.author ?? 'Unknown Author',
