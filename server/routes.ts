@@ -291,7 +291,7 @@ export function registerRoutes(app: Express): Server {
         page: "1",
       });
 
-     // console.log("Last.fm data before transformation:", data);
+      // console.log("Last.fm data before transformation:", data);
 
       if (!data.recenttracks?.track) {
         throw new Error("No tracks found in Last.fm response");
@@ -396,9 +396,22 @@ export function registerRoutes(app: Express): Server {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
 
-      const API_ENDPOINT = `https://api.feedbin.com/v2/entries.json`;
+      // First, get total count
+      const countResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
+        params: {
+          starred: true,
+          per_page: 1
+        },
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+        }
+      });
 
-      const response = await axios.get(API_ENDPOINT, {
+      const totalCount = parseInt(countResponse.headers['total-count'] || '0');
+
+      // Then get paginated data
+      const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
         params: {
           starred: true,
           per_page: perPage,
@@ -444,12 +457,15 @@ export function registerRoutes(app: Express): Server {
         }
       }));
 
+      const totalPages = Math.ceil(totalCount / perPage);
+
       res.json({
         articles,
         pagination: {
           current_page: page,
           per_page: perPage,
-          total: response.headers['total-count'] ? parseInt(response.headers['total-count']) : articles.length,
+          total: totalCount,
+          total_pages: totalPages
         }
       });
 
@@ -461,7 +477,8 @@ export function registerRoutes(app: Express): Server {
         pagination: {
           current_page: 1,
           per_page: 20,
-          total: 0
+          total: 0,
+          total_pages: 0
         }
       });
     }

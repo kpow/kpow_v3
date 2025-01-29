@@ -10,22 +10,12 @@ interface PaginationData {
   current_page: number;
   per_page: number;
   total: number;
+  total_pages: number;
 }
 
 interface StarredResponse {
   articles: StarredArticle[];
   pagination: PaginationData;
-}
-
-interface TransformedArticle {
-  title: string;
-  subtitle: string;
-  author: string;
-  date: string;
-  imageSrc: string;
-  type: 'star';
-  url: string;
-  excerpt?: string;
 }
 
 const ARTICLES_PER_PAGE = 9;
@@ -34,26 +24,11 @@ export default function StarredArticles() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading } = useQuery<StarredResponse>({
-    queryKey: [`/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`],
-    select: (data): { articles: TransformedArticle[]; pagination: PaginationData } => ({
-      articles: data.articles.map(article => ({
-        title: article.title ?? 'Untitled Article',
-        subtitle: `by ${article.author ?? 'Unknown Author'}`,
-        author: article.author ?? 'Unknown Author',
-        date: new Date(article.published).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        }),
-        imageSrc: article.lead_image_url ?? "/placeholder-star.png",
-        type: "star" as const,
-        url: article.url ?? '#',
-        excerpt: article.summary ?? 'No excerpt available'
-      })),
-      pagination: data.pagination
-    })
+    queryKey: [`/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`]
   });
 
-  const totalPages = Math.ceil((data?.pagination?.total ?? 0) / ARTICLES_PER_PAGE);
+  const totalPages = data?.pagination?.total_pages ?? 1;
+  const totalArticles = data?.pagination?.total ?? 0;
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -88,6 +63,20 @@ export default function StarredArticles() {
     );
   }
 
+  const articles = data?.articles.map(article => ({
+    title: article.title ?? 'Untitled Article',
+    subtitle: `by ${article.author ?? 'Unknown Author'}`,
+    author: article.author ?? 'Unknown Author',
+    date: new Date(article.published).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    }),
+    imageSrc: article.lead_image_url ?? "/placeholder-star.png",
+    type: "star" as const,
+    url: article.url ?? '#',
+    excerpt: article.summary ?? 'No excerpt available'
+  })) ?? [];
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-3">Starred Articles</h1>
@@ -102,7 +91,7 @@ export default function StarredArticles() {
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <span className="text-sm">
-          {currentPage} of {totalPages} ({data?.pagination?.total ?? 0} articles)
+          {currentPage} of {totalPages} ({totalArticles} articles)
         </span>
         <Button
           variant="outline"
@@ -115,7 +104,7 @@ export default function StarredArticles() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {data?.articles.map((article, index) => (
+        {articles.map((article, index) => (
           <ContentSection
             key={`${currentPage}-${index}`}
             {...article}
@@ -124,27 +113,7 @@ export default function StarredArticles() {
         ))}
       </div>
 
-      <div className="flex justify-center gap-2 items-center mt-6">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm">
-          {currentPage} of {totalPages} ({data?.pagination?.total ?? 0} articles)
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+
     </div>
   );
 }
