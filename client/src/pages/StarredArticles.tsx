@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { ContentSection } from "@/components/ContentSection";
 import { StarredArticle } from "@/lib/hooks/use-starred-articles";
+import { useToast } from "@/hooks/use-toast";
 
 interface PaginationData {
   current_page: number;
@@ -22,28 +23,28 @@ const ARTICLES_PER_PAGE = 9;
 
 export default function StarredArticles() {
   const [currentPage, setCurrentPage] = useState(1);
+  const { toast } = useToast();
 
-  const { data, isLoading } = useQuery<StarredResponse>({
-    queryKey: ['/api/starred-articles', currentPage, ARTICLES_PER_PAGE],
-    queryFn: async () => {
-      const response = await fetch(
-        `/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`,
-        { credentials: "include" }
-      );
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const data: StarredResponse = await response.json();
-      return data;
-    }
+  const { data, isLoading, error } = useQuery<StarredResponse>({
+    queryKey: [`/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`],
   });
+
+  if (error) {
+    toast({
+      title: "Error loading articles",
+      description: error instanceof Error ? error.message : "Please try again later",
+      variant: "destructive",
+    });
+  }
 
   const totalPages = data?.pagination?.total_pages ?? 1;
   const totalArticles = data?.pagination?.total ?? 0;
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   if (isLoading) {
@@ -51,11 +52,11 @@ export default function StarredArticles() {
       <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-3">Starred Articles</h1>
         <div className="flex justify-center gap-2 items-center mb-6">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" disabled>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm">Loading...</span>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" disabled>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -96,7 +97,7 @@ export default function StarredArticles() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+          onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -107,7 +108,7 @@ export default function StarredArticles() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+          onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />
