@@ -444,7 +444,7 @@ export function registerRoutes(app: Express): Server {
         })
       );
 
-      const articles = articlesWithDetails.map((article: any) => ({
+      const articles = articlesWithDetails.reverse().map((article: any) => ({
         id: article?.id ?? 0,
         title: article?.title ?? 'Untitled Article',
         author: article?.author ?? 'Unknown Author',
