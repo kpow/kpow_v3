@@ -38,8 +38,10 @@ export default function Home() {
       queryKey: ["/api/books"],
     });
 
-  const { data: starredData, isLoading: isLoadingStarred } =
-    useStarredArticles(1, 3);
+  const { data: starredData, isLoading: isLoadingStarred } = useStarredArticles(
+    1,
+    3,
+  );
 
   const reviews = bookData?.GoodreadsResponse?.reviews?.[0]?.review || [];
   const firstBook = reviews[0]?.book;
@@ -142,9 +144,11 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">star feed</h2>
-          <button className="text-sm text-gray-500 hover:text-gray-700">
-            SEE MORE
-          </button>
+          <Link key="StarFeed" href="starred-articles">
+            <button className="text-sm text-gray-500 hover:text-gray-700">
+              SEE MORE
+            </button>
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {isLoadingStarred

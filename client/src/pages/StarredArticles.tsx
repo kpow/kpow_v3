@@ -26,13 +26,16 @@ export default function StarredArticles() {
   const { toast } = useToast();
 
   const { data, isLoading, error } = useQuery<StarredResponse>({
-    queryKey: [`/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`],
+    queryKey: [
+      `/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`,
+    ],
   });
 
   if (error) {
     toast({
       title: "Error loading articles",
-      description: error instanceof Error ? error.message : "Please try again later",
+      description:
+        error instanceof Error ? error.message : "Please try again later",
       variant: "destructive",
     });
   }
@@ -71,23 +74,33 @@ export default function StarredArticles() {
             </div>
           ))}
         </div>
+        <div className="flex justify-center gap-2 items-center mb-6">
+          <Button variant="outline" size="icon" disabled>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm">Loading...</span>
+          <Button variant="outline" size="icon" disabled>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     );
   }
 
-  const articles = data?.articles.map((article: StarredArticle) => ({
-    title: article.title ?? 'Untitled Article',
-    subtitle: `by ${article.author ?? 'Unknown Author'}`,
-    author: article.author ?? 'Unknown Author',
-    date: new Date(article.published).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    }),
-    imageSrc: article.lead_image_url ?? "/placeholder-star.png",
-    type: "star" as const,
-    url: article.url ?? '#',
-    excerpt: article.summary ?? 'No excerpt available'
-  })) ?? [];
+  const articles =
+    data?.articles.map((article: StarredArticle) => ({
+      title: article.title ?? "Untitled Article",
+      subtitle: `by ${article.author ?? "Unknown Author"}`,
+      author: article.author ?? "Unknown Author",
+      date: new Date(article.published).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      imageSrc: article.lead_image_url ?? "/placeholder-star.png",
+      type: "star" as const,
+      url: article.url ?? "#",
+      excerpt: article.summary ?? "No excerpt available",
+    })) ?? [];
 
   return (
     <div className="container mx-auto p-4">
@@ -123,6 +136,28 @@ export default function StarredArticles() {
             excerpt={article.excerpt}
           />
         ))}
+      </div>
+
+      <div className="flex justify-center gap-2 items-center mt-6">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="text-sm">
+          {currentPage} of {totalPages} ({totalArticles} articles)
+        </span>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

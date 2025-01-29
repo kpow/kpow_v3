@@ -35,7 +35,7 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     {
       icon: <Star className="w-4 h-4" />,
       label: "star feed",
-      href: "/star-feed",
+      href: "/starred-articles",
     },
     {
       icon: <Book className="w-4 h-4" />,
