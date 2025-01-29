@@ -94,21 +94,21 @@ export default function Books() {
           <Button variant="outline" size="icon">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm">XX of XX (XXX books)</span>
+          <span className="text-sm">Loading . . .</span>
           <Button variant="outline" size="icon">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
-            <Skeleton key={i} className="h-[280px] w-full" />
+            <Skeleton key={i} className="h-[240px] w-full" />
           ))}
         </div>
-        <div className="flex justify-center gap-2 items-center  mb-3">
+        <div className="flex justify-center gap-2 items-center  mt-3">
           <Button variant="outline" size="icon">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm">XX of XX (XXX books)</span>
+          <span className="text-sm">Loading . . .</span>
           <Button variant="outline" size="icon">
             <ChevronRight className="h-4 w-4" />
           </Button>
