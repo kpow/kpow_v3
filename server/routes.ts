@@ -396,22 +396,17 @@ export function registerRoutes(app: Express): Server {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
 
-      // First, get total count
-      console.log('Fetching starred articles count...');
-      const countResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
-        params: {
-          starred: true,
-          per_page: 1,
-          order: 'desc' // Ensure we're getting newest first
-        },
+      // First, get total count from starred_entries endpoint
+      console.log('Fetching total starred entries count...');
+      const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
         headers: {
           Accept: 'application/json',
           Authorization: `Basic ${process.env.FEEDBIN_KEY}`
         }
       });
 
-      const totalCount = parseInt(countResponse.headers['total-count'] || '0');
-      console.log(`Total starred articles: ${totalCount}`);
+      const totalCount = Array.isArray(starredEntriesResponse.data) ? starredEntriesResponse.data.length : 0;
+      console.log(`Total starred entries: ${totalCount}`);
 
       // Then get paginated data
       console.log(`Fetching page ${page} of starred articles...`);
@@ -420,7 +415,7 @@ export function registerRoutes(app: Express): Server {
           starred: true,
           per_page: perPage,
           page: page,
-          order: 'desc' // Ensure we're getting newest first in paginated results
+          order: 'desc' // Ensure we're getting newest first
         },
         headers: {
           Accept: 'application/json',
