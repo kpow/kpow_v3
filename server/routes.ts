@@ -396,26 +396,27 @@ export function registerRoutes(app: Express): Server {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
 
-      // First, get total count
-      const countResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
-        params: {
-          starred: true,
-          per_page: 1
-        },
+      // First, get all starred entry IDs to determine total count
+      const starredResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
         headers: {
           Accept: 'application/json',
           Authorization: `Basic ${process.env.FEEDBIN_KEY}`
         }
       });
 
-      const totalCount = parseInt(countResponse.headers['total-count'] || '0');
+      const totalCount = starredResponse.data.length;
+      const totalPages = Math.ceil(totalCount / perPage);
 
-      // Then get paginated data
-      const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
+      // Calculate pagination slice
+      const start = (page - 1) * perPage;
+      const end = Math.min(start + perPage, totalCount);
+      const currentPageIds = starredResponse.data.slice(start, end);
+
+      // Fetch actual entries for the current page
+      const entriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
         params: {
-          starred: true,
-          per_page: perPage,
-          page: page
+          ids: currentPageIds.join(','),
+          per_page: perPage
         },
         headers: {
           Accept: 'application/json',
@@ -425,7 +426,7 @@ export function registerRoutes(app: Express): Server {
 
       // Fetch content details for each article
       const articlesWithDetails = await Promise.all(
-        response.data.map(async (article: any) => {
+        entriesResponse.data.map(async (article: any) => {
           try {
             if (article.extracted_content_url) {
               const contentResponse = await axios.get(article.extracted_content_url);
@@ -456,8 +457,6 @@ export function registerRoutes(app: Express): Server {
           url: article?.feed?.feed_url ?? '#'
         }
       }));
-
-      const totalPages = Math.ceil(totalCount / perPage);
 
       res.json({
         articles,
