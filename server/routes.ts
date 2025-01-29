@@ -404,13 +404,15 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
-      const totalCount = starredResponse.data.length;
+      // Reverse the array to get newest entries first
+      const starredIds = [...starredResponse.data].reverse();
+      const totalCount = starredIds.length;
       const totalPages = Math.ceil(totalCount / perPage);
 
       // Calculate pagination slice
       const start = (page - 1) * perPage;
       const end = Math.min(start + perPage, totalCount);
-      const currentPageIds = starredResponse.data.slice(start, end);
+      const currentPageIds = starredIds.slice(start, end);
 
       // Fetch actual entries for the current page
       const entriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
