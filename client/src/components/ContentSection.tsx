@@ -107,10 +107,10 @@ export function ContentSection({
             {author && (
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-6 w-6 rounded-full bg-gray-300">
-                  <img
+                  {/* <img
                     alt="favicon"
                     src={`https://api.faviconkit.com/${url}/35`}
-                  />
+                  /> */}
                 </div>
                 <span className="text-sm text-gray-600">{author}</span>
                 {date && (
