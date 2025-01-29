@@ -43,7 +43,7 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 6; // Match with backend
+const BOOKS_PER_PAGE = 8; // Match with backend
 
 export default function Books() {
   const [currentPage, setCurrentPage] = useState(1);

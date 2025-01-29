@@ -41,24 +41,29 @@ export function ShowCard({ show }: ShowCardProps) {
 
   const formatShowDate = (dateString: string) => {
     try {
-      return format(parseISO(dateString), 'PPP');
+      return format(parseISO(dateString), "PPP");
     } catch (error) {
-      console.error('Error formatting date:', dateString, error);
+      console.error("Error formatting date:", dateString, error);
       return dateString; // Fallback to original date string if parsing fails
     }
   };
 
   return (
     <>
-      <Card className="cursor-pointer transition-colors hover:bg-accent/50" onClick={() => setIsModalOpen(true)}>
-        <CardContent className="p-6">
+      <Card
+        className="cursor-pointer transition-colors hover:bg-accent/50"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <CardContent className="p-4">
           <div className="space-y-4">
             <div className="flex items-start justify-between">
               <div className="space-y-1">
                 <h3 className="font-slackey text-lg">{show.venue}</h3>
                 <div className="flex items-center text-sm text-muted-foreground">
                   <MapPin className="mr-1 h-4 w-4" />
-                  <span>{show.city}, {show.state}</span>
+                  <span>
+                    {show.city}, {show.state}
+                  </span>
                 </div>
               </div>
             </div>
@@ -70,7 +75,7 @@ export function ShowCard({ show }: ShowCardProps) {
         </CardContent>
       </Card>
 
-      <ShowDetailsModal 
+      <ShowDetailsModal
         show={show}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
