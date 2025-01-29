@@ -30,9 +30,11 @@ export function RecentPlays() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center space-x-2">
-        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-        <span>Loading recent tracks...</span>
+      <div className="w-full px-2 py-0">
+        <div className="flex items-center gap-2 mb-4">
+          <SiLastdotfm className="h-5 w-5" />
+          <h2 className="text-2xl font-bold">Recently Played</h2>
+        </div>
       </div>
     );
   }

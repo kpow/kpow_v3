@@ -13,7 +13,7 @@ export function Header() {
           <Link key="Home" href="/">
             <div className="flex items-center gap-2">
               <Logo />
-              <div className="font-slackey text-1xl sm:text-2xl">kpow</div>
+              <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
             </div>
           </Link>
           <nav className="flex items-center gap-4">
