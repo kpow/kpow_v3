@@ -45,12 +45,13 @@ export function BookFeed() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {reviews.slice(0, 2).map((review, index) => {
         const book = review.book;
-        const title = book?.title_without_series?.[0] ?? "Untitled";
-        const description = book?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "";
-        const imageUrl = book?.image_url?.[0] ?? "/placeholder-book.png";
-        const link = book?.link?.[0] ?? "#";
-        const author = book?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown";
-        const rating = parseFloat(book?.average_rating?.[0] ?? "0");
+        // Get values directly from the book object
+        const title = book.title_without_series?.[0] ?? "Untitled";
+        const description = book.description?.[0]?.replace(/<[^>]*>/g, "") ?? "";
+        const imageUrl = book.image_url?.[0] ?? "/placeholder-book.png";
+        const link = book.link?.[0] ?? "#";
+        const author = book.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown";
+        const rating = parseFloat(book.average_rating?.[0] ?? "0");
 
         return (
           <Card key={index} className="overflow-hidden">
