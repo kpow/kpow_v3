@@ -397,10 +397,12 @@ export function registerRoutes(app: Express): Server {
       }
 
       // First, get total count
+      console.log('Fetching starred articles count...');
       const countResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
         params: {
           starred: true,
-          per_page: 1
+          per_page: 1,
+          order: 'desc' // Ensure we're getting newest first
         },
         headers: {
           Accept: 'application/json',
@@ -409,19 +411,27 @@ export function registerRoutes(app: Express): Server {
       });
 
       const totalCount = parseInt(countResponse.headers['total-count'] || '0');
+      console.log(`Total starred articles: ${totalCount}`);
 
       // Then get paginated data
+      console.log(`Fetching page ${page} of starred articles...`);
       const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
         params: {
           starred: true,
           per_page: perPage,
-          page: page
+          page: page,
+          order: 'desc' // Ensure we're getting newest first in paginated results
         },
         headers: {
           Accept: 'application/json',
           Authorization: `Basic ${process.env.FEEDBIN_KEY}`
         }
       });
+
+      // Log the first article's date to verify ordering
+      if (response.data.length > 0) {
+        console.log('First article published date:', response.data[0].published);
+      }
 
       // Fetch content details for each article
       const articlesWithDetails = await Promise.all(

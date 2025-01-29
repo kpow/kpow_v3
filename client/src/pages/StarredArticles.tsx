@@ -24,7 +24,16 @@ export default function StarredArticles() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading } = useQuery<StarredResponse>({
-    queryKey: [`/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`]
+    queryKey: [`/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`],
+    onSuccess: (data) => {
+      // Log the articles' dates to verify ordering
+      console.log('Received articles with dates:', 
+        data.articles.map(article => ({
+          title: article.title,
+          published: new Date(article.published).toLocaleString()
+        }))
+      );
+    }
   });
 
   const totalPages = data?.pagination?.total_pages ?? 1;
