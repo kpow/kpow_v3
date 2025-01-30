@@ -72,7 +72,9 @@ export default function Books({ params }: { params?: { page?: string } }) {
       data.GoodreadsResponse.reviews[0].review.forEach((review: Book) => {
         console.log('Book ratings:', {
           title: review.book[0]?.title?.[0],
-          ratings: review.ratings
+          user_rating: review.ratings.user_rating,
+          average_rating: review.ratings.average_rating,
+          ratings_count: review.ratings.ratings_count
         });
       });
 
