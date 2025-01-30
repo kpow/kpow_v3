@@ -6,6 +6,7 @@ import {
   Download,
   Link
 } from "lucide-react";
+import GitHubCalendar from 'react-github-calendar';
 
 export default function About() {
   const skills = [
@@ -81,12 +82,34 @@ export default function About() {
           donut connoisseur.
         </p>
 
-        <div>
+        <div className="mb-16">
           <img
             src="/kpow_about.jpg"
             alt="Team photo"
             className="w-full rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
           />
+        </div>
+
+        {/* GitHub Calendar Section */}
+        <div className="bg-white rounded-xl p-8 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+          <h2 className="text-[2rem] leading-tight font-slackey mb-6">GitHub Activity</h2>
+          <p className="text-gray-600 mb-6">
+            Here's a snapshot of my coding activity. Each box represents a day of contributions.
+          </p>
+          <div className="overflow-x-auto">
+            <GitHubCalendar 
+              username="kpow" 
+              colorScheme='dark'
+              fontSize={12}
+              blockSize={12}
+              blockMargin={5}
+              style={{
+                width: '100%',
+                minHeight: '200px',
+                padding: '20px 0'
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
