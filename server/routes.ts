@@ -489,6 +489,33 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.get("/api/github/user", async (_req, res) => {
+    try {
+      const githubToken = process.env.GITHUB_TOKEN;
+      if (!githubToken) {
+        throw new Error("GitHub token not found in environment variables");
+      }
+
+      const response = await axios.get('https://api.github.com/users/kpow', {
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Authorization': `Bearer ${githubToken}`,
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
+
+      // Log the raw data
+      console.log("GitHub API Raw Response:", JSON.stringify(response.data, null, 2));
+
+      res.json(response.data);
+    } catch (error) {
+      console.error("Error fetching GitHub data:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch GitHub data" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
