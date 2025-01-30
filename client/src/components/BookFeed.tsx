@@ -15,6 +15,10 @@ interface Book {
     }>;
     average_rating: string[];
   };
+  ratings: {
+    user_rating: string;
+    average_rating: string;
+  };
 }
 
 interface GoodreadsResponse {
@@ -31,8 +35,6 @@ export function BookFeed() {
   });
 
   const reviews = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
-  const firstBook = reviews[0]?.book;
-  console.log("inside comp first Book:", firstBook);
 
   if (isLoading) {
     return (
@@ -46,13 +48,6 @@ export function BookFeed() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {reviews.slice(0, 2).map((review, index) => {
-        console.log("inside comp review:", review);
-        console.log("inside comp review,book:", review.book);
-        console.log(
-          "inside comp review,book.description[0]:",
-          review.book[0].description[0],
-        );
-        // Get values from the nested array structure
         const title = review.book[0].title_without_series?.[0] ?? "Untitled";
         const description =
           review.book[0].description[0]?.replace(/<[^>]*>/g, "") ?? "";
@@ -61,7 +56,8 @@ export function BookFeed() {
         const link = review.book[0].link?.[0] ?? "#";
         const author =
           review.book[0].authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown";
-        const rating = parseFloat(review.book[0].average_rating?.[0] ?? "0");
+        const userRating = parseFloat(review.ratings?.user_rating ?? "0");
+        const averageRating = parseFloat(review.ratings?.average_rating ?? "0");
 
         return (
           <Card key={index} className="overflow-hidden">
@@ -77,15 +73,33 @@ export function BookFeed() {
                   <p className="text-sm text-muted-foreground mt-1">
                     by {author}
                   </p>
-                  <div className="flex gap-1 mt-2">
-                    {[...Array(5)].map((_, i) => (
-                      <span
-                        key={i}
-                        className={`text-sm ${i < rating ? "text-yellow-400" : "text-gray-300"}`}
-                      >
-                        ★
-                      </span>
-                    ))}
+                  <div className="flex gap-4 mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground">Your Rating</span>
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={`user-${i}`}
+                            className={`text-sm ${i < userRating ? "text-yellow-400" : "text-gray-300"}`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground">Average</span>
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={`avg-${i}`}
+                            className={`text-sm ${i < averageRating ? "text-yellow-400" : "text-gray-300"}`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-6 mt-2">
                     {description}
