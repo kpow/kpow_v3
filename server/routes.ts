@@ -338,20 +338,10 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
-      const result = await parseXMLAsync(response.data) as {
-        GoodreadsResponse: {
-          reviews: Array<{
-            $: { total: string; start: string; end: string };
-            review: Array<{
-              rating: string[];
-              book: {
-                average_rating: string[];
-                ratings_count: string[];
-              }[];
-            }>;
-          }>;
-        };
-      };
+      const result = await parseXMLAsync(response.data);
+
+      // Log the complete raw review data for the first book
+      console.log("Raw review data for first book:", JSON.stringify(result.GoodreadsResponse.reviews[0].review[0], null, 2));
 
       const reviews = result.GoodreadsResponse.reviews[0];
 
