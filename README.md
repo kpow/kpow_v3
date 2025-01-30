@@ -149,10 +149,45 @@ The application will be available at `http://localhost:5000`.
 │       │   └── hooks/    # Custom hooks
 │       └── pages/        # Page components
 ├── server/                # Backend code
-│   ├── routes.ts         # API routes
+│   ├── routes/           # API routes by integration
+│   │   ├── phish-routes.ts      # Phish.net API routes
+│   │   ├── lastfm-routes.ts     # Last.fm API routes
+│   │   ├── goodreads-routes.ts  # Goodreads API routes
+│   │   ├── feedbin-routes.ts    # Feedbin API routes
+│   │   └── github-routes.ts     # GitHub API routes
+│   ├── utils/            # Shared utilities
+│   │   └── api-utils.ts  # Common API functions
+│   ├── routes.ts         # Route registration
 │   └── index.ts          # Server setup
 └── theme.json            # Theme configuration
 ```
+
+### API Integration Structure
+The backend routes are organized by their respective API integrations:
+
+- `phish-routes.ts`: Handles all Phish.net related endpoints
+  - Show statistics
+  - Setlist information
+  - Venue data
+  - Song occurrences
+
+- `lastfm-routes.ts`: Last.fm integration
+  - Recent tracks
+  - Music listening data
+
+- `goodreads-routes.ts`: Goodreads integration
+  - Book listings
+  - Reading progress
+  - Book reviews
+
+- `feedbin-routes.ts`: Feedbin RSS integration
+  - Starred articles
+  - Feed management
+
+- `github-routes.ts`: GitHub integration
+  - User profile data
+  - Repository information
+
 
 ## Development Guidelines
 
