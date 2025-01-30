@@ -342,29 +342,10 @@ export function registerRoutes(app: Express): Server {
         GoodreadsResponse: {
           reviews: Array<{
             $: { total: string; start: string; end: string };
-            review: Array<{
-              rating: string[];
-              book: {
-                id: Array<{ _: string; $: { type: string } }>;
-                title: string[];
-                title_without_series: string[];
-                description: string[];
-                image_url: string[];
-                link: string[];
-                authors: Array<{
-                  author: Array<{
-                    name: string[];
-                  }>;
-                }>;
-                average_rating: string[];
-                ratings_count: string[];
-              };
-            }>;
+            review: Array<any>;
           }>;
         };
       };
-
-      console.log("Parsed XML first review:", JSON.stringify(result.GoodreadsResponse.reviews[0].review[0], null, 2));
 
       const reviews = result.GoodreadsResponse.reviews[0];
 
@@ -375,23 +356,18 @@ export function registerRoutes(app: Express): Server {
       const currentPage = parseInt(page as string);
       const totalPages = Math.ceil(total / parseInt(perPage as string));
 
-      // Construct a properly typed response object with both user rating and average rating
+      console.log("Pagination data:", {
+        total,
+        start,
+        end,
+        currentPage,
+        totalPages,
+        reviewCount: reviews.review?.length
+      });
+
+      // Construct a properly typed response object
       const responseData = {
-        GoodreadsResponse: {
-          ...result.GoodreadsResponse,
-          reviews: [{
-            ...reviews,
-            review: reviews.review.map(review => ({
-              ...review,
-              rating: review.rating?.[0],  // User's rating
-              book: {
-                ...review.book,
-                average_rating: review.book.average_rating?.[0] || "0",  // Average rating from all users
-                ratings_count: review.book.ratings_count?.[0] || "0"
-              }
-            }))
-          }]
-        },
+        GoodreadsResponse: result.GoodreadsResponse,
         pagination: {
           total,
           start,

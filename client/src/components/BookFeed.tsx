@@ -15,7 +15,6 @@ interface Book {
     }>;
     average_rating: string[];
   };
-  rating?: string;  // User's rating
 }
 
 interface GoodreadsResponse {
@@ -32,6 +31,8 @@ export function BookFeed() {
   });
 
   const reviews = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
+  const firstBook = reviews[0]?.book;
+  console.log("inside comp first Book:", firstBook);
 
   if (isLoading) {
     return (
@@ -45,13 +46,22 @@ export function BookFeed() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {reviews.slice(0, 2).map((review, index) => {
-        const title = review.book.title_without_series?.[0] ?? "Untitled";
-        const description = review.book.description?.[0]?.replace(/<[^>]*>/g, "") ?? "";
-        const imageUrl = review.book.image_url?.[0] ?? "/placeholder-book.png";
-        const link = review.book.link?.[0] ?? "#";
-        const author = review.book.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown";
-        const rating = review.rating ? parseFloat(review.rating) : null;
-        const averageRating = parseFloat(review.book.average_rating?.[0] ?? "0");
+        console.log("inside comp review:", review);
+        console.log("inside comp review,book:", review.book);
+        console.log(
+          "inside comp review,book.description[0]:",
+          review.book[0].description[0],
+        );
+        // Get values from the nested array structure
+        const title = review.book[0].title_without_series?.[0] ?? "Untitled";
+        const description =
+          review.book[0].description[0]?.replace(/<[^>]*>/g, "") ?? "";
+        const imageUrl =
+          review.book[0].image_url?.[0] ?? "/placeholder-book.png";
+        const link = review.book[0].link?.[0] ?? "#";
+        const author =
+          review.book[0].authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown";
+        const rating = parseFloat(review.book[0].average_rating?.[0] ?? "0");
 
         return (
           <Card key={index} className="overflow-hidden">
@@ -71,7 +81,7 @@ export function BookFeed() {
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={i}
-                        className={`text-sm ${i < averageRating ? "text-yellow-400" : "text-gray-300"}`}
+                        className={`text-sm ${i < rating ? "text-yellow-400" : "text-gray-300"}`}
                       >
                         ★
                       </span>
