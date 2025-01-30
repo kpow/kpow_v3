@@ -49,6 +49,12 @@ export default function Books({ params }: { params?: { page?: string } }) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
   const [, setLocation] = useLocation();
 
+  // Handle invalid page numbers
+  if (params?.page && (isNaN(currentPage) || currentPage < 1)) {
+    setLocation("/books");
+    return null;
+  }
+
   const { data, isLoading, error } = useQuery<GoodreadsResponse>({
     queryKey: [`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`],
     queryFn: async () => {
@@ -67,7 +73,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
       return data;
     },
     staleTime: 0,
-    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   if (error) {
@@ -148,7 +154,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
-        {books.map((review, index) => (
+        {books.map((review: Book, index: number) => (
           <BookCard key={`${currentPage}-${index}`} review={review} />
         ))}
       </div>

@@ -45,6 +45,11 @@ My coding playground and the begining of my post-singularity self.
 - Direct links to Goodreads pages
 - Responsive book card layout
 - Automatic HTML stripping from descriptions
+- URL-based pagination:
+  - Access specific pages via `/books/page/{number}`
+  - Sharable page links
+  - Browser history integration
+  - Smooth page transitions
 
 ### Star Feed (Articles)
 - Feedbin API integration
@@ -58,6 +63,11 @@ My coding playground and the begining of my post-singularity self.
 - Clickable cards linking to original articles
 - Clean, modern card layout
 - Responsive grid design
+- URL-based pagination:
+  - Access specific pages via `/starred-articles/page/{number}`
+  - Sharable page links
+  - Browser history integration
+  - Smooth page transitions
 
 ### Recent Plays Integration
 - Last.fm API integration
@@ -151,6 +161,7 @@ The application will be available at `http://localhost:5000`.
 - Maintain consistent styling using the theme configuration
 - Use TypeScript for type safety
 - Follow the established project structure
+- Implement URL-based pagination for list views
 
 ## Available Scripts
 

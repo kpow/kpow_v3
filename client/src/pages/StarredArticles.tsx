@@ -26,6 +26,12 @@ export default function StarredArticles({ params }: { params?: { page?: string }
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
+  // Handle invalid page numbers
+  if (params?.page && (isNaN(currentPage) || currentPage < 1)) {
+    setLocation("/starred-articles");
+    return null;
+  }
+
   const { data, isLoading, error } = useQuery<StarredResponse>({
     queryKey: [
       `/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`,
