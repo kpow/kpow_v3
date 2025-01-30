@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useLocation } from "wouter";
 import { BookCard } from "@/components/BookCard";
 
 interface Book {
@@ -43,13 +43,14 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 8; // Match with backend
+const BOOKS_PER_PAGE = 8;
 
-export default function Books() {
-  const [currentPage, setCurrentPage] = useState(1);
+export default function Books({ params }: { params?: { page?: string } }) {
+  const currentPage = params?.page ? parseInt(params.page) : 1;
+  const [, setLocation] = useLocation();
 
   const { data, isLoading, error } = useQuery<GoodreadsResponse>({
-    queryKey: ["/api/books", currentPage, BOOKS_PER_PAGE],
+    queryKey: [`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`],
     queryFn: async () => {
       console.log(`Fetching page ${currentPage} of books...`);
       const response = await fetch(
@@ -65,7 +66,6 @@ export default function Books() {
       console.log(`Received data for page ${currentPage}:`, data);
       return data;
     },
-    // Ensure query is refetched when page changes
     staleTime: 0,
     cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
@@ -90,12 +90,12 @@ export default function Books() {
       <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-3">My Books</h1>
 
-        <div className="flex justify-center gap-2 items-center  mb-3">
-          <Button variant="outline" size="icon">
+        <div className="flex justify-center gap-2 items-center mb-3">
+          <Button variant="outline" size="icon" disabled>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm">Loading . . .</span>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" disabled>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -104,40 +104,32 @@ export default function Books() {
             <Skeleton key={i} className="h-[240px] w-full" />
           ))}
         </div>
-        <div className="flex justify-center gap-2 items-center  mt-3">
-          <Button variant="outline" size="icon">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">Loading . . .</span>
-          <Button variant="outline" size="icon">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
     );
   }
 
-  // Safely access books array with optional chaining and default to empty array
   const books = data?.GoodreadsResponse?.reviews?.[0]?.review ?? [];
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
   const totalBooks = pagination?.total ?? 0;
 
   const handlePageChange = (newPage: number) => {
-    console.log(`Changing to page ${newPage}`);
-    setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (newPage >= 1 && newPage <= totalPages) {
+      console.log(`Changing to page ${newPage}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setLocation(newPage === 1 ? "/books" : `/books/page/${newPage}`);
+    }
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-3">My Books</h1>
 
-      <div className="flex justify-center gap-2 items-center  mb-3">
+      <div className="flex justify-center gap-2 items-center mb-3">
         <Button
           variant="outline"
           size="icon"
-          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+          onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -148,9 +140,7 @@ export default function Books() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() =>
-            handlePageChange(Math.min(currentPage + 1, totalPages))
-          }
+          onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />
@@ -163,12 +153,11 @@ export default function Books() {
         ))}
       </div>
 
-      {/* Pagination Controls */}
       <div className="flex justify-center gap-2 items-center">
         <Button
           variant="outline"
           size="icon"
-          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+          onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -179,9 +168,7 @@ export default function Books() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() =>
-            handlePageChange(Math.min(currentPage + 1, totalPages))
-          }
+          onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />

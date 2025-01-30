@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useLocation } from "wouter";
 import { ContentSection } from "@/components/ContentSection";
 import { StarredArticle } from "@/lib/hooks/use-starred-articles";
 import { useToast } from "@/hooks/use-toast";
@@ -21,8 +21,9 @@ interface StarredResponse {
 
 const ARTICLES_PER_PAGE = 9;
 
-export default function StarredArticles() {
-  const [currentPage, setCurrentPage] = useState(1);
+export default function StarredArticles({ params }: { params?: { page?: string } }) {
+  const currentPage = params?.page ? parseInt(params.page) : 1;
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const { data, isLoading, error } = useQuery<StarredResponse>({
@@ -46,7 +47,7 @@ export default function StarredArticles() {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       window.scrollTo({ top: 0, behavior: "smooth" });
-      setCurrentPage(newPage);
+      setLocation(newPage === 1 ? "/starred-articles" : `/starred-articles/page/${newPage}`);
     }
   };
 
