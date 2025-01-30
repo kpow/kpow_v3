@@ -338,11 +338,20 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
+      // Log the raw XML response for debugging
+      console.log('Raw Goodreads Response:', response.data);
+
       const result = await parseXMLAsync(response.data) as {
         GoodreadsResponse: {
           reviews: Array<{
             $: { total: string; start: string; end: string };
-            review: Array<any>;
+            review: Array<{
+              rating: string[];
+              book: {
+                average_rating: string[];
+                // ... other book fields
+              };
+            }>;
           }>;
         };
       };
@@ -356,16 +365,10 @@ export function registerRoutes(app: Express): Server {
       const currentPage = parseInt(page as string);
       const totalPages = Math.ceil(total / parseInt(perPage as string));
 
-      console.log("Pagination data:", {
-        total,
-        start,
-        end,
-        currentPage,
-        totalPages,
-        reviewCount: reviews.review?.length
-      });
+      // Log the parsed data for verification
+      console.log("First review data:", reviews.review?.[0]);
 
-      // Construct a properly typed response object
+      // Construct response object
       const responseData = {
         GoodreadsResponse: result.GoodreadsResponse,
         pagination: {
