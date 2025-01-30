@@ -342,7 +342,13 @@ export function registerRoutes(app: Express): Server {
         GoodreadsResponse: {
           reviews: Array<{
             $: { total: string; start: string; end: string };
-            review: Array<any>;
+            review: Array<{
+              rating: string[];
+              book: {
+                average_rating: string[];
+                ratings_count: string[];
+              }[];
+            }>;
           }>;
         };
       };
@@ -356,18 +362,26 @@ export function registerRoutes(app: Express): Server {
       const currentPage = parseInt(page as string);
       const totalPages = Math.ceil(total / parseInt(perPage as string));
 
-      console.log("Pagination data:", {
-        total,
-        start,
-        end,
-        currentPage,
-        totalPages,
-        reviewCount: reviews.review?.length
-      });
+      // Add ratings data to the response
+      const reviewsWithRatings = reviews.review.map(review => ({
+        ...review,
+        ratings: {
+          user_rating: review.rating?.[0] ?? "0",
+          average_rating: review.book?.[0]?.average_rating?.[0] ?? "0",
+          ratings_count: review.book?.[0]?.ratings_count?.[0] ?? "0"
+        }
+      }));
 
-      // Construct a properly typed response object
+      console.log("First review ratings:", reviewsWithRatings[0]?.ratings);
+
       const responseData = {
-        GoodreadsResponse: result.GoodreadsResponse,
+        GoodreadsResponse: {
+          ...result.GoodreadsResponse,
+          reviews: [{
+            ...reviews,
+            review: reviewsWithRatings
+          }]
+        },
         pagination: {
           total,
           start,

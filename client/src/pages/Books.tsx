@@ -17,12 +17,10 @@ interface Book {
       }>;
     }>;
   };
-  shelves: {
-    shelf: Array<{
-      $: {
-        name: string;
-      };
-    }>;
+  ratings: {
+    user_rating: string;
+    average_rating: string;
+    ratings_count: string;
   };
 }
 
@@ -69,7 +67,15 @@ export default function Books({ params }: { params?: { page?: string } }) {
         throw new Error(`${response.status}: ${await response.text()}`);
       }
       const data = await response.json();
-      console.log(`Received data for page ${currentPage}:`, data);
+
+      // Log ratings data for each book
+      data.GoodreadsResponse.reviews[0].review.forEach((review: Book) => {
+        console.log('Book ratings:', {
+          title: review.book[0]?.title?.[0],
+          ratings: review.ratings
+        });
+      });
+
       return data;
     },
     staleTime: 0,
@@ -136,7 +142,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           variant="outline"
           size="icon"
           onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}  
+          disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
