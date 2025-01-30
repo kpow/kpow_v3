@@ -357,8 +357,7 @@ export function registerRoutes(app: Express): Server {
         ...review,
         ratings: {
           user_rating: review.rating?.[0] ?? "0",
-          average_rating: review.book?.[0]?.average_rating?.[0] ?? "0",
-          ratings_count: review.book?.[0]?.ratings_count?.[0] ?? "0"
+          average_rating: review.book?.[0]?.average_rating?.[0] ?? "0"
         }
       }));
 
