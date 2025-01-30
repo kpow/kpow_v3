@@ -99,7 +99,7 @@ export default function About() {
           <div className="overflow-x-auto">
             <GitHubCalendar 
               username="kpow" 
-              colorScheme='dark'
+              colorScheme='light'
               fontSize={12}
               blockSize={12}
               blockMargin={5}
