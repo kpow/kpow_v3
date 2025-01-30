@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 
 interface Book {
@@ -12,14 +11,10 @@ interface Book {
         name: string[];
       }>;
     }>;
+    average_rating: string[];
+    ratings_count: string[];
   };
-  shelves: {
-    shelf: Array<{
-      $: {
-        name: string;
-      };
-    }>;
-  };
+  rating?: string;  // User's rating
 }
 
 interface BookCardProps {
@@ -44,11 +39,29 @@ export function BookCard({ review }: BookCardProps) {
     );
   }
 
-  const title = review?.book[0]?.title?.[0] ?? "Untitled Book";
-  const imageUrl = review?.book[0]?.image_url?.[0] ?? "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
-  const authorName = review?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
-  const description = review?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "No description available";
-  const bookLink = review?.book[0]?.link?.[0] ?? "#";
+  const title = review?.book.title?.[0] ?? "Untitled Book";
+  const imageUrl = review?.book.image_url?.[0] ?? "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
+  const authorName = review?.book.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
+  const description = review?.book.description?.[0]?.replace(/<[^>]*>/g, "") ?? "No description available";
+  const bookLink = review?.book.link?.[0] ?? "#";
+  const averageRating = parseFloat(review?.book.average_rating?.[0] ?? "0");
+  const ratingsCount = parseInt(review?.book.ratings_count?.[0] ?? "0");
+  const userRating = review?.rating ? parseFloat(review.rating) : null;
+
+  const renderStars = (rating: number | null) => {
+    return (
+      <div className="flex gap-1">
+        {[...Array(5)].map((_, i) => (
+          <span
+            key={i}
+            className={`text-sm ${i < (rating || 0) ? "text-yellow-400" : "text-gray-300"}`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -64,6 +77,24 @@ export function BookCard({ review }: BookCardProps) {
             <p className="text-sm text-muted-foreground mt-1">
               by {authorName}
             </p>
+
+            {userRating && (
+              <div className="mt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Your rating:</span>
+                  {renderStars(userRating)}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Average rating:</span>
+                {renderStars(averageRating)}
+                <span className="text-sm text-muted-foreground">({ratingsCount})</span>
+              </div>
+            </div>
+
             <p className="text-sm text-muted-foreground line-clamp-6 mt-2">
               {description}
             </p>
