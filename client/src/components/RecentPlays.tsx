@@ -112,8 +112,8 @@ export function RecentPlays() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="bg-primary text-primary-foreground hover:bg-primary/90" />
-        <CarouselNext className="bg-primary text-primary-foreground hover:bg-primary/90" />
+        <CarouselPrevious className="bg-blue-600 hover:bg-blue-700 text-primary-foreground" />
+        <CarouselNext className="bg-blue-600 hover:bg-blue-700 text-primary-foreground" />
       </Carousel>
     </div>
   );
