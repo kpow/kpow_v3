@@ -1,6 +1,7 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
 import { BookFeed } from "@/components/BookFeed";
+import { GitHubSection } from "@/components/GitHubSection";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
@@ -170,6 +171,10 @@ export default function Home() {
               ))}
         </div>
       </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+
+      <GitHubSection />
     </div>
   );
 }
