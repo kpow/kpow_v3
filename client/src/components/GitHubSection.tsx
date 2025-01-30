@@ -35,7 +35,7 @@ export function GitHubSection() {
           <div className="flex gap-4">
             {/* Left column - Avatar and name */}
             <div className="flex flex-col items-center">
-              <Avatar className="h-16 w-16 mb-2">
+              <Avatar className="h-[100px] w-[100px] mb-2">
                 <AvatarImage src={user.avatar_url} alt={user.name} />
                 <AvatarFallback>{user.name.slice(0, 2)}</AvatarFallback>
               </Avatar>
@@ -52,7 +52,6 @@ export function GitHubSection() {
 
             {/* Right column - Bio and badges */}
             <div className="flex-1 flex flex-col justify-between">
-              <p className="text-sm text-gray-600 mb-2">{user.bio}</p>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary" className="text-xs">
                   {user.public_repos} repos
@@ -64,17 +63,23 @@ export function GitHubSection() {
                   {user.following} following
                 </Badge>
               </div>
+              <p className="text-xs text-gray-600 mb-2 font-bold">{user.bio}</p>
             </div>
           </div>
         </Card>
 
         {/* GitHub Calendar - 2/3 width */}
         <div className="md:col-span-2">
-          <GitHubCalendar 
-            username={user.login}
-            colorScheme="light"
-            fontSize={12}
-          />
+          <Card className="p-2">
+            <GitHubCalendar
+              username={user.login}
+              colorScheme="light"
+              fontSize={12}
+              blockMargin={4}
+              blockRadius={1}
+              blockSize={14}
+            />
+          </Card>
         </div>
       </div>
     </div>

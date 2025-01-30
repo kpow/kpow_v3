@@ -136,7 +136,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           variant="outline"
           size="icon"
           onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={currentPage === 1}  
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>

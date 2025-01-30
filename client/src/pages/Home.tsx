@@ -175,6 +175,8 @@ export default function Home() {
       <div className="h-px bg-gray-200 my-4" />
 
       <GitHubSection />
+
+      <div className="h-px bg-gray-200 my-4" />
     </div>
   );
 }
