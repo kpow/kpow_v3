@@ -69,10 +69,10 @@ export default function Books({ params }: { params?: { page?: string } }) {
 
       // Log ratings data for each book
       data.GoodreadsResponse.reviews[0].review.forEach((review: Book) => {
-        console.log('Book ratings:', {
+        console.log("Book ratings:", {
           title: review.book[0]?.title?.[0],
           user_rating: review.ratings.user_rating,
-          average_rating: review.ratings.average_rating
+          average_rating: review.ratings.average_rating,
         });
       });
 
@@ -100,21 +100,52 @@ export default function Books({ params }: { params?: { page?: string } }) {
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-3">My Books</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold mb-3">My Books</h1>
 
-        <div className="flex justify-center gap-2 items-center mb-3">
-          <Button variant="outline" size="icon" disabled>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">Loading . . .</span>
-          <Button variant="outline" size="icon" disabled>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <div className="flex justify-center gap-2 items-center mb-3">
+            <Button
+              variant="outline"
+              size="icon"
+              disabled
+              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm">Loading . . .</span>
+            <Button
+              variant="outline"
+              size="icon"
+              disabled
+              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
             <Skeleton key={i} className="h-[240px] w-full" />
           ))}
+        </div>
+        <div className="flex justify-center gap-2 items-center mt-3">
+          <Button
+            variant="outline"
+            size="icon"
+            disabled
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm">Loading . . .</span>
+          <Button
+            variant="outline"
+            size="icon"
+            disabled
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     );
@@ -135,28 +166,32 @@ export default function Books({ params }: { params?: { page?: string } }) {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-3">My Books</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold mb-3">My Books</h1>
 
-      <div className="flex justify-center gap-2 items-center mb-3">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm">
-          {currentPage} of {totalPages} ({totalBooks} books)
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        <div className="flex justify-center gap-2 items-center mb-3">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm">
+            {currentPage} of {totalPages} ({totalBooks} books)
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
@@ -171,6 +206,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           size="icon"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -182,6 +218,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           size="icon"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

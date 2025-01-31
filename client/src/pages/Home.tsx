@@ -132,7 +132,7 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">book feed</h2>
           <Link key="BookFeed" href="books">
-            <button className="text-sm text-gray-500 hover:text-gray-700">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
               SEE MORE
             </button>
           </Link>
@@ -146,7 +146,7 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">star feed</h2>
           <Link key="StarFeed" href="starred-articles">
-            <button className="text-sm text-gray-500 hover:text-gray-700">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
               SEE MORE
             </button>
           </Link>

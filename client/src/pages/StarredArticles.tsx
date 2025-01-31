@@ -21,7 +21,11 @@ interface StarredResponse {
 
 const ARTICLES_PER_PAGE = 9;
 
-export default function StarredArticles({ params }: { params?: { page?: string } }) {
+export default function StarredArticles({
+  params,
+}: {
+  params?: { page?: string };
+}) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -53,22 +57,38 @@ export default function StarredArticles({ params }: { params?: { page?: string }
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       window.scrollTo({ top: 0, behavior: "smooth" });
-      setLocation(newPage === 1 ? "/starred-articles" : `/starred-articles/page/${newPage}`);
+      setLocation(
+        newPage === 1
+          ? "/starred-articles"
+          : `/starred-articles/page/${newPage}`,
+      );
     }
   };
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-3">Starred Articles</h1>
-        <div className="flex justify-center gap-2 items-center mb-6">
-          <Button variant="outline" size="icon" disabled>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">Loading...</span>
-          <Button variant="outline" size="icon" disabled>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold mb-3">Starred Articles</h1>
+          <div className="flex justify-center gap-2 items-center mb-6">
+            <Button
+              variant="outline"
+              size="icon"
+              disabled
+              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm">Loading...</span>
+            <Button
+              variant="outline"
+              size="icon"
+              disabled
+              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {Array.from({ length: ARTICLES_PER_PAGE }).map((_, i) => (
@@ -81,12 +101,22 @@ export default function StarredArticles({ params }: { params?: { page?: string }
             </div>
           ))}
         </div>
-        <div className="flex justify-center gap-2 items-center mb-6">
-          <Button variant="outline" size="icon" disabled>
+        <div className="flex justify-center gap-2 items-center mt-6">
+          <Button
+            variant="outline"
+            size="icon"
+            disabled
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+          >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm">Loading...</span>
-          <Button variant="outline" size="icon" disabled>
+          <Button
+            variant="outline"
+            size="icon"
+            disabled
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+          >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -111,28 +141,32 @@ export default function StarredArticles({ params }: { params?: { page?: string }
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-3">Starred Articles</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold mb-3">Starred Articles</h1>
 
-      <div className="flex justify-center gap-2 items-center mb-6">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm">
-          {currentPage} of {totalPages} ({totalArticles} articles)
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        <div className="flex justify-center gap-2 items-center mb-6">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm">
+            {currentPage} of {totalPages} ({totalArticles} articles)
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -151,6 +185,7 @@ export default function StarredArticles({ params }: { params?: { page?: string }
           size="icon"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -162,6 +197,7 @@ export default function StarredArticles({ params }: { params?: { page?: string }
           size="icon"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { SiLastdotfm } from "react-icons/si";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Track {
   name: string;
@@ -31,9 +32,15 @@ export function RecentPlays() {
   if (isLoading) {
     return (
       <div className="w-full px-2 py-0">
-        <div className="flex items-center gap-2 mb-4">
+        <div className="items-center gap-2 mb-4">
           <SiLastdotfm className="h-5 w-5" />
           <h2 className="text-2xl font-bold">Recently Played</h2>
+          <div className="w-full p-2">
+            <Skeleton
+              key="skelly"
+              className="md:h-[150px] lg:h-[200px] w-full"
+            />
+          </div>
         </div>
       </div>
     );
