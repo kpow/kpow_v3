@@ -10,12 +10,19 @@ interface VideoCardProps {
   onPlay: () => void;
 }
 
-export function VideoCard({ id, title, description, thumbnail, duration, onPlay }: VideoCardProps) {
+export function VideoCard({
+  id,
+  title,
+  description,
+  thumbnail,
+  duration,
+  onPlay,
+}: VideoCardProps) {
   return (
     <Card className="overflow-hidden">
       <div className="relative aspect-video">
-        <img 
-          src={thumbnail} 
+        <img
+          src={thumbnail}
           alt={title}
           className="w-full h-full object-cover"
         />
@@ -25,7 +32,9 @@ export function VideoCard({ id, title, description, thumbnail, duration, onPlay 
       </div>
       <div className="p-4 h-[180px] flex flex-col">
         <h3 className="font-semibold text-lg line-clamp-2 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">{description}</p>
+        <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
+          {description}
+        </p>
         <Button onClick={onPlay} className="w-full mt-auto">
           Play Video
         </Button>
