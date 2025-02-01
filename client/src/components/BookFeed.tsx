@@ -31,10 +31,13 @@ interface GoodreadsResponse {
 
 export function BookFeed() {
   const { data, isLoading } = useQuery<GoodreadsResponse>({
-    queryKey: ["/api/books"],
+    queryKey: ["/api/books?per_page=50"],
   });
 
   const reviews = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
+  const randomReviews = reviews.length > 2 
+    ? reviews.sort(() => Math.random() - 0.5).slice(0, 2) 
+    : reviews;
 
   if (isLoading) {
     return (
@@ -47,7 +50,7 @@ export function BookFeed() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {reviews.slice(0, 2).map((review, index) => {
+      {randomReviews.map((review, index) => {
         const title = review.book[0].title_without_series?.[0] ?? "Untitled";
         const description =
           review.book[0].description[0]?.replace(/<[^>]*>/g, "") ?? "";
