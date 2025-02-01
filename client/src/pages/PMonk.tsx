@@ -1,6 +1,6 @@
 import Masonry from 'react-masonry-css';
 import imageData from '../../../attached_assets/pmonk';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface ImageData {
   src: string;
@@ -8,6 +8,7 @@ interface ImageData {
 
 interface LoadedImage extends ImageData {
   loaded: boolean;
+  visible: boolean;
 }
 
 // Breakpoint columns object
@@ -20,10 +21,15 @@ const breakpointColumnsObj = {
 
 export const PMonk = () => {
   const [loadedImages, setLoadedImages] = useState<LoadedImage[]>([]);
+  const observers = useRef<{ [key: number]: IntersectionObserver }>({});
 
   useEffect(() => {
     // Convert imported image data to our state format
-    setLoadedImages((imageData as ImageData[]).map(img => ({ ...img, loaded: false })));
+    setLoadedImages((imageData as ImageData[]).map(img => ({ 
+      ...img, 
+      loaded: false,
+      visible: false 
+    })));
   }, []);
 
   const handleImageLoad = (index: number) => {
@@ -31,6 +37,39 @@ export const PMonk = () => {
       prev.map((img, i) => i === index ? { ...img, loaded: true } : img)
     );
   };
+
+  const handleIntersection = useCallback((index: number) => (entries: IntersectionObserverEntry[]) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setLoadedImages(prev => 
+          prev.map((img, i) => i === index ? { ...img, visible: true } : img)
+        );
+        // Disconnect the observer once the image is visible
+        if (observers.current[index]) {
+          observers.current[index].disconnect();
+          delete observers.current[index];
+        }
+      }
+    });
+  }, []);
+
+  const imageRef = useCallback((node: HTMLDivElement | null, index: number) => {
+    if (node && !loadedImages[index]?.visible) {
+      // Create a new observer for this image
+      observers.current[index] = new IntersectionObserver(handleIntersection(index), {
+        rootMargin: '50px 0px', // Start loading images 50px before they enter the viewport
+        threshold: 0.1
+      });
+      observers.current[index].observe(node);
+    }
+  }, [handleIntersection, loadedImages]);
+
+  // Cleanup observers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(observers.current).forEach(observer => observer.disconnect());
+    };
+  }, []);
 
   return (
     <div className="p-4">
@@ -42,16 +81,19 @@ export const PMonk = () => {
         {loadedImages.map((image, index) => (
           <div 
             key={index}
+            ref={node => imageRef(node, index)}
             className="mb-4 overflow-hidden rounded-lg transition-opacity duration-300"
             style={{ opacity: image.loaded ? 1 : 0 }}
           >
-            <img
-              src={image.src}
-              alt={`Gallery image ${index + 1}`}
-              className="w-full h-auto"
-              onLoad={() => handleImageLoad(index)}
-              loading="lazy"
-            />
+            {image.visible && (
+              <img
+                src={image.src}
+                alt={`Gallery image ${index + 1}`}
+                className="w-full h-auto"
+                onLoad={() => handleImageLoad(index)}
+                loading="lazy"
+              />
+            )}
           </div>
         ))}
       </Masonry>
