@@ -30,12 +30,12 @@ export function VideoCard({
           {duration}
         </div>
       </div>
-      <div className="p-4 h-[180px] flex flex-col">
+      <div className="p-4 h-[200px] flex flex-col">
         <h3 className="font-semibold text-lg line-clamp-2 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
+        <p className="text-sm text-gray-600 line-clamp-4 mb-2 flex-1 overflow-hidden">
           {description}
         </p>
-        <Button onClick={onPlay} className="w-full mt-auto">
+        <Button onClick={onPlay} className="w-full">
           Play Video
         </Button>
       </div>
