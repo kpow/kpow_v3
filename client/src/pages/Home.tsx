@@ -57,14 +57,14 @@ export default function Home() {
       subtitle: "PLAY",
       imageSrc: "/battle.jpg",
       type: "main" as const,
-      link: "/show-stats",
+      link: "#",
     },
     {
       title: "tunes",
       subtitle: "LISTEN",
       imageSrc: "/tunes.jpg",
       type: "main" as const,
-      link: "/books",
+      link: "#",
     },
     {
       title: "pmonk",
