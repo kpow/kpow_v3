@@ -81,14 +81,13 @@ export function ContentSection({
           <h3 className="text-xl font-bold font-slackey uppercase text-white mb-2">
             {title}
           </h3>
-          <div className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm rounded text-sm text-white">
-            {subtitle}
-          </div>
-          {link && (
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <a href={link} className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-                {subtitle}
-              </a>
+          {link ? (
+            <a href={link} className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+              {subtitle}
+            </a>
+          ) : (
+            <div className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm rounded text-sm text-white">
+              {subtitle}
             </div>
           )}
         </div>
