@@ -79,7 +79,7 @@ export default function StarredArticles({
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm">Loading...</span>
+            <span className="text-sm">Loading</span>
             <Button
               variant="outline"
               size="icon"
@@ -110,7 +110,7 @@ export default function StarredArticles({
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm">Loading...</span>
+          <span className="text-sm">Loading</span>
           <Button
             variant="outline"
             size="icon"
@@ -142,7 +142,7 @@ export default function StarredArticles({
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold mb-3">Starred Articles</h1>
+        <h1 className="text-3xl font-bold mb-6">Starred Articles</h1>
 
         <div className="flex justify-center gap-2 items-center mb-6">
           <Button
@@ -155,7 +155,7 @@ export default function StarredArticles({
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm">
-            {currentPage} of {totalPages} ({totalArticles} articles)
+            {currentPage} of {totalPages}
           </span>
           <Button
             variant="outline"
@@ -190,7 +190,7 @@ export default function StarredArticles({
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <span className="text-sm">
-          {currentPage} of {totalPages} ({totalArticles} articles)
+          {currentPage} of {totalPages}
         </span>
         <Button
           variant="outline"
