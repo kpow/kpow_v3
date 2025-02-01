@@ -24,16 +24,26 @@ export default function Videos() {
   const [, params] = useRoute("/videos/page/:page");
   const page = params?.page ? parseInt(params.page) : 1;
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [pageTokens, setPageTokens] = useState<Record<number, string>>({});
 
   const { data, isLoading } = useQuery({
     queryKey: ["videos", page],
     queryFn: async () => {
       const response = await axios.get(`/api/youtube/playlist/${PLAYLIST_ID}`, {
         params: {
-          page,
           pageSize: ITEMS_PER_PAGE,
+          pageToken: pageTokens[page - 1] || "",
         },
       });
+
+      // Store the next page token for future use
+      if (response.data.nextPageToken) {
+        setPageTokens(prev => ({
+          ...prev,
+          [page]: response.data.nextPageToken
+        }));
+      }
+
       return response.data;
     },
   });
@@ -56,7 +66,30 @@ export default function Videos() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Video Gallery</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold">Video Gallery</h1>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+          >
+            Previous
+          </Button>
+          <span className="px-4 py-2 text-sm font-medium">
+            Page {page}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(page + 1)}
+            disabled={!data?.hasNextPage}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -84,21 +117,6 @@ export default function Videos() {
               </div>
             ))}
           </Masonry>
-
-          <div className="flex justify-center gap-4 mt-8">
-            <Button
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={() => handlePageChange(page + 1)}
-              disabled={!data?.hasNextPage}
-            >
-              Next
-            </Button>
-          </div>
         </>
       )}
 
