@@ -38,9 +38,9 @@ export default function Videos() {
 
       // Store the next page token for future use
       if (response.data.nextPageToken) {
-        setPageTokens(prev => ({
+        setPageTokens((prev) => ({
           ...prev,
-          [page]: response.data.nextPageToken
+          [page]: response.data.nextPageToken,
         }));
       }
 
@@ -67,24 +67,24 @@ export default function Videos() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-bold">Video Gallery</h1>
+        <h1 className="text-4xl font-bold">youtubez live</h1>
         <div className="flex items-center gap-2">
-          <Button 
+          <Button
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
           >
             Previous
           </Button>
-          <span className="px-4 py-2 text-sm font-medium">
-            Page {page}
-          </span>
+          <span className="px-4 py-2 text-sm font-medium">Page {page}</span>
           <Button
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(page + 1)}
             disabled={!data?.hasNextPage}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
           >
             Next
           </Button>
@@ -95,15 +95,17 @@ export default function Videos() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="bg-gray-200 aspect-video rounded-lg mb-4" />
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
+              <div className="bg-gray-200 h-[100px] aspect-video rounded-lg mb-10" />
+              <div className="h-4 bg-gray-200 h-[100px] rounded w-full mb-2" />
+              <div className="h-4 bg-gray-200 h-[100px] rounded w-full" />
             </div>
           ))}
         </div>
       ) : error ? (
         <div className="text-center py-8">
-          <p className="text-red-500">Error loading videos. Please try again later.</p>
+          <p className="text-red-500">
+            Error loading videos. Please try again later.
+          </p>
         </div>
       ) : (
         <>
@@ -123,7 +125,27 @@ export default function Videos() {
           </Masonry>
         </>
       )}
-
+      <div className="flex items-center gap-2 mt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+        >
+          Previous
+        </Button>
+        <span className="px-4 py-2 text-sm font-medium">Page {page}</span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(page + 1)}
+          disabled={!data?.hasNextPage}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+        >
+          Next
+        </Button>
+      </div>
       <VideoModal
         videoId={selectedVideo || ""}
         isOpen={!!selectedVideo}

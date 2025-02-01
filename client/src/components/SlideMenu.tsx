@@ -45,7 +45,7 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     {
       icon: <Youtube className="w-4 h-4" />,
       label: "youtube live",
-      href: "/youtube",
+      href: "/videos",
     },
     {
       icon: <Gamepad2 className="w-4 h-4" />,

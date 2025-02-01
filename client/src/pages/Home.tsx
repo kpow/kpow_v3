@@ -64,11 +64,11 @@ export default function Home() {
       subtitle: "LISTEN",
       imageSrc: "/tunes.jpg",
       type: "main" as const,
-      link: "#",
+      link: "/videos",
     },
     {
       title: "pmonk",
-      subtitle: "checkit",
+      subtitle: "CHECKIT",
       imageSrc: "/pmonk.jpg",
       type: "main" as const,
       link: "/pmonk",
