@@ -57,18 +57,21 @@ export default function Home() {
       subtitle: "PLAY",
       imageSrc: "/battle.jpg",
       type: "main" as const,
+      link: "/show-stats",
     },
     {
       title: "tunes",
       subtitle: "LISTEN",
       imageSrc: "/tunes.jpg",
       type: "main" as const,
+      link: "/books",
     },
     {
       title: "pmonk",
       subtitle: "CREDIT",
       imageSrc: "/pmonk.jpg",
       type: "main" as const,
+      link: "/pmonk",
     },
   ];
 

@@ -11,6 +11,7 @@ interface ContentSectionProps {
   description?: string;
   excerpt?: string;
   url?: string;
+  link?: string; // Added link prop
 }
 
 export function ContentSection({
@@ -24,6 +25,7 @@ export function ContentSection({
   description,
   excerpt,
   url,
+  link, // Added link prop
 }: ContentSectionProps) {
   const renderStars = (rating: number) => {
     return (
@@ -82,6 +84,13 @@ export function ContentSection({
           <div className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm rounded text-sm text-white">
             {subtitle}
           </div>
+          {link && (
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <a href={link} className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+                {subtitle}
+              </a>
+            </div>
+          )}
         </div>
       </div>
     );
