@@ -8,6 +8,7 @@ import About from "@/pages/About";
 import ShowStats from "@/pages/show-stats";
 import Books from "@/pages/Books";
 import StarredArticles from "@/pages/StarredArticles";
+import PMonk from "@/pages/PMonk";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
         <Route path="/books" component={Books} />
         <Route path="/starred-articles/page/:page" component={StarredArticles} />
         <Route path="/starred-articles" component={StarredArticles} />
+        <Route path="/pmonk" component={PMonk} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
