@@ -1,6 +1,6 @@
-import Masonry from 'react-masonry-css';
-import imageData from '../../../attached_assets/pmonk';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import Masonry from "react-masonry-css";
+import imageData from "../../../attached_assets/pmonk";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -19,7 +19,7 @@ const breakpointColumnsObj = {
   default: 4,
   1100: 3,
   700: 2,
-  500: 1
+  500: 1,
 };
 
 // Fisher-Yates shuffle algorithm
@@ -40,47 +40,62 @@ export const PMonk = () => {
 
   useEffect(() => {
     // Convert imported image data to our state format and shuffle
-    setLoadedImages(shuffleArray(imageData as ImageData[]).map(img => ({ 
-      ...img, 
-      loaded: false,
-      visible: false 
-    })));
+    setLoadedImages(
+      shuffleArray(imageData as ImageData[]).map((img) => ({
+        ...img,
+        loaded: false,
+        visible: false,
+      })),
+    );
   }, []);
 
   const handleImageLoad = (index: number) => {
-    setLoadedImages(prev => 
-      prev.map((img, i) => i === index ? { ...img, loaded: true } : img)
+    setLoadedImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, loaded: true } : img)),
     );
   };
 
-  const handleIntersection = useCallback((index: number) => (entries: IntersectionObserverEntry[]) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        setLoadedImages(prev => 
-          prev.map((img, i) => i === index ? { ...img, visible: true } : img)
-        );
-        if (observers.current[index]) {
-          observers.current[index].disconnect();
-          delete observers.current[index];
+  const handleIntersection = useCallback(
+    (index: number) => (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setLoadedImages((prev) =>
+            prev.map((img, i) =>
+              i === index ? { ...img, visible: true } : img,
+            ),
+          );
+          if (observers.current[index]) {
+            observers.current[index].disconnect();
+            delete observers.current[index];
+          }
         }
-      }
-    });
-  }, []);
-
-  const imageRef = useCallback((node: HTMLDivElement | null, index: number) => {
-    if (node && !loadedImages[index]?.visible) {
-      observers.current[index] = new IntersectionObserver(handleIntersection(index), {
-        rootMargin: '50px 0px',
-        threshold: 0.1
       });
-      observers.current[index].observe(node);
-    }
-  }, [handleIntersection, loadedImages]);
+    },
+    [],
+  );
+
+  const imageRef = useCallback(
+    (node: HTMLDivElement | null, index: number) => {
+      if (node && !loadedImages[index]?.visible) {
+        observers.current[index] = new IntersectionObserver(
+          handleIntersection(index),
+          {
+            rootMargin: "50px 0px",
+            threshold: 0.1,
+          },
+        );
+        observers.current[index].observe(node);
+      }
+    },
+    [handleIntersection, loadedImages],
+  );
 
   // Cleanup observers on unmount
   useEffect(() => {
     return () => {
-      Object.values(observers.current).forEach(observer => observer.disconnect());
+      Object.values(observers.current).forEach((observer) =>
+        observer.disconnect(),
+      );
     };
   }, []);
 
@@ -90,24 +105,24 @@ export const PMonk = () => {
       if (!lightboxOpen) return;
 
       switch (e.key) {
-        case 'ArrowLeft':
-          setCurrentImageIndex(prev => 
-            prev === 0 ? loadedImages.length - 1 : prev - 1
+        case "ArrowLeft":
+          setCurrentImageIndex((prev) =>
+            prev === 0 ? loadedImages.length - 1 : prev - 1,
           );
           break;
-        case 'ArrowRight':
-          setCurrentImageIndex(prev => 
-            prev === loadedImages.length - 1 ? 0 : prev + 1
+        case "ArrowRight":
+          setCurrentImageIndex((prev) =>
+            prev === loadedImages.length - 1 ? 0 : prev + 1,
           );
           break;
-        case 'Escape':
+        case "Escape":
           setLightboxOpen(false);
           break;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxOpen, loadedImages.length]);
 
   const openLightbox = (index: number) => {
@@ -116,14 +131,14 @@ export const PMonk = () => {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex(prev => 
-      prev === loadedImages.length - 1 ? 0 : prev + 1
+    setCurrentImageIndex((prev) =>
+      prev === loadedImages.length - 1 ? 0 : prev + 1,
     );
   };
 
   const prevImage = () => {
-    setCurrentImageIndex(prev => 
-      prev === 0 ? loadedImages.length - 1 : prev - 1
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? loadedImages.length - 1 : prev - 1,
     );
   };
 
@@ -136,9 +151,9 @@ export const PMonk = () => {
           columnClassName="pl-4 bg-background"
         >
           {loadedImages.map((image, index) => (
-            <div 
+            <div
               key={index}
-              ref={node => imageRef(node, index)}
+              ref={(node) => imageRef(node, index)}
               className="mb-4 overflow-hidden rounded-lg transition-opacity duration-300 cursor-pointer"
               style={{ opacity: image.loaded ? 1 : 0 }}
               onClick={() => openLightbox(index)}
@@ -162,7 +177,7 @@ export const PMonk = () => {
           <div className="relative flex items-center justify-center min-h-[50vh]">
             <Button
               variant="ghost"
-              className="absolute left-2 z-10 p-2"
+              className="absolute -left-10 z-10 p-2 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               onClick={prevImage}
             >
               <ChevronLeft className="h-8 w-8" />
@@ -176,7 +191,7 @@ export const PMonk = () => {
 
             <Button
               variant="ghost"
-              className="absolute right-2 z-10 p-2"
+              className="absolute -right-10 z-10 p-2 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               onClick={nextImage}
             >
               <ChevronRight className="h-8 w-8" />
@@ -184,7 +199,7 @@ export const PMonk = () => {
 
             <Button
               variant="ghost"
-              className="absolute top-2 right-2 z-10"
+              className="absolute -top-2 -right-2 z-2 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               onClick={() => setLightboxOpen(false)}
             >
               <X className="h-6 w-6" />
