@@ -46,7 +46,7 @@ router.get("/playlist/:playlistId", async (req, res) => {
       description: item.snippet?.description,
       thumbnail: item.snippet?.thumbnails?.high?.url,
       duration: videosResponse.data.items?.[index]?.contentDetails?.duration,
-    }));
+    })).filter(item => item.title !== "Private video");
 
     res.json({
       items,
