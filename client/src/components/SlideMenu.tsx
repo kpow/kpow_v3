@@ -61,8 +61,20 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     {
       icon: <Code className="w-4 h-4" />,
       label: "gatsby version",
-      href: "/gatsby",
-      className: "text-blue-600",
+      href: "https://gatsby.kpow-wow.com/",
+      //className: "text-blue-600",
+    },
+    {
+      icon: <Code className="w-4 h-4" />,
+      label: "next.js version",
+      href: "https://kpow-wow.com/",
+      //className: "text-blue-600",
+    },
+    {
+      icon: <Code className="w-4 h-4" />,
+      label: "2012 version",
+      href: "https://2012.kpow.com/",
+      //className: "text-blue-600",
     },
   ];
 
