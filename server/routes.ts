@@ -6,6 +6,7 @@ import { registerLastFmRoutes } from "./routes/lastfm-routes";
 import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
 import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
+import youtubeRoutes from "./routes/youtube-routes";
 
 // Verify required environment variables
 if (!process.env.PHISH_API_KEY) {
@@ -14,6 +15,10 @@ if (!process.env.PHISH_API_KEY) {
 
 if (!process.env.LASTFM_API_KEY) {
   throw new Error("LASTFM_API_KEY environment variable is required");
+}
+
+if (!process.env.YOUTUBE_API_KEY) {
+  throw new Error("YOUTUBE_API_KEY environment variable is required");
 }
 
 export function registerRoutes(app: Express): Server {
@@ -25,6 +30,9 @@ export function registerRoutes(app: Express): Server {
   registerGoodreadsRoutes(router);
   registerFeedbinRoutes(router);
   registerGithubRoutes(router);
+
+  // Register YouTube routes
+  router.use('/api/youtube', youtubeRoutes);
 
   // Use the router
   app.use(router);
