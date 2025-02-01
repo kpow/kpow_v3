@@ -82,6 +82,7 @@ export default function ShowStats() {
                   size="sm"
                   onClick={() => setVenuesPage((p) => Math.max(1, p - 1))}
                   disabled={venuesPage === 1 || venuesLoading}
+                  className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
                 >
                   Previous
                 </Button>
@@ -89,6 +90,7 @@ export default function ShowStats() {
                 <Button
                   variant="outline"
                   size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
                   onClick={() => setVenuesPage((p) => p + 1)}
                   disabled={
                     venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) ||
@@ -158,6 +160,7 @@ export default function ShowStats() {
               size="sm"
               onClick={() => setShowsPage((p) => Math.max(1, p - 1))}
               disabled={showsPage === 1 || showsLoading}
+              className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
             >
               Previous
             </Button>
@@ -165,6 +168,7 @@ export default function ShowStats() {
             <Button
               variant="outline"
               size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               onClick={() => setShowsPage((p) => p + 1)}
               disabled={
                 showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
