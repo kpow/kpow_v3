@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import axios from "axios";
 import Masonry from "react-masonry-css";
 import { VideoCard } from "../components/VideoCard";
 import { VideoModal } from "../components/VideoModal";
 import { Button } from "../components/ui/button";
+import { useState } from "react";
 
 const ITEMS_PER_PAGE = 9;
 const PLAYLIST_ID = "PLLnMxi7_aEL7eyC1HiZ2d1d4ce5irHaTQ";
@@ -19,8 +20,9 @@ interface Video {
 }
 
 export default function Videos() {
-  const [location, setLocation] = useLocation();
-  const page = parseInt(new URLSearchParams(location.split("?")[1]).get("page") || "1");
+  const [, setLocation] = useLocation();
+  const [, params] = useRoute("/videos/page/:page");
+  const page = params?.page ? parseInt(params.page) : 1;
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
@@ -46,10 +48,16 @@ export default function Videos() {
     700: 1,
   };
 
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1) return;
+    if (!data?.hasNextPage && newPage > page) return;
+    setLocation(newPage === 1 ? "/videos" : `/videos/page/${newPage}`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold mb-8">Video Gallery</h1>
-      
+
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
@@ -79,13 +87,13 @@ export default function Videos() {
 
           <div className="flex justify-center gap-4 mt-8">
             <Button
-              onClick={() => setLocation(`/videos?page=${page - 1}`)}
+              onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
             >
               Previous
             </Button>
             <Button
-              onClick={() => setLocation(`/videos?page=${page + 1}`)}
+              onClick={() => handlePageChange(page + 1)}
               disabled={!data?.hasNextPage}
             >
               Next
