@@ -145,6 +145,7 @@ export const PMonk = () => {
   return (
     <>
       <div className="p-4">
+         <h1 className="text-3xl font-bold mb-6">pmonk</h1>
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="flex -ml-4 w-auto"
@@ -197,13 +198,13 @@ export const PMonk = () => {
               <ChevronRight className="h-8 w-8" />
             </Button>
 
-            <Button
+            {/* <Button
               variant="ghost"
-              className="absolute -top-2 -right-2 z-2 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+              className="absolute -top-2 -right-2 z-100 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               onClick={() => setLightboxOpen(false)}
             >
               <X className="h-6 w-6" />
-            </Button>
+            </Button> */}
           </div>
         </DialogContent>
       </Dialog>
