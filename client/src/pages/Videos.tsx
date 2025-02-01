@@ -26,7 +26,7 @@ export default function Videos() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [pageTokens, setPageTokens] = useState<Record<number, string>>({});
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["videos", page],
     queryFn: async () => {
       const response = await axios.get(`/api/youtube/playlist/${PLAYLIST_ID}`, {
@@ -100,6 +100,10 @@ export default function Videos() {
               <div className="h-4 bg-gray-200 rounded w-1/2" />
             </div>
           ))}
+        </div>
+      ) : error ? (
+        <div className="text-center py-8">
+          <p className="text-red-500">Error loading videos. Please try again later.</p>
         </div>
       ) : (
         <>

@@ -7,9 +7,12 @@ const youtube = google.youtube("v3");
 router.get("/playlist/:playlistId", async (req, res) => {
   try {
     const playlistId = req.params.playlistId;
-    const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 9;
     const pageToken = req.query.pageToken as string;
+
+    if (!process.env.YOUTUBE_API_KEY) {
+      throw new Error("YouTube API key not configured");
+    }
 
     const response = await youtube.playlistItems.list({
       key: process.env.YOUTUBE_API_KEY,
@@ -22,6 +25,14 @@ router.get("/playlist/:playlistId", async (req, res) => {
     const videoIds = response.data.items?.map(
       (item) => item.contentDetails?.videoId
     ).filter(Boolean) as string[];
+
+    if (!videoIds.length) {
+      return res.json({
+        items: [],
+        hasNextPage: false,
+        nextPageToken: null,
+      });
+    }
 
     const videosResponse = await youtube.videos.list({
       key: process.env.YOUTUBE_API_KEY,
@@ -44,7 +55,10 @@ router.get("/playlist/:playlistId", async (req, res) => {
     });
   } catch (error) {
     console.error("YouTube API Error:", error);
-    res.status(500).json({ error: "Failed to fetch videos" });
+    res.status(500).json({ 
+      error: "Failed to fetch videos",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
   }
 });
 
