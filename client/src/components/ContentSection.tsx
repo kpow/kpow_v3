@@ -14,6 +14,8 @@ interface ContentSectionProps {
   link?: string; // Added link prop
 }
 
+import { Link } from '@wouter/react'; // Assuming Link is from @wouter/react
+
 export function ContentSection({
   title,
   subtitle,
@@ -82,9 +84,9 @@ export function ContentSection({
             {title}
           </h3>
           {link ? (
-            <a href={link} className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+            <Link href={link} className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
               {subtitle}
-            </a>
+            </Link>
           ) : (
             <div className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm rounded text-sm text-white">
               {subtitle}
@@ -98,7 +100,7 @@ export function ContentSection({
   if (type === "star") {
     return (
       <div className="group relative border rounded-lg shadow-sm">
-        <a
+        <Link
           href={url}
           target="_blank"
           rel="noopener noreferrer"
@@ -136,7 +138,7 @@ export function ContentSection({
               </p>
             )}
           </div>
-        </a>
+        </Link>
       </div>
     );
   }
