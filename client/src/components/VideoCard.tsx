@@ -32,7 +32,7 @@ export function VideoCard({
       </div>
       <div className="p-4 h-[180px] flex flex-col">
         <h3 className="font-semibold text-lg line-clamp-2 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 line-clamp-4 mb-4 flex-1">
+        <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
           {description}
         </p>
         <Button onClick={onPlay} className="w-full mt-auto">
