@@ -89,8 +89,8 @@ export function OnThisDayShows() {
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-slackey">on this day</h2>
+        <div className="flex flex-col items-center justify-between mb-4">
+          <h2 className="text-lg font-slackey mb-4">on this day</h2>
           <div className="flex gap-2">
             <Select
               value={month.toString()}
