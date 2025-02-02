@@ -57,7 +57,7 @@ export default function Home() {
       subtitle: "PLAY",
       imageSrc: "/battle.jpg",
       type: "main" as const,
-      link: "#",
+      link: "/battle",
     },
     {
       title: "tunes",
@@ -118,7 +118,7 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {mainSections.map((section) => (
           <ContentSection key={section.title} {...section} />

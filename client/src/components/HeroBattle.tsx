@@ -263,7 +263,6 @@ export function HeroBattle() {
         </div>
       </div>
 
-      {/* Hero cards in a separate 2-column grid */}
       {(hero1 || hero2) && (
         <div className="grid grid-cols-2 gap-4">
           {[hero1, hero2].map(
@@ -271,7 +270,6 @@ export function HeroBattle() {
               hero && (
                 <div key={index} className="relative">
                   <Card className="p-4">
-                    {/* Rest of the hero card content remains unchanged */}
                     <div className="relative">
                       <img
                         src={hero.images.lg}
@@ -279,11 +277,11 @@ export function HeroBattle() {
                         className="w-full object-cover"
                       />
                       {winner && winner.id !== hero.id && (
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <img 
-                            src="/attached_assets/loser.png" 
+                            src="/images/loser.png" 
                             alt="Loser" 
-                            className="w-full h-full object-contain"
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                         </div>
                       )}
