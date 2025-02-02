@@ -12,6 +12,7 @@ My coding playground and the begining of my post-singularity self.
   - Wouter for routing
   - Date-fns for date formatting
   - Recharts for data visualizations
+  - Framer Motion for animations
 
 - **Backend**:
   - Express.js
@@ -23,6 +24,24 @@ My coding playground and the begining of my post-singularity self.
   - Drizzle ORM with PostgreSQL (optional)
 
 ## Features
+
+### Hero Battle Game
+- Interactive hero battle system featuring characters from various universes
+- Two game modes:
+  - Random Battle: Automatically selects random heroes
+  - Manual Selection: Choose specific heroes to battle
+- Comprehensive hero information display:
+  - Collapsible sections for Power Stats, Biography, Appearance, Work, and Connections
+  - Power Stats section expanded by default for quick reference
+  - Dynamic image loading with battle outcome visualization
+- Betting system:
+  - Persistent betting stash using localStorage
+  - Place bets on your chosen hero
+  - Win/lose system based on hero power calculations
+- Battle mechanics:
+  - Intelligent power level calculations
+  - Random factor for unpredictable outcomes
+  - Clear winner display with visual feedback
 
 ### Show Statistics Dashboard
 - Comprehensive show statistics
@@ -107,111 +126,3 @@ Key features of the API integrations:
 ## Local Development Setup
 
 1. Clone the repository:
-```bash
-git clone https://github.com/kpow/kpow_v3.git
-cd kpow
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-   Create a `.env` file in the root directory and add your API keys:
-   ```
-   PHISH_API_KEY=your_phish_api_key
-   LASTFM_API_KEY=your_lastfm_api_key
-   GOODREADS_API_KEY=your_goodreads_api_key
-   FEEDBIN_KEY=your_feedbin_key
-   ```
-
-4. Start the development server:
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5000`.
-
-## Project Structure
-
-```
-├── client/                 # Frontend code
-│   ├── public/            # Static assets
-│   └── src/
-│       ├── components/    # React components
-│       │   ├── BookCard.tsx
-│       │   ├── BookFeed.tsx
-│       │   ├── ContentSection.tsx
-│       │   ├── RecentPlays.tsx
-│       │   └── ui/       # ShadcN UI components
-│       ├── lib/
-│       │   └── hooks/    # Custom hooks
-│       └── pages/        # Page components
-├── server/                # Backend code
-│   ├── routes/           # API routes by integration
-│   │   ├── phish-routes.ts      # Phish.net API routes
-│   │   ├── lastfm-routes.ts     # Last.fm API routes
-│   │   ├── goodreads-routes.ts  # Goodreads API routes
-│   │   ├── feedbin-routes.ts    # Feedbin API routes
-│   │   └── github-routes.ts     # GitHub API routes
-│   ├── utils/            # Shared utilities
-│   │   └── api-utils.ts  # Common API functions
-│   ├── routes.ts         # Route registration
-│   └── index.ts          # Server setup
-└── theme.json            # Theme configuration
-```
-
-### API Integration Structure
-The backend routes are organized by their respective API integrations:
-
-- `phish-routes.ts`: Handles all Phish.net related endpoints
-  - Show statistics
-  - Setlist information
-  - Venue data
-  - Song occurrences
-
-- `lastfm-routes.ts`: Last.fm integration
-  - Recent tracks
-  - Music listening data
-
-- `goodreads-routes.ts`: Goodreads integration
-  - Book listings
-  - Reading progress
-  - Book reviews
-
-- `feedbin-routes.ts`: Feedbin RSS integration
-  - Starred articles
-  - Feed management
-
-- `github-routes.ts`: GitHub integration
-  - User profile data
-  - Repository information
-
-
-## Development Guidelines
-
-- Use the existing shadcn + Tailwind CSS setup for styling
-- Follow the component structure in `client/src/components`
-- Maintain consistent styling using the theme configuration
-- Use TypeScript for type safety
-- Follow the established project structure
-- Implement URL-based pagination for list views
-
-## Available Scripts
-
-- `npm run dev` - Start the development server
-- `npm run build` - Build the production version
-- `npm run check` - Run TypeScript type checking
-- `npm start` - Start the production server
-- `npm run db:push` - Push database schema changes (if using database)
-
-## Contributing
-
-1. Create a new branch for your feature
-2. Make your changes
-3. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
