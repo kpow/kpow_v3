@@ -30,12 +30,8 @@ export function HeroBattle() {
   const [searchTerm1, setSearchTerm1] = useState("");
   const [searchTerm2, setSearchTerm2] = useState("");
 
-  const filteredHeroes1 = heroes.filter(h => 
+  const filteredHeroes = heroes.filter(h => 
     h.name.toLowerCase().includes(searchTerm1.toLowerCase())
-  );
-
-  const filteredHeroes2 = heroes.filter(h => 
-    h.name.toLowerCase().includes(searchTerm2.toLowerCase())
   );
 
   const handleBattle = () => {
@@ -106,13 +102,7 @@ export function HeroBattle() {
                 <SelectValue placeholder="Select hero 1" />
               </SelectTrigger>
               <SelectContent>
-                <Input
-                  placeholder="Search heroes..."
-                  value={searchTerm1}
-                  onChange={(e) => setSearchTerm1(e.target.value)}
-                  className="mb-2"
-                />
-                {filteredHeroes1.map(hero => (
+                {heroes.map(hero => (
                   <SelectItem key={hero.id} value={hero.id.toString()}>
                     {hero.name}
                   </SelectItem>
@@ -129,13 +119,7 @@ export function HeroBattle() {
                 <SelectValue placeholder="Select hero 2" />
               </SelectTrigger>
               <SelectContent>
-                <Input
-                  placeholder="Search heroes..."
-                  value={searchTerm2}
-                  onChange={(e) => setSearchTerm2(e.target.value)}
-                  className="mb-2"
-                />
-                {filteredHeroes2.map(hero => (
+                {heroes.map(hero => (
                   <SelectItem key={hero.id} value={hero.id.toString()}>
                     {hero.name}
                   </SelectItem>
