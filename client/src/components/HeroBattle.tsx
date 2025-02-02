@@ -279,10 +279,12 @@ export function HeroBattle() {
                         className="w-full object-cover"
                       />
                       {winner && winner.id !== hero.id && (
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                          <div className="text-red-600 text-[200px] font-bold transform rotate-45">
-                            ×
-                          </div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <img 
+                            src="/attached_assets/loser.png" 
+                            alt="Loser" 
+                            className="w-full h-full object-contain"
+                          />
                         </div>
                       )}
                     </div>
