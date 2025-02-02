@@ -24,6 +24,7 @@ export function Header() {
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
               aria-label="Toggle menu"
             >
+              
               <svg
                 viewBox="0 0 24 24"
                 width="24"
