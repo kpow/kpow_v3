@@ -228,7 +228,7 @@ export function HeroBattle() {
                     <CollapsibleContent className="p-2">
                       <div className="space-y-3">
                         <div className="space-y-1">
-                          <div className="font-medium text-sm text-gray-600">Full Name</div>
+                          <div className="font-bold text-sm">Full Name</div>
                           <div>{hero.biography.fullName || 'Unknown'}</div>
                         </div>
                         <div className="space-y-1">
@@ -257,18 +257,18 @@ export function HeroBattle() {
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="p-2">
-                      <div className="space-y-3">
-                        <div className="space-y-1">
-                          <div className="font-medium text-sm text-gray-600">Race</div>
-                          <div>{hero.appearance.race || 'Unknown'}</div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span>Race</span>
+                          <span>{hero.appearance.race || 'Unknown'}</span>
                         </div>
-                        <div className="space-y-1">
-                          <div className="font-medium text-sm text-gray-600">Height</div>
-                          <div>{hero.appearance.height[1] || 'Unknown'}</div>
+                        <div className="flex justify-between">
+                          <span>Height</span>
+                          <span>{hero.appearance.height[1] || 'Unknown'}</span>
                         </div>
-                        <div className="space-y-1">
-                          <div className="font-medium text-sm text-gray-600">Weight</div>
-                          <div>{hero.appearance.weight[1] || 'Unknown'}</div>
+                        <div className="flex justify-between">
+                          <span>Weight</span>
+                          <span>{hero.appearance.weight[1] || 'Unknown'}</span>
                         </div>
                       </div>
                     </CollapsibleContent>
