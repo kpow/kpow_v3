@@ -24,10 +24,18 @@ export interface Hero {
 
 // Get hero powers from powers data
 export function getHeroPowers(heroName: string): string[] {
+  console.log('Getting powers for hero:', heroName);
+  console.log('Powers data available:', Object.keys(heroPowers));
+
   const powers: string[] = [];
   const heroIndex = heroPowers.Name.indexOf(heroName);
 
-  if (heroIndex === -1) return powers;
+  console.log('Hero index in powers data:', heroIndex);
+
+  if (heroIndex === -1) {
+    console.log('Hero not found in powers data');
+    return powers;
+  }
 
   // Iterate through all power types
   Object.entries(heroPowers).forEach(([power, haspower]) => {
@@ -37,6 +45,7 @@ export function getHeroPowers(heroName: string): string[] {
     }
   });
 
+  console.log('Found powers:', powers);
   return powers;
 }
 

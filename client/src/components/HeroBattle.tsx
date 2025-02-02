@@ -88,7 +88,7 @@ export function HeroBattle() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto max-w-[800px] p-4">
       {winner && (
         <>
           <div className="flex justify-center text-xl font-bold mb-3">
@@ -240,27 +240,6 @@ export function HeroBattle() {
                               </div>
                             ),
                           )}
-                        </CollapsibleContent>
-                      </Collapsible>
-
-                      <Collapsible>
-                        <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
-                          <span className="font-semibold">Powers</span>
-                          <ChevronDown className="h-4 w-4" />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="p-2">
-                          <div className="grid grid-cols-2 gap-2">
-                            {hero.powers?.map((power) => (
-                              <div
-                                key={power}
-                                className="bg-gray-50 p-2 rounded text-sm"
-                              >
-                                {power}
-                              </div>
-                            )) || (
-                              <div className="text-gray-500">No powers listed</div>
-                            )}
-                          </div>
                         </CollapsibleContent>
                       </Collapsible>
 
