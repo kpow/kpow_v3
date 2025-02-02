@@ -10,7 +10,9 @@ async function getShowsOnDate(month: number, day: number) {
   if (!response.ok) {
     throw new Error('Failed to fetch shows');
   }
-  return response.json();
+  const data = await response.json();
+  console.log('Shows on this day:', data); // Debug log
+  return data;
 }
 
 export function OnThisDayShows() {
@@ -19,10 +21,22 @@ export function OnThisDayShows() {
   const month = today.getMonth() + 1; // getMonth() returns 0-11
   const day = today.getDate();
 
-  const { data: shows, isLoading } = useQuery({
+  const { data: shows, isLoading, error } = useQuery({
     queryKey: ["shows-on-date", month, day],
     queryFn: () => getShowsOnDate(month, day),
   });
+
+  if (error) {
+    console.error('Error loading shows:', error);
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <h2 className="text-lg font-slackey mb-4">on this day</h2>
+          <div className="text-red-500">Error loading shows</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -47,23 +61,27 @@ export function OnThisDayShows() {
       <CardContent className="pt-6">
         <h2 className="text-lg font-slackey mb-4">on this day</h2>
         <div className="space-y-3">
-          {shows?.map((show: ShowAttendance) => (
-            <div
-              key={show.showid}
-              className="flex justify-between items-center p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setSelectedShow(show)}
-            >
-              <div className="space-y-1">
-                <div className="font-medium">{show.venue}</div>
+          {shows && shows.length > 0 ? (
+            shows.map((show: ShowAttendance) => (
+              <div
+                key={show.showid}
+                className="flex justify-between items-center p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() => setSelectedShow(show)}
+              >
+                <div className="space-y-1">
+                  <div className="font-medium">{show.venue}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {format(new Date(show.showdate), 'PPP')}
+                  </div>
+                </div>
                 <div className="text-sm text-muted-foreground">
-                  {format(new Date(show.showdate), 'PPP')}
+                  {show.city}, {show.state}
                 </div>
               </div>
-              <div className="text-sm text-muted-foreground">
-                {show.city}, {show.state}
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="text-muted-foreground">No shows on this day</div>
+          )}
         </div>
       </CardContent>
 
