@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Select,
@@ -116,30 +117,21 @@ export function HeroBattle() {
 
   return (
     <div className="container mx-auto space-y-6">
-      <div className="flex justify-left items-center">
-        <h1 className="text-4xl font-bold font-slackey mb-8 mr-8 text-left">
+      <div className="flex justify-left items-center gap-4">
+        <h1 className="text-4xl font-bold font-slackey mb-8 text-left">
           battle
         </h1>
-        <div className="mb-8">
-          <Button
-            variant={mode === "manual" ? "default" : "outline"}
-            onClick={() => {
-              setMode("manual");
+        <div className="flex items-center gap-2 mb-8">
+          <span className={mode === "manual" ? "font-bold" : ""}>Manual</span>
+          <Switch
+            checked={mode === "random"}
+            onCheckedChange={(checked) => {
+              setMode(checked ? "random" : "manual");
               handleReset();
+              if (checked) handleRandom();
             }}
-          >
-            Manual Selection
-          </Button>
-          <Button
-            variant={mode === "random" ? "default" : "outline"}
-            onClick={() => {
-              setMode("random");
-              handleReset();
-              handleRandom();
-            }}
-          >
-            Random Battle
-          </Button>
+          />
+          <span className={mode === "random" ? "font-bold" : ""}>Random</span>
         </div>
       </div>
       <div className="grid grid-cols-4 gap-4">
