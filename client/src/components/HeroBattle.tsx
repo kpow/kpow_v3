@@ -135,7 +135,7 @@ export function HeroBattle() {
         </div>
       </div>
       <div className="grid grid-cols-4 gap-4">
-        <div className="col-span-4 flex justify-center">
+        <div className="col-span-4 flex justify-center flex-col md:flex-row">
           <div className="mt-4">
             {mode === "manual" && (
               <div className="grid grid-cols-2 gap-4 mb-6">
