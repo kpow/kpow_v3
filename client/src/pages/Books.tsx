@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { BookCard } from "@/components/BookCard";
+import { CustomPagination } from "@/components/ui/custom-pagination";
 
 interface Book {
   book: {
@@ -156,42 +157,18 @@ export default function Books({ params }: { params?: { page?: string } }) {
   const totalPages = pagination?.totalPages ?? 1;
   const totalBooks = pagination?.total ?? 0;
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      console.log(`Changing to page ${newPage}`);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      setLocation(newPage === 1 ? "/books" : `/books/page/${newPage}`);
-    }
-  };
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center flex-col sm:flex-row">
         <h1 className="text-3xl font-bold mb-3">My Books</h1>
-
-        <div className="flex justify-center gap-2 items-center mb-3">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">
-            {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          baseUrl="/books"
+          onPageChange={() => {}}
+          className="mb-3"
+        />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
@@ -200,29 +177,12 @@ export default function Books({ params }: { params?: { page?: string } }) {
         ))}
       </div>
 
-      <div className="flex justify-center gap-2 items-center">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm">
-          {currentPage} of {totalPages}
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl="/books"
+        onPageChange={() => {}}
+      />
     </div>
   );
 }

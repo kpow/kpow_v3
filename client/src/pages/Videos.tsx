@@ -5,8 +5,8 @@ import axios from "axios";
 import Masonry from "react-masonry-css";
 import { VideoCard } from "../components/VideoCard";
 import { VideoModal } from "../components/VideoModal";
-import { Button } from "../components/ui/button";
 import { useState } from "react";
+import { CustomPagination } from "@/components/ui/custom-pagination";
 
 const ITEMS_PER_PAGE = 9;
 const PLAYLIST_ID = "PLLnMxi7_aEL7eyC1HiZ2d1d4ce5irHaTQ";
@@ -68,27 +68,12 @@ export default function Videos() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
         <h1 className="text-4xl font-bold">youtubez live</h1>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-          >
-            Previous
-          </Button>
-          <span className="px-4 py-2 text-sm font-medium">Page {page}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(page + 1)}
-            disabled={!data?.hasNextPage}
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-          >
-            Next
-          </Button>
-        </div>
+        <CustomPagination
+          currentPage={page}
+          totalPages={data?.hasNextPage ? page + 1 : page}
+          baseUrl="/videos"
+          onPageChange={() => {}}
+        />
       </div>
 
       {isLoading ? (
@@ -125,27 +110,15 @@ export default function Videos() {
           </Masonry>
         </>
       )}
-      <div className="flex items-center gap-2 mt-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
-          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-        >
-          Previous
-        </Button>
-        <span className="px-4 py-2 text-sm font-medium">Page {page}</span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handlePageChange(page + 1)}
-          disabled={!data?.hasNextPage}
-          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-        >
-          Next
-        </Button>
-      </div>
+
+      <CustomPagination
+        currentPage={page}
+        totalPages={data?.hasNextPage ? page + 1 : page}
+        baseUrl="/videos"
+        onPageChange={() => {}}
+        className="mt-4"
+      />
+
       <VideoModal
         videoId={selectedVideo || ""}
         isOpen={!!selectedVideo}
