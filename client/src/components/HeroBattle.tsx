@@ -118,10 +118,10 @@ export function HeroBattle() {
   return (
     <div className="container mx-auto space-y-6">
       <div className="flex justify-left items-center gap-4">
-        <h1 className="text-4xl font-bold font-slackey mb-8 text-left">
+        <h1 className="text-4xl font-bold font-slackey mb-2 text-left">
           battle
         </h1>
-        <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center gap-2 mb-2">
           <span className={mode === "manual" ? "font-bold" : ""}>Manual</span>
           <Switch
             checked={mode === "random"}
@@ -220,7 +220,7 @@ export function HeroBattle() {
             </div>
           </div>
 
-          <div className="gap-4 mb-8 pl-4">
+          <div className="gap-4 pl-4">
             <AnimatePresence mode="wait">
               {!isBattling && !winner && hero1 && hero2 && (
                 <motion.div
