@@ -68,6 +68,8 @@ export function HeroBattle() {
     setBet(0);
     setSearchTerm1("");
     setSearchTerm2("");
+    // Generate new random heroes after reset
+    handleRandom();
   };
 
   return (
