@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { fetchPhishData } from "../utils/api-utils";
+import path from "path";
+import fs from "fs";
 
 export function registerPhishRoutes(router: Router) {
   router.get("/api/shows", async (req, res) => {
@@ -180,7 +182,7 @@ export function registerPhishRoutes(router: Router) {
     }
   });
 
-    router.get("/api/setlist/occurrences/:songName", async (req, res) => {
+  router.get("/api/setlist/occurrences/:songName", async (req, res) => {
     try {
       const { songName } = req.params;
       const shows = await fetchPhishData("/attendance/username/koolyp");
@@ -219,15 +221,21 @@ export function registerPhishRoutes(router: Router) {
         return res.status(400).json({ message: "Invalid month or day parameters" });
       }
 
-      // Query all shows on this date using the shows/query endpoint
-      const showsData = await fetchPhishData(`/shows/query?month=${month}&day=${day}`);
+      // Read from local JSON file
+      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'all-phish-shows.json');
+      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8'));
 
-      if (!Array.isArray(showsData)) {
-        return res.json([]);
-      }
+      // Filter shows for the given month and day
+      const showsOnDate = showsData.filter((show: any) => {
+        const showDate = new Date(show.showdate);
+        return (
+          showDate.getMonth() + 1 === month && 
+          showDate.getDate() === day
+        );
+      });
 
       // Sort shows by year, most recent first
-      const sortedShows = showsData.sort(
+      const sortedShows = showsOnDate.sort(
         (a: any, b: any) =>
           new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
       );
@@ -246,6 +254,21 @@ export function registerPhishRoutes(router: Router) {
       res.json(formattedShows);
     } catch (error) {
       console.error("Error fetching shows by date:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  // New route to generate the JSON file
+  router.post("/api/admin/generate-shows-json", async (_req, res) => {
+    try {
+      const showsData = await fetchPhishData("/shows/artist/phish?order_by=showdate");
+
+      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'all-phish-shows.json');
+      fs.writeFileSync(showsFilePath, JSON.stringify(showsData, null, 2));
+
+      res.json({ message: "Shows data has been saved to JSON file", count: showsData.length });
+    } catch (error) {
+      console.error("Error generating shows JSON:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
