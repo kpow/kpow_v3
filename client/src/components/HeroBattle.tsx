@@ -11,6 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 import { 
   determineBattleWinner, 
   getRandomHero, 
@@ -187,74 +193,110 @@ export function HeroBattle() {
                   )}
                 </div>
                 <h3 className="text-xl font-bold mt-2">{hero.name}</h3>
-                <div className="mt-2 space-y-1">
-                  <h4 className="font-semibold">Power Stats</h4>
-                  {Object.entries(hero.powerstats).map(([stat, value]) => (
-                    <div key={stat} className="flex justify-between">
-                      <span className="capitalize">{stat}</span>
-                      <span>{value}</span>
-                    </div>
-                  ))}
 
-                  <h4 className="font-semibold mt-4">Biography</h4>
-                  <div>
-                    <div className="flex justify-between">
-                      <span>Full Name</span>
-                      <span>{hero.biography.fullName || 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Alignment</span>
-                      <span className="capitalize">{hero.biography.alignment}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Place of Birth</span>
-                      <span>{hero.biography.placeOfBirth || 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>First Appearance</span>
-                      <span>{hero.biography.firstAppearance || 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Publisher</span>
-                      <span>{hero.biography.publisher || 'Unknown'}</span>
-                    </div>
-                  </div>
+                <div className="mt-4 space-y-2">
+                  <Collapsible defaultOpen>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
+                      <span className="font-semibold">Power Stats</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="p-2">
+                      {Object.entries(hero.powerstats).map(([stat, value]) => (
+                        <div key={stat} className="flex justify-between">
+                          <span className="capitalize">{stat}</span>
+                          <span>{value}</span>
+                        </div>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
 
-                  <h4 className="font-semibold mt-4">Appearance</h4>
-                  <div>
-                    <div className="flex justify-between">
-                      <span>Race</span>
-                      <span>{hero.appearance.race || 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Height</span>
-                      <span>{hero.appearance.height[1] || 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Weight</span>
-                      <span>{hero.appearance.weight[1] || 'Unknown'}</span>
-                    </div>
-                  </div>
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
+                      <span className="font-semibold">Biography</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="p-2">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span>Full Name</span>
+                          <span>{hero.biography.fullName || 'Unknown'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Alignment</span>
+                          <span className="capitalize">{hero.biography.alignment}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Place of Birth</span>
+                          <span>{hero.biography.placeOfBirth || 'Unknown'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>First Appearance</span>
+                          <span>{hero.biography.firstAppearance || 'Unknown'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Publisher</span>
+                          <span>{hero.biography.publisher || 'Unknown'}</span>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
 
-                  <h4 className="font-semibold mt-4">Work</h4>
-                  <div>
-                    <div className="flex justify-between">
-                      <span>Occupation</span>
-                      <span className="text-right">{hero.work.occupation || 'Unknown'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Base</span>
-                      <span className="text-right">{hero.work.base || 'Unknown'}</span>
-                    </div>
-                  </div>
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
+                      <span className="font-semibold">Appearance</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="p-2">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span>Race</span>
+                          <span>{hero.appearance.race || 'Unknown'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Height</span>
+                          <span>{hero.appearance.height[1] || 'Unknown'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Weight</span>
+                          <span>{hero.appearance.weight[1] || 'Unknown'}</span>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
 
-                  <h4 className="font-semibold mt-4">Connections</h4>
-                  <div>
-                    <div className="flex justify-between">
-                      <span>Group Affiliation</span>
-                      <span className="text-right">{hero.connections.groupAffiliation || 'Unknown'}</span>
-                    </div>
-                  </div>
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
+                      <span className="font-semibold">Work</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="p-2">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span>Occupation</span>
+                          <span className="text-right">{hero.work.occupation || 'Unknown'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Base</span>
+                          <span className="text-right">{hero.work.base || 'Unknown'}</span>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
+                      <span className="font-semibold">Connections</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="p-2">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span>Group Affiliation</span>
+                          <span className="text-right">{hero.connections.groupAffiliation || 'Unknown'}</span>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
               </Card>
             </div>
