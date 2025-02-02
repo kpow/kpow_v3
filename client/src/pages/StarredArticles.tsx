@@ -141,7 +141,7 @@ export default function StarredArticles({
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-col sm:flex-row">
         <h1 className="text-3xl font-bold mb-6">Starred Articles</h1>
 
         <div className="flex justify-center gap-2 items-center mb-6">

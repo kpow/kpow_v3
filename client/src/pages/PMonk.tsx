@@ -145,7 +145,7 @@ export const PMonk = () => {
   return (
     <>
       <div className="p-4">
-         <h1 className="text-3xl font-bold mb-6">pmonk</h1>
+        <h1 className="text-3xl font-bold mb-6">pmonk</h1>
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="flex -ml-4 w-auto"

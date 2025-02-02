@@ -3,7 +3,7 @@ import { Logo } from "./Logo";
 export function Footer() {
   return (
     <footer className="bg-black text-white py-12">
-      <div className="container max-w-6xl mx-auto px-4 flex gap-8 justify-between">
+      <div className="container max-w-6xl mx-auto px-4 flex gap-8 justify-between flex-col sm:flex-row">
         {/* About Section */}
         <div className="flex items-start gap-4 max-w-sm">
           <div className="flex-shrink-0"></div>

@@ -33,7 +33,6 @@ export function RecentPlays() {
     return (
       <div className="w-full px-2 py-0">
         <div className="items-center gap-2 mb-4">
-          <SiLastdotfm className="h-5 w-5" />
           <h2 className="text-2xl font-bold">Recently Played</h2>
           <div className="w-full p-2">
             <Skeleton
@@ -61,7 +60,6 @@ export function RecentPlays() {
   return (
     <div className="w-full px-2 py-0">
       <div className="flex items-center gap-2 mb-4">
-        <SiLastdotfm className="h-5 w-5" />
         <h2 className="text-2xl font-bold">Recently Played</h2>
       </div>
 
