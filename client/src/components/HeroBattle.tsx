@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -20,7 +20,7 @@ import {
 import heroes from "../../../attached_assets/superheros-prod.js";
 
 export function HeroBattle() {
-  const [mode, setMode] = useState<"manual" | "random">("manual");
+  const [mode, setMode] = useState<"manual" | "random">("random");
   const [hero1, setHero1] = useState<Hero | null>(null);
   const [hero2, setHero2] = useState<Hero | null>(null);
   const [winner, setWinner] = useState<Hero | null>(null);
@@ -30,9 +30,9 @@ export function HeroBattle() {
   const [searchTerm1, setSearchTerm1] = useState("");
   const [searchTerm2, setSearchTerm2] = useState("");
 
-  const filteredHeroes = heroes.filter(h => 
-    h.name.toLowerCase().includes(searchTerm1.toLowerCase())
-  );
+  useEffect(() => {
+    handleRandom();
+  }, []);
 
   const handleBattle = () => {
     if (!hero1 || !hero2) return;
@@ -85,6 +85,7 @@ export function HeroBattle() {
           onClick={() => {
             setMode("random");
             handleReset();
+            handleRandom();
           }}
         >
           Random Battle
@@ -161,7 +162,6 @@ export function HeroBattle() {
         </div>
       )}
 
-      {/* Hero Display */}
       {(hero1 || hero2) && (
         <div className="grid grid-cols-2 gap-4">
           {[hero1, hero2].map((hero, index) => hero && (
@@ -225,7 +225,6 @@ export function HeroBattle() {
         </div>
       )}
 
-      {/* Battle Controls */}
       <div className="flex justify-center gap-4 mt-6">
         {hero1 && hero2 && !winner && (
           <Button onClick={handleBattle}>Fight!</Button>
