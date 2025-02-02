@@ -58,7 +58,7 @@ export function ShowDetailsModal({ show, isOpen, onClose }: ShowDetailsModalProp
                 {setlist?.setlistnotes && (
                   <div className="mt-4">
                     <h4 className="text-sm font-semibold mb-2">Show Notes:</h4>
-                    <div className="text-sm text-muted-foreground">{setlist.setlistnotes}</div>
+                    <p className="text-sm text-muted-foreground">{setlist.setlistnotes}</p>
                   </div>
                 )}
               </div>
