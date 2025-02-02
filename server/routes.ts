@@ -7,6 +7,7 @@ import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
 import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
 import youtubeRoutes from "./routes/youtube-routes";
+import contactRoutes from "./routes/contact-routes";
 
 // Verify required environment variables
 if (!process.env.PHISH_API_KEY) {
@@ -33,6 +34,9 @@ export function registerRoutes(app: Express): Server {
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
+
+  // Register contact routes
+  router.use('/', contactRoutes);
 
   // Use the router
   app.use(router);
