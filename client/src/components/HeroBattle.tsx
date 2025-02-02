@@ -25,12 +25,17 @@ import {
 } from "@/lib/battle-service";
 import heroes from "../../../attached_assets/superheros-prod.js";
 
+const STORAGE_KEY = 'hero-battle-stash';
+
 export function HeroBattle() {
   const [mode, setMode] = useState<"manual" | "random">("random");
   const [hero1, setHero1] = useState<Hero | null>(null);
   const [hero2, setHero2] = useState<Hero | null>(null);
   const [winner, setWinner] = useState<Hero | null>(null);
-  const [stash, setStash] = useState(100);
+  const [stash, setStash] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? Number(saved) : 100;
+  });
   const [bet, setBet] = useState<number>(0);
   const [selectedHero, setSelectedHero] = useState<number | null>(null);
   const [searchTerm1, setSearchTerm1] = useState("");
@@ -39,6 +44,11 @@ export function HeroBattle() {
   useEffect(() => {
     handleRandom();
   }, []);
+
+  // Save stash to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, stash.toString());
+  }, [stash]);
 
   const handleBattle = () => {
     if (!hero1 || !hero2) return;
