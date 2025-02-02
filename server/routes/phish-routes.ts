@@ -219,18 +219,15 @@ export function registerPhishRoutes(router: Router) {
         return res.status(400).json({ message: "Invalid month or day parameters" });
       }
 
-      const shows = await fetchPhishData("/attendance/username/koolyp");
+      // Query all shows on this date using the shows/query endpoint
+      const showsData = await fetchPhishData(`/shows/query?month=${month}&day=${day}`);
 
-      // Filter shows for the given month and day
-      const showsOnDate = shows.filter((show: any) => {
-        const showDate = new Date(show.showdate);
-        return (
-          showDate.getMonth() + 1 === month && showDate.getDate() === day
-        );
-      });
+      if (!Array.isArray(showsData)) {
+        return res.json([]);
+      }
 
       // Sort shows by year, most recent first
-      const sortedShows = showsOnDate.sort(
+      const sortedShows = showsData.sort(
         (a: any, b: any) =>
           new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
       );
