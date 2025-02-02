@@ -102,7 +102,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
     return (
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center flex-col md:flex-row">
-          <h1 className="text-3xl font-bold mb-6">My Books</h1>
+          <h1 className="text-3xl font-bold mb-6">book feed</h1>
 
           <div className="flex justify-center gap-2 items-center mb-3">
             <Button
