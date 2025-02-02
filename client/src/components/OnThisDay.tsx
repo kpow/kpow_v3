@@ -1,9 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "./ui/card";
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import { useState } from "react";
 import { ShowDetailsModal } from "./show-details-modal";
 import { ShowAttendance } from "@/lib/phish-api";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue, 
+} from "./ui/select";
 
 async function getShowsOnDate(month: number, day: number) {
   const response = await fetch(`/api/shows/on-date?month=${month}&day=${day}`);
@@ -15,16 +22,39 @@ async function getShowsOnDate(month: number, day: number) {
   return data;
 }
 
+const months = [
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
 export function OnThisDayShows() {
   const [selectedShow, setSelectedShow] = useState<ShowAttendance | null>(null);
-  const yesterday = subDays(new Date(), 1); // Get yesterday's date
-  const month = yesterday.getMonth() + 1; // getMonth() returns 0-11
-  const day = yesterday.getDate();
+  const today = new Date();
+  const [month, setMonth] = useState(today.getMonth() + 1);
+  const [day, setDay] = useState(today.getDate());
 
   const { data: shows, isLoading, error } = useQuery({
     queryKey: ["shows-on-date", month, day],
     queryFn: () => getShowsOnDate(month, day),
   });
+
+  // Get maximum days for the selected month
+  const getDaysInMonth = (month: number) => {
+    return new Date(2025, month, 0).getDate();
+  };
+
+  const daysInMonth = getDaysInMonth(month);
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   if (error) {
     console.error('Error loading shows:', error);
@@ -59,7 +89,41 @@ export function OnThisDayShows() {
   return (
     <Card>
       <CardContent className="pt-6">
-        <h2 className="text-lg font-slackey mb-4">on this day (Feb {day})</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-slackey">on this day</h2>
+          <div className="flex gap-2">
+            <Select
+              value={month.toString()}
+              onValueChange={(value) => setMonth(parseInt(value))}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((month) => (
+                  <SelectItem key={month.value} value={month.value}>
+                    {month.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={day.toString()}
+              onValueChange={(value) => setDay(parseInt(value))}
+            >
+              <SelectTrigger className="w-[80px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {days.map((d) => (
+                  <SelectItem key={d} value={d.toString()}>
+                    {d}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="space-y-3">
           {shows && shows.length > 0 ? (
             shows.map((show: ShowAttendance) => (
