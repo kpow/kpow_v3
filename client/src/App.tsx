@@ -10,6 +10,7 @@ import Books from "@/pages/Books";
 import StarredArticles from "@/pages/StarredArticles";
 import PMonk from "@/pages/PMonk";
 import Videos from "@/pages/Videos";
+import Battle from "@/pages/Battle";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
         <Route path="/videos/page/:page" component={Videos} />
         <Route path="/videos" component={Videos} />
         <Route path="/pmonk" component={PMonk} />
+        <Route path="/battle" component={Battle} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
