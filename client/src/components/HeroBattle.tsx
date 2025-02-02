@@ -140,7 +140,7 @@ export function HeroBattle() {
                 Random Battle
               </Button>
 
-              {hero1 && hero2 && !winner && !isBattling && (
+              {hero1 && hero2 && !winner && (
                 <Button onClick={handleBattle}>Fight!</Button>
               )}
               {winner && <Button onClick={handleReset}>Reset</Button>}
@@ -210,24 +210,28 @@ export function HeroBattle() {
                       onChange={(e) => setBet(Number(e.target.value))}
                       className="w-24"
                     />
-                    <div>Stash: {stash}</div>
+                    <div className="font-bold text-1xl">Stash: {stash}</div>
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          <div className="gap-4 mb-8">
+          <div className="gap-4 mb-8 pl-4">
             <AnimatePresence mode="wait">
               {!isBattling && !winner && hero1 && hero2 && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl"
+                  transition={{ duration: 0.4 }}
+                  className="flex items-center justify-center p-2 h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl m-2 text-center min-w-[300px]"
                 >
-                  {hero1.name} vs. {hero2.name}
+                  {hero1.name}
+                  <br />
+                  vs.
+                  <br />
+                  {hero2.name}
                 </motion.div>
               )}
               {isBattling && battleStep >= 0 && (
@@ -236,8 +240,8 @@ export function HeroBattle() {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl"
+                  transition={{ duration: 0.6 }}
+                  className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl min-w-[300px]"
                 >
                   {BATTLE_STEPS[battleStep]}
                 </motion.div>
@@ -246,7 +250,7 @@ export function HeroBattle() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center justify-center w-full h-32 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl p-4 text-center"
+                  className="flex items-center justify-center w-full h-32 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl p-4 text-center min-w-[300px]"
                 >
                   {winner.name} Wins!
                 </motion.div>
