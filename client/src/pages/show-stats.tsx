@@ -10,6 +10,7 @@ import { ShowCard, ShowCardSkeleton } from "@/components/show-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { OnThisDayShows } from "@/components/OnThisDay";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -106,6 +107,7 @@ export default function ShowStats() {
 
         {/* Stats Cards - Right Column */}
         <div className="space-y-4">
+          <OnThisDayShows />
           <Card>
             <CardContent className="pt-6">
               <h2 className="text-lg font-slackey mb-2">total shows</h2>

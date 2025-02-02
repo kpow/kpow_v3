@@ -180,7 +180,7 @@ export function registerPhishRoutes(router: Router) {
     }
   });
 
-  router.get("/api/setlist/occurrences/:songName", async (req, res) => {
+    router.get("/api/setlist/occurrences/:songName", async (req, res) => {
     try {
       const { songName } = req.params;
       const shows = await fetchPhishData("/attendance/username/koolyp");
@@ -206,6 +206,49 @@ export function registerPhishRoutes(router: Router) {
       res.json(songOccurrences);
     } catch (error) {
       console.error("Error fetching song setlist:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
+  router.get("/api/shows/on-date", async (req, res) => {
+    try {
+      const month = parseInt(req.query.month as string);
+      const day = parseInt(req.query.day as string);
+
+      if (isNaN(month) || isNaN(day)) {
+        return res.status(400).json({ message: "Invalid month or day parameters" });
+      }
+
+      const shows = await fetchPhishData("/attendance/username/koolyp");
+
+      // Filter shows for the given month and day
+      const showsOnDate = shows.filter((show: any) => {
+        const showDate = new Date(show.showdate);
+        return (
+          showDate.getMonth() + 1 === month && showDate.getDate() === day
+        );
+      });
+
+      // Sort shows by year, most recent first
+      const sortedShows = showsOnDate.sort(
+        (a: any, b: any) =>
+          new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
+      );
+
+      // Format shows
+      const formattedShows = sortedShows.map((show: any) => ({
+        showid: show.showid,
+        showdate: show.showdate,
+        venue: show.venue,
+        city: show.city,
+        state: show.state,
+        country: show.country,
+        notes: show.notes,
+      }));
+
+      res.json(formattedShows);
+    } catch (error) {
+      console.error("Error fetching shows by date:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
