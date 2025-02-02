@@ -1,0 +1,68 @@
+import { z } from "zod";
+
+export interface Hero {
+  id: number;
+  name: string;
+  powerstats: {
+    intelligence: number;
+    strength: number;
+    speed: number;
+    durability: number;
+    power: number;
+    combat: number;
+  };
+  images: {
+    lg: string;
+  };
+  biography: {
+    fullName: string;
+    alignment: string;
+  };
+}
+
+// Calculate total power level with randomization
+export function calculatePowerLevel(hero: Hero): number {
+  const stats = hero.powerstats;
+  const baseScore = (
+    stats.intelligence * 0.2 +
+    stats.strength * 0.2 +
+    stats.speed * 0.15 +
+    stats.durability * 0.15 +
+    stats.power * 0.15 +
+    stats.combat * 0.15
+  );
+  
+  // Add randomization factor (-10% to +10%)
+  const randomFactor = 0.9 + Math.random() * 0.2;
+  return baseScore * randomFactor;
+}
+
+// Determine battle winner
+export function determineBattleWinner(hero1: Hero, hero2: Hero): Hero {
+  const hero1Power = calculatePowerLevel(hero1);
+  const hero2Power = calculatePowerLevel(hero2);
+  
+  return hero1Power >= hero2Power ? hero1 : hero2;
+}
+
+// Random hero selection
+export function getRandomHero(heroes: Hero[]): Hero {
+  const randomIndex = Math.floor(Math.random() * heroes.length);
+  return heroes[randomIndex];
+}
+
+// Betting validation schema
+export const betSchema = z.object({
+  amount: z.number().min(1).max(100),
+  selectedHero: z.number(), // Hero ID
+});
+
+export type Bet = z.infer<typeof betSchema>;
+
+// Process bet result
+export function processBet(bet: Bet, winner: Hero, stash: number): number {
+  if (winner.id === bet.selectedHero) {
+    return stash + bet.amount;
+  }
+  return stash - bet.amount;
+}
