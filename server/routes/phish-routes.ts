@@ -4,6 +4,37 @@ import path from "path";
 import fs from "fs";
 
 export function registerPhishRoutes(router: Router) {
+  router.post("/api/admin/generate-shows-json", async (_req, res) => {
+    try {
+      console.log("Fetching all Phish shows...");
+      const showsData = await fetchPhishData("/shows/artist/phish?order_by=showdate");
+      console.log(`Received shows data. Length: ${Array.isArray(showsData) ? showsData.length : 'Not an array'}`);
+
+      const assetsDir = path.join(process.cwd(), 'attached_assets');
+      if (!fs.existsSync(assetsDir)) {
+        fs.mkdirSync(assetsDir, { recursive: true });
+      }
+      const showsFilePath = path.join(assetsDir, 'all-phish-shows.json');
+      fs.writeFileSync(showsFilePath, JSON.stringify(showsData, null, 2));
+      res.json({ 
+        message: "Shows data has been saved to JSON file", 
+        count: Array.isArray(showsData) ? showsData.length : 0,
+        path: showsFilePath 
+      });
+    } catch (error) {
+      console.error("Error generating shows JSON:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", {
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
   router.get("/api/shows", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
@@ -221,11 +252,9 @@ export function registerPhishRoutes(router: Router) {
         return res.status(400).json({ message: "Invalid month or day parameters" });
       }
 
-      // Read from local JSON file
-      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'all-phish-shows.json');
-      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8'));
+      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'allshows.json');
+      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
 
-      // Filter shows for the given month and day
       const showsOnDate = showsData.filter((show: any) => {
         const showDate = new Date(show.showdate);
         return (
@@ -234,13 +263,11 @@ export function registerPhishRoutes(router: Router) {
         );
       });
 
-      // Sort shows by year, most recent first
       const sortedShows = showsOnDate.sort(
         (a: any, b: any) =>
           new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
       );
 
-      // Format shows
       const formattedShows = sortedShows.map((show: any) => ({
         showid: show.showid,
         showdate: show.showdate,
@@ -248,27 +275,12 @@ export function registerPhishRoutes(router: Router) {
         city: show.city,
         state: show.state,
         country: show.country,
-        notes: show.notes,
+        notes: show.setlist_notes,
       }));
 
       res.json(formattedShows);
     } catch (error) {
       console.error("Error fetching shows by date:", error);
-      res.status(500).json({ message: (error as Error).message });
-    }
-  });
-
-  // New route to generate the JSON file
-  router.post("/api/admin/generate-shows-json", async (_req, res) => {
-    try {
-      const showsData = await fetchPhishData("/shows/artist/phish?order_by=showdate");
-
-      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'all-phish-shows.json');
-      fs.writeFileSync(showsFilePath, JSON.stringify(showsData, null, 2));
-
-      res.json({ message: "Shows data has been saved to JSON file", count: showsData.length });
-    } catch (error) {
-      console.error("Error generating shows JSON:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
