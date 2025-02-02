@@ -226,26 +226,26 @@ export function HeroBattle() {
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="p-2">
-                      <div className="space-y-1">
-                        <div className="flex justify-between">
-                          <span>Full Name</span>
-                          <span>{hero.biography.fullName || 'Unknown'}</span>
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Full Name</div>
+                          <div>{hero.biography.fullName || 'Unknown'}</div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Alignment</span>
-                          <span className="capitalize">{hero.biography.alignment}</span>
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Alignment</div>
+                          <div className="capitalize">{hero.biography.alignment}</div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Place of Birth</span>
-                          <span>{hero.biography.placeOfBirth || 'Unknown'}</span>
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Place of Birth</div>
+                          <div>{hero.biography.placeOfBirth || 'Unknown'}</div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>First Appearance</span>
-                          <span>{hero.biography.firstAppearance || 'Unknown'}</span>
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">First Appearance</div>
+                          <div>{hero.biography.firstAppearance || 'Unknown'}</div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Publisher</span>
-                          <span>{hero.biography.publisher || 'Unknown'}</span>
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Publisher</div>
+                          <div>{hero.biography.publisher || 'Unknown'}</div>
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -257,18 +257,18 @@ export function HeroBattle() {
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="p-2">
-                      <div className="space-y-1">
-                        <div className="flex justify-between">
-                          <span>Race</span>
-                          <span>{hero.appearance.race || 'Unknown'}</span>
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Race</div>
+                          <div>{hero.appearance.race || 'Unknown'}</div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Height</span>
-                          <span>{hero.appearance.height[1] || 'Unknown'}</span>
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Height</div>
+                          <div>{hero.appearance.height[1] || 'Unknown'}</div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Weight</span>
-                          <span>{hero.appearance.weight[1] || 'Unknown'}</span>
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Weight</div>
+                          <div>{hero.appearance.weight[1] || 'Unknown'}</div>
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -280,14 +280,14 @@ export function HeroBattle() {
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="p-2">
-                      <div className="space-y-1">
-                        <div className="flex justify-between">
-                          <span>Occupation</span>
-                          <span className="text-right">{hero.work.occupation || 'Unknown'}</span>
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Occupation</div>
+                          <div>{hero.work.occupation || 'Unknown'}</div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Base</span>
-                          <span className="text-right">{hero.work.base || 'Unknown'}</span>
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Base</div>
+                          <div>{hero.work.base || 'Unknown'}</div>
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -299,10 +299,10 @@ export function HeroBattle() {
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="p-2">
-                      <div className="space-y-1">
-                        <div className="flex justify-between">
-                          <span>Group Affiliation</span>
-                          <span className="text-right">{hero.connections.groupAffiliation || 'Unknown'}</span>
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <div className="font-medium text-sm text-gray-600">Group Affiliation</div>
+                          <div>{hero.connections.groupAffiliation || 'Unknown'}</div>
                         </div>
                       </div>
                     </CollapsibleContent>
