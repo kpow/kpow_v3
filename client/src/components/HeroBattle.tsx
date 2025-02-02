@@ -20,6 +20,7 @@ import { ChevronDown } from "lucide-react";
 import {
   determineBattleWinner,
   getRandomHero,
+  getHeroPowers,
   type Hero,
   type Bet,
 } from "@/lib/battle-service";
@@ -38,8 +39,6 @@ export function HeroBattle() {
   });
   const [bet, setBet] = useState<number>(0);
   const [selectedHero, setSelectedHero] = useState<number | null>(null);
-  const [searchTerm1, setSearchTerm1] = useState("");
-  const [searchTerm2, setSearchTerm2] = useState("");
 
   useEffect(() => {
     handleRandom();
@@ -68,11 +67,29 @@ export function HeroBattle() {
     while (randomHero2.id === randomHero1.id) {
       randomHero2 = getRandomHero(heroes);
     }
+
+    // Add powers to heroes
+    randomHero1.powers = getHeroPowers(randomHero1.name);
+    randomHero2.powers = getHeroPowers(randomHero2.name);
+
     setHero1(randomHero1);
     setHero2(randomHero2);
     setWinner(null);
     setSelectedHero(null);
     setBet(0);
+  };
+
+  const handleHeroSelect = (value: string, heroNumber: number) => {
+    const hero = heroes.find((h) => h.id.toString() === value);
+    if (hero) {
+      // Add powers to hero
+      hero.powers = getHeroPowers(hero.name);
+      if (heroNumber === 1) {
+        setHero1(hero);
+      } else {
+        setHero2(hero);
+      }
+    }
   };
 
   const handleReset = () => {
@@ -81,14 +98,12 @@ export function HeroBattle() {
     setWinner(null);
     setSelectedHero(null);
     setBet(0);
-    setSearchTerm1("");
-    setSearchTerm2("");
     // Generate new random heroes after reset
     handleRandom();
   };
 
   return (
-    <div className="container mx-auto max-w-[800px] p-4">
+    <div className="container mx-auto p-4">
       {winner && (
         <>
           <div className="flex justify-center text-xl font-bold mb-3">
@@ -130,12 +145,7 @@ export function HeroBattle() {
       {mode === "manual" && (
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
-            <Select
-              onValueChange={(value) => {
-                const hero = heroes.find((h) => h.id.toString() === value);
-                if (hero) setHero1(hero);
-              }}
-            >
+            <Select onValueChange={(value) => handleHeroSelect(value, 1)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select hero 1" />
               </SelectTrigger>
@@ -149,12 +159,7 @@ export function HeroBattle() {
             </Select>
           </div>
           <div>
-            <Select
-              onValueChange={(value) => {
-                const hero = heroes.find((h) => h.id.toString() === value);
-                if (hero) setHero2(hero);
-              }}
-            >
+            <Select onValueChange={(value) => handleHeroSelect(value, 2)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select hero 2" />
               </SelectTrigger>
@@ -172,7 +177,6 @@ export function HeroBattle() {
 
       {mode === "random" && (
         <div className="flex justify-center gap-4 mb-6">
-          {/* <Button onClick={handleRandom}>Generate Random Heroes</Button> */}
           {hero1 && hero2 && (
             <div className="flex items-center gap-4">
               <RadioGroup
@@ -243,6 +247,28 @@ export function HeroBattle() {
                         </CollapsibleContent>
                       </Collapsible>
 
+                      <Collapsible>
+                        <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
+                          <span className="font-semibold">Powers</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="p-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            {hero.powers && hero.powers.length > 0 ? (
+                              hero.powers.map((power) => (
+                                <div
+                                  key={power}
+                                  className="bg-gray-50 p-2 rounded text-sm"
+                                >
+                                  {power}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-gray-500">No powers listed</div>
+                            )}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                       <Collapsible>
                         <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
                           <span className="font-bold">Biography</span>
