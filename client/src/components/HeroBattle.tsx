@@ -4,6 +4,13 @@ import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { 
   determineBattleWinner, 
   getRandomHero, 
@@ -11,7 +18,6 @@ import {
   type Bet 
 } from "@/lib/battle-service";
 import heroes from "../../../attached_assets/superheros-prod.js";
-import { motion, AnimatePresence } from "framer-motion";
 
 export function HeroBattle() {
   const [mode, setMode] = useState<"manual" | "random">("manual");
@@ -23,7 +29,6 @@ export function HeroBattle() {
   const [selectedHero, setSelectedHero] = useState<number | null>(null);
   const [searchTerm1, setSearchTerm1] = useState("");
   const [searchTerm2, setSearchTerm2] = useState("");
-  const [isBattling, setIsBattling] = useState(false);
 
   const filteredHeroes1 = heroes.filter(h => 
     h.name.toLowerCase().includes(searchTerm1.toLowerCase())
@@ -33,17 +38,10 @@ export function HeroBattle() {
     h.name.toLowerCase().includes(searchTerm2.toLowerCase())
   );
 
-  const handleBattle = async () => {
+  const handleBattle = () => {
     if (!hero1 || !hero2) return;
-
-    setIsBattling(true);
-
-    // Simulate battle animation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
     const battleWinner = determineBattleWinner(hero1, hero2);
     setWinner(battleWinner);
-    setIsBattling(false);
 
     if (mode === "random" && selectedHero) {
       const newStash = selectedHero === battleWinner.id 
@@ -100,42 +98,50 @@ export function HeroBattle() {
       {mode === "manual" && (
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
-            <Input
-              placeholder="Search hero 1..."
-              value={searchTerm1}
-              onChange={(e) => setSearchTerm1(e.target.value)}
-              className="mb-2"
-            />
-            <div className="max-h-40 overflow-y-auto border rounded p-2">
-              {filteredHeroes1.map(h => (
-                <div
-                  key={h.id}
-                  className="cursor-pointer p-1 hover:bg-gray-100"
-                  onClick={() => setHero1(h)}
-                >
-                  {h.name}
-                </div>
-              ))}
-            </div>
+            <Select onValueChange={(value) => {
+              const hero = heroes.find(h => h.id.toString() === value);
+              if (hero) setHero1(hero);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select hero 1" />
+              </SelectTrigger>
+              <SelectContent>
+                <Input
+                  placeholder="Search heroes..."
+                  value={searchTerm1}
+                  onChange={(e) => setSearchTerm1(e.target.value)}
+                  className="mb-2"
+                />
+                {filteredHeroes1.map(hero => (
+                  <SelectItem key={hero.id} value={hero.id.toString()}>
+                    {hero.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
-            <Input
-              placeholder="Search hero 2..."
-              value={searchTerm2}
-              onChange={(e) => setSearchTerm2(e.target.value)}
-              className="mb-2"
-            />
-            <div className="max-h-40 overflow-y-auto border rounded p-2">
-              {filteredHeroes2.map(h => (
-                <div
-                  key={h.id}
-                  className="cursor-pointer p-1 hover:bg-gray-100"
-                  onClick={() => setHero2(h)}
-                >
-                  {h.name}
-                </div>
-              ))}
-            </div>
+            <Select onValueChange={(value) => {
+              const hero = heroes.find(h => h.id.toString() === value);
+              if (hero) setHero2(hero);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select hero 2" />
+              </SelectTrigger>
+              <SelectContent>
+                <Input
+                  placeholder="Search heroes..."
+                  value={searchTerm2}
+                  onChange={(e) => setSearchTerm2(e.target.value)}
+                  className="mb-2"
+                />
+                {filteredHeroes2.map(hero => (
+                  <SelectItem key={hero.id} value={hero.id.toString()}>
+                    {hero.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}
@@ -171,55 +177,65 @@ export function HeroBattle() {
         </div>
       )}
 
-      {/* Battle Animation */}
-      {isBattling && (
-        <motion.div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div 
-            className="text-6xl font-bold text-white"
-            animate={{ 
-              scale: [1, 1.5, 1],
-              rotate: [0, 360, 0]
-            }}
-            transition={{ duration: 2 }}
-          >
-            BATTLE!
-          </motion.div>
-        </motion.div>
-      )}
-
       {/* Hero Display */}
       {(hero1 || hero2) && (
         <div className="grid grid-cols-2 gap-4">
           {[hero1, hero2].map((hero, index) => hero && (
             <div key={index} className="relative">
               <Card className="p-4">
-                <img 
-                  src={hero.images.lg} 
-                  alt={hero.name} 
-                  className="w-full h-64 object-cover"
-                />
+                <div className="relative">
+                  <img 
+                    src={hero.images.lg} 
+                    alt={hero.name} 
+                    className="w-full h-64 object-cover"
+                  />
+                  {winner && winner.id !== hero.id && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                      <div className="text-red-600 text-[200px] font-bold transform rotate-45">
+                        ×
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <h3 className="text-xl font-bold mt-2">{hero.name}</h3>
                 <div className="mt-2 space-y-1">
+                  <h4 className="font-semibold">Power Stats</h4>
                   {Object.entries(hero.powerstats).map(([stat, value]) => (
                     <div key={stat} className="flex justify-between">
                       <span className="capitalize">{stat}</span>
                       <span>{value}</span>
                     </div>
                   ))}
-                </div>
-              </Card>
-              {winner && winner.id !== hero.id && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-red-600 text-[200px] font-bold transform rotate-45">
-                    ×
+
+                  <h4 className="font-semibold mt-4">Biography</h4>
+                  <div>
+                    <div className="flex justify-between">
+                      <span>Full Name</span>
+                      <span>{hero.biography.fullName || 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Alignment</span>
+                      <span className="capitalize">{hero.biography.alignment}</span>
+                    </div>
+                  </div>
+
+                  <h4 className="font-semibold mt-4">Appearance</h4>
+                  <div>
+                    <div className="flex justify-between">
+                      <span>Race</span>
+                      <span>{hero.appearance.race || 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Height</span>
+                      <span>{hero.appearance.height[1] || 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Weight</span>
+                      <span>{hero.appearance.weight[1] || 'Unknown'}</span>
+                    </div>
                   </div>
                 </div>
-              )}
+              </Card>
             </div>
           ))}
         </div>
@@ -227,7 +243,7 @@ export function HeroBattle() {
 
       {/* Battle Controls */}
       <div className="flex justify-center gap-4 mt-6">
-        {hero1 && hero2 && !winner && !isBattling && (
+        {hero1 && hero2 && !winner && (
           <Button onClick={handleBattle}>Fight!</Button>
         )}
         {winner && (
