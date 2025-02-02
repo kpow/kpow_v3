@@ -217,8 +217,19 @@ export function HeroBattle() {
             )}
           </div>
 
-          <div className="gap-4" >
+          <div className="gap-4 mb-8">
             <AnimatePresence mode="wait">
+              {!isBattling && !winner && hero1 && hero2 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl"
+                >
+                  {hero1.name} vs. {hero2.name}
+                </motion.div>
+              )}
               {isBattling && battleStep >= 0 && (
                 <motion.div
                   key={battleStep}
