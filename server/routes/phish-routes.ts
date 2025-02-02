@@ -126,7 +126,7 @@ export function registerPhishRoutes(router: Router) {
           venue: firstSong.venue,
           location: `${firstSong.city}, ${firstSong.state}`,
           setlistdata: setlistText,
-          setlistnotes: firstSong.setlistnotes || "",
+          setlistnotes: firstSong.setlistnotes?.replace(/<\/?[^>]+(>|$)/g, "") || "",
         });
       } else {
         res.status(404).json({ message: "Setlist not found" });
