@@ -29,7 +29,7 @@ import heroes from "../../../attached_assets/superheros-prod.js";
 
 const STORAGE_KEY = "hero-battle-stash";
 const BATTLE_STEPS = ["Data", "AI", "FIGHT!"];
-const STEP_DURATION = 500;
+const STEP_DURATION = 800;
 
 export function HeroBattle() {
   const [mode, setMode] = useState<"manual" | "random">("random");
@@ -115,37 +115,36 @@ export function HeroBattle() {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="container mx-auto space-y-6">
+      <div className="flex justify-left items-center">
+        <h1 className="text-4xl font-bold font-slackey mb-8 mr-8 text-left">
+          battle
+        </h1>
+        <div className="mb-8">
+          <Button
+            variant={mode === "manual" ? "default" : "outline"}
+            onClick={() => {
+              setMode("manual");
+              handleReset();
+            }}
+          >
+            Manual Selection
+          </Button>
+          <Button
+            variant={mode === "random" ? "default" : "outline"}
+            onClick={() => {
+              setMode("random");
+              handleReset();
+              handleRandom();
+            }}
+          >
+            Random Battle
+          </Button>
+        </div>
+      </div>
       <div className="grid grid-cols-4 gap-4">
         <div className="col-span-4 flex justify-center">
-          <div>
-            <div className="flex justify-center gap-4 mb-6">
-              <Button
-                variant={mode === "manual" ? "default" : "outline"}
-                onClick={() => {
-                  setMode("manual");
-                  handleReset();
-                }}
-              >
-                Manual Selection
-              </Button>
-              <Button
-                variant={mode === "random" ? "default" : "outline"}
-                onClick={() => {
-                  setMode("random");
-                  handleReset();
-                  handleRandom();
-                }}
-              >
-                Random Battle
-              </Button>
-
-              {hero1 && hero2 && !winner && (
-                <Button onClick={handleBattle}>Fight!</Button>
-              )}
-              {winner && <Button onClick={handleReset}>Reset</Button>}
-            </div>
-
+          <div className="mt-4">
             {mode === "manual" && (
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
@@ -215,6 +214,18 @@ export function HeroBattle() {
                 )}
               </div>
             )}
+            <div className="flex justify-center gap-4 mb-6">
+              {hero1 && hero2 && !winner && (
+                <Button className="w-full" onClick={handleBattle}>
+                  Fight!
+                </Button>
+              )}
+              {winner && (
+                <Button className="w-full" onClick={handleReset}>
+                  Reset
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="gap-4 mb-8 pl-4">
@@ -224,7 +235,7 @@ export function HeroBattle() {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.3 }}
                   className="flex items-center justify-center p-2 h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl m-2 text-center min-w-[300px]"
                 >
                   {hero1.name}
@@ -240,7 +251,7 @@ export function HeroBattle() {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: .3 }}
                   className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl min-w-[300px]"
                 >
                   {BATTLE_STEPS[battleStep]}
