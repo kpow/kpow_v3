@@ -56,6 +56,8 @@ export function HeroBattle() {
     setHero1(randomHero1);
     setHero2(randomHero2);
     setWinner(null);
+    setSelectedHero(null);
+    setBet(0);
   };
 
   const handleReset = () => {
@@ -134,10 +136,11 @@ export function HeroBattle() {
       {mode === "random" && (
         <div className="flex justify-center gap-4 mb-6">
           <Button onClick={handleRandom}>Generate Random Heroes</Button>
-          {hero1 && hero2 && !winner && (
+          {hero1 && hero2 && (
             <div className="flex items-center gap-4">
               <RadioGroup 
                 onValueChange={(value) => setSelectedHero(Number(value))}
+                value={selectedHero?.toString()}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value={hero1.id.toString()} id="hero1" />
@@ -201,6 +204,18 @@ export function HeroBattle() {
                       <span>Alignment</span>
                       <span className="capitalize">{hero.biography.alignment}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span>Place of Birth</span>
+                      <span>{hero.biography.placeOfBirth || 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>First Appearance</span>
+                      <span>{hero.biography.firstAppearance || 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Publisher</span>
+                      <span>{hero.biography.publisher || 'Unknown'}</span>
+                    </div>
                   </div>
 
                   <h4 className="font-semibold mt-4">Appearance</h4>
@@ -216,6 +231,26 @@ export function HeroBattle() {
                     <div className="flex justify-between">
                       <span>Weight</span>
                       <span>{hero.appearance.weight[1] || 'Unknown'}</span>
+                    </div>
+                  </div>
+
+                  <h4 className="font-semibold mt-4">Work</h4>
+                  <div>
+                    <div className="flex justify-between">
+                      <span>Occupation</span>
+                      <span className="text-right">{hero.work.occupation || 'Unknown'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Base</span>
+                      <span className="text-right">{hero.work.base || 'Unknown'}</span>
+                    </div>
+                  </div>
+
+                  <h4 className="font-semibold mt-4">Connections</h4>
+                  <div>
+                    <div className="flex justify-between">
+                      <span>Group Affiliation</span>
+                      <span className="text-right">{hero.connections.groupAffiliation || 'Unknown'}</span>
                     </div>
                   </div>
                 </div>
