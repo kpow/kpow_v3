@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Logo } from "./Logo";
 import { SlideMenu } from "./SlideMenu";
 import { Link } from "wouter";
+import { ContactDialog } from "./ContactDialog";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,9 +18,7 @@ export function Header() {
             </div>
           </Link>
           <nav className="flex items-center gap-4">
-            <button className="font-slackey px-4 py-1 rounded bg-blue-600 hover:bg-blue-700 transition-colors">
-              contact
-            </button>
+            <ContactDialog />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
