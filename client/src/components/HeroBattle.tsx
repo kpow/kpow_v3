@@ -245,6 +245,27 @@ export function HeroBattle() {
 
                       <Collapsible>
                         <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
+                          <span className="font-semibold">Powers</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="p-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            {hero.powers?.map((power) => (
+                              <div
+                                key={power}
+                                className="bg-gray-50 p-2 rounded text-sm"
+                              >
+                                {power}
+                              </div>
+                            )) || (
+                              <div className="text-gray-500">No powers listed</div>
+                            )}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+
+                      <Collapsible>
+                        <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
                           <span className="font-bold">Biography</span>
                           <ChevronDown className="h-4 w-4" />
                         </CollapsibleTrigger>
