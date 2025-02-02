@@ -6,8 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Roboto', 'sans-serif'],
-        slackey: ['Slackey', 'cursive'],
+        sans: ["Roboto", "sans-serif"],
+        slackey: ["Slackey", "cursive"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -75,10 +75,24 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        shake: {
+          '0%': { transform: 'translateX(0) rotate(0deg)' },
+          '10%': { transform: 'translateX(-6px) rotate(-3deg)' },
+          '20%': { transform: 'translateX(6px) rotate(3deg)' },
+          '30%': { transform: 'translateX(-6px) rotate(-3deg)' },
+          '40%': { transform: 'translateX(6px) rotate(3deg)' },
+          '50%': { transform: 'translateX(-4px) rotate(-2deg)' },
+          '60%': { transform: 'translateX(4px) rotate(2deg)' },
+          '70%': { transform: 'translateX(-2px) rotate(-1deg)' },
+          '80%': { transform: 'translateX(2px) rotate(1deg)' },
+          '90%': { transform: 'translateX(-1px) rotate(0deg)' },
+          '100%': { transform: 'translateX(0) rotate(0deg)' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        shake: "shake 0.6s ease-in-out",
       },
     },
   },

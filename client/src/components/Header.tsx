@@ -12,9 +12,12 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link key="Home" href="/">
-            <div className="flex items-center gap-2">
-              <Logo />
-              <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
+             <div className="hover:animate-shake">
+              <div className="flex items-center gap-2 group">
+             
+                <Logo />
+                <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
+              </div>
             </div>
           </Link>
           <nav className="flex items-center gap-4">
@@ -24,7 +27,6 @@ export function Header() {
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
               aria-label="Toggle menu"
             >
-              
               <svg
                 viewBox="0 0 24 24"
                 width="24"
