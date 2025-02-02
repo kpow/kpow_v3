@@ -120,17 +120,26 @@ export function HeroBattle() {
         <h1 className="text-4xl font-bold font-slackey mb-8 mr-8 text-left">
           battle
         </h1>
-        <div className="mb-8 flex items-center gap-2">
-          <span className={`text-sm ${mode === 'manual' ? 'font-bold' : ''}`}>Manual</span>
-          <Switch
-            checked={mode === "random"}
-            onCheckedChange={(checked) => {
-              setMode(checked ? "random" : "manual");
+        <div className="mb-8">
+          <Button
+            variant={mode === "manual" ? "default" : "outline"}
+            onClick={() => {
+              setMode("manual");
               handleReset();
-              if (checked) handleRandom();
             }}
-          />
-          <span className={`text-sm ${mode === 'random' ? 'font-bold' : ''}`}>Random</span>
+          >
+            Manual Selection
+          </Button>
+          <Button
+            variant={mode === "random" ? "default" : "outline"}
+            onClick={() => {
+              setMode("random");
+              handleReset();
+              handleRandom();
+            }}
+          >
+            Random Battle
+          </Button>
         </div>
       </div>
       <div className="grid grid-cols-4 gap-4">
