@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "./ui/card";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import { useState } from "react";
 import { ShowDetailsModal } from "./show-details-modal";
 import { ShowAttendance } from "@/lib/phish-api";
@@ -11,15 +11,15 @@ async function getShowsOnDate(month: number, day: number) {
     throw new Error('Failed to fetch shows');
   }
   const data = await response.json();
-  console.log('Shows on this day:', data); // Debug log
+  console.log('Shows on this day:', data);
   return data;
 }
 
 export function OnThisDayShows() {
   const [selectedShow, setSelectedShow] = useState<ShowAttendance | null>(null);
-  const today = new Date();
-  const month = today.getMonth() + 1; // getMonth() returns 0-11
-  const day = today.getDate();
+  const yesterday = subDays(new Date(), 1); // Get yesterday's date
+  const month = yesterday.getMonth() + 1; // getMonth() returns 0-11
+  const day = yesterday.getDate();
 
   const { data: shows, isLoading, error } = useQuery({
     queryKey: ["shows-on-date", month, day],
@@ -59,7 +59,7 @@ export function OnThisDayShows() {
   return (
     <Card>
       <CardContent className="pt-6">
-        <h2 className="text-lg font-slackey mb-4">on this day</h2>
+        <h2 className="text-lg font-slackey mb-4">on this day (Feb {day})</h2>
         <div className="space-y-3">
           {shows && shows.length > 0 ? (
             shows.map((show: ShowAttendance) => (
