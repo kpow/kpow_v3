@@ -98,18 +98,35 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       >
         <nav className="pt-20 px-4 space-y-1">
           {menuItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={onClose}
-              className={cn(
-                "flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors",
-                item.className,
-              )}
-            >
-              {item.icon}
-              <span className="text-[13px]">{item.label}</span>
-            </Link>
+            item.href.startsWith('http') ? (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={onClose}
+                className={cn(
+                  "flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors",
+                  item.className,
+                )}
+              >
+                {item.icon}
+                <span className="text-[13px]">{item.label}</span>
+              </a>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={onClose}
+                className={cn(
+                  "flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors",
+                  item.className,
+                )}
+              >
+                {item.icon}
+                <span className="text-[13px]">{item.label}</span>
+              </Link>
+            )
           ))}
         </nav>
       </div>
