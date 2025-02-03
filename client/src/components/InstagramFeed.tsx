@@ -211,7 +211,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className={`absolute left-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-primary-foreground -left-5 ${
+          className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-blue-600 hover:bg-blue-700 text-primary-foreground -left-5 ${
             !canScrollPrev ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           onClick={scrollPrev}
@@ -223,7 +223,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className={`absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-primary-foreground -right-5 ${
+          className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-blue-600 hover:bg-blue-700 text-primary-foreground -right-5 ${
             !canScrollNext ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           onClick={scrollNext}

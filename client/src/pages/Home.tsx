@@ -207,7 +207,9 @@ export default function Home() {
       <div className="h-px bg-gray-200 my-4" />
 
       <div>
-        <h2 className="text-2xl font-bold font-slackey mb-6">instagram</h2>
+        <h2 className="text-2xl font-bold font-slackey mb-6">
+          k-showz on insta
+        </h2>
         {isLoadingInstagram ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
