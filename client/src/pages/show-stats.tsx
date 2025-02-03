@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { OnThisDayShows } from "@/components/OnThisDay";
 import { VenueShowsModal } from "@/components/venue-shows-modal";
+import { SongStats } from "@/components/song-stats";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -167,7 +168,7 @@ export default function ShowStats() {
       </div>
 
       {/* Shows Grid */}
-      <Card>
+      <Card className="mb-8">
         <CardContent className="pt-6 p-4">
           <h2 className="text-2xl font-slackey mb-6">shows</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -199,6 +200,10 @@ export default function ShowStats() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Song Stats Section */}
+      <SongStats />
+
       <VenueShowsModal
         isOpen={isVenueModalOpen}
         onClose={() => {
