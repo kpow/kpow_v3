@@ -29,9 +29,9 @@ export default function About() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-16">
+    <div className="max-w-2xl mx-auto px-4 py-4">
       {/* Header section */}
-      <div className="bg-white rounded-xl p-8 mb-16 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+      <div className="bg-white rounded-xl p-8 mb-8 shadow-[0_0_15px_rgba(0,0,0,0.05)] text-center">
         <h1 className="text-[2.5rem] leading-tight font-slackey mb-4">
           Hi, I'm Kevin
         </h1>
@@ -48,7 +48,7 @@ export default function About() {
 
       {/* What's up section */}
       <div>
-        <h2 className="text-[2rem] leading-tight font-slackey mb-12">
+        <h2 className="text-[2rem] leading-tight font-slackey mb-6">
           What's up?
         </h2>
 
@@ -63,7 +63,7 @@ export default function About() {
           ))}
         </div>
 
-        <p className="text-gray-700 leading-relaxed mt-16 mb-16">
+        <p className="text-gray-700 leading-relaxed mt-8 mb-8">
           I am a technologist with a relentless passion for designing solutions
           that overcome technical obstacles. Pushing for innovation, I
           continually challenge myself and my teams to make technology work

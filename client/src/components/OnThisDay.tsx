@@ -126,7 +126,7 @@ export function OnThisDayShows() {
           <LoadingSkeleton />
         ) : (
           <>
-            <div className="flex flex-col items-center justify-between mb-4">
+            <div className="flex flex-col justify-between mb-4">
               <h2 className="text-lg font-slackey mb-4">on this day</h2>
               <div className="flex items-center gap-2">
                 <Button
