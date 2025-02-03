@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Modal from 'react-modal';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import useEmblaCarousel from 'embla-carousel-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Types for Instagram media
 interface InstagramMediaChild {
@@ -20,22 +21,56 @@ interface InstagramMedia {
   permalink: string;
   caption?: string;
   timestamp: string;
-  carousel_media?: InstagramMediaChild[];
+  children?: {
+    data: InstagramMediaChild[];
+  };
 }
 
+// Update the InstagramFeedProps interface
 interface InstagramFeedProps {
   posts: InstagramMedia[];
+  onLoadMore: () => void;
+  hasMore: boolean;
+  isLoadingMore: boolean;
 }
 
-export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
-  const [emblaRef] = useEmblaCarousel({
+export const InstagramFeed: React.FC<InstagramFeedProps> = ({
+  posts,
+  onLoadMore,
+  hasMore,
+  isLoadingMore
+}) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
-    slidesToScroll: 1
+    slidesToScroll: 4
   });
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+  }, [emblaApi, onSelect]);
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
   const handleOpenModal = (postIndex: number) => {
     setCurrentPostIndex(postIndex);
@@ -50,26 +85,26 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
 
   const getCurrentMedia = () => {
     const post = posts[currentPostIndex];
-    if (post.media_type === 'CAROUSEL_ALBUM' && post.carousel_media) {
-      return post.carousel_media[currentMediaIndex];
+    if (post.media_type === 'CAROUSEL_ALBUM' && post.children) {
+      return post.children.data[currentMediaIndex];
     }
     return post;
   };
 
   const handlePreviousMedia = () => {
     const post = posts[currentPostIndex];
-    if (post.media_type === 'CAROUSEL_ALBUM' && post.carousel_media) {
+    if (post.media_type === 'CAROUSEL_ALBUM' && post.children) {
       setCurrentMediaIndex(prev => 
-        prev > 0 ? prev - 1 : post.carousel_media!.length - 1
+        prev > 0 ? prev - 1 : post.children!.data.length - 1
       );
     }
   };
 
   const handleNextMedia = () => {
     const post = posts[currentPostIndex];
-    if (post.media_type === 'CAROUSEL_ALBUM' && post.carousel_media) {
+    if (post.media_type === 'CAROUSEL_ALBUM' && post.children) {
       setCurrentMediaIndex(prev => 
-        prev < post.carousel_media!.length - 1 ? prev + 1 : 0
+        prev < post.children!.data.length - 1 ? prev + 1 : 0
       );
     }
   };
@@ -104,26 +139,67 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
     );
   };
 
+  // Add scroll monitoring for infinite load
+  useEffect(() => {
+    if (!emblaApi || !hasMore || isLoadingMore) return;
+
+    const onScroll = () => {
+      if (emblaApi.canScrollNext()) return;
+      onLoadMore();
+    };
+
+    emblaApi.on('scroll', onScroll);
+    return () => {
+      emblaApi.off('scroll', onScroll);
+    };
+  }, [emblaApi, hasMore, isLoadingMore, onLoadMore]);
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {posts.map((post, index) => (
-            <div key={post.id} className="flex-[0_0_25%] min-w-0 px-2">
-              <Card 
-                className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => handleOpenModal(index)}
-              >
-                {renderMedia(post)}
-                {post.media_type === 'CAROUSEL_ALBUM' && (
-                  <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                    Multiple
-                  </div>
-                )}
-              </Card>
-            </div>
-          ))}
+      <div className="relative">
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
+            {posts.map((post, index) => (
+              <div key={post.id} className="flex-[0_0_25%] min-w-0 px-2">
+                <Card 
+                  className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => handleOpenModal(index)}
+                >
+                  {renderMedia(post)}
+                  {post.media_type === 'CAROUSEL_ALBUM' && (
+                    <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
+                      Multiple
+                    </div>
+                  )}
+                </Card>
+              </div>
+            ))}
+          </div>
         </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white/100 shadow-md ${
+            !canScrollPrev ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          onClick={scrollPrev}
+          disabled={!canScrollPrev}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white/100 shadow-md ${
+            !canScrollNext ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          onClick={scrollNext}
+          disabled={!canScrollNext}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
 
       <Modal
@@ -160,7 +236,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
               →
             </Button>
 
-            {posts[currentPostIndex].media_type === 'CAROUSEL_ALBUM' && posts[currentPostIndex].carousel_media && (
+            {posts[currentPostIndex].media_type === 'CAROUSEL_ALBUM' && posts[currentPostIndex].children && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 <Button
                   variant="outline"
@@ -170,7 +246,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
                   ←
                 </Button>
                 <span className="bg-black/50 text-white px-3 py-1 rounded">
-                  {currentMediaIndex + 1} / {posts[currentPostIndex].carousel_media!.length}
+                  {currentMediaIndex + 1} / {posts[currentPostIndex].children!.data.length}
                 </span>
                 <Button
                   variant="outline"

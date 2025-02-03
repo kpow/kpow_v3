@@ -3,10 +3,11 @@ import { RecentPlays } from "@/components/RecentPlays";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
 import { InstagramFeed } from "@/components/InstagramFeed";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
+import { useState } from "react";
 
 interface Author {
   name: string[];
@@ -34,22 +35,78 @@ interface GoodreadsResponse {
   };
 }
 
+interface InstagramMedia {
+  id: string;
+  media_url: string;
+}
+
+
+interface InstagramResponse {
+  posts: InstagramMedia[];
+  paging: {
+    cursors: {
+      before: string;
+      after: string;
+    };
+    next?: string;
+  } | null;
+}
+
 export default function Home() {
+  const [instagramAfter, setInstagramAfter] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const queryClient = useQueryClient();
+
+
   const { data: bookData, isLoading: isLoadingBooks } =
     useQuery<GoodreadsResponse>({
       queryKey: ["/api/books"],
     });
 
-  const { data: instagramData, isLoading: isLoadingInstagram } = useQuery({
+  const { data: instagramData, isLoading: isLoadingInstagram } = useQuery<InstagramResponse>({
     queryKey: ["/api/instagram/feed"],
     queryFn: async () => {
       const response = await fetch("/api/instagram/feed");
       if (!response.ok) {
         throw new Error("Failed to fetch Instagram feed");
       }
-      return response.json();
+      const data = await response.json();
+      if (data.paging?.cursors?.after) {
+        setInstagramAfter(data.paging.cursors.after);
+      }
+      return data;
     },
   });
+
+  const loadMoreInstagramPosts = async () => {
+    if (!instagramAfter || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      const response = await fetch(`/api/instagram/feed?after=${instagramAfter}`);
+      if (!response.ok) throw new Error("Failed to fetch more posts");
+
+      const newData = await response.json();
+      if (newData.paging?.cursors?.after) {
+        setInstagramAfter(newData.paging.cursors.after);
+      } else {
+        setInstagramAfter(null);
+      }
+
+      // Update the Instagram data in the cache
+      queryClient.setQueryData<InstagramResponse>(["/api/instagram/feed"], (oldData) => {
+        if (!oldData) return newData;
+        return {
+          ...newData,
+          posts: [...oldData.posts, ...newData.posts],
+        };
+      });
+    } catch (error) {
+      console.error("Error loading more posts:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const { data: starredData, isLoading: isLoadingStarred } = useStarredArticles(
     1,
@@ -148,7 +205,19 @@ export default function Home() {
             ))}
           </div>
         ) : instagramData ? (
-          <InstagramFeed posts={instagramData} />
+          <>
+            <InstagramFeed
+              posts={instagramData.posts}
+              onLoadMore={loadMoreInstagramPosts}
+              hasMore={!!instagramAfter}
+              isLoadingMore={isLoadingMore}
+            />
+            {isLoadingMore && (
+              <div className="mt-4 flex justify-center">
+                <Skeleton className="h-8 w-8 rounded-full animate-spin" />
+              </div>
+            )}
+          </>
         ) : null}
       </div>
 

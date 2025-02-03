@@ -23,30 +23,29 @@ interface InstagramMedia {
   };
 }
 
-// Get Instagram feed
+// Get Instagram feed with pagination
 router.get('/feed', async (req, res) => {
   try {
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const after = req.query.after as string | undefined;
+
     if (!accessToken) {
       throw new Error('Instagram access token not found');
     }
 
-    const response = await axios.get(
-      `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,children{media_type,media_url,thumbnail_url}&access_token=${accessToken}`
-    );
+    let url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,children{media_type,media_url,thumbnail_url}&access_token=${accessToken}`;
 
-    // Process the response to handle carousel albums
-    const processedData = response.data.data.map((item: InstagramMedia) => {
-      if (item.media_type === 'CAROUSEL_ALBUM' && item.children) {
-        return {
-          ...item,
-          carousel_media: item.children.data
-        };
-      }
-      return item;
+    if (after) {
+      url += `&after=${after}`;
+    }
+
+    const response = await axios.get(url);
+
+    // Return both the posts and pagination info
+    res.json({
+      posts: response.data.data,
+      paging: response.data.paging || null
     });
-
-    res.json(processedData);
   } catch (error) {
     console.error('Error fetching Instagram feed:', error);
     res.status(500).json({ error: 'Failed to fetch Instagram feed' });
