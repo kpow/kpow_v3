@@ -7,6 +7,7 @@ import { VideoCard } from "../components/VideoCard";
 import { VideoModal } from "../components/VideoModal";
 import { useState } from "react";
 import { CustomPagination } from "@/components/ui/custom-pagination";
+import { PageTitle } from "@/components/ui/page-title";
 
 const ITEMS_PER_PAGE = 9;
 const PLAYLIST_ID = "PLLnMxi7_aEL7eyC1HiZ2d1d4ce5irHaTQ";
@@ -36,7 +37,6 @@ export default function Videos() {
         },
       });
 
-      // Store the next page token for future use
       if (response.data.nextPageToken) {
         setPageTokens((prev) => ({
           ...prev,
@@ -67,7 +67,7 @@ export default function Videos() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
-        <h1 className="text-4xl font-bold">youtubez live</h1>
+        <PageTitle size="lg">youtubez live</PageTitle>
         <CustomPagination
           currentPage={page}
           totalPages={data?.hasNextPage ? page + 1 : page}

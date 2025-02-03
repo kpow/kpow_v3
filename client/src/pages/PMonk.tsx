@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { PageTitle } from "@/components/ui/page-title";
 
 interface ImageData {
   src: string;
@@ -145,7 +146,7 @@ export const PMonk = () => {
   return (
     <>
       <div className="p-4">
-        <h1 className="text-3xl font-bold mb-6">pmonk</h1>
+        <PageTitle size="default" className="mb-6">pmonk</PageTitle>
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="flex -ml-4 w-auto"
