@@ -78,13 +78,13 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
     setCurrentMediaIndex(0);
   };
 
-  const renderMedia = (media: InstagramMedia | InstagramMediaChild) => {
+  const renderMedia = (media: InstagramMedia | InstagramMediaChild, inModal: boolean = false) => {
     if (media.media_type === 'VIDEO') {
       return (
         <video 
           src={media.media_url}
           controls
-          className="w-full h-full object-cover"
+          className={inModal ? "w-full aspect-video object-contain bg-black" : "w-full h-full object-cover"}
           poster={media.thumbnail_url}
         />
       );
@@ -93,7 +93,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
       <img 
         src={media.media_url}
         alt={('caption' in media && media.caption) || 'Instagram post'}
-        className="w-full h-full object-cover"
+        className={inModal ? "w-full aspect-video object-contain bg-black" : "w-full h-full object-cover"}
       />
     );
   };
@@ -120,75 +120,77 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={handleCloseModal}
-        className="max-w-5xl mx-auto mt-10 bg-white dark:bg-gray-800 rounded-lg overflow-hidden"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4"
+        className="max-w-6xl mx-auto mt-10 bg-black rounded-lg overflow-hidden"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4"
       >
-        <div className="relative">
+        <div className="relative flex flex-col">
           <Button
             variant="outline"
-            className="absolute top-4 right-4 z-10"
+            className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/75 text-white"
             onClick={handleCloseModal}
           >
             ✕
           </Button>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative aspect-square">
-              {renderMedia(getCurrentMedia())}
+          <div className="relative">
+            {renderMedia(getCurrentMedia(), true)}
 
-              <Button
-                variant="outline"
-                className="absolute left-4 top-1/2 -translate-y-1/2"
-                onClick={handlePreviousPost}
-              >
-                ←
-              </Button>
+            <Button
+              variant="outline"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
+              onClick={handlePreviousPost}
+            >
+              ←
+            </Button>
 
-              <Button
-                variant="outline"
-                className="absolute right-4 top-1/2 -translate-y-1/2"
-                onClick={handleNextPost}
-              >
-                →
-              </Button>
+            <Button
+              variant="outline"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
+              onClick={handleNextPost}
+            >
+              →
+            </Button>
 
-              {posts[currentPostIndex].media_type === 'CAROUSEL_ALBUM' && posts[currentPostIndex].carousel_media && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={handlePreviousMedia}
-                    className="p-2"
-                  >
-                    ←
-                  </Button>
-                  <span className="bg-black bg-opacity-50 text-white px-3 py-1 rounded">
-                    {currentMediaIndex + 1} / {posts[currentPostIndex].carousel_media!.length}
-                  </span>
-                  <Button
-                    variant="outline"
-                    onClick={handleNextMedia}
-                    className="p-2"
-                  >
-                    →
-                  </Button>
-                </div>
-              )}
-            </div>
+            {posts[currentPostIndex].media_type === 'CAROUSEL_ALBUM' && posts[currentPostIndex].carousel_media && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handlePreviousMedia}
+                  className="p-2 bg-black/50 hover:bg-black/75 text-white"
+                >
+                  ←
+                </Button>
+                <span className="bg-black/50 text-white px-3 py-1 rounded">
+                  {currentMediaIndex + 1} / {posts[currentPostIndex].carousel_media!.length}
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={handleNextMedia}
+                  className="p-2 bg-black/50 hover:bg-black/75 text-white"
+                >
+                  →
+                </Button>
+              </div>
+            )}
+          </div>
 
-            <div className="p-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="bg-white p-3 flex items-center justify-between text-sm">
+            <div className="flex items-center gap-4">
+              <span className="text-gray-500">
                 {new Date(posts[currentPostIndex].timestamp).toLocaleDateString()}
-              </p>
-              <p className="mt-2">{posts[currentPostIndex].caption}</p>
-              <a
-                href={posts[currentPostIndex].permalink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-block text-blue-500 hover:underline"
-              >
-                View on Instagram
-              </a>
+              </span>
+              <span className="line-clamp-1 flex-1">
+                {posts[currentPostIndex].caption}
+              </span>
             </div>
+            <a
+              href={posts[currentPostIndex].permalink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline whitespace-nowrap"
+            >
+              View on Instagram
+            </a>
           </div>
         </div>
       </Modal>
