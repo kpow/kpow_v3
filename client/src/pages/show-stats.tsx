@@ -14,6 +14,7 @@ import { useState } from "react";
 import { OnThisDayShows } from "@/components/OnThisDay";
 import { VenueShowsModal } from "@/components/venue-shows-modal";
 import { SongStats } from "@/components/song-stats";
+import { PageTitle } from "@/components/ui/page-title";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -53,7 +54,6 @@ export default function ShowStats() {
   });
 
 
-  // Function to render show cards or skeletons
   const renderShowsContent = () => {
     if (showsLoading) {
       return Array.from({ length: SHOWS_PER_PAGE }).map((_, index) => (
@@ -67,11 +67,9 @@ export default function ShowStats() {
 
   return (
     <div className="container mx-auto p-2">
-      <h1 className="text-4xl font-slackey mb-8">phashboard</h1>
+      <PageTitle size="lg" className="mb-8">phashboard</PageTitle>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        {/* Most Visited Venues - Left Column */}
         <Card>
           <CardContent className="pt-6">
             <h2 className="text-lg font-slackey mb-4">venues</h2>
@@ -121,7 +119,6 @@ export default function ShowStats() {
           </CardContent>
         </Card>
 
-        {/* Stats Cards - Right Column */}
         <div className="space-y-4">
           <OnThisDayShows />
         </div>
@@ -167,7 +164,6 @@ export default function ShowStats() {
         </Card>
       </div>
 
-      {/* Shows Grid */}
       <Card className="mb-8">
         <CardContent className="pt-6 p-4">
           <h2 className="text-2xl font-slackey mb-6">shows</h2>
@@ -201,7 +197,6 @@ export default function ShowStats() {
         </CardContent>
       </Card>
 
-      {/* Song Stats Section */}
       <SongStats />
 
       <VenueShowsModal
