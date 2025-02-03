@@ -35,3 +35,15 @@
     background-position:0 0, 0 0, 19px 33px, 19px 33px, 0 0, 19px 33px;
   }
 }
+
+@keyframes shake {
+  0% { transform: translateX(0); filter: blur(0); }
+  25% { transform: translateX(-2px); filter: blur(0.5px); }
+  50% { transform: translateX(2px); filter: blur(0.5px); }
+  75% { transform: translateX(-2px); filter: blur(0.5px); }
+  100% { transform: translateX(0); filter: blur(0); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
