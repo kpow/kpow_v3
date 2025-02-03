@@ -43,7 +43,8 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
-    slidesToScroll: 4
+    slidesToScroll: 4,
+    dragFree: true
   });
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -154,20 +155,33 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     );
   };
 
+    const shouldLoadMore = useCallback(() => {
+    if (!emblaApi || !hasMore || isLoadingMore) return false;
+    const lastSlideInView = emblaApi.slidesInView().slice(-1)[0];
+    const totalSlides = emblaApi.scrollSnapList().length;
+    return lastSlideInView >= totalSlides - 4; // Load more when approaching the end
+  }, [emblaApi, hasMore, isLoadingMore]);
+
   // Add scroll monitoring for infinite load
   useEffect(() => {
-    if (!emblaApi || !hasMore || isLoadingMore) return;
+    if (!emblaApi) return;
 
     const onScroll = () => {
-      if (emblaApi.canScrollNext()) return;
-      onLoadMore();
+      if (shouldLoadMore()) {
+        onLoadMore();
+      }
     };
 
     emblaApi.on('scroll', onScroll);
+        // Also check when slides become settled
+    emblaApi.on('settle', onScroll);
+
+
     return () => {
       emblaApi.off('scroll', onScroll);
+      emblaApi.off('settle', onScroll);
     };
-  }, [emblaApi, hasMore, isLoadingMore, onLoadMore]);
+  }, [emblaApi, shouldLoadMore, onLoadMore]);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4">

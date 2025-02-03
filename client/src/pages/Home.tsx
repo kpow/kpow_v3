@@ -55,8 +55,8 @@ interface InstagramResponse {
 export default function Home() {
   const [instagramAfter, setInstagramAfter] = useState<string | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>([]);
   const queryClient = useQueryClient();
-
 
   const { data: bookData, isLoading: isLoadingBooks } =
     useQuery<GoodreadsResponse>({
@@ -74,6 +74,7 @@ export default function Home() {
       if (data.paging?.cursors?.after) {
         setInstagramAfter(data.paging.cursors.after);
       }
+      setAllInstagramPosts(data.posts);
       return data;
     },
   });
@@ -87,13 +88,15 @@ export default function Home() {
       if (!response.ok) throw new Error("Failed to fetch more posts");
 
       const newData = await response.json();
+
+      setAllInstagramPosts(prev => [...prev, ...newData.posts]);
+
       if (newData.paging?.cursors?.after) {
         setInstagramAfter(newData.paging.cursors.after);
       } else {
         setInstagramAfter(null);
       }
 
-      // Update the Instagram data in the cache
       queryClient.setQueryData<InstagramResponse>(["/api/instagram/feed"], (oldData) => {
         if (!oldData) return newData;
         return {
@@ -204,10 +207,10 @@ export default function Home() {
               <Skeleton key={i} className="aspect-square rounded-lg" />
             ))}
           </div>
-        ) : instagramData ? (
+        ) : (
           <>
             <InstagramFeed
-              posts={instagramData.posts}
+              posts={allInstagramPosts}
               onLoadMore={loadMoreInstagramPosts}
               hasMore={!!instagramAfter}
               isLoadingMore={isLoadingMore}
@@ -218,7 +221,7 @@ export default function Home() {
               </div>
             )}
           </>
-        ) : null}
+        )}
       </div>
 
       <div className="h-px bg-gray-200 my-4" />
