@@ -131,3 +131,16 @@ export async function getSetlistStats(username: string): Promise<SetlistStats> {
     songCounts
   };
 }
+
+export async function getShowsByVenue(
+  username: string,
+  venue: string
+): Promise<ShowAttendance[]> {
+  const response = await fetch(`${API_BASE}/venues/${encodeURIComponent(venue)}/shows`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch venue shows');
+  }
+
+  return response.json();
+}

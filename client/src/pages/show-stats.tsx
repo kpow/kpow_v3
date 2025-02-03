@@ -4,6 +4,7 @@ import {
   getShowStats,
   getPaginatedVenues,
   getSetlistStats,
+  getShowsByVenue,
 } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShowCard, ShowCardSkeleton } from "@/components/show-card";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { OnThisDayShows } from "@/components/OnThisDay";
+import { VenueShowsModal } from "@/components/venue-shows-modal";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -19,6 +21,8 @@ export default function ShowStats() {
   const username = "koolyp";
   const [showsPage, setShowsPage] = useState(1);
   const [venuesPage, setVenuesPage] = useState(1);
+  const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
+  const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/shows/stats", username],
@@ -40,6 +44,13 @@ export default function ShowStats() {
     queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
     placeholderData: (previousData) => previousData,
   });
+
+  const { data: venueShows } = useQuery({
+    queryKey: ["/api/venues/shows", username, selectedVenue],
+    queryFn: () => selectedVenue ? getShowsByVenue(username, selectedVenue) : Promise.resolve([]),
+    enabled: !!selectedVenue,
+  });
+
 
   // Function to render show cards or skeletons
   const renderShowsContent = () => {
@@ -67,7 +78,11 @@ export default function ShowStats() {
               {venuesData?.venues.map((venue) => (
                 <div
                   key={venue.venue}
-                  className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
+                  className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
+                  onClick={() => {
+                    setSelectedVenue(venue.venue);
+                    setIsVenueModalOpen(true);
+                  }}
                 >
                   <span className="font-medium">{venue.venue}</span>
                   <span className="text-muted-foreground">
@@ -184,6 +199,15 @@ export default function ShowStats() {
           </div>
         </CardContent>
       </Card>
+      <VenueShowsModal
+        isOpen={isVenueModalOpen}
+        onClose={() => {
+          setIsVenueModalOpen(false);
+          setSelectedVenue(null);
+        }}
+        venue={selectedVenue || ""}
+        shows={venueShows || []}
+      />
     </div>
   );
 }

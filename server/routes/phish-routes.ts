@@ -284,6 +284,32 @@ export function registerPhishRoutes(router: Router) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
+
+  router.get("/api/venues/:venue/shows", async (req, res) => {
+    try {
+      const { venue } = req.params;
+      const shows = await fetchPhishData("/attendance/username/koolyp");
+
+      const venueShows = shows
+        .filter((show: any) => show.venue === venue)
+        .map((show: any) => ({
+          showid: show.showid,
+          showdate: show.showdate,
+          venue: show.venue,
+          city: show.city,
+          state: show.state,
+          country: show.country,
+          notes: show.notes,
+        }))
+        .sort((a: any, b: any) => 
+          new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
+        );
+
+      res.json(venueShows);
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
 }
 
 function formatSongUrl(songName: string): string {
