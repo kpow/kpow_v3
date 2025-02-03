@@ -2,6 +2,7 @@ import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
@@ -38,6 +39,17 @@ export default function Home() {
     useQuery<GoodreadsResponse>({
       queryKey: ["/api/books"],
     });
+
+  const { data: instagramData, isLoading: isLoadingInstagram } = useQuery({
+    queryKey: ["/api/instagram/feed"],
+    queryFn: async () => {
+      const response = await fetch("/api/instagram/feed");
+      if (!response.ok) {
+        throw new Error("Failed to fetch Instagram feed");
+      }
+      return response.json();
+    },
+  });
 
   const { data: starredData, isLoading: isLoadingStarred } = useStarredArticles(
     1,
@@ -123,6 +135,21 @@ export default function Home() {
         {mainSections.map((section) => (
           <ContentSection key={section.title} {...section} />
         ))}
+      </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+
+      <div>
+        <h2 className="text-2xl font-bold font-slackey mb-6">instagram</h2>
+        {isLoadingInstagram ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-square rounded-lg" />
+            ))}
+          </div>
+        ) : instagramData ? (
+          <InstagramFeed posts={instagramData} />
+        ) : null}
       </div>
 
       <div className="h-px bg-gray-200 my-4" />

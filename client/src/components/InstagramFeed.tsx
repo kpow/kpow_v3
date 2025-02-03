@@ -26,7 +26,7 @@ interface InstagramFeedProps {
   posts: InstagramMedia[];
 }
 
-const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
+export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
