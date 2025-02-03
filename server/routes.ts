@@ -8,6 +8,7 @@ import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
+import instagramRoutes from "./routes/instagram-routes";
 
 // Verify required environment variables
 if (!process.env.PHISH_API_KEY) {
@@ -22,6 +23,10 @@ if (!process.env.YOUTUBE_API_KEY) {
   throw new Error("YOUTUBE_API_KEY environment variable is required");
 }
 
+if (!process.env.INSTAGRAM_ACCESS_TOKEN) {
+  throw new Error("INSTAGRAM_ACCESS_TOKEN environment variable is required");
+}
+
 export function registerRoutes(app: Express): Server {
   const router = Router();
 
@@ -34,6 +39,9 @@ export function registerRoutes(app: Express): Server {
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
+
+  // Register Instagram routes
+  router.use('/api/instagram', instagramRoutes);
 
   // Register contact routes
   router.use('/', contactRoutes);
