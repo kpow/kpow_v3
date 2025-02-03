@@ -12,7 +12,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link key="Home" href="/">
-             <div className="hover:animate-shake">
+             <div className="hover:animate-shake transition-all hover:blur-[0.5px]">
               <div className="flex items-center gap-2 group">
              
                 <Logo />
