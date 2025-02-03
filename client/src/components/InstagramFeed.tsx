@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
+import useEmblaCarousel from 'embla-carousel-react';
 
 // Types for Instagram media
 interface InstagramMediaChild {
@@ -27,6 +28,11 @@ interface InstagramFeedProps {
 }
 
 export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
+  const [emblaRef] = useEmblaCarousel({
+    align: 'start',
+    containScroll: 'trimSnaps',
+    slidesToScroll: 1
+  });
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -100,21 +106,24 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {posts.map((post, index) => (
-          <Card 
-            key={post.id} 
-            className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-            onClick={() => handleOpenModal(index)}
-          >
-            {renderMedia(post)}
-            {post.media_type === 'CAROUSEL_ALBUM' && (
-              <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                Multiple
-              </div>
-            )}
-          </Card>
-        ))}
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {posts.map((post, index) => (
+            <div key={post.id} className="flex-[0_0_25%] min-w-0 px-2">
+              <Card 
+                className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => handleOpenModal(index)}
+              >
+                {renderMedia(post)}
+                {post.media_type === 'CAROUSEL_ALBUM' && (
+                  <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
+                    Multiple
+                  </div>
+                )}
+              </Card>
+            </div>
+          ))}
+        </div>
       </div>
 
       <Modal
