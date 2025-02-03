@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface InstagramMedia {
   id: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  media_type: string;
   media_url: string;
   thumbnail_url?: string;
   permalink: string;
@@ -27,6 +27,11 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
     containScroll: 'trimSnaps',
     dragFree: true
   });
+
+  // Set up Modal root element
+  useEffect(() => {
+    Modal.setAppElement('#root');
+  }, []);
 
   const handleOpenModal = (index: number) => {
     setCurrentIndex(index);
@@ -48,6 +53,38 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
   const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
   const scrollNext = () => emblaApi && emblaApi.scrollNext();
 
+  const renderMedia = (post: InstagramMedia, isModal: boolean = false) => {
+    console.log('Rendering media:', { type: post.media_type, isModal });
+
+    if (post.media_type === 'VIDEO') {
+      return (
+        <video 
+          key={post.id}
+          src={post.media_url}
+          className={isModal ? "w-full h-auto max-h-[70vh] mx-auto" : "w-full h-full object-cover"}
+          poster={post.thumbnail_url}
+          controls={isModal}
+          autoPlay={isModal}
+          muted={!isModal}
+          playsInline
+          onError={(e) => console.error('Video error:', e)}
+        >
+          <source src={post.media_url} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      );
+    }
+
+    return (
+      <img 
+        src={post.media_url} 
+        alt={post.caption || 'Instagram post'}
+        className={isModal ? "w-full h-auto max-h-[70vh] mx-auto object-contain" : "w-full h-full object-cover"}
+        onError={(e) => console.error('Image error:', e)}
+      />
+    );
+  };
+
   return (
     <div className="w-full relative">
       <div className="overflow-hidden relative" ref={emblaRef}>
@@ -58,19 +95,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
                 className="overflow-hidden cursor-pointer h-[300px]" 
                 onClick={() => handleOpenModal(index)}
               >
-                {post.media_type === 'VIDEO' ? (
-                  <video 
-                    src={post.media_url}
-                    className="w-full h-full object-cover"
-                    poster={post.thumbnail_url}
-                  />
-                ) : (
-                  <img 
-                    src={post.media_url} 
-                    alt={post.caption || 'Instagram post'}
-                    className="w-full h-full object-cover"
-                  />
-                )}
+                {renderMedia(post)}
               </Card>
             </div>
           ))}
@@ -113,20 +138,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
 
           <div className="flex flex-col">
             <div className="relative w-full bg-black">
-              {posts[currentIndex]?.media_type === 'VIDEO' ? (
-                <video 
-                  src={posts[currentIndex]?.media_url}
-                  controls
-                  className="w-full h-auto max-h-[70vh] mx-auto"
-                  poster={posts[currentIndex]?.thumbnail_url}
-                />
-              ) : (
-                <img 
-                  src={posts[currentIndex]?.media_url}
-                  alt={posts[currentIndex]?.caption || 'Instagram post'}
-                  className="w-full h-auto max-h-[70vh] mx-auto object-contain"
-                />
-              )}
+              {posts[currentIndex] && renderMedia(posts[currentIndex], true)}
 
               <Button
                 variant="ghost"
