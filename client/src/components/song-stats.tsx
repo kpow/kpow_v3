@@ -9,17 +9,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getSetlistStats } from "@/lib/phish-api";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { format } from "date-fns";
 import { Skeleton } from "./ui/skeleton";
 
+const SONGS_PER_PAGE = 10;
+
 interface ShowOccurrence {
   date: string;
   venue: string;
   setlist: string;
+  url?: string;
 }
 
 function SongStatsSkeleton() {
@@ -40,12 +43,14 @@ function SongStatsSkeleton() {
 
 export function SongStats() {
   const [selectedSong, setSelectedSong] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const { data: songStats, isLoading } = useQuery({
     queryKey: ["/api/songs/stats"],
     queryFn: () => getSetlistStats("koolyp"),
   });
 
-  const { data: songOccurrences } = useQuery({
+  const { data: songOccurrences, isLoading: occurrencesLoading } = useQuery({
     queryKey: ["/api/setlist/occurrences", selectedSong],
     queryFn: async () => {
       const response = await fetch(`/api/setlist/occurrences/${encodeURIComponent(selectedSong!)}`);
@@ -65,6 +70,16 @@ export function SongStats() {
           count,
         }))
     : [];
+
+  // Calculate pagination
+  const sortedSongs = songStats
+    ? Object.entries(songStats.songCounts)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+    : [];
+
+  const totalPages = Math.ceil(sortedSongs.length / SONGS_PER_PAGE);
+  const startIndex = (currentPage - 1) * SONGS_PER_PAGE;
+  const paginatedSongs = sortedSongs.slice(startIndex, startIndex + SONGS_PER_PAGE);
 
   return (
     <Card>
@@ -91,54 +106,87 @@ export function SongStats() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <ScrollArea className="h-[400px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Song</TableHead>
-                    <TableHead className="text-right">Count</TableHead>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Song</TableHead>
+                  <TableHead className="text-right">Count</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedSongs.map(([song, count]) => (
+                  <TableRow
+                    key={song}
+                    className="cursor-pointer hover:bg-accent/50"
+                    onClick={() => setSelectedSong(song)}
+                  >
+                    <TableCell>{song}</TableCell>
+                    <TableCell className="text-right">{count}</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Object.entries(songStats?.songCounts || {})
-                    .sort(([, a], [, b]) => (b as number) - (a as number))
-                    .map(([song, count]) => (
-                      <TableRow
-                        key={song}
-                        className="cursor-pointer hover:bg-accent/50"
-                        onClick={() => setSelectedSong(song)}
-                      >
-                        <TableCell>{song}</TableCell>
-                        <TableCell className="text-right">{count}</TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
+                ))}
+              </TableBody>
+            </Table>
+
+            <div className="flex justify-between items-center mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+              >
+                Previous
+              </Button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+              >
+                Next
+              </Button>
+            </div>
           </div>
         )}
 
         <Dialog open={!!selectedSong} onOpenChange={() => setSelectedSong(null)}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-slackey">{selectedSong}</DialogTitle>
+              <DialogTitle className="text-2xl font-slackey">
+                {selectedSong}
+              </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 mt-4">
-              {songOccurrences?.map((occurrence: ShowOccurrence) => (
-                <div
-                  key={occurrence.date}
-                  className="p-4 rounded-lg bg-muted/50 space-y-2"
-                >
-                  <div className="font-medium">
-                    {format(new Date(occurrence.date), "PPP")}
+            {occurrencesLoading ? (
+              <div className="space-y-4 mt-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="p-4 rounded-lg bg-muted/50 space-y-2">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-64" />
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {occurrence.venue}
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4 mt-4">
+                {songOccurrences?.map((occurrence: ShowOccurrence) => (
+                  <div
+                    key={occurrence.date}
+                    className="p-4 rounded-lg bg-muted/50 space-y-2"
+                  >
+                    <div className="font-medium">
+                      {format(new Date(occurrence.date), "PPP")}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {occurrence.venue}
+                    </div>
+                    <div className="text-sm">{occurrence.setlist}</div>
                   </div>
-                  <div className="text-sm">{occurrence.setlist}</div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </CardContent>
