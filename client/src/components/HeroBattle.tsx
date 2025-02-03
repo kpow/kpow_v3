@@ -208,12 +208,12 @@ export function HeroBattle() {
             )}
             <div className="flex justify-center gap-4 mb-6">
               {hero1 && hero2 && !winner && (
-                <Button className="w-full" onClick={handleBattle}>
+                <Button className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded" onClick={handleBattle}>
                   Fight!
                 </Button>
               )}
               {winner && (
-                <Button className="w-full" onClick={handleReset}>
+                <Button className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded" onClick={handleReset}>
                   Reset
                 </Button>
               )}
