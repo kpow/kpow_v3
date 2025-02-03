@@ -22,22 +22,7 @@ router.get('/feed', async (req, res) => {
     }
 
     const response = await axios.get(
-      `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp&access_token=${accessToken}`,
-      {
-        headers: {
-          'Accept': 'application/json'
-        }
-      }
-    );
-
-    // Log media types for debugging
-    console.log('Instagram API Response:', 
-      response.data.data.map((item: InstagramMedia) => ({
-        id: item.id,
-        type: item.media_type,
-        hasUrl: !!item.media_url,
-        hasThumbnail: !!item.thumbnail_url
-      }))
+      `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp&access_token=${accessToken}`
     );
 
     res.json(response.data.data);
