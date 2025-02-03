@@ -120,16 +120,31 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   };
 
   const renderMedia = (media: InstagramMedia | InstagramMediaChild, inModal: boolean = false) => {
-    if (media.media_type === 'VIDEO') {
-      return (
-        <video 
-          src={media.media_url}
-          controls
-          className={inModal ? "w-full aspect-video object-contain bg-black" : "w-full h-full object-cover"}
-          poster={media.thumbnail_url}
-        />
-      );
+    if (inModal) {
+      // In modal view, show videos with controls
+      if (media.media_type === 'VIDEO') {
+        return (
+          <video 
+            src={media.media_url}
+            controls
+            className="w-full aspect-video object-contain bg-black"
+            poster={media.thumbnail_url}
+          />
+        );
+      }
+    } else {
+      // In grid view, always show images (thumbnails for videos)
+      if (media.media_type === 'VIDEO' && media.thumbnail_url) {
+        return (
+          <img 
+            src={media.thumbnail_url}
+            alt={('caption' in media && media.caption) || 'Instagram video thumbnail'}
+            className="w-full h-full object-cover"
+          />
+        );
+      }
     }
+
     return (
       <img 
         src={media.media_url}
@@ -169,6 +184,11 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
                   {post.media_type === 'CAROUSEL_ALBUM' && (
                     <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
                       Multiple
+                    </div>
+                  )}
+                  {post.media_type === 'VIDEO' && (
+                    <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
+                      Video
                     </div>
                   )}
                 </Card>
