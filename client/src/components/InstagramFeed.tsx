@@ -26,7 +26,6 @@ interface InstagramMedia {
   };
 }
 
-// Update the InstagramFeedProps interface
 interface InstagramFeedProps {
   posts: InstagramMedia[];
   onLoadMore: () => void;
@@ -35,7 +34,7 @@ interface InstagramFeedProps {
 }
 
 export const InstagramFeed: React.FC<InstagramFeedProps> = ({
-  posts,
+  posts = [],  // Provide default empty array
   onLoadMore,
   hasMore,
   isLoadingMore
@@ -53,6 +52,13 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
 
+  // Reset state when posts change or component unmounts
+  useEffect(() => {
+    setCurrentPostIndex(0);
+    setCurrentMediaIndex(0);
+    setModalIsOpen(false);
+  }, [posts]);
+
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setCanScrollPrev(emblaApi.canScrollPrev());
@@ -63,6 +69,9 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     if (!emblaApi) return;
     onSelect();
     emblaApi.on('select', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
   }, [emblaApi, onSelect]);
 
   const scrollPrev = useCallback(() => {
@@ -74,9 +83,11 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   }, [emblaApi]);
 
   const handleOpenModal = (postIndex: number) => {
-    setCurrentPostIndex(postIndex);
-    setCurrentMediaIndex(0);
-    setModalIsOpen(true);
+    if (postIndex >= 0 && postIndex < posts.length) {
+      setCurrentPostIndex(postIndex);
+      setCurrentMediaIndex(0);
+      setModalIsOpen(true);
+    }
   };
 
   const handleCloseModal = () => {
@@ -86,7 +97,9 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
 
   const getCurrentMedia = () => {
     const post = posts[currentPostIndex];
-    if (post.media_type === 'CAROUSEL_ALBUM' && post.children) {
+    if (!post) return null;
+
+    if (post.media_type === 'CAROUSEL_ALBUM' && post.children?.data?.[currentMediaIndex]) {
       return post.children.data[currentMediaIndex];
     }
     return post;
@@ -94,7 +107,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
 
   const handlePreviousMedia = () => {
     const post = posts[currentPostIndex];
-    if (post.media_type === 'CAROUSEL_ALBUM' && post.children) {
+    if (post?.media_type === 'CAROUSEL_ALBUM' && post.children) {
       setCurrentMediaIndex(prev => 
         prev > 0 ? prev - 1 : post.children!.data.length - 1
       );
@@ -103,7 +116,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
 
   const handleNextMedia = () => {
     const post = posts[currentPostIndex];
-    if (post.media_type === 'CAROUSEL_ALBUM' && post.children) {
+    if (post?.media_type === 'CAROUSEL_ALBUM' && post.children) {
       setCurrentMediaIndex(prev => 
         prev < post.children!.data.length - 1 ? prev + 1 : 0
       );
@@ -120,9 +133,10 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     setCurrentMediaIndex(0);
   };
 
-  const renderMedia = (media: InstagramMedia | InstagramMediaChild, inModal: boolean = false) => {
+  const renderMedia = (media: InstagramMedia | InstagramMediaChild | null, inModal: boolean = false) => {
+    if (!media) return null;
+
     if (inModal) {
-      // In modal view, show videos with controls
       if (media.media_type === 'VIDEO') {
         return (
           <video 
@@ -134,7 +148,6 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
         );
       }
     } else {
-      // In grid view, always show images (thumbnails for videos)
       if (media.media_type === 'VIDEO' && media.thumbnail_url) {
         return (
           <img 
@@ -155,14 +168,13 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     );
   };
 
-    const shouldLoadMore = useCallback(() => {
+  const shouldLoadMore = useCallback(() => {
     if (!emblaApi || !hasMore || isLoadingMore) return false;
     const lastSlideInView = emblaApi.slidesInView().slice(-1)[0];
     const totalSlides = emblaApi.scrollSnapList().length;
-    return lastSlideInView >= totalSlides - 4; // Load more when approaching the end
+    return lastSlideInView >= totalSlides - 4;
   }, [emblaApi, hasMore, isLoadingMore]);
 
-  // Add scroll monitoring for infinite load
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -173,9 +185,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     };
 
     emblaApi.on('scroll', onScroll);
-        // Also check when slides become settled
     emblaApi.on('settle', onScroll);
-
 
     return () => {
       emblaApi.off('scroll', onScroll);
@@ -183,13 +193,21 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     };
   }, [emblaApi, shouldLoadMore, onLoadMore]);
 
+  // Set modal app element for accessibility
+  useEffect(() => {
+    Modal.setAppElement('#root');
+  }, []);
+
+  const currentPost = posts[currentPostIndex];
+  const currentMedia = getCurrentMedia();
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="relative">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {posts.map((post, index) => (
-              <div key={post.id} className="flex-[0_0_25%] min-w-0 px-2">
+              <div key={`${post.id}-${index}`} className="flex-[0_0_25%] min-w-0 px-2">
                 <Card 
                   className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
                   onClick={() => handleOpenModal(index)}
@@ -200,7 +218,6 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
                     <p className="font-slackey text-sm line-clamp-2 mb-2">
                       {post.caption}
                     </p>
-                    
                   </div>
                 </Card>
               </div>
@@ -239,76 +256,78 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
         className="max-w-6xl mx-auto mt-10 bg-black rounded-lg overflow-hidden"
         overlayClassName="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4"
       >
-        <div className="relative flex flex-col">
-          <Button
-            variant="outline"
-            className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/75 text-white"
-            onClick={handleCloseModal}
-          >
-            ✕
-          </Button>
-
-          <div className="relative">
-            {renderMedia(getCurrentMedia(), true)}
-
+        {currentPost && currentMedia && (
+          <div className="relative flex flex-col">
             <Button
               variant="outline"
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
-              onClick={handlePreviousPost}
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/75 text-white"
+              onClick={handleCloseModal}
             >
-              ←
+              ✕
             </Button>
 
-            <Button
-              variant="outline"
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
-              onClick={handleNextPost}
-            >
-              →
-            </Button>
+            <div className="relative">
+              {renderMedia(currentMedia, true)}
 
-            {posts[currentPostIndex].media_type === 'CAROUSEL_ALBUM' && posts[currentPostIndex].children && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={handlePreviousMedia}
-                  className="p-2 bg-black/50 hover:bg-black/75 text-white"
-                >
-                  ←
-                </Button>
-                <span className="bg-black/50 text-white px-3 py-1 rounded">
-                  {currentMediaIndex + 1} / {posts[currentPostIndex].children!.data.length}
-                </span>
-                <Button
-                  variant="outline"
-                  onClick={handleNextMedia}
-                  className="p-2 bg-black/50 hover:bg-black/75 text-white"
-                >
-                  →
-                </Button>
-              </div>
-            )}
-          </div>
+              <Button
+                variant="outline"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
+                onClick={handlePreviousPost}
+              >
+                ←
+              </Button>
 
-          <div className="bg-white p-3 flex items-center justify-between text-sm">
-            <div className="flex items-center gap-4">
-              <span className="text-gray-500">
-                {new Date(posts[currentPostIndex].timestamp).toLocaleDateString()}
-              </span>
-              <span className="line-clamp-1 flex-1">
-                {posts[currentPostIndex].caption}
-              </span>
+              <Button
+                variant="outline"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
+                onClick={handleNextPost}
+              >
+                →
+              </Button>
+
+              {currentPost.media_type === 'CAROUSEL_ALBUM' && currentPost.children && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={handlePreviousMedia}
+                    className="p-2 bg-black/50 hover:bg-black/75 text-white"
+                  >
+                    ←
+                  </Button>
+                  <span className="bg-black/50 text-white px-3 py-1 rounded">
+                    {currentMediaIndex + 1} / {currentPost.children.data.length}
+                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={handleNextMedia}
+                    className="p-2 bg-black/50 hover:bg-black/75 text-white"
+                  >
+                    →
+                  </Button>
+                </div>
+              )}
             </div>
-            <a
-              href={posts[currentPostIndex].permalink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline whitespace-nowrap"
-            >
-              View on Instagram
-            </a>
+
+            <div className="bg-white p-3 flex items-center justify-between text-sm">
+              <div className="flex items-center gap-4">
+                <span className="text-gray-500">
+                  {new Date(currentPost.timestamp).toLocaleDateString()}
+                </span>
+                <span className="line-clamp-1 flex-1">
+                  {currentPost.caption}
+                </span>
+              </div>
+              <a
+                href={currentPost.permalink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline whitespace-nowrap"
+              >
+                View on Instagram
+              </a>
+            </div>
           </div>
-        </div>
+        )}
       </Modal>
     </div>
   );

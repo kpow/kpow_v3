@@ -35,9 +35,24 @@ interface GoodreadsResponse {
   };
 }
 
+interface InstagramMediaChild {
+  id: string;
+  media_type: 'IMAGE' | 'VIDEO';
+  media_url: string;
+  thumbnail_url?: string;
+}
+
 interface InstagramMedia {
   id: string;
+  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
   media_url: string;
+  thumbnail_url?: string;
+  permalink: string;
+  caption?: string;
+  timestamp: string;
+  children?: {
+    data: InstagramMediaChild[];
+  };
 }
 
 interface InstagramResponse {
