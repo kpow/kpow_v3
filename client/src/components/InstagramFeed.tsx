@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import Slider from 'react-slick';
 import Modal from 'react-modal';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // Types for Instagram media
 interface InstagramMedia {
@@ -18,9 +21,31 @@ interface InstagramFeedProps {
   posts: InstagramMedia[];
 }
 
-export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
+const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+        }
+      }
+    ]
+  };
 
   const handleOpenModal = (index: number) => {
     setCurrentIndex(index);
@@ -40,24 +65,28 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      {posts.map((post, index) => (
-        <Card key={post.id} className="overflow-hidden cursor-pointer" onClick={() => handleOpenModal(index)}>
-          {post.media_type === 'VIDEO' ? (
-            <video 
-              src={post.media_url}
-              className="w-full h-64 object-cover"
-              poster={post.thumbnail_url}
-            />
-          ) : (
-            <img 
-              src={post.media_url} 
-              alt={post.caption || 'Instagram post'}
-              className="w-full h-64 object-cover"
-            />
-          )}
-        </Card>
-      ))}
+    <div className="w-full max-w-6xl mx-auto px-4">
+      <Slider {...settings}>
+        {posts.map((post, index) => (
+          <div key={post.id} className="p-2">
+            <Card className="overflow-hidden cursor-pointer" onClick={() => handleOpenModal(index)}>
+              {post.media_type === 'VIDEO' ? (
+                <video 
+                  src={post.media_url}
+                  className="w-full h-64 object-cover"
+                  poster={post.thumbnail_url}
+                />
+              ) : (
+                <img 
+                  src={post.media_url} 
+                  alt={post.caption || 'Instagram post'}
+                  className="w-full h-64 object-cover"
+                />
+              )}
+            </Card>
+          </div>
+        ))}
+      </Slider>
 
       <Modal
         isOpen={modalIsOpen}
@@ -73,7 +102,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
           >
             ✕
           </Button>
-
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               {posts[currentIndex].media_type === 'VIDEO' ? (
@@ -90,7 +119,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
                   className="w-full h-auto"
                 />
               )}
-
+              
               <Button
                 variant="outline"
                 className="absolute left-4 top-1/2 -translate-y-1/2"
@@ -98,7 +127,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
               >
                 ←
               </Button>
-
+              
               <Button
                 variant="outline"
                 className="absolute right-4 top-1/2 -translate-y-1/2"
@@ -107,7 +136,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
                 →
               </Button>
             </div>
-
+            
             <div className="p-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {new Date(posts[currentIndex].timestamp).toLocaleDateString()}
@@ -128,3 +157,5 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
     </div>
   );
 };
+
+export default InstagramFeed;
