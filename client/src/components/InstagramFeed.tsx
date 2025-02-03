@@ -18,7 +18,7 @@ interface InstagramFeedProps {
   posts: InstagramMedia[];
 }
 
-const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
+export const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -128,5 +128,3 @@ const InstagramFeed: React.FC<InstagramFeedProps> = ({ posts }) => {
     </div>
   );
 };
-
-export default InstagramFeed;
