@@ -157,11 +157,10 @@ export default function Books({ params }: { params?: { page?: string } }) {
   const totalPages = pagination?.totalPages ?? 1;
   const totalBooks = pagination?.total ?? 0;
 
-
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center flex-col sm:flex-row">
-        <h1 className="text-3xl font-bold mb-3">My Books</h1>
+        <h1 className="text-3xl font-bold mb-3">book feed</h1>
         <CustomPagination
           currentPage={currentPage}
           totalPages={totalPages}

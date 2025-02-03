@@ -66,6 +66,7 @@ LASTFM_API_KEY=your_key
 GOODREADS_API_KEY=your_key
 FEEDBIN_KEY=your_key
 INSTAGRAM_ACCESS_TOKEN=your_token
+GMAIL_APP_PASSWORD=your_app_password
 
 # Database Configuration
 DATABASE_URL=your_postgresql_url
