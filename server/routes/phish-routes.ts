@@ -263,10 +263,18 @@ export function registerPhishRoutes(router: Router) {
         );
       });
 
-      const sortedShows = showsOnDate.sort(
-        (a: any, b: any) =>
-          new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
-      );
+      // Ensure we're using the correct date by setting hours to noon to avoid timezone issues
+const targetDate = new Date(Date.UTC(2025, month - 1, day, 12));
+const showsOnDate = shows.filter((show: any) => {
+  const showDate = new Date(show.showdate);
+  return showDate.getUTCMonth() === targetDate.getUTCMonth() && 
+         showDate.getUTCDate() === targetDate.getUTCDate();
+});
+
+const sortedShows = showsOnDate.sort(
+  (a: any, b: any) =>
+    new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
+);
 
       const formattedShows = sortedShows.map((show: any) => ({
         showid: show.showid,
