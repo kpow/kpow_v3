@@ -57,20 +57,36 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     setCurrentPostIndex(0);
     setCurrentMediaIndex(0);
     setModalIsOpen(false);
-  }, [posts]);
+
+    // Reset scroll states when posts change
+    if (emblaApi) {
+      setCanScrollPrev(emblaApi.canScrollPrev());
+      setCanScrollNext(emblaApi.canScrollNext());
+    }
+  }, [posts, emblaApi]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
+
+    // Update scroll states whenever slides change
     setCanScrollPrev(emblaApi.canScrollPrev());
     setCanScrollNext(emblaApi.canScrollNext());
   }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
+
+    // Initial scroll state update
     onSelect();
+
+    // Subscribe to select events
     emblaApi.on('select', onSelect);
+    // Subscribe to settle events to update states after animations
+    emblaApi.on('settle', onSelect);
+
     return () => {
       emblaApi.off('select', onSelect);
+      emblaApi.off('settle', onSelect);
     };
   }, [emblaApi, onSelect]);
 
