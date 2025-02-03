@@ -184,27 +184,36 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   }, [emblaApi, shouldLoadMore, onLoadMore]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4">
+    <div className="w-full max-w-7xl mx-auto">
       <div className="relative">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {posts.map((post, index) => (
               <div key={post.id} className="flex-[0_0_25%] min-w-0 px-2">
                 <Card 
-                  className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
                   onClick={() => handleOpenModal(index)}
                 >
                   {renderMedia(post)}
-                  {post.media_type === 'CAROUSEL_ALBUM' && (
-                    <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                      Multiple
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-70 transition-opacity group-hover:opacity-90" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <p className="font-slackey text-sm line-clamp-2 mb-2">
+                      {post.caption}
+                    </p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span>{new Date(post.timestamp).toLocaleDateString()}</span>
+                      {post.media_type === 'CAROUSEL_ALBUM' && (
+                        <span className="bg-black/50 px-2 py-1 rounded">
+                          Multiple
+                        </span>
+                      )}
+                      {post.media_type === 'VIDEO' && (
+                        <span className="bg-black/50 px-2 py-1 rounded">
+                          Video
+                        </span>
+                      )}
                     </div>
-                  )}
-                  {post.media_type === 'VIDEO' && (
-                    <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                      Video
-                    </div>
-                  )}
+                  </div>
                 </Card>
               </div>
             ))}
@@ -213,8 +222,8 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
 
         <Button
           variant="outline"
-          size="icon"
-          className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white/100 shadow-md ${
+          size="sm"
+          className={`absolute left-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-primary-foreground -left-5 ${
             !canScrollPrev ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           onClick={scrollPrev}
@@ -225,8 +234,8 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
 
         <Button
           variant="outline"
-          size="icon"
-          className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white/100 shadow-md ${
+          size="sm"
+          className={`absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-primary-foreground -right-5 ${
             !canScrollNext ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           onClick={scrollNext}
