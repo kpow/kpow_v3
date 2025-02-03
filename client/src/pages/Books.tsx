@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { BookCard } from "@/components/BookCard";
 import { CustomPagination } from "@/components/ui/custom-pagination";
+import { PageTitle } from "@/components/ui/page-title";
 
 interface Book {
   book: {
@@ -102,7 +103,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
     return (
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center flex-col md:flex-row">
-          <h1 className="text-3xl font-bold mb-6">book feed</h1>
+          <PageTitle size="default" className="mb-6">book feed</PageTitle>
 
           <div className="flex justify-center gap-2 items-center mb-3">
             <Button
@@ -160,7 +161,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center flex-col sm:flex-row">
-        <h1 className="text-3xl font-bold mb-3">book feed</h1>
+        <PageTitle size="default" className="mb-3">book feed</PageTitle>
         <CustomPagination
           currentPage={currentPage}
           totalPages={totalPages}
