@@ -256,11 +256,10 @@ export function registerPhishRoutes(router: Router) {
       const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
 
       const showsOnDate = showsData.filter((show: any) => {
-        const showDate = new Date(show.showdate);
-        return (
-          showDate.getMonth() + 1 === month && 
-          showDate.getDate() === day
-        );
+        const showDate = new Date(show.showdate + 'T12:00:00Z');
+        const showUTCMonth = showDate.getUTCMonth() + 1;
+        const showUTCDay = showDate.getUTCDate();
+        return showUTCMonth === month && showUTCDay === day;
       });
 
       const sortedShows = showsOnDate.sort(
