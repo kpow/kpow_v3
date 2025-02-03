@@ -40,7 +40,6 @@ interface InstagramMedia {
   media_url: string;
 }
 
-
 interface InstagramResponse {
   posts: InstagramMedia[];
   paging: {
@@ -55,7 +54,9 @@ interface InstagramResponse {
 export default function Home() {
   const [instagramAfter, setInstagramAfter] = useState<string | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>([]);
+  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>(
+    [],
+  );
   const queryClient = useQueryClient();
 
   const { data: bookData, isLoading: isLoadingBooks } =
@@ -63,33 +64,36 @@ export default function Home() {
       queryKey: ["/api/books"],
     });
 
-  const { data: instagramData, isLoading: isLoadingInstagram } = useQuery<InstagramResponse>({
-    queryKey: ["/api/instagram/feed"],
-    queryFn: async () => {
-      const response = await fetch("/api/instagram/feed");
-      if (!response.ok) {
-        throw new Error("Failed to fetch Instagram feed");
-      }
-      const data = await response.json();
-      if (data.paging?.cursors?.after) {
-        setInstagramAfter(data.paging.cursors.after);
-      }
-      setAllInstagramPosts(data.posts);
-      return data;
-    },
-  });
+  const { data: instagramData, isLoading: isLoadingInstagram } =
+    useQuery<InstagramResponse>({
+      queryKey: ["/api/instagram/feed"],
+      queryFn: async () => {
+        const response = await fetch("/api/instagram/feed");
+        if (!response.ok) {
+          throw new Error("Failed to fetch Instagram feed");
+        }
+        const data = await response.json();
+        if (data.paging?.cursors?.after) {
+          setInstagramAfter(data.paging.cursors.after);
+        }
+        setAllInstagramPosts(data.posts);
+        return data;
+      },
+    });
 
   const loadMoreInstagramPosts = async () => {
     if (!instagramAfter || isLoadingMore) return;
 
     setIsLoadingMore(true);
     try {
-      const response = await fetch(`/api/instagram/feed?after=${instagramAfter}`);
+      const response = await fetch(
+        `/api/instagram/feed?after=${instagramAfter}`,
+      );
       if (!response.ok) throw new Error("Failed to fetch more posts");
 
       const newData = await response.json();
 
-      setAllInstagramPosts(prev => [...prev, ...newData.posts]);
+      setAllInstagramPosts((prev) => [...prev, ...newData.posts]);
 
       if (newData.paging?.cursors?.after) {
         setInstagramAfter(newData.paging.cursors.after);
@@ -97,13 +101,16 @@ export default function Home() {
         setInstagramAfter(null);
       }
 
-      queryClient.setQueryData<InstagramResponse>(["/api/instagram/feed"], (oldData) => {
-        if (!oldData) return newData;
-        return {
-          ...newData,
-          posts: [...oldData.posts, ...newData.posts],
-        };
-      });
+      queryClient.setQueryData<InstagramResponse>(
+        ["/api/instagram/feed"],
+        (oldData) => {
+          if (!oldData) return newData;
+          return {
+            ...newData,
+            posts: [...oldData.posts, ...newData.posts],
+          };
+        },
+      );
     } catch (error) {
       console.error("Error loading more posts:", error);
     } finally {
