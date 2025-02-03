@@ -200,19 +200,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
                     <p className="font-slackey text-sm line-clamp-2 mb-2">
                       {post.caption}
                     </p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span>{new Date(post.timestamp).toLocaleDateString()}</span>
-                      {post.media_type === 'CAROUSEL_ALBUM' && (
-                        <span className="bg-black/50 px-2 py-1 rounded">
-                          Multiple
-                        </span>
-                      )}
-                      {post.media_type === 'VIDEO' && (
-                        <span className="bg-black/50 px-2 py-1 rounded">
-                          Video
-                        </span>
-                      )}
-                    </div>
+                    
                   </div>
                 </Card>
               </div>
