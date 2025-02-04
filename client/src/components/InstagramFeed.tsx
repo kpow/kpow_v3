@@ -338,6 +338,11 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
                 <span className="text-gray-500">
                   {new Date(currentPost.timestamp).toLocaleDateString()}
                 </span>
+                {currentPost.location && (
+                  <span className="text-gray-500">
+                    📍 {currentPost.location.name}
+                  </span>
+                )}
                 <span className="line-clamp-1 flex-1">
                   {currentPost.caption}
                 </span>
