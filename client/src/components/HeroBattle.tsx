@@ -26,6 +26,7 @@ import {
   type Hero,
   type Bet,
 } from "@/lib/battle-service";
+import { PageTitle } from "@/components/ui/page-title";
 import heroes from "../../../attached_assets/superheros-prod.js";
 
 const STORAGE_KEY = "hero-battle-stash";
@@ -118,9 +119,9 @@ export function HeroBattle() {
   return (
     <div className="container mx-auto space-y-6">
       <div className="flex justify-left items-center gap-4">
-        <h1 className="text-4xl font-bold font-slackey mb-2 text-left">
+        <PageTitle size="lg" alignment="left">
           battle
-        </h1>
+        </PageTitle>
         <div className="flex items-center gap-2 mb-2">
           <span className={mode === "manual" ? "font-bold" : ""}>Manual</span>
           <Switch
@@ -208,12 +209,18 @@ export function HeroBattle() {
             )}
             <div className="flex justify-center gap-4 mb-6">
               {hero1 && hero2 && !winner && (
-                <Button className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded" onClick={handleBattle}>
+                <Button
+                  className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded"
+                  onClick={handleBattle}
+                >
                   Fight!
                 </Button>
               )}
               {winner && (
-                <Button className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded" onClick={handleReset}>
+                <Button
+                  className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded"
+                  onClick={handleReset}
+                >
                   Reset
                 </Button>
               )}
@@ -243,7 +250,7 @@ export function HeroBattle() {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ duration: .3 }}
+                  transition={{ duration: 0.3 }}
                   className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl min-w-[300px]"
                 >
                   {BATTLE_STEPS[battleStep]}
@@ -278,9 +285,9 @@ export function HeroBattle() {
                       />
                       {winner && winner.id !== hero.id && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                          <img 
-                            src="/images/loser.png" 
-                            alt="Loser" 
+                          <img
+                            src="/images/loser.png"
+                            alt="Loser"
                             className="absolute inset-0 w-full h-full object-cover"
                           />
                         </div>

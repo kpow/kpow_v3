@@ -103,7 +103,9 @@ export default function Books({ params }: { params?: { page?: string } }) {
     return (
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center flex-col md:flex-row">
-          <PageTitle size="default" className="mb-6">book feed</PageTitle>
+          <PageTitle size="lg" alignment="left">
+            book feed
+          </PageTitle>
 
           <div className="flex justify-center gap-2 items-center mb-3">
             <Button
@@ -161,7 +163,9 @@ export default function Books({ params }: { params?: { page?: string } }) {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center flex-col sm:flex-row">
-        <PageTitle size="default" className="mb-3">book feed</PageTitle>
+        <PageTitle size="lg" alignment="left">
+          book feed
+        </PageTitle>
         <CustomPagination
           currentPage={currentPage}
           totalPages={totalPages}

@@ -7,6 +7,7 @@ import { ContentSection } from "@/components/ContentSection";
 import { StarredArticle } from "@/lib/hooks/use-starred-articles";
 import { useToast } from "@/hooks/use-toast";
 import { CustomPagination } from "@/components/ui/custom-pagination";
+import { PageTitle } from "@/components/ui/page-title";
 
 interface PaginationData {
   current_page: number;
@@ -143,7 +144,9 @@ export default function StarredArticles({
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center flex-col sm:flex-row">
-        <h1 className="text-3xl font-bold mb-6">star feed</h1>
+        <PageTitle size="lg" alignment="left">
+          star feed
+        </PageTitle>
         <CustomPagination
           currentPage={currentPage}
           totalPages={totalPages}
