@@ -50,6 +50,10 @@ interface InstagramMedia {
   permalink: string;
   caption?: string;
   timestamp: string;
+  location?: {
+    id: string;
+    name: string;
+  };
   children?: {
     data: InstagramMediaChild[];
   };
