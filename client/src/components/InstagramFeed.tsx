@@ -21,6 +21,10 @@ interface InstagramMedia {
   permalink: string;
   caption?: string;
   timestamp: string;
+  location?: {
+    id: string;
+    name: string;
+  };
   children?: {
     data: InstagramMediaChild[];
   };
@@ -234,6 +238,11 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
                     <p className="font-slackey text-sm line-clamp-2 mb-2">
                       {post.caption}
                     </p>
+                    {post.location && (
+                      <p className="text-xs opacity-80">
+                        📍 {post.location.name}
+                      </p>
+                    )}
                   </div>
                 </Card>
               </div>
