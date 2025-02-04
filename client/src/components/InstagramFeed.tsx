@@ -238,11 +238,6 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
                     <p className="font-slackey text-sm line-clamp-2">
                       {post.caption}
                     </p>
-                    {post.location && (
-                      <p className="text-xs text-white mt-1">
-                        📍 {post.location.name}
-                      </p>
-                    )}
                   </div>
                 </Card>
               </div>

@@ -33,7 +33,7 @@ router.get('/feed', async (req, res) => {
       throw new Error('Instagram access token not found');
     }
 
-    let url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,location,children{media_type,media_url,thumbnail_url}&access_token=${accessToken}`;
+    let url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,children{media_type,media_url,thumbnail_url}&access_token=${accessToken}`;
 
     if (after) {
       url += `&after=${after}`;
