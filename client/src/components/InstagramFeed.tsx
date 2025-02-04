@@ -235,11 +235,11 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
                   {renderMedia(post)}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-70 transition-opacity group-hover:opacity-90" />
                   <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <p className="font-slackey text-sm line-clamp-2 mb-2">
+                    <p className="font-slackey text-sm line-clamp-2">
                       {post.caption}
                     </p>
                     {post.location && (
-                      <p className="text-xs opacity-80">
+                      <p className="text-xs text-white mt-1">
                         📍 {post.location.name}
                       </p>
                     )}
