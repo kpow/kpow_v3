@@ -54,27 +54,22 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     },
     { icon: <Music className="w-4 h-4" />, label: "pmonk", href: "/pmonk" },
     {
-      icon: <PlayCircle className="w-4 h-4" />,
-      label: "itunes beta",
-      href: "/itunes",
-    },
-    {
       icon: <Code className="w-4 h-4" />,
       label: "gatsby version",
       href: "https://gatsby.kpow-wow.com/",
-      //className: "text-blue-600",
+      className: "text-blue-600",
     },
     {
       icon: <Code className="w-4 h-4" />,
       label: "next.js version",
       href: "https://kpow-wow.com/",
-      //className: "text-blue-600",
+      className: "text-blue-600",
     },
     {
       icon: <Code className="w-4 h-4" />,
       label: "2012 version",
       href: "https://2012.kpow.com/",
-      //className: "text-blue-600",
+      className: "text-blue-600",
     },
   ];
 
@@ -97,8 +92,8 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
         )}
       >
         <nav className="pt-20 px-4 space-y-1">
-          {menuItems.map((item) => (
-            item.href.startsWith('http') ? (
+          {menuItems.map((item) =>
+            item.href.startsWith("http") ? (
               <a
                 key={item.label}
                 href={item.href}
@@ -126,8 +121,8 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
                 {item.icon}
                 <span className="text-[13px]">{item.label}</span>
               </Link>
-            )
-          ))}
+            ),
+          )}
         </nav>
       </div>
     </>
