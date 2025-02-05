@@ -1,0 +1,186 @@
+{
+  "venues": [
+    {
+      "venue": "Merriweather Post Pavilion",
+      "city": "Columbia",
+      "state": "MD",
+      "latitude": 39.2099,
+      "longitude": -76.8608
+    },
+    {
+      "venue": "Madison Square Garden",
+      "city": "New York",
+      "state": "NY",
+      "latitude": 40.7505,
+      "longitude": -73.9934
+    },
+    {
+      "venue": "Hampton Coliseum",
+      "city": "Hampton",
+      "state": "VA",
+      "latitude": 37.0298,
+      "longitude": -76.3194
+    },
+    {
+      "venue": "Red Rocks Amphitheatre",
+      "city": "Morrison",
+      "state": "CO",
+      "latitude": 39.6655,
+      "longitude": -105.2056
+    },
+    {
+      "venue": "Alpine Valley Music Theatre",
+      "city": "East Troy",
+      "state": "WI",
+      "latitude": 42.7358,
+      "longitude": -88.4281
+    },
+    {
+      "venue": "nTelos Pavilion",
+      "city": "Portsmouth",
+      "state": "VA",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Bader Field",
+      "city": "Atlantic City",
+      "state": "NJ",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Boardwalk Hall",
+      "city": "Atlantic City",
+      "state": "NJ",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "BarcelÃ³ Maya Beach",
+      "city": "Riviera Maya, Quintana Roo",
+      "state": "",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Wrigley Field",
+      "city": "Chicago",
+      "state": "IL",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Bill Graham Civic Auditorium",
+      "city": "San Francisco",
+      "state": "CA",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Oak Ridge Farm",
+      "city": "Arrington",
+      "state": "VA",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Dick's Sporting Goods Park",
+      "city": "Commerce City",
+      "state": "CO",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Walnut Creek Amphitheater",
+      "city": "Raleigh",
+      "state": "NC",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "North Charleston Coliseum",
+      "city": "North Charleston",
+      "state": "SC",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Budweiser Stage",
+      "city": "Toronto, Ontario",
+      "state": null,
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Atlantic City Beach",
+      "city": "Atlantic City",
+      "state": "NJ",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Moon Palace",
+      "city": "Cancun, Quintana Roo",
+      "state": "",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "John Paul Jones Arena",
+      "city": "Charlottesville",
+      "state": "VA",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "The Omni",
+      "city": "Atlanta",
+      "state": "GA",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "GTE Virginia Beach Amphitheater",
+      "city": "Virginia Beach",
+      "state": "VA",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Loring Commerce Centre",
+      "city": "Limestone",
+      "state": "ME",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Coastal Credit Union Music Park at Walnut Creek",
+      "city": "Raleigh",
+      "state": "NC",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Live Oak Bank Pavilion at Riverfront Park",
+      "city": "Wilmington",
+      "state": "NC",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Sphere",
+      "city": "Las Vegas",
+      "state": "NV",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    },
+    {
+      "venue": "Time Warner Cable Music Pavilion at Walnut Creek ",
+      "city": "Raleigh",
+      "state": "NC",
+      "latitude": 39.8283,
+      "longitude": -98.5795
+    }
+  ]
+}
