@@ -15,15 +15,16 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 export function VenueMap() {
-  // Center coordinates for continental USA
-  const center: [number, number] = [39.8283, -98.5795];
-  const zoom = 4;
+  // Calculate bounds based on all venue coordinates
+  const bounds = L.latLngBounds(venueData.venues.map(venue => [venue.latitude, venue.longitude]));
+
+  // Add padding to bounds to ensure all markers are visible
+  const paddedBounds = bounds.pad(0.1); // 10% padding
 
   return (
     <div className="h-[400px] w-full rounded-lg overflow-hidden">
       <MapContainer
-        center={center}
-        zoom={zoom}
+        bounds={paddedBounds}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
