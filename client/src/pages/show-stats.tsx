@@ -15,6 +15,7 @@ import { OnThisDayShows } from "@/components/OnThisDay";
 import { VenueShowsModal } from "@/components/venue-shows-modal";
 import { SongStats } from "@/components/song-stats";
 import { PageTitle } from "@/components/ui/page-title";
+import { VenueMap } from "@/components/venue-map";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -194,6 +195,13 @@ export default function ShowStats() {
               Next
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-8">
+        <CardContent className="pt-6">
+          <h2 className="text-2xl font-slackey mb-6">venue map</h2>
+          <VenueMap />
         </CardContent>
       </Card>
 
