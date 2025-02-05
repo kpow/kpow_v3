@@ -104,38 +104,51 @@ export function registerPhishRoutes(router: Router) {
         {},
       );
 
-      // Log current venue data for debugging
-      console.log("Current venue stats:", Object.keys(venueStats).length, "venues found");
+      // Update venues.json file with new venues if they don't exist
+      Object.entries(venueStats).forEach(([venue, stats]) => {
+        if (!venuesMap.has(venue)) {
+          const venueInfo = {
+            venue,
+            city: stats.city,
+            state: stats.state,
+            // Default coordinates for venues without location data
+            latitude: 39.8283,  // Approximate center of US
+            longitude: -98.5795
+          };
+          venuesData.venues.push(venueInfo);
+          venuesMap.set(venue, venueInfo);
+          // Write updated venues to file
+          fs.writeFileSync(venuesFilePath, JSON.stringify(venuesData, null, 2));
+        }
+      });
 
       const sortedVenues = Object.entries(venueStats)
         .map(([venue, stats]) => {
-          const venueInfo = venuesMap.get(venue);
-          console.log("Venue info for", venue, ":", venueInfo); // Debug log
-
+          const venueInfo = venuesMap.get(venue) || {};
           return {
             venue,
             count: stats.count,
             city: stats.city,
             state: stats.state,
-            latitude: venueInfo?.latitude || 39.8283,
-            longitude: venueInfo?.longitude || -98.5795
+            latitude: venueInfo.latitude,
+            longitude: venueInfo.longitude
           };
         })
         .sort((a, b) => b.count - a.count);
 
-      const total = sortedVenues.length;
       const start = (page - 1) * limit;
-      const end = limit === 100 ? undefined : start + limit; // If limit is 100, return all venues
+      const end = start + limit;
       const paginatedVenues = sortedVenues.slice(start, end);
 
-      console.log("Sending venues:", paginatedVenues.length, "out of", total);
+      const total = sortedVenues.length;
+      const totalPages = Math.ceil(total / limit);
 
       res.json({
         venues: paginatedVenues,
         pagination: {
           current: page,
-          total: Math.ceil(total / limit),
-          hasMore: page < Math.ceil(total / limit),
+          total: totalPages,
+          hasMore: page < totalPages,
         },
       });
     } catch (error) {

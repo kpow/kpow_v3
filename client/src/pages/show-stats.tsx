@@ -43,8 +43,8 @@ export default function ShowStats() {
   });
 
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
-    queryKey: ["/api/venues/stats", username, venuesPage],
-    queryFn: () => getPaginatedVenues(username, venuesPage, 100), // Increased limit to get all venues
+    queryKey: ["/api/venues/paginated", username, venuesPage],
+    queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
     placeholderData: (previousData) => previousData,
   });
 
@@ -53,6 +53,7 @@ export default function ShowStats() {
     queryFn: () => selectedVenue ? getShowsByVenue(username, selectedVenue) : Promise.resolve([]),
     enabled: !!selectedVenue,
   });
+
 
   const renderShowsContent = () => {
     if (showsLoading) {
@@ -71,7 +72,7 @@ export default function ShowStats() {
   };
 
   return (
-    <div className="container mx-auto p-2" onClick={(e) => e.stopPropagation()}>
+    <div className="container mx-auto p-2">
       <PageTitle size="lg" className="mb-8">phashboard</PageTitle>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -79,14 +80,11 @@ export default function ShowStats() {
           <CardContent className="pt-6">
             <h2 className="text-lg font-slackey mb-4">venues</h2>
             <div className="space-y-3">
-              {venuesData?.venues.slice(0, VENUES_PER_PAGE).map((venue) => (
+              {venuesData?.venues.map((venue) => (
                 <div
                   key={venue.venue}
                   className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleVenueSelect(venue.venue);
-                  }}
+                  onClick={() => handleVenueSelect(venue.venue)}
                 >
                   <span className="font-medium">{venue.venue}</span>
                   <span className="text-muted-foreground">
@@ -100,10 +98,7 @@ export default function ShowStats() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setVenuesPage((p) => Math.max(1, p - 1));
-                  }}
+                  onClick={() => setVenuesPage((p) => Math.max(1, p - 1))}
                   disabled={venuesPage === 1 || venuesLoading}
                   className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
                 >
@@ -114,10 +109,7 @@ export default function ShowStats() {
                   variant="outline"
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setVenuesPage((p) => p + 1);
-                  }}
+                  onClick={() => setVenuesPage((p) => p + 1)}
                   disabled={
                     venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) ||
                     venuesLoading
@@ -220,8 +212,7 @@ export default function ShowStats() {
 
       <VenueShowsModal
         isOpen={isVenueModalOpen}
-        onClose={(e) => {
-          if (e) e.stopPropagation();
+        onClose={() => {
           setIsVenueModalOpen(false);
           setSelectedVenue(null);
         }}
