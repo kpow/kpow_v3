@@ -125,44 +125,55 @@ export default function ShowStats() {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">total shows</h2>
-            <div className="text-4xl font-bold">
-              {statsLoading ? (
-                <Skeleton className="h-10 w-20" />
-              ) : (
-                stats?.totalShows || 0
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="md:col-span-2">
+          <Card className="h-full">
+            <CardContent className="pt-6">
+              <h2 className="text-2xl font-slackey mb-6">venue map</h2>
+              <VenueMap />
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">total venues</h2>
-            <div className="text-4xl font-bold">
-              {statsLoading ? (
-                <Skeleton className="h-10 w-20" />
-              ) : (
-                stats?.uniqueVenues || 0
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">total shows</h2>
+              <div className="text-4xl font-bold">
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-20" />
+                ) : (
+                  stats?.totalShows || 0
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-2">total songs</h2>
-            <div className="text-4xl font-bold">
-              {setlistStatsLoading ? (
-                <Skeleton className="h-10 w-20" />
-              ) : (
-                setlistStats?.uniqueSongs || 0
-              )}
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">total venues</h2>
+              <div className="text-4xl font-bold">
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-20" />
+                ) : (
+                  stats?.uniqueVenues || 0
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-2">total songs</h2>
+              <div className="text-4xl font-bold">
+                {setlistStatsLoading ? (
+                  <Skeleton className="h-10 w-20" />
+                ) : (
+                  setlistStats?.uniqueSongs || 0
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <Card className="mb-8">
@@ -195,13 +206,6 @@ export default function ShowStats() {
               Next
             </Button>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <h2 className="text-2xl font-slackey mb-6">venue map</h2>
-          <VenueMap />
         </CardContent>
       </Card>
 
