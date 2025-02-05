@@ -49,10 +49,17 @@ export function VenueMap({ venues, onVenueSelect }: VenueMapProps) {
     { lat: 0, lng: 0 }
   );
 
-  // Stop click event propagation to prevent modal from opening
+  // Stop event propagation and prevent the modal from opening when clicking the map or markers
+  const handleMapClick = (e: L.LeafletMouseEvent) => {
+    e.originalEvent.stopPropagation();
+  };
+
   const handleMarkerClick = (e: L.LeafletMouseEvent, venue: string) => {
     e.originalEvent.stopPropagation();
-    onVenueSelect?.(venue);
+    if (onVenueSelect) {
+      e.originalEvent.preventDefault();
+      onVenueSelect(venue);
+    }
   };
 
   return (
@@ -64,6 +71,7 @@ export function VenueMap({ venues, onVenueSelect }: VenueMapProps) {
             center={[center.lat, center.lng]}
             zoom={4}
             style={{ height: "100%", width: "100%" }}
+            onClick={handleMapClick}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
