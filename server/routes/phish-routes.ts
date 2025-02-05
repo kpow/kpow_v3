@@ -3,6 +3,11 @@ import { fetchPhishData } from "../utils/api-utils";
 import path from "path";
 import fs from "fs";
 
+// Read venues data from JSON file
+const venuesFilePath = path.join(process.cwd(), 'server', 'data', 'venues.json');
+const venuesData = JSON.parse(fs.readFileSync(venuesFilePath, 'utf-8'));
+const venuesMap = new Map(venuesData.venues.map((v: any) => [v.venue, v]));
+
 export function registerPhishRoutes(router: Router) {
   router.post("/api/admin/generate-shows-json", async (_req, res) => {
     try {
@@ -92,7 +97,15 @@ export function registerPhishRoutes(router: Router) {
       );
 
       const sortedVenues = Object.entries(venueStats)
-        .map(([venue, count]) => ({ venue, count: Number(count) }))
+        .map(([venue, count]) => {
+          const venueInfo = venuesMap.get(venue) || {};
+          return {
+            venue,
+            count: Number(count),
+            latitude: venueInfo.latitude,
+            longitude: venueInfo.longitude
+          };
+        })
         .sort((a, b) => b.count - a.count);
 
       const start = (page - 1) * limit;
@@ -111,6 +124,7 @@ export function registerPhishRoutes(router: Router) {
         },
       });
     } catch (error) {
+      console.error("Error in /api/venues/stats:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });

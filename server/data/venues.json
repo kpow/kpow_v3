@@ -1,0 +1,39 @@
+{
+  "venues": [
+    {
+      "venue": "Merriweather Post Pavilion",
+      "city": "Columbia",
+      "state": "MD",
+      "latitude": 39.2099,
+      "longitude": -76.8608
+    },
+    {
+      "venue": "Madison Square Garden",
+      "city": "New York",
+      "state": "NY",
+      "latitude": 40.7505,
+      "longitude": -73.9934
+    },
+    {
+      "venue": "Hampton Coliseum",
+      "city": "Hampton",
+      "state": "VA",
+      "latitude": 37.0298,
+      "longitude": -76.3194
+    },
+    {
+      "venue": "Red Rocks Amphitheatre",
+      "city": "Morrison",
+      "state": "CO",
+      "latitude": 39.6655,
+      "longitude": -105.2056
+    },
+    {
+      "venue": "Alpine Valley Music Theatre",
+      "city": "East Troy",
+      "state": "WI",
+      "latitude": 42.7358,
+      "longitude": -88.4281
+    }
+  ]
+}
