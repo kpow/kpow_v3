@@ -1,4 +1,9 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ShowAttendance } from "@/lib/phish-api";
 import { format } from "date-fns";
 import { CalendarDays, MapPin, Music } from "lucide-react";
@@ -12,7 +17,11 @@ interface ShowDetailsModalProps {
   onClose: () => void;
 }
 
-export function ShowDetailsModal({ show, isOpen, onClose }: ShowDetailsModalProps) {
+export function ShowDetailsModal({
+  show,
+  isOpen,
+  onClose,
+}: ShowDetailsModalProps) {
   const { data: setlist, isLoading: isLoadingSetlist } = useQuery({
     queryKey: ["/api/setlists", show?.showid],
     queryFn: () => getSetlist(show?.showid || ""),
@@ -23,18 +32,22 @@ export function ShowDetailsModal({ show, isOpen, onClose }: ShowDetailsModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto z-[9999]">
         <DialogHeader>
-          <DialogTitle className="font-slackey text-2xl">{show.venue}</DialogTitle>
+          <DialogTitle className="font-slackey text-2xl">
+            {show.venue}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-4">
           <div className="flex items-center text-muted-foreground">
             <CalendarDays className="mr-2 h-4 w-4" />
-            <span>{format(new Date(show.showdate), 'PPP')}</span>
+            <span>{format(new Date(show.showdate), "PPP")}</span>
           </div>
           <div className="flex items-center text-muted-foreground">
             <MapPin className="mr-2 h-4 w-4" />
-            <span>{show.city}, {show.state}</span>
+            <span>
+              {show.city}, {show.state}
+            </span>
           </div>
 
           {/* Setlist Section */}
@@ -58,7 +71,9 @@ export function ShowDetailsModal({ show, isOpen, onClose }: ShowDetailsModalProp
                 {setlist?.setlistnotes && (
                   <div className="mt-4">
                     <h4 className="text-sm font-semibold mb-2">Show Notes:</h4>
-                    <p className="text-sm text-muted-foreground">{setlist.setlistnotes}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {setlist.setlistnotes}
+                    </p>
                   </div>
                 )}
               </div>
