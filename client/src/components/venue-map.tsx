@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import '/leaflet.css';
+import '/client/public/leaflet.css';
 import venueData from '@db/show-venues.json';
 
 // Fix for default marker icons in react-leaflet
