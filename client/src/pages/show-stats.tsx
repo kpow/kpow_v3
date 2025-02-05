@@ -15,7 +15,6 @@ import { OnThisDayShows } from "@/components/OnThisDay";
 import { VenueShowsModal } from "@/components/venue-shows-modal";
 import { SongStats } from "@/components/song-stats";
 import { PageTitle } from "@/components/ui/page-title";
-import { VenueMap } from "@/components/venue-map";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -66,11 +65,6 @@ export default function ShowStats() {
     ));
   };
 
-  const handleVenueSelect = (venue: string) => {
-    setSelectedVenue(venue);
-    setIsVenueModalOpen(true);
-  };
-
   return (
     <div className="container mx-auto p-2">
       <PageTitle size="lg" className="mb-8">phashboard</PageTitle>
@@ -84,7 +78,10 @@ export default function ShowStats() {
                 <div
                   key={venue.venue}
                   className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-                  onClick={() => handleVenueSelect(venue.venue)}
+                  onClick={() => {
+                    setSelectedVenue(venue.venue);
+                    setIsVenueModalOpen(true);
+                  }}
                 >
                   <span className="font-medium">{venue.venue}</span>
                   <span className="text-muted-foreground">
@@ -126,14 +123,6 @@ export default function ShowStats() {
           <OnThisDayShows />
         </div>
       </div>
-
-      <div className="mb-8">
-        <VenueMap 
-          venues={venuesData?.venues ?? []} 
-          onVenueSelect={handleVenueSelect}
-        />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <Card>
           <CardContent className="pt-6">

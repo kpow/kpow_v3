@@ -3,11 +3,6 @@ import { fetchPhishData } from "../utils/api-utils";
 import path from "path";
 import fs from "fs";
 
-// Read venues data from JSON file
-const venuesFilePath = path.join(process.cwd(), 'server', 'data', 'venues.json');
-const venuesData = JSON.parse(fs.readFileSync(venuesFilePath, 'utf-8'));
-const venuesMap = new Map(venuesData.venues.map((v: any) => [v.venue, v]));
-
 export function registerPhishRoutes(router: Router) {
   router.post("/api/admin/generate-shows-json", async (_req, res) => {
     try {
@@ -88,52 +83,16 @@ export function registerPhishRoutes(router: Router) {
       const limit = parseInt(req.query.limit as string) || 5;
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      // Get all unique venues with their counts
       const venueStats = shows.reduce(
-        (acc: { [key: string]: { count: number, city: string, state: string } }, show: any) => {
-          if (!acc[show.venue]) {
-            acc[show.venue] = {
-              count: 0,
-              city: show.city,
-              state: show.state
-            };
-          }
-          acc[show.venue].count++;
+        (acc: { [key: string]: number }, show: any) => {
+          acc[show.venue] = (acc[show.venue] || 0) + 1;
           return acc;
         },
         {},
       );
 
-      // Update venues.json file with new venues if they don't exist
-      Object.entries(venueStats).forEach(([venue, stats]) => {
-        if (!venuesMap.has(venue)) {
-          const venueInfo = {
-            venue,
-            city: stats.city,
-            state: stats.state,
-            // Default coordinates for venues without location data
-            latitude: 39.8283,  // Approximate center of US
-            longitude: -98.5795
-          };
-          venuesData.venues.push(venueInfo);
-          venuesMap.set(venue, venueInfo);
-          // Write updated venues to file
-          fs.writeFileSync(venuesFilePath, JSON.stringify(venuesData, null, 2));
-        }
-      });
-
       const sortedVenues = Object.entries(venueStats)
-        .map(([venue, stats]) => {
-          const venueInfo = venuesMap.get(venue) || {};
-          return {
-            venue,
-            count: stats.count,
-            city: stats.city,
-            state: stats.state,
-            latitude: venueInfo.latitude,
-            longitude: venueInfo.longitude
-          };
-        })
+        .map(([venue, count]) => ({ venue, count: Number(count) }))
         .sort((a, b) => b.count - a.count);
 
       const start = (page - 1) * limit;
@@ -152,7 +111,6 @@ export function registerPhishRoutes(router: Router) {
         },
       });
     } catch (error) {
-      console.error("Error in /api/venues/stats:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
