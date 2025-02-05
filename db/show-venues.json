@@ -18,8 +18,8 @@
       "venue": "Hampton Coliseum",
       "city": "Hampton",
       "state": "VA",
-      "latitude": 37.0298,
-      "longitude": -76.3194
+      "latitude": 37.0186,
+      "longitude": -76.4387
     },
     {
       "venue": "Red Rocks Amphitheatre",
@@ -32,155 +32,155 @@
       "venue": "Alpine Valley Music Theatre",
       "city": "East Troy",
       "state": "WI",
-      "latitude": 42.7358,
-      "longitude": -88.4281
+      "latitude": 42.7347,
+      "longitude": -88.3129
     },
     {
       "venue": "nTelos Pavilion",
       "city": "Portsmouth",
       "state": "VA",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 36.8348,
+      "longitude": -76.2968
     },
     {
       "venue": "Bader Field",
       "city": "Atlantic City",
       "state": "NJ",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 39.3706,
+      "longitude": -74.4562
     },
     {
       "venue": "Boardwalk Hall",
       "city": "Atlantic City",
       "state": "NJ",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 39.3552,
+      "longitude": -74.4398
     },
     {
-      "venue": "BarcelÃ³ Maya Beach",
+      "venue": "Barceló Maya Beach",
       "city": "Riviera Maya, Quintana Roo",
       "state": "",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 20.4898,
+      "longitude": -87.2451
     },
     {
       "venue": "Wrigley Field",
       "city": "Chicago",
       "state": "IL",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 41.9484,
+      "longitude": -87.6553
     },
     {
       "venue": "Bill Graham Civic Auditorium",
       "city": "San Francisco",
       "state": "CA",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 37.7789,
+      "longitude": -122.4175
     },
     {
       "venue": "Oak Ridge Farm",
       "city": "Arrington",
       "state": "VA",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 37.7249,
+      "longitude": -78.8919
     },
     {
       "venue": "Dick's Sporting Goods Park",
       "city": "Commerce City",
       "state": "CO",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 39.8055,
+      "longitude": -104.8919
     },
     {
       "venue": "Walnut Creek Amphitheater",
       "city": "Raleigh",
       "state": "NC",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 35.7173,
+      "longitude": -78.5788
     },
     {
       "venue": "North Charleston Coliseum",
       "city": "North Charleston",
       "state": "SC",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 32.8657,
+      "longitude": -80.0209
     },
     {
       "venue": "Budweiser Stage",
       "city": "Toronto, Ontario",
       "state": null,
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 43.6374,
+      "longitude": -79.4145
     },
     {
       "venue": "Atlantic City Beach",
       "city": "Atlantic City",
       "state": "NJ",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 39.3550,
+      "longitude": -74.4180
     },
     {
       "venue": "Moon Palace",
       "city": "Cancun, Quintana Roo",
       "state": "",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 20.8813,
+      "longitude": -86.8515
     },
     {
       "venue": "John Paul Jones Arena",
       "city": "Charlottesville",
       "state": "VA",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 38.0329,
+      "longitude": -78.4991
     },
     {
       "venue": "The Omni",
       "city": "Atlanta",
       "state": "GA",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 33.7574,
+      "longitude": -84.3963
     },
     {
       "venue": "GTE Virginia Beach Amphitheater",
       "city": "Virginia Beach",
       "state": "VA",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 36.728058,
+      "longitude": -76.189466
     },
     {
       "venue": "Loring Commerce Centre",
       "city": "Limestone",
       "state": "ME",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 46.9497,
+      "longitude": -67.8856
     },
     {
       "venue": "Coastal Credit Union Music Park at Walnut Creek",
       "city": "Raleigh",
       "state": "NC",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 35.7173,
+      "longitude": -78.5788
     },
     {
       "venue": "Live Oak Bank Pavilion at Riverfront Park",
       "city": "Wilmington",
       "state": "NC",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 34.2439,
+      "longitude": -77.9489
     },
     {
       "venue": "Sphere",
       "city": "Las Vegas",
       "state": "NV",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 36.1199,
+      "longitude": -115.1545
     },
     {
       "venue": "Time Warner Cable Music Pavilion at Walnut Creek ",
       "city": "Raleigh",
       "state": "NC",
-      "latitude": 39.8283,
-      "longitude": -98.5795
+      "latitude": 35.7173,
+      "longitude": -78.5788
     }
   ]
 }
