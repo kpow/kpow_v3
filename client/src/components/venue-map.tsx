@@ -25,12 +25,7 @@ interface VenueMapProps {
 }
 
 export function VenueMap({ venues, onVenueSelect }: VenueMapProps) {
-  // Filter out venues with default coordinates (center of US)
-  const validVenues = venues.filter(v => 
-    v.latitude && 
-    v.longitude && 
-    !(v.latitude === 39.8283 && v.longitude === -98.5795)
-  );
+  const validVenues = venues.filter(v => v.latitude && v.longitude);
 
   if (validVenues.length === 0) {
     return (
@@ -43,7 +38,7 @@ export function VenueMap({ venues, onVenueSelect }: VenueMapProps) {
     );
   }
 
-  // Calculate center point from all valid venues
+  // Calculate center point from all venues
   const center = validVenues.reduce(
     (acc, venue) => {
       return {
@@ -54,22 +49,29 @@ export function VenueMap({ venues, onVenueSelect }: VenueMapProps) {
     { lat: 0, lng: 0 }
   );
 
-  // Create a div that captures clicks and stops propagation
-  const MapWrapper = ({ children }: { children: React.ReactNode }) => (
-    <div onClick={(e) => e.stopPropagation()} className="h-[400px] w-full rounded-lg overflow-hidden">
-      {children}
-    </div>
-  );
+  // Stop event propagation and prevent the modal from opening when clicking the map or markers
+  const handleMapClick = (e: L.LeafletMouseEvent) => {
+    e.originalEvent.stopPropagation();
+  };
+
+  const handleMarkerClick = (e: L.LeafletMouseEvent, venue: string) => {
+    e.originalEvent.stopPropagation();
+    if (onVenueSelect) {
+      e.originalEvent.preventDefault();
+      onVenueSelect(venue);
+    }
+  };
 
   return (
     <Card>
       <CardContent className="pt-6">
         <h2 className="text-lg font-slackey mb-4">venue map</h2>
-        <MapWrapper>
+        <div className="h-[400px] w-full rounded-lg overflow-hidden">
           <MapContainer
             center={[center.lat, center.lng]}
             zoom={4}
             style={{ height: "100%", width: "100%" }}
+            onClick={handleMapClick}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -81,10 +83,7 @@ export function VenueMap({ venues, onVenueSelect }: VenueMapProps) {
                 position={[venue.latitude || 0, venue.longitude || 0]}
                 icon={defaultIcon}
                 eventHandlers={{
-                  click: (e) => {
-                    e.originalEvent.stopPropagation();
-                    onVenueSelect?.(venue.venue);
-                  }
+                  click: (e) => handleMarkerClick(e, venue.venue)
                 }}
               >
                 <Popup>
@@ -98,7 +97,7 @@ export function VenueMap({ venues, onVenueSelect }: VenueMapProps) {
               </Marker>
             ))}
           </MapContainer>
-        </MapWrapper>
+        </div>
       </CardContent>
     </Card>
   );
