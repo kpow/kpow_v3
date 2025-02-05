@@ -1,15 +1,12 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import '/client/public/leaflet.css';
+import L from 'leaflet';
 import venueData from '@db/show-venues.json';
+import 'leaflet/dist/leaflet.css';
 
 // Fix for default marker icons in react-leaflet
-import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
+const DefaultIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -19,7 +16,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export function VenueMap() {
   // Center coordinates for continental USA
-  const center = [39.8283, -98.5795];
+  const center: [number, number] = [39.8283, -98.5795];
   const zoom = 4;
 
   return (
