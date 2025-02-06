@@ -230,10 +230,11 @@ export default function Home() {
           k-showz on insta
         </h2>
         {isLoadingInstagram ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-square rounded-lg" />
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-3  h-[400px] lg:grid-cols-4 gap-4">
+            <Skeleton
+              key={"skellywelly"}
+              className="w-full h-[400px] rounded-lg"
+            />
           </div>
         ) : (
           <>
