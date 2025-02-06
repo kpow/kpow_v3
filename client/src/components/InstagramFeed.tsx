@@ -227,7 +227,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {posts.map((post, index) => (
-              <div key={`${post.id}-${index}`} className="flex-[0_0_25%] min-w-0 px-2">
+              <div key={`${post.id}-${index}`} className="flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%] lg:flex-[0_0_25%] min-w-0 px-2">
                 <Card 
                   className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
                   onClick={() => handleOpenModal(index)}
