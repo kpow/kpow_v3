@@ -69,7 +69,7 @@ export function ContentSection({
   }
 
   if (type === "main") {
-    return (
+    const content = (
       <div className="group relative aspect-[4/3]">
         <div className="absolute inset-0 overflow-hidden rounded-lg">
           <img
@@ -83,20 +83,19 @@ export function ContentSection({
           <h3 className="text-xl font-bold font-slackey uppercase text-white mb-2">
             {title}
           </h3>
-          {link ? (
-            <Link 
-              to={link}
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded transition-colors duration-200"
-            >
-              {subtitle}
-            </Link>
-          ) : (
-            <div className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm rounded text-sm text-white">
-              {subtitle}
-            </div>
-          )}
+          <div className="inline-block px-3 py-1 bg-white/10 backdrop-blur-sm rounded text-sm text-white">
+            {subtitle}
+          </div>
         </div>
       </div>
+    );
+
+    return link ? (
+      <Link to={link} className="block cursor-pointer">
+        {content}
+      </Link>
+    ) : (
+      content
     );
   }
 
