@@ -22,20 +22,6 @@
       "longitude": -76.4387
     },
     {
-      "venue": "Red Rocks Amphitheatre",
-      "city": "Morrison",
-      "state": "CO",
-      "latitude": 39.6655,
-      "longitude": -105.2056
-    },
-    {
-      "venue": "Alpine Valley Music Theatre",
-      "city": "East Troy",
-      "state": "WI",
-      "latitude": 42.7347,
-      "longitude": -88.3129
-    },
-    {
       "venue": "nTelos Pavilion",
       "city": "Portsmouth",
       "state": "VA",
@@ -116,8 +102,8 @@
       "venue": "Atlantic City Beach",
       "city": "Atlantic City",
       "state": "NJ",
-      "latitude": 39.3550,
-      "longitude": -74.4180
+      "latitude": 39.355,
+      "longitude": -74.418
     },
     {
       "venue": "Moon Palace",

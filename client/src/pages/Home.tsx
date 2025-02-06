@@ -151,6 +151,13 @@ export default function Home() {
 
   const mainSections = [
     {
+      title: "phashboard",
+      subtitle: "DIG IN",
+      imageSrc: "/phash.jpg",
+      type: "main" as const,
+      link: "/stats",
+    },
+    {
       title: "battle",
       subtitle: "PLAY",
       imageSrc: "/battle.jpg",
@@ -217,7 +224,7 @@ export default function Home() {
 
   return (
     <div className="space-y-8 mt-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {mainSections.map((section) => (
           <ContentSection key={section.title} {...section} />
         ))}
