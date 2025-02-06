@@ -37,14 +37,14 @@ interface GoodreadsResponse {
 
 interface InstagramMediaChild {
   id: string;
-  media_type: 'IMAGE' | 'VIDEO';
+  media_type: "IMAGE" | "VIDEO";
   media_url: string;
   thumbnail_url?: string;
 }
 
 interface InstagramMedia {
   id: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
   media_url: string;
   thumbnail_url?: string;
   permalink: string;
@@ -243,35 +243,16 @@ export default function Home() {
               hasMore={!!instagramAfter}
               isLoadingMore={isLoadingMore}
             />
-            {isLoadingMore && (
+            {/* {isLoadingMore && (
               <div className="mt-4 flex justify-center">
                 <Skeleton className="h-8 w-8 rounded-full animate-spin" />
               </div>
-            )}
+            )} */}
           </>
         )}
       </div>
 
       <div className="h-px bg-gray-200 my-4" />
-
-      <RecentPlays />
-
-      <div className="h-px bg-gray-200 my-4" />
-
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">book feed</h2>
-          <Link key="BookFeed" href="books">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more books
-            </button>
-          </Link>
-        </div>
-        <BookFeed />
-      </div>
-
-      <div className="h-px bg-gray-200 my-4" />
-
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">star feed</h2>
@@ -300,6 +281,24 @@ export default function Home() {
                 />
               ))}
         </div>
+      </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+
+      <RecentPlays />
+
+      <div className="h-px bg-gray-200 my-4" />
+
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold font-slackey">book feed</h2>
+          <Link key="BookFeed" href="books">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+              more books
+            </button>
+          </Link>
+        </div>
+        <BookFeed />
       </div>
 
       <div className="h-px bg-gray-200 my-4" />
