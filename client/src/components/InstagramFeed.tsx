@@ -46,8 +46,13 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
-    slidesToScroll: 4,
-    dragFree: true
+    breakpoints: {
+      '(min-width: 1024px)': { slidesToScroll: 4 },
+      '(min-width: 768px)': { slidesToScroll: 3 },
+      '(min-width: 640px)': { slidesToScroll: 2 },
+    },
+    slidesToScroll: 1,
+    dragFree: false
   });
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
