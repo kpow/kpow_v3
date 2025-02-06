@@ -22,7 +22,7 @@ export function VenueMap() {
   const paddedBounds = bounds.pad(0.1); // 10% padding
 
   return (
-    <div className="h-[400px] w-full rounded-lg overflow-hidden">
+    <div className="h-[400px] w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
         bounds={paddedBounds}
         style={{ height: '100%', width: '100%' }}
