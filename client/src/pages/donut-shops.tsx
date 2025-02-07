@@ -34,6 +34,7 @@ export default function DonutShops() {
   const [searchState, setSearchState] = useState<SearchState>({});
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
+  const [mapZoom, setMapZoom] = useState(13);
   const { toast } = useToast();
 
   const { data: shops = [], isLoading, refetch } = useQuery({
@@ -64,10 +65,16 @@ export default function DonutShops() {
       const data = await response.json();
       console.log('Received shops data:', data);
 
-      // If we got results, center the map on the first shop
+      // Update map center based on search results
       if (data.length > 0) {
         const firstShop = data[0];
-        setMapCenter([firstShop.coordinates.latitude, firstShop.coordinates.longitude]);
+        const newCenter: [number, number] = [
+          firstShop.coordinates.latitude,
+          firstShop.coordinates.longitude
+        ];
+        console.log('Setting new map center:', newCenter);
+        setMapCenter(newCenter);
+        setMapZoom(13); // Reset zoom when changing location
       }
 
       return data;
@@ -198,6 +205,7 @@ export default function DonutShops() {
               <DonutShopMap 
                 shops={shops} 
                 center={mapCenter}
+                zoom={mapZoom}
                 onShopClick={handleShopClick}
               />
             </div>

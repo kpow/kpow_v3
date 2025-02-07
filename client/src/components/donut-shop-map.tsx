@@ -1,6 +1,7 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useEffect } from 'react';
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -10,6 +11,18 @@ const ShopIcon = L.icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
 });
+
+// Component to handle map center updates
+function MapUpdater({ center, zoom }: { center: [number, number], zoom: number }) {
+  const map = useMap();
+
+  useEffect(() => {
+    console.log('Updating map center to:', center);
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
+
+  return null;
+}
 
 interface Shop {
   id: string;
@@ -37,6 +50,8 @@ export function DonutShopMap({
   zoom = 13,
   onShopClick 
 }: DonutShopMapProps) {
+  console.log('DonutShopMap received:', { shops, center, zoom });
+
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
@@ -44,6 +59,7 @@ export function DonutShopMap({
         zoom={zoom}
         style={{ height: '100%', width: '100%' }}
       >
+        <MapUpdater center={center} zoom={zoom} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
