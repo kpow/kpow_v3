@@ -194,6 +194,9 @@ export default function DonutShops() {
             <ShopSlider shops={shops} onShopClick={handleShopClick} />
           </div>
         )}
+        <CardContent className="pt-2" />
+      </Card>
+      <Card className="lg:col-span-2 order-1 lg:order-2">
         <CardContent className="pt-2">
           <div className="h-[500px] w-full rounded-lg">
             <DonutShopMap
@@ -219,8 +222,8 @@ export default function DonutShops() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
-        <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-1 order-2 lg:order-1">
           <CardContent className="pt-4">
             <Tabs
               defaultValue="city"
