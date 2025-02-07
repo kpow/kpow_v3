@@ -27,7 +27,6 @@ interface SearchState {
   zipCode?: string;
   latitude?: number;
   longitude?: number;
-  timestamp?: number; // Added timestamp for forcing refetches
 }
 
 export default function DonutShops() {
@@ -37,9 +36,10 @@ export default function DonutShops() {
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
   const { toast } = useToast();
 
-  const { data: shops = [], isLoading, error } = useQuery({
+  const { data: shops = [], isLoading, refetch } = useQuery({
     queryKey: ["donutShops", searchState],
     queryFn: async () => {
+      console.log("Search state:", searchState);
       const queryString = new URLSearchParams();
 
       if (searchType === "city" && searchState.city) {
@@ -55,26 +55,28 @@ export default function DonutShops() {
 
       console.log('Fetching shops with query:', queryString.toString());
       const response = await fetch(`/api/yelp/search?${queryString}`);
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch shops');
       }
+
       const data = await response.json();
       console.log('Received shops data:', data);
+
+      // If we got results, center the map on the first shop
+      if (data.length > 0) {
+        const firstShop = data[0];
+        setMapCenter([firstShop.coordinates.latitude, firstShop.coordinates.longitude]);
+      }
+
       return data;
     },
-    enabled: Object.keys(searchState).length > 0,
-    retry: 1,
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch donut shops",
-        variant: "destructive",
-      });
-    }
+    enabled: false // Don't run query automatically
   });
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    // Validate search input
     if (searchType === "city" && !searchState.city) {
       toast({
         title: "Missing Information",
@@ -100,8 +102,13 @@ export default function DonutShops() {
       return;
     }
 
-    // Force a refetch by updating the state
-    setSearchState(prev => ({ ...prev, timestamp: Date.now() }));
+    console.log("Triggering search with state:", searchState);
+    await refetch(); // Manually trigger the query
+  };
+
+  const handleInputChange = (value: string | number, field: keyof SearchState) => {
+    console.log(`Updating ${field} with value:`, value);
+    setSearchState(prev => ({ ...prev, [field]: value }));
   };
 
   const handleShopClick = (shop: Shop) => {
@@ -130,7 +137,8 @@ export default function DonutShops() {
                 <Label>City Name</Label>
                 <Input 
                   placeholder="Enter city name"
-                  onChange={(e) => setSearchState({ city: e.target.value })}
+                  value={searchState.city || ''}
+                  onChange={(e) => handleInputChange(e.target.value, 'city')}
                 />
               </div>
             </TabsContent>
@@ -140,7 +148,8 @@ export default function DonutShops() {
                 <Label>Zip Code</Label>
                 <Input 
                   placeholder="Enter zip code"
-                  onChange={(e) => setSearchState({ zipCode: e.target.value })}
+                  value={searchState.zipCode || ''}
+                  onChange={(e) => handleInputChange(e.target.value, 'zipCode')}
                 />
               </div>
             </TabsContent>
@@ -152,10 +161,8 @@ export default function DonutShops() {
                   <Input 
                     type="number" 
                     placeholder="Enter latitude"
-                    onChange={(e) => setSearchState(prev => ({ 
-                      ...prev, 
-                      latitude: parseFloat(e.target.value) 
-                    }))}
+                    value={searchState.latitude || ''}
+                    onChange={(e) => handleInputChange(parseFloat(e.target.value), 'latitude')}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -163,10 +170,8 @@ export default function DonutShops() {
                   <Input 
                     type="number" 
                     placeholder="Enter longitude"
-                    onChange={(e) => setSearchState(prev => ({ 
-                      ...prev, 
-                      longitude: parseFloat(e.target.value) 
-                    }))}
+                    value={searchState.longitude || ''}
+                    onChange={(e) => handleInputChange(parseFloat(e.target.value), 'longitude')}
                   />
                 </div>
               </div>
