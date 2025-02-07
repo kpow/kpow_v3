@@ -66,15 +66,23 @@ export function HeroBattle() {
     }
 
     await new Promise((resolve) => setTimeout(resolve, STEP_DURATION));
-    const battleWinner = determineBattleWinner(hero1, hero2);
+    const { winner: battleWinner, isMiracleWin } = determineBattleWinner(hero1, hero2);
     setWinner(battleWinner);
     setIsBattling(false);
     setBattleStep(-1);
 
     if (mode === "random" && selectedHero) {
       const newStash =
-        selectedHero === battleWinner.id ? stash + bet : stash - bet;
+        selectedHero === battleWinner.id ? stash + (isMiracleWin ? bet * 3 : bet) : stash - bet;
       setStash(newStash);
+    }
+
+    // Show miracle win message
+    if (isMiracleWin) {
+      const winnerDiv = document.querySelector('.winner-message');
+      if (winnerDiv) {
+        winnerDiv.textContent = `${battleWinner.name} Wins! (MIRACLE WIN!)`;
+      }
     }
   };
 

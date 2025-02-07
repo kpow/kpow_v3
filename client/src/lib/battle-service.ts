@@ -67,11 +67,26 @@ export function calculatePowerLevel(hero: Hero): number {
 }
 
 // Determine battle winner
-export function determineBattleWinner(hero1: Hero, hero2: Hero): Hero {
+export function determineBattleWinner(hero1: Hero, hero2: Hero): { winner: Hero, isMiracleWin: boolean } {
   const hero1Power = calculatePowerLevel(hero1);
   const hero2Power = calculatePowerLevel(hero2);
+  
+  // 1% chance of miracle win for significantly weaker hero
+  const miracleChance = Math.random() < 0.01;
+  const powerDifference = Math.abs(hero1Power - hero2Power);
+  const isSignificantDifference = powerDifference > 50;
+  
+  if (isSignificantDifference && miracleChance) {
+    return {
+      winner: hero1Power < hero2Power ? hero1 : hero2,
+      isMiracleWin: true
+    };
+  }
 
-  return hero1Power >= hero2Power ? hero1 : hero2;
+  return {
+    winner: hero1Power >= hero2Power ? hero1 : hero2,
+    isMiracleWin: false
+  };
 }
 
 // Random hero selection
