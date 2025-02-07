@@ -130,27 +130,31 @@ export default function DonutShops() {
         donut tour
       </PageTitle>
 
-      <Card className="mb-4">
-        <CardContent className="pt-2">
-          <div className="h-[500px] w-full rounded-lg">
-            <DonutShopMap
-              shops={shops}
-              onShopClick={handleShopClick}
-              shouldFitBounds={shouldFitBounds}
-              selectedShopId={selectedShopId}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {shops.length > 0 && (
-        <Card className="mb-4">
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-semibold mb-4">Featured Shops</h2>
-            <ShopSlider shops={shops} onShopClick={handleShopClick} />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-4 mb-4">
+        <Card>
+          <CardContent className="pt-2">
+            <div className="h-[600px] w-full rounded-lg">
+              <DonutShopMap
+                shops={shops}
+                onShopClick={handleShopClick}
+                shouldFitBounds={shouldFitBounds}
+                selectedShopId={selectedShopId}
+              />
+            </div>
           </CardContent>
         </Card>
-      )}
+
+        {shops.length > 0 && (
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-semibold mb-4">Featured Shops</h2>
+              <div className="h-[520px] overflow-y-auto">
+                <ShopSlider shops={shops} onShopClick={handleShopClick} orientation="vertical" />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">        
         <Card className="lg:col-span-2">
