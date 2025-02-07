@@ -235,23 +235,26 @@ export default function DonutShops() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <Card className="mb-8">
+        <CardContent className="pt-6">
+          <h2 className="text-2xl font-slackey mb-6">Shop Map</h2>
+          <div className="h-[400px] w-full rounded-lg">
+            <DonutShopMap
+              shops={shops}
+              onShopClick={handleShopClick}
+              shouldFitBounds={shouldFitBounds}
+            />
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="lg:col-span-1">
+        <CardContent className="pt-6">
+          <h2 className="text-2xl font-slackey mb-6">Shop Details</h2>
+          <div className="space-y-4">
         <Card className="lg:col-span-2">
           <CardContent className="pt-6">
-            <h2 className="text-2xl font-slackey mb-6">Shop Map</h2>
-            <div className="h-[600px] w-full rounded-lg">
-              <DonutShopMap
-                shops={shops}
-                onShopClick={handleShopClick}
-                shouldFitBounds={shouldFitBounds}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-2xl font-slackey mb-6">Shop Details</h2>
+            <h2 className="text-2xl font-slackey mb-6">Search Shops</h2>
             <div className="space-y-4">
               {selectedShop ? (
                 <>
