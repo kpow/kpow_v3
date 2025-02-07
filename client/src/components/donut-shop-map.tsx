@@ -56,8 +56,6 @@ function MapController({
   useEffect(() => {
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
-      const latLng = marker.getLatLng();
-      map.setView(latLng, 15);
       marker.openPopup();
     }
   }, [selectedShopId, map, markersRef]);
