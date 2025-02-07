@@ -132,7 +132,7 @@ export default function DonutShops() {
 
       <Card className="mb-4">
         <CardContent className="pt-2">
-          <div className="h-[400px] w-full rounded-lg">
+          <div className="h-[500px] w-full rounded-lg">
             <DonutShopMap
               shops={shops}
               onShopClick={handleShopClick}
@@ -144,17 +144,17 @@ export default function DonutShops() {
       </Card>
 
       {shops.length > 0 && (
-        <Card className="mb-4">
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-semibold mb-4">Featured Shops</h2>
+        <Card className="mb-1">
+          <CardContent className="pt-2">
+            <h2 className="text-lg font-semibold mb-2">Featured Shops</h2>
             <ShopSlider shops={shops} onShopClick={handleShopClick} />
           </CardContent>
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">        
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
         <Card className="lg:col-span-2">
-          <CardContent className="pt-6">
+          <CardContent className="pt-4">
             <Tabs
               defaultValue="city"
               onValueChange={(value) => {
@@ -185,7 +185,9 @@ export default function DonutShops() {
                   <Input
                     placeholder="Enter zip code"
                     value={searchState.zipCode || ""}
-                    onChange={(e) => handleInputChange(e.target.value, "zipCode")}
+                    onChange={(e) =>
+                      handleInputChange(e.target.value, "zipCode")
+                    }
                   />
                 </div>
               </TabsContent>
@@ -199,7 +201,10 @@ export default function DonutShops() {
                       placeholder="Enter latitude"
                       value={searchState.latitude || ""}
                       onChange={(e) =>
-                        handleInputChange(parseFloat(e.target.value), "latitude")
+                        handleInputChange(
+                          parseFloat(e.target.value),
+                          "latitude",
+                        )
                       }
                     />
                   </div>
@@ -210,7 +215,10 @@ export default function DonutShops() {
                       placeholder="Enter longitude"
                       value={searchState.longitude || ""}
                       onChange={(e) =>
-                        handleInputChange(parseFloat(e.target.value), "longitude")
+                        handleInputChange(
+                          parseFloat(e.target.value),
+                          "longitude",
+                        )
                       }
                     />
                   </div>
@@ -234,7 +242,7 @@ export default function DonutShops() {
               <div className="mt-6">
                 <Button
                   onClick={handleSearch}
-                  className="w-full"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
                   disabled={isLoading}
                 >
                   {isLoading ? "Searching..." : "Search Donut Shops"}

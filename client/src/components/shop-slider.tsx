@@ -42,7 +42,7 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+          className="h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4"
           onClick={scrollPrev}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -50,7 +50,7 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
       </div>
 
       <div className="w-full overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-4">
+        <div className="flex gap-2">
           {shops.map((shop) => (
             <div
               key={shop.id}
@@ -70,7 +70,7 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                <div className="absolute bottom-0 left-0 right-0 p-2 text-white">
                   <h3 className="text-sm font-semibold mb-1 truncate">
                     {shop.name}
                   </h3>
@@ -85,7 +85,7 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+          className="h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4"
           onClick={scrollNext}
         >
           <ChevronRight className="h-4 w-4" />
