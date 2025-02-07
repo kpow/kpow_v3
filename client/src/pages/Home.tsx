@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
 import { useState } from "react";
+import { ShopSlider } from "@/components/shop-slider";
 
 interface Author {
   name: string[];
@@ -68,6 +69,20 @@ interface InstagramResponse {
     };
     next?: string;
   } | null;
+}
+
+interface Shop {
+  id: string;
+  name: string;
+  rating: number;
+  price?: string;
+  address: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  image_url?: string;
+  url: string;
 }
 
 export default function Home() {
@@ -212,6 +227,17 @@ export default function Home() {
     },
   ];
 
+  const { data: shops, isLoading: isLoadingShops } = useQuery<Shop[]>({
+    queryKey: ["/api/yelp/search"],
+    queryFn: async () => {
+      const response = await fetch(`/api/yelp/search?location=San Francisco, CA`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch donut shops");
+      }
+      return response.json();
+    },
+  });
+
   if (isLoadingBooks || isLoadingStarred) {
     return (
       <div className="container mx-auto p-4 space-y-4">
@@ -251,11 +277,6 @@ export default function Home() {
               hasMore={!!instagramAfter}
               isLoadingMore={isLoadingMore}
             />
-            {/* {isLoadingMore && (
-              <div className="mt-4 flex justify-center">
-                <Skeleton className="h-8 w-8 rounded-full animate-spin" />
-              </div>
-            )} */}
           </>
         )}
       </div>
@@ -307,6 +328,33 @@ export default function Home() {
           </Link>
         </div>
         <BookFeed />
+      </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold font-slackey">donut tour</h2>
+          <Link href="/donut-shops">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+              explore donut shops
+            </button>
+          </Link>
+        </div>
+        {isLoadingShops ? (
+          <div className="w-full">
+            <Skeleton className="h-[300px] w-full" />
+          </div>
+        ) : shops && shops.length > 0 ? (
+          <div className="h-full w-full rounded-lg overflow-hidden">
+            <ShopSlider
+              shops={shops}
+              onShopClick={(shop) => {
+                window.open(shop.url, "_blank");
+              }}
+            />
+          </div>
+        ) : null}
       </div>
 
       <div className="h-px bg-gray-200 my-4" />
