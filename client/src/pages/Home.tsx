@@ -353,12 +353,14 @@ export default function Home() {
       </div>
 
       <div className="h-px bg-gray-200 my-4" />
-
       {/* {donuts} */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">
-            donut tour {shops && shops.length > 0 ? `- ${currentCity.city}, ${currentCity.state}` : ''}
+            donut tour{" "}
+            {shops && shops.length > 0
+              ? `- ${currentCity.city}, ${currentCity.state}`
+              : ""}
           </h2>
           <Link href="/donut-shops">
             <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
@@ -383,7 +385,6 @@ export default function Home() {
       </div>
 
       <div className="h-px bg-gray-200 my-4" />
-
       {/* {gitHubz} */}
       <GitHubSection />
 
