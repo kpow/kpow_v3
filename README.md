@@ -1,6 +1,6 @@
-# KPOW - Digital Content Platform
+# KPOW - Digital Content & Local Discovery Platform
 
-A comprehensive cross-domain media analytics platform featuring an advanced interactive Phish show exploration system with dynamic data retrieval and personalized music event tracking.
+A comprehensive cross-domain media and location analytics platform, specializing in donut shop exploration with advanced search, mapping, and interactive discovery features.
 
 ## Tech Stack
 
@@ -8,10 +8,12 @@ A comprehensive cross-domain media analytics platform featuring an advanced inte
 - React with TypeScript + Tailwind CSS
 - ShadcN UI + Framer Motion
 - React Query + Wouter
+- Leaflet for interactive mapping
 - Advanced data visualization with Recharts
 
 ### Backend
 - Express.js with secure API integrations:
+  - Yelp Fusion API
   - Phish.net API v5
   - Last.fm API
   - Goodreads API
@@ -20,6 +22,18 @@ A comprehensive cross-domain media analytics platform featuring an advanced inte
 - Drizzle ORM with PostgreSQL
 
 ## Core Features
+
+### Donut Shop Explorer
+- Automatic random US city donut shop loading
+- Interactive venue mapping with Leaflet
+- Advanced filtering by rating and location
+- Comprehensive shop details including:
+  - Ratings and reviews
+  - Price ranges
+  - Operating hours
+  - Photos and contact information
+- City/ZIP code-based search functionality
+- Dynamic map bounds adjustment
 
 ### Advanced Show Analytics
 - Comprehensive Phish show statistics dashboard
@@ -61,12 +75,12 @@ npm install
 2. Configure environment:
 ```bash
 # API Keys
+YELP_API_KEY=your_key
 PHISH_API_KEY=your_key
 LASTFM_API_KEY=your_key
 GOODREADS_API_KEY=your_key
 FEEDBIN_KEY=your_key
 INSTAGRAM_ACCESS_TOKEN=your_token
-GMAIL_APP_PASSWORD=your_app_password
 
 # Database Configuration
 DATABASE_URL=your_postgresql_url
