@@ -132,7 +132,7 @@ export default function DonutShops() {
 
       <Card className="mb-4">
         <CardContent className="pt-2">
-          <div className="h-[400px] w-full rounded-lg">
+          <div className="h-[500px] w-full rounded-lg">
             <DonutShopMap
               shops={shops}
               onShopClick={handleShopClick}
