@@ -35,11 +35,10 @@ export default function DonutShops() {
   const [searchState, setSearchState] = useState<SearchState>({});
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [minRating, setMinRating] = useState(0);
-  const [searchId, setSearchId] = useState(""); // Add state for tracking searches
   const { toast } = useToast();
 
   const { data: allShops = [], isLoading, refetch } = useQuery({
-    queryKey: ["donutShops", searchState, searchId], //Added searchId to queryKey
+    queryKey: ["donutShops", searchState],
     queryFn: async () => {
       console.log("Search state:", searchState);
       const queryString = new URLSearchParams();
@@ -71,7 +70,7 @@ export default function DonutShops() {
   });
 
   // Filter shops based on minimum rating
-  const shops = allShops.filter(shop =>
+  const shops = allShops.filter(shop => 
     shop.rating >= minRating
   );
 
@@ -102,10 +101,8 @@ export default function DonutShops() {
       return;
     }
 
-    // Generate new search ID when performing a new search
-    setSearchId(Date.now().toString());
     console.log("Triggering search with state:", searchState);
-    await refetch();
+    await refetch(); // Manually trigger the query
   };
 
   const handleInputChange = (value: string | number, field: keyof SearchState) => {
@@ -140,7 +137,7 @@ export default function DonutShops() {
             <TabsContent value="city" className="space-y-4">
               <div className="grid gap-2">
                 <Label>City Name</Label>
-                <Input
+                <Input 
                   placeholder="Enter city name"
                   value={searchState.city || ''}
                   onChange={(e) => handleInputChange(e.target.value, 'city')}
@@ -151,7 +148,7 @@ export default function DonutShops() {
             <TabsContent value="zipcode" className="space-y-4">
               <div className="grid gap-2">
                 <Label>Zip Code</Label>
-                <Input
+                <Input 
                   placeholder="Enter zip code"
                   value={searchState.zipCode || ''}
                   onChange={(e) => handleInputChange(e.target.value, 'zipCode')}
@@ -163,8 +160,8 @@ export default function DonutShops() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label>Latitude</Label>
-                  <Input
-                    type="number"
+                  <Input 
+                    type="number" 
                     placeholder="Enter latitude"
                     value={searchState.latitude || ''}
                     onChange={(e) => handleInputChange(parseFloat(e.target.value), 'latitude')}
@@ -172,8 +169,8 @@ export default function DonutShops() {
                 </div>
                 <div className="grid gap-2">
                   <Label>Longitude</Label>
-                  <Input
-                    type="number"
+                  <Input 
+                    type="number" 
                     placeholder="Enter longitude"
                     value={searchState.longitude || ''}
                     onChange={(e) => handleInputChange(parseFloat(e.target.value), 'longitude')}
@@ -201,7 +198,7 @@ export default function DonutShops() {
           </Tabs>
 
           <div className="mt-6">
-            <Button
+            <Button 
               onClick={handleSearch}
               className="w-full"
               disabled={isLoading}
@@ -217,9 +214,8 @@ export default function DonutShops() {
           <CardContent className="pt-6">
             <h2 className="text-2xl font-slackey mb-6">Shop Map</h2>
             <div className="h-[600px] w-full rounded-lg">
-              <DonutShopMap
+              <DonutShopMap 
                 shops={shops}
-                searchId={searchId} // Pass searchId to DonutShopMap
                 onShopClick={handleShopClick}
               />
             </div>
@@ -245,8 +241,8 @@ export default function DonutShops() {
                     </div>
                   )}
                   {selectedShop.image_url && (
-                    <img
-                      src={selectedShop.image_url}
+                    <img 
+                      src={selectedShop.image_url} 
                       alt={selectedShop.name}
                       className="w-full h-48 object-cover rounded-lg"
                     />
