@@ -34,7 +34,7 @@ export default function DonutShops() {
   const [searchState, setSearchState] = useState<SearchState>({});
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
-  const [mapZoom, setMapZoom] = useState(13);
+  const [mapZoom, setMapZoom] = useState(11); // Changed from 13 to 11 for a wider view
   const { toast } = useToast();
 
   const { data: shops = [], isLoading, refetch } = useQuery({
@@ -74,7 +74,7 @@ export default function DonutShops() {
         ];
         console.log('Setting new map center:', newCenter);
         setMapCenter(newCenter);
-        setMapZoom(13); // Reset zoom when changing location
+        setMapZoom(11); // Changed from 13 to 11 for a wider view
       }
 
       return data;

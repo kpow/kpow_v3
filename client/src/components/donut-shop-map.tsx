@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-pink.png",
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -47,7 +47,7 @@ interface DonutShopMapProps {
 export function DonutShopMap({ 
   shops = [], 
   center = [40.7128, -74.0060], // Default to NYC
-  zoom = 13,
+  zoom = 11, // Changed from 13 to 11 for a wider view
   onShopClick 
 }: DonutShopMapProps) {
   console.log('DonutShopMap received:', { shops, center, zoom });
