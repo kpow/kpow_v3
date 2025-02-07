@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { DonutShopMap } from "@/components/donut-shop-map";
 import { useToast } from "@/hooks/use-toast";
 
@@ -116,9 +122,12 @@ export default function DonutShops() {
     setSelectedShop(shop);
   };
 
-  const handleRatingChange = (value: number[]) => {
-    handleInputChange(value[0], 'minRating');
+  const handleRatingChange = (value: string) => {
+    handleInputChange(parseFloat(value), 'minRating');
   };
+
+  // Generate rating options (0 to 5 stars, with half-star increments)
+  const ratingOptions = Array.from({ length: 11 }, (_, i) => i * 0.5);
 
   return (
     <div className="container mx-auto p-4">
@@ -186,18 +195,21 @@ export default function DonutShops() {
             {/* Rating Filter */}
             <div className="mt-6 space-y-4">
               <Label>Minimum Rating</Label>
-              <div className="flex items-center gap-4">
-                <Slider
-                  value={[searchState.minRating || 0]}
-                  onValueChange={handleRatingChange}
-                  max={5}
-                  step={0.5}
-                  className="flex-1"
-                />
-                <span className="min-w-[4rem] text-sm">
-                  {searchState.minRating || 0} ⭐
-                </span>
-              </div>
+              <Select
+                value={searchState.minRating?.toString() || "0"}
+                onValueChange={handleRatingChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select minimum rating" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ratingOptions.map((rating) => (
+                    <SelectItem key={rating} value={rating.toString()}>
+                      {rating} ⭐
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </Tabs>
 
