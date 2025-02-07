@@ -26,8 +26,8 @@ interface ShopSliderProps {
 export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: ShopSliderProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
-    containScroll: "trimSnaps",
-    direction: orientation === 'vertical' ? 'vertical' : 'horizontal',
+    direction: orientation === 'vertical' ? 'y' : 'x',
+    dragFree: true,
   });
 
   const scrollPrev = useCallback(() => {
@@ -51,9 +51,9 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
         </Button>
 
         <div className="flex-1 overflow-hidden" ref={emblaRef}>
-          <div className="flex flex-col">
+          <div className="flex flex-col h-full">
             {shops.map((shop) => (
-              <div key={shop.id} className="min-h-0 flex-shrink-0">
+              <div key={shop.id} className="flex-[0_0_70px]">
                 <Card 
                   className="relative h-[70px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02] m-0 rounded-none border-0"
                   onClick={() => onShopClick(shop)}
