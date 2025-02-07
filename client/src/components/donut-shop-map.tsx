@@ -16,14 +16,15 @@ const ShopIcon = L.icon({
 function MapController({ 
   shops, 
   shouldFitBounds,
-  selectedShopId
+  selectedShopId,
+  markersRef
 }: { 
   shops: Shop[], 
   shouldFitBounds: boolean,
-  selectedShopId?: string 
+  selectedShopId?: string,
+  markersRef: React.MutableRefObject<{ [key: string]: L.Marker }> 
 }) {
   const map = useMap();
-  const markersRef = useRef<{ [key: string]: L.Marker }>({});
 
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
@@ -40,14 +41,10 @@ function MapController({
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
       const latLng = marker.getLatLng();
-
-      // Zoom to marker
       map.setView(latLng, 15);
-
-      // Open popup
       marker.openPopup();
     }
-  }, [selectedShopId, map]);
+  }, [selectedShopId, map, markersRef]);
 
   return null;
 }
@@ -79,6 +76,7 @@ export function DonutShopMap({
   selectedShopId
 }: DonutShopMapProps) {
   console.log('DonutShopMap received:', { shops, selectedShopId });
+  const markersRef = useRef<{ [key: string]: L.Marker }>({});
 
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
@@ -91,6 +89,7 @@ export function DonutShopMap({
           shops={shops} 
           shouldFitBounds={shouldFitBounds}
           selectedShopId={selectedShopId}
+          markersRef={markersRef}
         />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
