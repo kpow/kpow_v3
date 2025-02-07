@@ -13,11 +13,11 @@ const ShopIcon = L.icon({
 });
 
 // Component to handle map center and bounds updates
-function MapUpdater({ shops }: { shops: Shop[] }) {
+function MapUpdater({ shops, shouldFitBounds }: { shops: Shop[], shouldFitBounds: boolean }) {
   const map = useMap();
 
   useEffect(() => {
-    if (shops.length > 0) {
+    if (shouldFitBounds && shops.length > 0) {
       // Create bounds object
       const bounds = L.latLngBounds(
         shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
@@ -29,7 +29,7 @@ function MapUpdater({ shops }: { shops: Shop[] }) {
       // Fit map to bounds
       map.fitBounds(paddedBounds);
     }
-  }, [shops, map]);
+  }, [shops, shouldFitBounds, map]);
 
   return null;
 }
@@ -50,11 +50,13 @@ interface Shop {
 interface DonutShopMapProps {
   shops: Shop[];
   onShopClick?: (shop: Shop) => void;
+  shouldFitBounds?: boolean;
 }
 
 export function DonutShopMap({ 
   shops = [], 
-  onShopClick 
+  onShopClick,
+  shouldFitBounds = false
 }: DonutShopMapProps) {
   console.log('DonutShopMap received:', { shops });
 
@@ -65,7 +67,7 @@ export function DonutShopMap({
         zoom={11} // Default zoom, will be adjusted by MapUpdater
         style={{ height: '100%', width: '100%' }}
       >
-        <MapUpdater shops={shops} />
+        <MapUpdater shops={shops} shouldFitBounds={shouldFitBounds} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

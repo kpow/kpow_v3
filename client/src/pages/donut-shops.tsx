@@ -35,6 +35,7 @@ export default function DonutShops() {
   const [searchState, setSearchState] = useState<SearchState>({});
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [minRating, setMinRating] = useState(0);
+  const [shouldFitBounds, setShouldFitBounds] = useState(false);
   const { toast } = useToast();
 
   const { data: allShops = [], isLoading, refetch } = useQuery({
@@ -64,6 +65,10 @@ export default function DonutShops() {
 
       const data = await response.json();
       console.log('Received shops data:', data);
+
+      // Set shouldFitBounds to true when new search results come in
+      setShouldFitBounds(true);
+
       return data;
     },
     enabled: false // Don't run query automatically
@@ -112,6 +117,8 @@ export default function DonutShops() {
 
   const handleShopClick = (shop: Shop) => {
     setSelectedShop(shop);
+    // Don't fit bounds when clicking a shop
+    setShouldFitBounds(false);
   };
 
   const handleRatingChange = (value: number[]) => {
@@ -217,6 +224,7 @@ export default function DonutShops() {
               <DonutShopMap 
                 shops={shops}
                 onShopClick={handleShopClick}
+                shouldFitBounds={shouldFitBounds}
               />
             </div>
           </CardContent>
