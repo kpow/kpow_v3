@@ -1,8 +1,8 @@
-import { useRef, useCallback } from "react";
+import { useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Shop {
   id: string;
@@ -40,70 +40,59 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
 
   if (orientation === 'vertical') {
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 h-full">
         <Button 
           variant="ghost" 
           size="icon"
-          className="h-8 w-full bg-background/80 backdrop-blur-sm border-0"
+          className="h-8 w-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
           onClick={scrollPrev}
         >
           <ChevronUp className="h-4 w-4" />
         </Button>
 
-        <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex-1 overflow-hidden" ref={emblaRef}>
           <div className="flex flex-col">
             {shops.map((shop) => (
-              <div key={shop.id} className="min-h-0">
+              <div key={shop.id} className="min-h-0 flex-shrink-0">
                 <Card 
                   className="relative h-[70px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02] m-0 rounded-none border-0"
                   onClick={() => onShopClick(shop)}
                 >
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url(${
-                  shop.image_url ||
-                  "https://placehold.co/300x200/jpeg?text=No+Image"
-                })`,
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-              <h3 className="text-sm font-semibold mb-1 truncate">
-                {shop.name}
-              </h3>
-            </div>
-              </Card>
-            </div>
-          ))}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${
+                        shop.image_url ||
+                        "https://placehold.co/300x200/jpeg?text=No+Image"
+                      })`,
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <h3 className="text-sm font-semibold mb-1 truncate">
+                      {shop.name}
+                    </h3>
+                  </div>
+                </Card>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="h-8 w-full bg-background/80 backdrop-blur-sm border-0"
-        onClick={scrollNext}
-      >
-        <ChevronDown className="h-4 w-4" />
-      </Button>
-    </div>
-  );
-}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="h-8 w-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
+          onClick={scrollNext}
+        >
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
-          onClick={scrollPrev}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-      </div>
-
       <div className="w-full overflow-hidden" ref={emblaRef}>
         <div className="flex gap-4">
           {shops.map((shop) => (
@@ -134,17 +123,6 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
-          onClick={scrollNext}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   );
