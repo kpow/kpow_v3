@@ -116,25 +116,37 @@ export default function DonutShops() {
   };
 
   const handleRandomCity = async () => {
-    const newCity = getRandomCity();
-    setSearchState({
-      city: newCity.city,
-      state: newCity.state,
-      zipCode: undefined,
-      latitude: undefined,
-      longitude: undefined
-    });
-    setSelectedShopId(null);
-    setShouldFitBounds(true);
-    setMinRating(0); // Reset rating filter
-    setSearchType("city"); // Ensure we're in city search mode
-
     try {
+      // Add loading state
+      const newCity = getRandomCity();
+
+      // Reset all states first
+      setSearchType("city");
+      setMinRating(0);
+      setSelectedShopId(null);
+      setShouldFitBounds(true);
+
+      // Update search state with new city
+      setSearchState({
+        city: newCity.city,
+        state: newCity.state,
+        zipCode: undefined,
+        latitude: undefined,
+        longitude: undefined
+      });
+
+      // Wait for the API call to complete
       await refetch();
+
+      toast({
+        title: "Success",
+        description: `Loaded donut shops in ${newCity.city}, ${newCity.state}`,
+      });
     } catch (error) {
+      console.error("Failed to load new city:", error);
       toast({
         title: "Error",
-        description: "Failed to load shops for the new city",
+        description: "Failed to load shops for the new city. Please try again.",
         variant: "destructive",
       });
     }
