@@ -84,10 +84,6 @@ export function DonutShopMap({
             <Popup>
               <div className="p-2">
                 <h3 className="font-bold mb-1">{shop.name}</h3>
-                <p className="text-sm mb-1">Rating: {shop.rating} ⭐</p>
-                {shop.price && (
-                  <p className="text-sm mb-1">Price: {shop.price}</p>
-                )}
                 <p className="text-sm">{shop.address}</p>
               </div>
             </Popup>
