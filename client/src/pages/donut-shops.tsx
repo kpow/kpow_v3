@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { DonutShopMap } from "@/components/donut-shop-map";
 import { ShopSlider } from "@/components/shop-slider";
 import { useToast } from "@/hooks/use-toast";
+import { cities } from "@/data/cities";
 
 interface Shop {
   id: string;
@@ -31,13 +32,23 @@ interface SearchState {
   longitude?: number;
 }
 
+const getRandomCity = () => {
+  const randomIndex = Math.floor(Math.random() * cities.length);
+  return cities[randomIndex].city;
+};
+
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
-  const [searchState, setSearchState] = useState<SearchState>({});
+  const [searchState, setSearchState] = useState<SearchState>({ city: getRandomCity() });
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Trigger search when component mounts
+    refetch();
+  }, [refetch]); // Empty dependency array means this runs once on mount
 
   const {
     data: allShops = [],
