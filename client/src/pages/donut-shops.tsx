@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { DonutShopMap } from "@/components/donut-shop-map";
+import { ShopSlider } from "@/components/shop-slider";
 import { useToast } from "@/hooks/use-toast";
 
 interface Shop {
@@ -121,6 +121,13 @@ export default function DonutShops() {
   const handleShopClick = (shop: Shop) => {
     setSelectedShop(shop);
     setShouldFitBounds(false);
+    // Create a slightly padded viewport around the selected shop
+    const padding = 0.01; // Approximately 1km padding
+    const bounds = [
+      [shop.coordinates.latitude - padding, shop.coordinates.longitude - padding],
+      [shop.coordinates.latitude + padding, shop.coordinates.longitude + padding],
+    ];
+    // The map component will handle the bounds update
   };
 
   const handleRatingChange = (value: number[]) => {
@@ -135,7 +142,7 @@ export default function DonutShops() {
 
       <Card className="mb-4">
         <CardContent className="pt-2">
-          <div className="h-[600px] w-full rounded-lg">
+          <div className="h-[400px] w-full rounded-lg">
             <DonutShopMap
               shops={shops}
               onShopClick={handleShopClick}
@@ -144,6 +151,15 @@ export default function DonutShops() {
           </div>
         </CardContent>
       </Card>
+
+      {shops.length > 0 && (
+        <Card className="mb-4">
+          <CardContent className="pt-6">
+            <h2 className="text-lg font-semibold mb-4">Featured Shops</h2>
+            <ShopSlider shops={shops} onShopClick={handleShopClick} />
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">        
         <Card className="lg:col-span-2">
@@ -236,8 +252,6 @@ export default function DonutShops() {
             </Tabs>
           </CardContent>
         </Card>
-
-       
       </div>
     </div>
   );
