@@ -169,7 +169,7 @@ export default function DonutShops() {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto max-w-[1800px]">
       <div className="flex justify-between items-center mb-4">
         <PageTitle size="lg">
           donut tour{" "}
@@ -222,7 +222,7 @@ export default function DonutShops() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
         <Card className="lg:col-span-1 order-2 lg:order-1">
           <CardContent className="pt-4">
             <Tabs
