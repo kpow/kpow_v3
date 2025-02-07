@@ -201,6 +201,19 @@ export default function DonutShops() {
             />
           </div>
         </CardContent>
+        <div className="m-4 mt-0 flex flex-col justify-center">
+          <Label className="mb-2">Minimum Rating</Label>
+          <div className="flex items-center gap-4">
+            <Slider
+              value={[minRating]}
+              onValueChange={handleRatingChange}
+              max={5}
+              step={0.1}
+              className="flex-1"
+            />
+            <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
+          </div>
+        </div>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
@@ -285,20 +298,6 @@ export default function DonutShops() {
                   </div>
                 </div>
               </TabsContent>
-
-              <div className="mt-6 space-y-4">
-                <Label>Minimum Rating</Label>
-                <div className="flex items-center gap-4">
-                  <Slider
-                    value={[minRating]}
-                    onValueChange={handleRatingChange}
-                    max={5}
-                    step={0.1}
-                    className="flex-1"
-                  />
-                  <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
-                </div>
-              </div>
 
               <div className="mt-6">
                 <Button
