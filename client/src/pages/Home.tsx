@@ -91,20 +91,22 @@ const getRandomCity = () => {
   const randomIndex = Math.floor(Math.random() * cities.length);
   return {
     city: cities[randomIndex].city,
-    state: cities[randomIndex].state
+    state: cities[randomIndex].state,
   };
 };
 
 export default function Home() {
   const [instagramAfter, setInstagramAfter] = useState<string | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>([]);
+  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>(
+    [],
+  );
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const initialCity = getRandomCity();
   const [currentCity, setCurrentCity] = useState({
     city: initialCity.city,
-    state: initialCity.state
+    state: initialCity.state,
   });
 
   const { data: bookData, isLoading: isLoadingBooks } =
@@ -245,7 +247,9 @@ export default function Home() {
     queryKey: ["/api/yelp/search", currentCity],
     queryFn: async () => {
       const location = `${currentCity.city}, ${currentCity.state}`;
-      const response = await fetch(`/api/yelp/search?location=${encodeURIComponent(location)}`);
+      const response = await fetch(
+        `/api/yelp/search?location=${encodeURIComponent(location)}`,
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch donut shops");
       }
@@ -265,6 +269,7 @@ export default function Home() {
 
   return (
     <div className="space-y-8 mt-4">
+      {/* main cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {mainSections.map((section) => (
           <ContentSection key={section.title} {...section} />
@@ -273,53 +278,9 @@ export default function Home() {
 
       <div className="h-px bg-gray-200 my-4" />
 
+      {/* {instagram} */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">book feed</h2>
-          <Link key="BookFeed" href="books">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more books
-            </button>
-          </Link>
-        </div>
-        <BookFeed />
-      </div>
-
-      <div className="h-px bg-gray-200 my-4" />
-
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">
-            donut tour {shops && shops.length > 0 ? `- ${currentCity.city}, ${currentCity.state}` : ''}
-          </h2>
-          <Link href="/donut-shops">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              explore donut shops
-            </button>
-          </Link>
-        </div>
-        {isLoadingShops ? (
-          <div className="w-full">
-            <Skeleton className="h-[300px] w-full" />
-          </div>
-        ) : shops && shops.length > 0 ? (
-          <div className="h-full w-full rounded-lg overflow-hidden">
-            <ShopSlider
-              shops={shops}
-              onShopClick={(shop) => {
-                window.open(shop.url, "_blank");
-              }}
-            />
-          </div>
-        ) : null}
-      </div>
-
-      <div className="h-px bg-gray-200 my-4" />
-
-      <div>
-        <h2 className="text-2xl font-bold font-slackey">
-          k-showz on insta
-        </h2>
+        <h2 className="text-2xl font-bold font-slackey">k-showz on insta</h2>
         {isLoadingInstagram ? (
           <div className="grid grid-cols-2 md:grid-cols-3  h-[400px] lg:grid-cols-4 gap-4">
             <Skeleton
@@ -340,6 +301,7 @@ export default function Home() {
       </div>
 
       <div className="h-px bg-gray-200 my-4" />
+      {/* {starred} */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">star feed</h2>
@@ -372,10 +334,58 @@ export default function Home() {
 
       <div className="h-px bg-gray-200 my-4" />
 
+      {/* {recentPlays} */}
       <RecentPlays />
 
       <div className="h-px bg-gray-200 my-4" />
 
+      {/* {books} */}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold font-slackey">book feed</h2>
+          <Link key="BookFeed" href="books">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+              more books
+            </button>
+          </Link>
+        </div>
+        <BookFeed />
+      </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+      {/* {donuts} */}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold font-slackey">
+            donut tour{" "}
+            {shops && shops.length > 0
+              ? `- ${currentCity.city}, ${currentCity.state}`
+              : ""}
+          </h2>
+          <Link href="/donut-shops">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+              explore donut shops
+            </button>
+          </Link>
+        </div>
+        {isLoadingShops ? (
+          <div className="w-full">
+            <Skeleton className="h-[300px] w-full" />
+          </div>
+        ) : shops && shops.length > 0 ? (
+          <div className="h-full w-full rounded-lg overflow-hidden">
+            <ShopSlider
+              shops={shops}
+              onShopClick={(shop) => {
+                window.open(shop.url, "_blank");
+              }}
+            />
+          </div>
+        ) : null}
+      </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+      {/* {gitHubz} */}
       <GitHubSection />
 
       <div className="h-px bg-gray-200 my-4" />
