@@ -7,8 +7,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShopSlider } from "@/components/shop-slider";
+import { cities } from "@/data/cities";
+import { useToast } from "@/hooks/use-toast";
 
 interface Author {
   name: string[];
@@ -85,13 +87,25 @@ interface Shop {
   url: string;
 }
 
+const getRandomCity = () => {
+  const randomIndex = Math.floor(Math.random() * cities.length);
+  return {
+    city: cities[randomIndex].city,
+    state: cities[randomIndex].state
+  };
+};
+
 export default function Home() {
   const [instagramAfter, setInstagramAfter] = useState<string | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>(
-    [],
-  );
+  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>([]);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const initialCity = getRandomCity();
+  const [currentCity, setCurrentCity] = useState({
+    city: initialCity.city,
+    state: initialCity.state
+  });
 
   const { data: bookData, isLoading: isLoadingBooks } =
     useQuery<GoodreadsResponse>({
@@ -228,9 +242,10 @@ export default function Home() {
   ];
 
   const { data: shops, isLoading: isLoadingShops } = useQuery<Shop[]>({
-    queryKey: ["/api/yelp/search"],
+    queryKey: ["/api/yelp/search", currentCity],
     queryFn: async () => {
-      const response = await fetch(`/api/yelp/search?location=San Francisco, CA`);
+      const location = `${currentCity.city}, ${currentCity.state}`;
+      const response = await fetch(`/api/yelp/search?location=${encodeURIComponent(location)}`);
       if (!response.ok) {
         throw new Error("Failed to fetch donut shops");
       }
@@ -321,7 +336,7 @@ export default function Home() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-slackey">
-            donut tour {shops && shops.length > 0 ? '- San Francisco, CA' : ''}
+            donut tour {shops && shops.length > 0 ? `- ${currentCity.city}, ${currentCity.state}` : ''}
           </h2>
           <Link href="/donut-shops">
             <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
