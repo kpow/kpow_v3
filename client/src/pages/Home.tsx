@@ -274,7 +274,50 @@ export default function Home() {
       <div className="h-px bg-gray-200 my-4" />
 
       <div>
-        <h2 className="text-2xl font-bold font-slackey mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold font-slackey">book feed</h2>
+          <Link key="BookFeed" href="books">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+              more books
+            </button>
+          </Link>
+        </div>
+        <BookFeed />
+      </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold font-slackey">
+            donut tour {shops && shops.length > 0 ? `- ${currentCity.city}, ${currentCity.state}` : ''}
+          </h2>
+          <Link href="/donut-shops">
+            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
+              explore donut shops
+            </button>
+          </Link>
+        </div>
+        {isLoadingShops ? (
+          <div className="w-full">
+            <Skeleton className="h-[300px] w-full" />
+          </div>
+        ) : shops && shops.length > 0 ? (
+          <div className="h-full w-full rounded-lg overflow-hidden">
+            <ShopSlider
+              shops={shops}
+              onShopClick={(shop) => {
+                window.open(shop.url, "_blank");
+              }}
+            />
+          </div>
+        ) : null}
+      </div>
+
+      <div className="h-px bg-gray-200 my-4" />
+
+      <div>
+        <h2 className="text-2xl font-bold font-slackey">
           k-showz on insta
         </h2>
         {isLoadingInstagram ? (
@@ -330,35 +373,6 @@ export default function Home() {
       <div className="h-px bg-gray-200 my-4" />
 
       <RecentPlays />
-
-      <div className="h-px bg-gray-200 my-4" />
-
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">
-            donut tour {shops && shops.length > 0 ? `- ${currentCity.city}, ${currentCity.state}` : ''}
-          </h2>
-          <Link href="/donut-shops">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              explore donut shops
-            </button>
-          </Link>
-        </div>
-        {isLoadingShops ? (
-          <div className="w-full">
-            <Skeleton className="h-[300px] w-full" />
-          </div>
-        ) : shops && shops.length > 0 ? (
-          <div className="h-full w-full rounded-lg overflow-hidden">
-            <ShopSlider
-              shops={shops}
-              onShopClick={(shop) => {
-                window.open(shop.url, "_blank");
-              }}
-            />
-          </div>
-        ) : null}
-      </div>
 
       <div className="h-px bg-gray-200 my-4" />
 
