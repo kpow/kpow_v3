@@ -121,7 +121,9 @@ export default function DonutShops() {
       city: newCity.city,
       state: newCity.state
     });
-    refetch();
+    setSelectedShopId(null); // Clear selected shop
+    setShouldFitBounds(true); // Reset map bounds
+    refetch(); // Refetch data for new city
   };
 
   const getValidationMessage = () => {
