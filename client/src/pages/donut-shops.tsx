@@ -121,6 +121,7 @@ export default function DonutShops() {
       city: newCity.city,
       state: newCity.state
     });
+    handleSearch(); // Use the existing search functionality
   };
 
   const getValidationMessage = () => {
