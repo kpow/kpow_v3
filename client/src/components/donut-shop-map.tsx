@@ -16,16 +16,18 @@ const ShopIcon = L.icon({
 function MapUpdater({ shops, searchId }: { shops: Shop[], searchId: string }) {
   const map = useMap();
 
-  // Only update bounds when searchId changes (new search performed)
+  // Update markers whenever shops change
   useEffect(() => {
-    if (shops.length > 0 && searchId) {
+    if (shops.length === 0) return;
+
+    // Only update bounds when searchId changes (new search performed)
+    if (searchId) {
       const bounds = L.latLngBounds(
         shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
       );
-      const paddedBounds = bounds.pad(0.2); // 20% padding
-      map.fitBounds(paddedBounds);
+      map.fitBounds(bounds.pad(0.2)); // 20% padding
     }
-  }, [searchId]);  // Only depend on searchId changes
+  }, [shops, searchId, map]); // Keep shops dependency for marker updates
 
   return null;
 }
@@ -57,8 +59,8 @@ export function DonutShopMap({
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
-        center={[40.7128, -74.0060]} // Default center, will be adjusted by MapUpdater
-        zoom={11} // Default zoom, will be adjusted by MapUpdater
+        center={[40.7128, -74.0060]} // Default center (NYC)
+        zoom={11}
         style={{ height: '100%', width: '100%' }}
       >
         <MapUpdater shops={shops} searchId={searchId} />
