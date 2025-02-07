@@ -12,14 +12,24 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-// Component to handle map center updates
-function MapUpdater({ center, zoom }: { center: [number, number], zoom: number }) {
+// Component to handle map center and bounds updates
+function MapUpdater({ shops }: { shops: Shop[] }) {
   const map = useMap();
 
   useEffect(() => {
-    console.log('Updating map center to:', center);
-    map.setView(center, zoom);
-  }, [center, zoom, map]);
+    if (shops.length > 0) {
+      // Create bounds object
+      const bounds = L.latLngBounds(
+        shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
+      );
+
+      // Add padding to bounds
+      const paddedBounds = bounds.pad(0.2); // 20% padding
+
+      // Fit map to bounds
+      map.fitBounds(paddedBounds);
+    }
+  }, [shops, map]);
 
   return null;
 }
@@ -39,27 +49,23 @@ interface Shop {
 
 interface DonutShopMapProps {
   shops: Shop[];
-  center?: [number, number];
-  zoom?: number;
   onShopClick?: (shop: Shop) => void;
 }
 
 export function DonutShopMap({ 
   shops = [], 
-  center = [40.7128, -74.0060], // Default to NYC
-  zoom = 11, // Changed from 13 to 11 for a wider view
   onShopClick 
 }: DonutShopMapProps) {
-  console.log('DonutShopMap received:', { shops, center, zoom });
+  console.log('DonutShopMap received:', { shops });
 
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
-        center={center}
-        zoom={zoom}
+        center={[40.7128, -74.0060]} // Default center, will be adjusted by MapUpdater
+        zoom={11} // Default zoom, will be adjusted by MapUpdater
         style={{ height: '100%', width: '100%' }}
       >
-        <MapUpdater center={center} zoom={zoom} />
+        <MapUpdater shops={shops} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

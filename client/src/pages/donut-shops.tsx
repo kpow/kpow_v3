@@ -33,8 +33,6 @@ export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [searchState, setSearchState] = useState<SearchState>({});
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
-  const [mapZoom, setMapZoom] = useState(11); // Changed from 13 to 11 for a wider view
   const { toast } = useToast();
 
   const { data: shops = [], isLoading, refetch } = useQuery({
@@ -64,19 +62,6 @@ export default function DonutShops() {
 
       const data = await response.json();
       console.log('Received shops data:', data);
-
-      // Update map center based on search results
-      if (data.length > 0) {
-        const firstShop = data[0];
-        const newCenter: [number, number] = [
-          firstShop.coordinates.latitude,
-          firstShop.coordinates.longitude
-        ];
-        console.log('Setting new map center:', newCenter);
-        setMapCenter(newCenter);
-        setMapZoom(11); // Changed from 13 to 11 for a wider view
-      }
-
       return data;
     },
     enabled: false // Don't run query automatically
@@ -120,7 +105,6 @@ export default function DonutShops() {
 
   const handleShopClick = (shop: Shop) => {
     setSelectedShop(shop);
-    setMapCenter([shop.coordinates.latitude, shop.coordinates.longitude]);
   };
 
   return (
@@ -203,9 +187,7 @@ export default function DonutShops() {
             <h2 className="text-2xl font-slackey mb-6">Shop Map</h2>
             <div className="h-[600px] w-full rounded-lg">
               <DonutShopMap 
-                shops={shops} 
-                center={mapCenter}
-                zoom={mapZoom}
+                shops={shops}
                 onShopClick={handleShopClick}
               />
             </div>
