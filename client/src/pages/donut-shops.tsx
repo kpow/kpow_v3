@@ -11,6 +11,7 @@ import { DonutShopMap } from "@/components/donut-shop-map";
 import { ShopSlider } from "@/components/shop-slider";
 import { useToast } from "@/hooks/use-toast";
 import { cities } from "@/data/cities";
+import { Shuffle } from "lucide-react";
 
 interface Shop {
   id: string;
@@ -114,6 +115,15 @@ export default function DonutShops() {
     await refetch();
   };
 
+  const handleRandomCity = () => {
+    const newCity = getRandomCity();
+    setSearchState({
+      city: newCity.city,
+      state: newCity.state
+    });
+    refetch();
+  };
+
   const getValidationMessage = () => {
     if (searchType === "city" && (!searchState.city || !searchState.state)) {
       return "Please enter both city and state";
@@ -148,9 +158,20 @@ export default function DonutShops() {
 
   return (
     <div className="container mx-auto">
-      <PageTitle size="lg" className="mb-4">
-        donut tour
-      </PageTitle>
+      <div className="flex justify-between items-center mb-4">
+        <PageTitle size="lg">
+          donut tour {searchState.city && searchState.state ? `- ${searchState.city}, ${searchState.state}` : ''}
+        </PageTitle>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRandomCity}
+          className="ml-4"
+        >
+          <Shuffle className="h-4 w-4 mr-2" />
+          Random City
+        </Button>
+      </div>
 
       <Card className="mb-4">
         {shops.length > 0 && (
