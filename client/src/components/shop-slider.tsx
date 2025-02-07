@@ -32,10 +32,12 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
         {shops.map((shop) => (
           <div
             key={shop.id}
-            className="flex-[0_0_300px] min-w-0"
-            onClick={() => onShopClick(shop)}
+            className="flex-[0_0_180px] min-w-0"
           >
-            <Card className="relative h-[200px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]">
+            <Card 
+              className="relative h-[140px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
+              onClick={() => onShopClick(shop)}
+            >
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
