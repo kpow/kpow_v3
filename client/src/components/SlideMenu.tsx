@@ -12,6 +12,7 @@ import {
   PlayCircle,
   Code,
   Fish,
+  Circle,
 } from "lucide-react";
 
 interface SlideMenuProps {
@@ -53,6 +54,11 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       href: "/battle",
     },
     { icon: <Music className="w-4 h-4" />, label: "pmonk", href: "/pmonk" },
+    {
+      icon: <Circle className="w-4 h-4" />,
+      label: "donut tour",
+      href: "/donut-shops",
+    },
     {
       icon: <Code className="w-4 h-4" />,
       label: "gatsby version",
