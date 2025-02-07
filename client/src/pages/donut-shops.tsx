@@ -28,15 +28,13 @@ interface SearchState {
   zipCode?: string;
   latitude?: number;
   longitude?: number;
-  minRating?: number;
 }
 
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
-  const [searchState, setSearchState] = useState<SearchState>({
-    minRating: 0
-  });
+  const [searchState, setSearchState] = useState<SearchState>({});
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [minRating, setMinRating] = useState(0);
   const { toast } = useToast();
 
   const { data: allShops = [], isLoading, refetch } = useQuery({
@@ -73,7 +71,7 @@ export default function DonutShops() {
 
   // Filter shops based on minimum rating
   const shops = allShops.filter(shop => 
-    !searchState.minRating || shop.rating >= searchState.minRating
+    shop.rating >= minRating
   );
 
   const handleSearch = async () => {
@@ -117,7 +115,7 @@ export default function DonutShops() {
   };
 
   const handleRatingChange = (value: number[]) => {
-    handleInputChange(value[0], 'minRating');
+    setMinRating(value[0]);
   };
 
   return (
@@ -128,9 +126,7 @@ export default function DonutShops() {
         <CardContent className="pt-6">
           <Tabs defaultValue="city" onValueChange={(value) => {
             setSearchType(value);
-            setSearchState(prev => ({ 
-              minRating: prev.minRating // Preserve rating filter
-            })); // Clear previous search state when changing type
+            setSearchState({}); // Clear search state but keep rating filter
           }}>
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="city">City Search</TabsTrigger>
@@ -188,14 +184,14 @@ export default function DonutShops() {
               <Label>Minimum Rating</Label>
               <div className="flex items-center gap-4">
                 <Slider
-                  value={[searchState.minRating || 0]}
+                  value={[minRating]}
                   onValueChange={handleRatingChange}
                   max={5}
                   step={0.5}
                   className="flex-1"
                 />
                 <span className="min-w-[4rem] text-sm">
-                  {searchState.minRating || 0} ⭐
+                  {minRating} ⭐
                 </span>
               </div>
             </div>
