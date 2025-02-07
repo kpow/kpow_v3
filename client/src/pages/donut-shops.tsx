@@ -45,11 +45,6 @@ export default function DonutShops() {
   const [shouldFitBounds, setShouldFitBounds] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Trigger search when component mounts
-    refetch();
-  }, [refetch]); // Empty dependency array means this runs once on mount
-
   const {
     data: allShops = [],
     isLoading,
@@ -87,6 +82,13 @@ export default function DonutShops() {
     },
     enabled: false,
   });
+
+  useEffect(() => {
+    // Only trigger search when refetch is available
+    if (refetch) {
+      refetch();
+    }
+  }, [refetch]); // Dependency on refetch ensures it's available
 
   const shops = allShops.filter((shop) => shop.rating >= minRating);
 
