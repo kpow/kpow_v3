@@ -34,7 +34,7 @@ interface SearchState {
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [searchState, setSearchState] = useState<SearchState>({});
-  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(false);
   const { toast } = useToast();
@@ -119,15 +119,8 @@ export default function DonutShops() {
   };
 
   const handleShopClick = (shop: Shop) => {
-    setSelectedShop(shop);
+    setSelectedShopId(shop.id);
     setShouldFitBounds(false);
-    // Create a slightly padded viewport around the selected shop
-    const padding = 0.01; // Approximately 1km padding
-    const bounds = [
-      [shop.coordinates.latitude - padding, shop.coordinates.longitude - padding],
-      [shop.coordinates.latitude + padding, shop.coordinates.longitude + padding],
-    ];
-    // The map component will handle the bounds update
   };
 
   const handleRatingChange = (value: number[]) => {
@@ -147,6 +140,7 @@ export default function DonutShops() {
               shops={shops}
               onShopClick={handleShopClick}
               shouldFitBounds={shouldFitBounds}
+              selectedShopId={selectedShopId}
             />
           </div>
         </CardContent>

@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -12,24 +12,42 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-// Component to handle map center and bounds updates
-function MapUpdater({ shops, shouldFitBounds }: { shops: Shop[], shouldFitBounds: boolean }) {
+// Component to handle map updates and marker control
+function MapController({ 
+  shops, 
+  shouldFitBounds,
+  selectedShopId
+}: { 
+  shops: Shop[], 
+  shouldFitBounds: boolean,
+  selectedShopId?: string 
+}) {
   const map = useMap();
+  const markersRef = useRef<{ [key: string]: L.Marker }>({});
 
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
-      // Create bounds object
       const bounds = L.latLngBounds(
         shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
       );
-
-      // Add padding to bounds
-      const paddedBounds = bounds.pad(0.2); // 20% padding
-
-      // Fit map to bounds
+      const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
   }, [shops, shouldFitBounds, map]);
+
+  // Handle selected shop updates
+  useEffect(() => {
+    if (selectedShopId && markersRef.current[selectedShopId]) {
+      const marker = markersRef.current[selectedShopId];
+      const latLng = marker.getLatLng();
+
+      // Zoom to marker
+      map.setView(latLng, 15);
+
+      // Open popup
+      marker.openPopup();
+    }
+  }, [selectedShopId, map]);
 
   return null;
 }
@@ -51,23 +69,29 @@ interface DonutShopMapProps {
   shops: Shop[];
   onShopClick?: (shop: Shop) => void;
   shouldFitBounds?: boolean;
+  selectedShopId?: string;
 }
 
 export function DonutShopMap({ 
   shops = [], 
   onShopClick,
-  shouldFitBounds = false
+  shouldFitBounds = false,
+  selectedShopId
 }: DonutShopMapProps) {
-  console.log('DonutShopMap received:', { shops });
+  console.log('DonutShopMap received:', { shops, selectedShopId });
 
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
-        center={[39.8283, -98.5795]} // Geographic center of the continental United States
-        zoom={4} // Zoom level to show the continental United States
+        center={[39.8283, -98.5795]}
+        zoom={4}
         style={{ height: '100%', width: '100%' }}
       >
-        <MapUpdater shops={shops} shouldFitBounds={shouldFitBounds} />
+        <MapController 
+          shops={shops} 
+          shouldFitBounds={shouldFitBounds}
+          selectedShopId={selectedShopId}
+        />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -77,6 +101,11 @@ export function DonutShopMap({
             key={shop.id}
             position={[shop.coordinates.latitude, shop.coordinates.longitude]}
             icon={ShopIcon}
+            ref={(el) => {
+              if (el) {
+                markersRef.current[shop.id] = el;
+              }
+            }}
             eventHandlers={{
               click: () => onShopClick?.(shop)
             }}
