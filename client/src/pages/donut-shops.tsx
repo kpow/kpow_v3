@@ -116,15 +116,24 @@ export default function DonutShops() {
   };
 
   const handleRandomCity = () => {
-    const newCity = getRandomCity();
-    setSearchState({
-      city: newCity.city,
-      state: newCity.state
-    });
-    // Add a small delay to ensure state is updated before search
-    setTimeout(() => {
-      handleSearch();
-    }, 100);
+    try {
+      const newCity = getRandomCity();
+      setSearchState({
+        city: newCity.city,
+        state: newCity.state
+      });
+      // Add a small delay to ensure React state updates complete
+      // before triggering the search - this prevents race conditions
+      setTimeout(() => {
+        handleSearch();
+      }, 100);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to select a random city. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getValidationMessage = () => {
