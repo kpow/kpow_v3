@@ -16,11 +16,24 @@ const filterChainStores = (businesses: any[]) => {
 // Search donut/doughnut shops
 router.get('/search', async (req, res) => {
   try {
-    const { location } = req.query;
+    const { location, latitude, longitude, radius } = req.query;
 
-    if (!location) {
-      return res.status(400).json({ error: 'Location is required' });
+    // Validate that either location OR coordinates are provided
+    if (!location && (!latitude || !longitude)) {
+      return res.status(400).json({ error: 'Either location or coordinates (latitude & longitude) are required' });
     }
+
+    // Base parameters
+    const baseParams = {
+      categories: 'donuts',
+      sort_by: 'rating',
+      limit: 25,
+      ...(radius ? { radius: Math.min(Number(radius), 40000) } : {}), // Max 40000 meters (25 miles)
+      ...(location ? { location } : { 
+        latitude: Number(latitude),
+        longitude: Number(longitude)
+      })
+    };
 
     // Make parallel requests for both "donut" and "doughnut"
     const [donutResponse, doughnutResponse] = await Promise.all([
@@ -29,11 +42,8 @@ router.get('/search', async (req, res) => {
           'Authorization': `Bearer ${process.env.YELP_API_KEY}`,
         },
         params: {
-          term: 'donut shop',
-          location: location,
-          categories: 'donuts',
-          sort_by: 'rating',
-          limit: 25
+          ...baseParams,
+          term: 'donut shop'
         }
       }),
       axios.get('https://api.yelp.com/v3/businesses/search', {
@@ -41,14 +51,15 @@ router.get('/search', async (req, res) => {
           'Authorization': `Bearer ${process.env.YELP_API_KEY}`,
         },
         params: {
-          term: 'doughnut shop',
-          location: location,
-          categories: 'donuts',
-          sort_by: 'rating',
-          limit: 25
+          ...baseParams,
+          term: 'doughnut shop'
         }
       })
     ]);
+
+    // Log full responses for debugging
+    console.log('Donut Search Raw Response:', JSON.stringify(donutResponse.data, null, 2));
+    console.log('Doughnut Search Raw Response:', JSON.stringify(doughnutResponse.data, null, 2));
 
     // Combine and deduplicate results
     const allBusinesses = [...donutResponse.data.businesses, ...doughnutResponse.data.businesses];
@@ -71,8 +82,15 @@ router.get('/search', async (req, res) => {
       price: business.price,
       image_url: business.image_url,
       url: business.url,
-      phone: business.display_phone
+      phone: business.display_phone,
+      distance: business.distance, // Added distance field
+      categories: business.categories, // Added categories
+      is_closed: business.is_closed, // Added operating status
+      photos: business.photos || [business.image_url], // Added photos array
     }));
+
+    // Log the final formatted results
+    console.log('Formatted Results:', JSON.stringify(formattedResults, null, 2));
 
     res.json(formattedResults);
   } catch (error: any) {
