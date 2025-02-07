@@ -9,6 +9,7 @@ import { registerGithubRoutes } from "./routes/github-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
+import yelpRoutes from "./routes/yelp";
 
 // Verify required environment variables
 if (!process.env.PHISH_API_KEY) {
@@ -27,6 +28,10 @@ if (!process.env.INSTAGRAM_ACCESS_TOKEN) {
   throw new Error("INSTAGRAM_ACCESS_TOKEN environment variable is required");
 }
 
+if (!process.env.YELP_API_KEY) {
+  throw new Error("YELP_API_KEY environment variable is required");
+}
+
 export function registerRoutes(app: Express): Server {
   const router = Router();
 
@@ -42,6 +47,9 @@ export function registerRoutes(app: Express): Server {
 
   // Register Instagram routes
   router.use('/api/instagram', instagramRoutes);
+
+  // Register Yelp routes
+  router.use('/api/yelp', yelpRoutes);
 
   // Register contact routes
   router.use('/', contactRoutes);
