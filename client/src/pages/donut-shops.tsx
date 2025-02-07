@@ -87,11 +87,10 @@ export default function DonutShops() {
       }
 
       const data = await response.json();
+      setShouldFitBounds(true);
       return data;
     },
-    enabled: false, // Don't fetch automatically
-    staleTime: 0, // Consider data immediately stale
-    cacheTime: 0, // Don't cache the data
+    enabled: false,
   });
 
   useEffect(() => {
@@ -118,9 +117,10 @@ export default function DonutShops() {
 
   const handleRandomCity = async () => {
     try {
+      // Add loading state
       const newCity = getRandomCity();
 
-      // Reset search related states
+      // Reset all states first
       setSearchType("city");
       setMinRating(0);
       setSelectedShopId(null);
@@ -135,12 +135,8 @@ export default function DonutShops() {
         longitude: undefined
       });
 
-      // Force a fresh fetch with the new city
-      const result = await refetch();
-
-      if (result.error) {
-        throw result.error;
-      }
+      // Wait for the API call to complete
+      await refetch();
 
       toast({
         title: "Success",
