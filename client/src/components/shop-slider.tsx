@@ -49,13 +49,9 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                <h3 className="text-lg font-semibold mb-1 truncate">
+                <h3 className="text-sm font-semibold mb-1 truncate">
                   {shop.name}
                 </h3>
-                <div className="flex items-center gap-2">
-                  <span>{shop.rating} ⭐</span>
-                  {shop.price && <span>• {shop.price}</span>}
-                </div>
               </div>
             </Card>
           </div>
