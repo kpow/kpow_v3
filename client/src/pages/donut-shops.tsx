@@ -40,15 +40,17 @@ export default function DonutShops() {
       const queryString = new URLSearchParams();
 
       if (searchType === "city" && searchParams.city) {
-        queryString.append("city", searchParams.city);
+        queryString.append("location", searchParams.city);
       } else if (searchType === "zipcode" && searchParams.zipCode) {
-        queryString.append("zipcode", searchParams.zipCode);
+        queryString.append("location", searchParams.zipCode);
       } else if (searchType === "coords" && searchParams.latitude && searchParams.longitude) {
         queryString.append("latitude", searchParams.latitude.toString());
         queryString.append("longitude", searchParams.longitude.toString());
+      } else {
+        return [];
       }
 
-      const response = await fetch(`/api/donut-shops?${queryString}`);
+      const response = await fetch(`/api/yelp/search?${queryString}`);
       if (!response.ok) throw new Error("Failed to fetch shops");
       return response.json();
     },
