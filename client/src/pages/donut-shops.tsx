@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,7 +46,6 @@ export default function DonutShops() {
   } = useQuery({
     queryKey: ["donutShops", searchState],
     queryFn: async () => {
-      console.log("Search state:", searchState);
       const queryString = new URLSearchParams();
 
       if (searchType === "city" && searchState.city) {
@@ -63,7 +63,6 @@ export default function DonutShops() {
         return [];
       }
 
-      console.log("Fetching shops with query:", queryString.toString());
       const response = await fetch(`/api/yelp/search?${queryString}`);
 
       if (!response.ok) {
@@ -72,21 +71,15 @@ export default function DonutShops() {
       }
 
       const data = await response.json();
-      console.log("Received shops data:", data);
-
-      // Set shouldFitBounds to true when new search results come in
       setShouldFitBounds(true);
-
       return data;
     },
-    enabled: false, // Don't run query automatically
+    enabled: false,
   });
 
-  // Filter shops based on minimum rating
   const shops = allShops.filter((shop) => shop.rating >= minRating);
 
   const handleSearch = async () => {
-    // Validate search input
     if (searchType === "city" && !searchState.city) {
       toast({
         title: "Missing Information",
@@ -115,21 +108,18 @@ export default function DonutShops() {
       return;
     }
 
-    console.log("Triggering search with state:", searchState);
-    await refetch(); // Manually trigger the query
+    await refetch();
   };
 
   const handleInputChange = (
     value: string | number,
     field: keyof SearchState,
   ) => {
-    console.log(`Updating ${field} with value:`, value);
     setSearchState((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleShopClick = (shop: Shop) => {
     setSelectedShop(shop);
-    // Don't fit bounds when clicking a shop
     setShouldFitBounds(false);
   };
 
@@ -145,98 +135,6 @@ export default function DonutShops() {
 
       <Card className="mb-8">
         <CardContent className="pt-6">
-          <Tabs
-            defaultValue="city"
-            onValueChange={(value) => {
-              setSearchType(value);
-              setSearchState({}); // Clear search state but keep rating filter
-            }}
-          >
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="city">City Search</TabsTrigger>
-              <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
-              <TabsTrigger value="coords">Coordinates</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="city" className="space-y-4">
-              <div className="grid gap-2">
-                <Label>City Name</Label>
-                <Input
-                  placeholder="Enter city name"
-                  value={searchState.city || ""}
-                  onChange={(e) => handleInputChange(e.target.value, "city")}
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="zipcode" className="space-y-4">
-              <div className="grid gap-2">
-                <Label>Zip Code</Label>
-                <Input
-                  placeholder="Enter zip code"
-                  value={searchState.zipCode || ""}
-                  onChange={(e) => handleInputChange(e.target.value, "zipCode")}
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="coords" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Latitude</Label>
-                  <Input
-                    type="number"
-                    placeholder="Enter latitude"
-                    value={searchState.latitude || ""}
-                    onChange={(e) =>
-                      handleInputChange(parseFloat(e.target.value), "latitude")
-                    }
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Longitude</Label>
-                  <Input
-                    type="number"
-                    placeholder="Enter longitude"
-                    value={searchState.longitude || ""}
-                    onChange={(e) =>
-                      handleInputChange(parseFloat(e.target.value), "longitude")
-                    }
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Rating Filter */}
-            <div className="mt-6 space-y-4">
-              <Label>Minimum Rating</Label>
-              <div className="flex items-center gap-4">
-                <Slider
-                  value={[minRating]}
-                  onValueChange={handleRatingChange}
-                  max={5}
-                  step={0.1}
-                  className="flex-1"
-                />
-                <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
-              </div>
-            </div>
-          </Tabs>
-
-          <div className="mt-6">
-            <Button
-              onClick={handleSearch}
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? "Searching..." : "Search Donut Shops"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-8">
-        <CardContent className="pt-6">
           <h2 className="text-2xl font-slackey mb-6">Shop Map</h2>
           <div className="h-[400px] w-full rounded-lg">
             <DonutShopMap
@@ -247,21 +145,107 @@ export default function DonutShops() {
           </div>
         </CardContent>
       </Card>
-      
-      <Card className="lg:col-span-1">
-        <CardContent className="pt-6">
-          <h2 className="text-2xl font-slackey mb-6">Shop Details</h2>
-          <div className="space-y-4">
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <Card className="lg:col-span-2">
           <CardContent className="pt-6">
-            <h2 className="text-2xl font-slackey mb-6">Search Shops</h2>
+            <Tabs
+              defaultValue="city"
+              onValueChange={(value) => {
+                setSearchType(value);
+                setSearchState({});
+              }}
+            >
+              <TabsList className="grid w-full grid-cols-3 mb-6">
+                <TabsTrigger value="city">City Search</TabsTrigger>
+                <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
+                <TabsTrigger value="coords">Coordinates</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="city" className="space-y-4">
+                <div className="grid gap-2">
+                  <Label>City Name</Label>
+                  <Input
+                    placeholder="Enter city name"
+                    value={searchState.city || ""}
+                    onChange={(e) => handleInputChange(e.target.value, "city")}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="zipcode" className="space-y-4">
+                <div className="grid gap-2">
+                  <Label>Zip Code</Label>
+                  <Input
+                    placeholder="Enter zip code"
+                    value={searchState.zipCode || ""}
+                    onChange={(e) => handleInputChange(e.target.value, "zipCode")}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="coords" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label>Latitude</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter latitude"
+                      value={searchState.latitude || ""}
+                      onChange={(e) =>
+                        handleInputChange(parseFloat(e.target.value), "latitude")
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Longitude</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter longitude"
+                      value={searchState.longitude || ""}
+                      onChange={(e) =>
+                        handleInputChange(parseFloat(e.target.value), "longitude")
+                      }
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <div className="mt-6 space-y-4">
+                <Label>Minimum Rating</Label>
+                <div className="flex items-center gap-4">
+                  <Slider
+                    value={[minRating]}
+                    onValueChange={handleRatingChange}
+                    max={5}
+                    step={0.1}
+                    className="flex-1"
+                  />
+                  <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <Button
+                  onClick={handleSearch}
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Searching..." : "Search Donut Shops"}
+                </Button>
+              </div>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="text-2xl font-slackey mb-6">Shop Details</h2>
             <div className="space-y-4">
               {selectedShop ? (
                 <>
                   <h3 className="text-xl font-bold">{selectedShop.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    {selectedShop.address}
-                  </p>
+                  <p className="text-sm text-gray-600">{selectedShop.address}</p>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">Rating:</span>
                     <span>{selectedShop.rating} ⭐</span>
