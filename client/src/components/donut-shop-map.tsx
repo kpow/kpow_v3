@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -12,24 +12,23 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-// Component to handle map center and bounds updates
-function MapUpdater({ shops }: { shops: Shop[] }) {
+// Component to handle map bounds updates
+function MapUpdater({ shops, searchId }: { shops: Shop[], searchId: string }) {
   const map = useMap();
+  const hasUpdatedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (shops.length > 0) {
-      // Create bounds object
+    // Only update bounds if we have shops and haven't updated for this search yet
+    if (shops.length > 0 && hasUpdatedRef.current !== searchId) {
       const bounds = L.latLngBounds(
         shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
       );
 
-      // Add padding to bounds
       const paddedBounds = bounds.pad(0.2); // 20% padding
-
-      // Fit map to bounds
       map.fitBounds(paddedBounds);
+      hasUpdatedRef.current = searchId;
     }
-  }, [shops, map]);
+  }, [shops, map, searchId]);
 
   return null;
 }
@@ -49,11 +48,13 @@ interface Shop {
 
 interface DonutShopMapProps {
   shops: Shop[];
+  searchId: string;
   onShopClick?: (shop: Shop) => void;
 }
 
 export function DonutShopMap({ 
   shops = [], 
+  searchId,
   onShopClick 
 }: DonutShopMapProps) {
   console.log('DonutShopMap received:', { shops });
@@ -65,7 +66,7 @@ export function DonutShopMap({
         zoom={11} // Default zoom, will be adjusted by MapUpdater
         style={{ height: '100%', width: '100%' }}
       >
-        <MapUpdater shops={shops} />
+        <MapUpdater shops={shops} searchId={searchId} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
