@@ -27,6 +27,7 @@ interface Shop {
 
 interface SearchState {
   city?: string;
+  state?: string;
   zipCode?: string;
   latitude?: number;
   longitude?: number;
@@ -34,12 +35,19 @@ interface SearchState {
 
 const getRandomCity = () => {
   const randomIndex = Math.floor(Math.random() * cities.length);
-  return cities[randomIndex].city;
+  return {
+    city: cities[randomIndex].city,
+    state: cities[randomIndex].state
+  };
 };
 
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
-  const [searchState, setSearchState] = useState<SearchState>({ city: getRandomCity() });
+  const initialCity = getRandomCity();
+  const [searchState, setSearchState] = useState<SearchState>({
+    city: initialCity.city,
+    state: initialCity.state
+  });
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(false);
@@ -55,7 +63,8 @@ export default function DonutShops() {
       const queryString = new URLSearchParams();
 
       if (searchType === "city" && searchState.city) {
-        queryString.append("location", searchState.city);
+        const location = `${searchState.city}, ${searchState.state}`;
+        queryString.append("location", location);
       } else if (searchType === "zipcode" && searchState.zipCode) {
         queryString.append("location", searchState.zipCode);
       } else if (
@@ -106,8 +115,8 @@ export default function DonutShops() {
   };
 
   const getValidationMessage = () => {
-    if (searchType === "city" && !searchState.city) {
-      return "Please enter a city name";
+    if (searchType === "city" && (!searchState.city || !searchState.state)) {
+      return "Please enter both city and state";
     }
     if (searchType === "zipcode" && !searchState.zipCode) {
       return "Please enter a zip code";
@@ -144,6 +153,11 @@ export default function DonutShops() {
       </PageTitle>
 
       <Card className="mb-4">
+        {shops.length > 0 && (
+          <div className="h-full w-full rounded-lg overflow-hidden">
+            <ShopSlider shops={shops} onShopClick={handleShopClick} />
+          </div>
+        )}
         <CardContent className="pt-2">
           <div className="h-[500px] w-full rounded-lg">
             <DonutShopMap
@@ -155,15 +169,6 @@ export default function DonutShops() {
           </div>
         </CardContent>
       </Card>
-
-      {shops.length > 0 && (
-        <Card className="mb-1">
-          <CardContent className="pt-2">
-            <h2 className="text-lg font-semibold mb-2">Featured Shops</h2>
-            <ShopSlider shops={shops} onShopClick={handleShopClick} />
-          </CardContent>
-        </Card>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
         <Card className="lg:col-span-2">
@@ -182,13 +187,23 @@ export default function DonutShops() {
               </TabsList>
 
               <TabsContent value="city" className="space-y-4">
-                <div className="grid gap-2">
-                  <Label>City Name</Label>
-                  <Input
-                    placeholder="Enter city name"
-                    value={searchState.city || ""}
-                    onChange={(e) => handleInputChange(e.target.value, "city")}
-                  />
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label>City Name</Label>
+                    <Input
+                      placeholder="Enter city name"
+                      value={searchState.city || ""}
+                      onChange={(e) => handleInputChange(e.target.value, "city")}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>State</Label>
+                    <Input
+                      placeholder="Enter state (e.g., CA)"
+                      value={searchState.state || ""}
+                      onChange={(e) => handleInputChange(e.target.value, "state")}
+                    />
+                  </div>
                 </div>
               </TabsContent>
 
