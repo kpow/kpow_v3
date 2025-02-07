@@ -38,7 +38,7 @@ const getRandomCity = () => {
   const randomIndex = Math.floor(Math.random() * cities.length);
   return {
     city: cities[randomIndex].city,
-    state: cities[randomIndex].state
+    state: cities[randomIndex].state,
   };
 };
 
@@ -47,7 +47,7 @@ export default function DonutShops() {
   const initialCity = getRandomCity();
   const [searchState, setSearchState] = useState<SearchState>({
     city: initialCity.city,
-    state: initialCity.state
+    state: initialCity.state,
   });
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
@@ -120,7 +120,7 @@ export default function DonutShops() {
       const newCity = getRandomCity();
       setSearchState({
         city: newCity.city,
-        state: newCity.state
+        state: newCity.state,
       });
       // Add a small delay to ensure React state updates complete
       // before triggering the search - this prevents race conditions
@@ -172,7 +172,10 @@ export default function DonutShops() {
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-4">
         <PageTitle size="lg">
-          donut tour {searchState.city && searchState.state ? `- ${searchState.city}, ${searchState.state}` : ''}
+          donut tour{" "}
+          {searchState.city && searchState.state
+            ? `- ${searchState.city}, ${searchState.state}`
+            : ""}
         </PageTitle>
         <Button
           variant="outline"
@@ -239,7 +242,9 @@ export default function DonutShops() {
                     <Input
                       placeholder="Enter city name"
                       value={searchState.city || ""}
-                      onChange={(e) => handleInputChange(e.target.value, "city")}
+                      onChange={(e) =>
+                        handleInputChange(e.target.value, "city")
+                      }
                     />
                   </div>
                   <div className="grid gap-2">
@@ -247,7 +252,9 @@ export default function DonutShops() {
                     <Input
                       placeholder="Enter state (e.g., CA)"
                       value={searchState.state || ""}
-                      onChange={(e) => handleInputChange(e.target.value, "state")}
+                      onChange={(e) =>
+                        handleInputChange(e.target.value, "state")
+                      }
                     />
                   </div>
                 </div>
