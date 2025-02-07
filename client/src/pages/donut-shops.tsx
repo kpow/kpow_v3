@@ -7,6 +7,7 @@ import { PageTitle } from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { DonutShopMap } from "@/components/donut-shop-map";
+import { useToast } from "@/hooks/use-toast";
 
 interface Shop {
   id: string;
@@ -26,40 +27,81 @@ interface SearchState {
   zipCode?: string;
   latitude?: number;
   longitude?: number;
+  timestamp?: number; // Added timestamp for forcing refetches
 }
 
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
-  const [searchParams, setSearchParams] = useState<SearchState>({});
+  const [searchState, setSearchState] = useState<SearchState>({});
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // Default to NYC
+  const { toast } = useToast();
 
-  const { data: shops = [], isLoading } = useQuery({
-    queryKey: ["donutShops", searchParams],
+  const { data: shops = [], isLoading, error } = useQuery({
+    queryKey: ["donutShops", searchState],
     queryFn: async () => {
       const queryString = new URLSearchParams();
 
-      if (searchType === "city" && searchParams.city) {
-        queryString.append("location", searchParams.city);
-      } else if (searchType === "zipcode" && searchParams.zipCode) {
-        queryString.append("location", searchParams.zipCode);
-      } else if (searchType === "coords" && searchParams.latitude && searchParams.longitude) {
-        queryString.append("latitude", searchParams.latitude.toString());
-        queryString.append("longitude", searchParams.longitude.toString());
+      if (searchType === "city" && searchState.city) {
+        queryString.append("location", searchState.city);
+      } else if (searchType === "zipcode" && searchState.zipCode) {
+        queryString.append("location", searchState.zipCode);
+      } else if (searchType === "coords" && searchState.latitude && searchState.longitude) {
+        queryString.append("latitude", searchState.latitude.toString());
+        queryString.append("longitude", searchState.longitude.toString());
       } else {
         return [];
       }
 
+      console.log('Fetching shops with query:', queryString.toString());
       const response = await fetch(`/api/yelp/search?${queryString}`);
-      if (!response.ok) throw new Error("Failed to fetch shops");
-      return response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch shops');
+      }
+      const data = await response.json();
+      console.log('Received shops data:', data);
+      return data;
     },
-    enabled: Object.keys(searchParams).length > 0
+    enabled: Object.keys(searchState).length > 0,
+    retry: 1,
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to fetch donut shops",
+        variant: "destructive",
+      });
+    }
   });
 
   const handleSearch = () => {
-    // Trigger the query by updating search params
-    setSearchParams({ ...searchParams });
+    if (searchType === "city" && !searchState.city) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter a city name",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (searchType === "zipcode" && !searchState.zipCode) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter a zip code",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (searchType === "coords" && (!searchState.latitude || !searchState.longitude)) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both latitude and longitude",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Force a refetch by updating the state
+    setSearchState(prev => ({ ...prev, timestamp: Date.now() }));
   };
 
   const handleShopClick = (shop: Shop) => {
@@ -73,7 +115,10 @@ export default function DonutShops() {
 
       <Card className="mb-8">
         <CardContent className="pt-6">
-          <Tabs defaultValue="city" onValueChange={setSearchType}>
+          <Tabs defaultValue="city" onValueChange={(value) => {
+            setSearchType(value);
+            setSearchState({}); // Clear previous search state when changing type
+          }}>
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="city">City Search</TabsTrigger>
               <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
@@ -85,7 +130,7 @@ export default function DonutShops() {
                 <Label>City Name</Label>
                 <Input 
                   placeholder="Enter city name"
-                  onChange={(e) => setSearchParams({ city: e.target.value })}
+                  onChange={(e) => setSearchState({ city: e.target.value })}
                 />
               </div>
             </TabsContent>
@@ -95,7 +140,7 @@ export default function DonutShops() {
                 <Label>Zip Code</Label>
                 <Input 
                   placeholder="Enter zip code"
-                  onChange={(e) => setSearchParams({ zipCode: e.target.value })}
+                  onChange={(e) => setSearchState({ zipCode: e.target.value })}
                 />
               </div>
             </TabsContent>
@@ -107,7 +152,7 @@ export default function DonutShops() {
                   <Input 
                     type="number" 
                     placeholder="Enter latitude"
-                    onChange={(e) => setSearchParams(prev => ({ 
+                    onChange={(e) => setSearchState(prev => ({ 
                       ...prev, 
                       latitude: parseFloat(e.target.value) 
                     }))}
@@ -118,7 +163,7 @@ export default function DonutShops() {
                   <Input 
                     type="number" 
                     placeholder="Enter longitude"
-                    onChange={(e) => setSearchParams(prev => ({ 
+                    onChange={(e) => setSearchState(prev => ({ 
                       ...prev, 
                       longitude: parseFloat(e.target.value) 
                     }))}
