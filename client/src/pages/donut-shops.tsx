@@ -38,7 +38,11 @@ export default function DonutShops() {
   const [shouldFitBounds, setShouldFitBounds] = useState(false);
   const { toast } = useToast();
 
-  const { data: allShops = [], isLoading, refetch } = useQuery({
+  const {
+    data: allShops = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["donutShops", searchState],
     queryFn: async () => {
       console.log("Search state:", searchState);
@@ -48,36 +52,38 @@ export default function DonutShops() {
         queryString.append("location", searchState.city);
       } else if (searchType === "zipcode" && searchState.zipCode) {
         queryString.append("location", searchState.zipCode);
-      } else if (searchType === "coords" && searchState.latitude && searchState.longitude) {
+      } else if (
+        searchType === "coords" &&
+        searchState.latitude &&
+        searchState.longitude
+      ) {
         queryString.append("latitude", searchState.latitude.toString());
         queryString.append("longitude", searchState.longitude.toString());
       } else {
         return [];
       }
 
-      console.log('Fetching shops with query:', queryString.toString());
+      console.log("Fetching shops with query:", queryString.toString());
       const response = await fetch(`/api/yelp/search?${queryString}`);
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch shops');
+        throw new Error(errorData.error || "Failed to fetch shops");
       }
 
       const data = await response.json();
-      console.log('Received shops data:', data);
+      console.log("Received shops data:", data);
 
       // Set shouldFitBounds to true when new search results come in
       setShouldFitBounds(true);
 
       return data;
     },
-    enabled: false // Don't run query automatically
+    enabled: false, // Don't run query automatically
   });
 
   // Filter shops based on minimum rating
-  const shops = allShops.filter(shop => 
-    shop.rating >= minRating
-  );
+  const shops = allShops.filter((shop) => shop.rating >= minRating);
 
   const handleSearch = async () => {
     // Validate search input
@@ -97,7 +103,10 @@ export default function DonutShops() {
       });
       return;
     }
-    if (searchType === "coords" && (!searchState.latitude || !searchState.longitude)) {
+    if (
+      searchType === "coords" &&
+      (!searchState.latitude || !searchState.longitude)
+    ) {
       toast({
         title: "Missing Information",
         description: "Please enter both latitude and longitude",
@@ -110,9 +119,12 @@ export default function DonutShops() {
     await refetch(); // Manually trigger the query
   };
 
-  const handleInputChange = (value: string | number, field: keyof SearchState) => {
+  const handleInputChange = (
+    value: string | number,
+    field: keyof SearchState,
+  ) => {
     console.log(`Updating ${field} with value:`, value);
-    setSearchState(prev => ({ ...prev, [field]: value }));
+    setSearchState((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleShopClick = (shop: Shop) => {
@@ -127,14 +139,19 @@ export default function DonutShops() {
 
   return (
     <div className="container mx-auto p-4">
-      <PageTitle size="lg" className="mb-8">Donut Shop Finder</PageTitle>
+      <PageTitle size="lg" className="mb-8">
+        Donut Shop Finder
+      </PageTitle>
 
       <Card className="mb-8">
         <CardContent className="pt-6">
-          <Tabs defaultValue="city" onValueChange={(value) => {
-            setSearchType(value);
-            setSearchState({}); // Clear search state but keep rating filter
-          }}>
+          <Tabs
+            defaultValue="city"
+            onValueChange={(value) => {
+              setSearchType(value);
+              setSearchState({}); // Clear search state but keep rating filter
+            }}
+          >
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="city">City Search</TabsTrigger>
               <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
@@ -144,10 +161,10 @@ export default function DonutShops() {
             <TabsContent value="city" className="space-y-4">
               <div className="grid gap-2">
                 <Label>City Name</Label>
-                <Input 
+                <Input
                   placeholder="Enter city name"
-                  value={searchState.city || ''}
-                  onChange={(e) => handleInputChange(e.target.value, 'city')}
+                  value={searchState.city || ""}
+                  onChange={(e) => handleInputChange(e.target.value, "city")}
                 />
               </div>
             </TabsContent>
@@ -155,10 +172,10 @@ export default function DonutShops() {
             <TabsContent value="zipcode" className="space-y-4">
               <div className="grid gap-2">
                 <Label>Zip Code</Label>
-                <Input 
+                <Input
                   placeholder="Enter zip code"
-                  value={searchState.zipCode || ''}
-                  onChange={(e) => handleInputChange(e.target.value, 'zipCode')}
+                  value={searchState.zipCode || ""}
+                  onChange={(e) => handleInputChange(e.target.value, "zipCode")}
                 />
               </div>
             </TabsContent>
@@ -167,20 +184,24 @@ export default function DonutShops() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label>Latitude</Label>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     placeholder="Enter latitude"
-                    value={searchState.latitude || ''}
-                    onChange={(e) => handleInputChange(parseFloat(e.target.value), 'latitude')}
+                    value={searchState.latitude || ""}
+                    onChange={(e) =>
+                      handleInputChange(parseFloat(e.target.value), "latitude")
+                    }
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label>Longitude</Label>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     placeholder="Enter longitude"
-                    value={searchState.longitude || ''}
-                    onChange={(e) => handleInputChange(parseFloat(e.target.value), 'longitude')}
+                    value={searchState.longitude || ""}
+                    onChange={(e) =>
+                      handleInputChange(parseFloat(e.target.value), "longitude")
+                    }
                   />
                 </div>
               </div>
@@ -194,18 +215,16 @@ export default function DonutShops() {
                   value={[minRating]}
                   onValueChange={handleRatingChange}
                   max={5}
-                  step={0.5}
+                  step={0.1}
                   className="flex-1"
                 />
-                <span className="min-w-[4rem] text-sm">
-                  {minRating} ⭐
-                </span>
+                <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
               </div>
             </div>
           </Tabs>
 
           <div className="mt-6">
-            <Button 
+            <Button
               onClick={handleSearch}
               className="w-full"
               disabled={isLoading}
@@ -221,7 +240,7 @@ export default function DonutShops() {
           <CardContent className="pt-6">
             <h2 className="text-2xl font-slackey mb-6">Shop Map</h2>
             <div className="h-[600px] w-full rounded-lg">
-              <DonutShopMap 
+              <DonutShopMap
                 shops={shops}
                 onShopClick={handleShopClick}
                 shouldFitBounds={shouldFitBounds}
@@ -237,7 +256,9 @@ export default function DonutShops() {
               {selectedShop ? (
                 <>
                   <h3 className="text-xl font-bold">{selectedShop.name}</h3>
-                  <p className="text-sm text-gray-600">{selectedShop.address}</p>
+                  <p className="text-sm text-gray-600">
+                    {selectedShop.address}
+                  </p>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">Rating:</span>
                     <span>{selectedShop.rating} ⭐</span>
@@ -249,15 +270,17 @@ export default function DonutShops() {
                     </div>
                   )}
                   {selectedShop.image_url && (
-                    <img 
-                      src={selectedShop.image_url} 
+                    <img
+                      src={selectedShop.image_url}
                       alt={selectedShop.name}
                       className="w-full h-48 object-cover rounded-lg"
                     />
                   )}
                 </>
               ) : (
-                <p className="text-gray-500">Select a shop on the map to see details</p>
+                <p className="text-gray-500">
+                  Select a shop on the map to see details
+                </p>
               )}
             </div>
           </CardContent>
