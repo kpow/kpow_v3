@@ -115,41 +115,12 @@ export default function DonutShops() {
     await refetch();
   };
 
-  const handleRandomCity = async () => {
-    try {
-      // Add loading state
-      const newCity = getRandomCity();
-
-      // Reset all states first
-      setSearchType("city");
-      setMinRating(0);
-      setSelectedShopId(null);
-      setShouldFitBounds(true);
-
-      // Update search state with new city
-      setSearchState({
-        city: newCity.city,
-        state: newCity.state,
-        zipCode: undefined,
-        latitude: undefined,
-        longitude: undefined
-      });
-
-      // Wait for the API call to complete
-      await refetch();
-
-      toast({
-        title: "Success",
-        description: `Loaded donut shops in ${newCity.city}, ${newCity.state}`,
-      });
-    } catch (error) {
-      console.error("Failed to load new city:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load shops for the new city. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handleRandomCity = () => {
+    const newCity = getRandomCity();
+    setSearchState({
+      city: newCity.city,
+      state: newCity.state
+    });
   };
 
   const getValidationMessage = () => {
