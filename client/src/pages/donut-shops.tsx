@@ -80,35 +80,32 @@ export default function DonutShops() {
   const shops = allShops.filter((shop) => shop.rating >= minRating);
 
   const handleSearch = async () => {
-    if (searchType === "city" && !searchState.city) {
+    const validationMessage = getValidationMessage();
+    if (validationMessage) {
       toast({
         title: "Missing Information",
-        description: "Please enter a city name",
+        description: validationMessage,
         variant: "destructive",
       });
       return;
     }
+    await refetch();
+  };
+
+  const getValidationMessage = () => {
+    if (searchType === "city" && !searchState.city) {
+      return "Please enter a city name";
+    }
     if (searchType === "zipcode" && !searchState.zipCode) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter a zip code",
-        variant: "destructive",
-      });
-      return;
+      return "Please enter a zip code";
     }
     if (
       searchType === "coords" &&
       (!searchState.latitude || !searchState.longitude)
     ) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter both latitude and longitude",
-        variant: "destructive",
-      });
-      return;
+      return "Please enter both latitude and longitude";
     }
-
-    await refetch();
+    return null;
   };
 
   const handleInputChange = (

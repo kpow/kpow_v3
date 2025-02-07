@@ -12,20 +12,36 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
+interface Shop {
+  id: string;
+  name: string;
+  rating: number;
+  price?: string;
+  address: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  image_url?: string;
+}
+
+interface MapControllerProps {
+  shops: Shop[];
+  shouldFitBounds: boolean;
+  selectedShopId?: string;
+  markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
+}
+
 // Component to handle map updates and marker control
 function MapController({ 
   shops, 
   shouldFitBounds,
   selectedShopId,
   markersRef
-}: { 
-  shops: Shop[], 
-  shouldFitBounds: boolean,
-  selectedShopId?: string,
-  markersRef: React.MutableRefObject<{ [key: string]: L.Marker }> 
-}) {
+}: MapControllerProps) {
   const map = useMap();
 
+  // Handle bounds fitting
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
       const bounds = L.latLngBounds(
@@ -49,19 +65,6 @@ function MapController({
   return null;
 }
 
-interface Shop {
-  id: string;
-  name: string;
-  rating: number;
-  price?: string;
-  address: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  image_url?: string;
-}
-
 interface DonutShopMapProps {
   shops: Shop[];
   onShopClick?: (shop: Shop) => void;
@@ -75,7 +78,6 @@ export function DonutShopMap({
   shouldFitBounds = false,
   selectedShopId
 }: DonutShopMapProps) {
-  console.log('DonutShopMap received:', { shops, selectedShopId });
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
 
   return (
@@ -112,34 +114,26 @@ export function DonutShopMap({
             <Popup>
               <div className="p-1">
                 <div className="space-y-2">
-                  {shop ? (
-                    <>
-                      <h3 className="text-xl font-bold">{shop.name}</h3>
-                      <p className="text-sm text-gray-600">{shop.address}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                          <span className="font-medium">Rating:</span>
-                          <span>{shop.rating} ⭐</span>
-                        </div>
-                        {shop.price && (
-                          <div className="flex items-center gap-1">
-                            <span className="font-medium">Price:</span>
-                            <span>{shop.price}</span>
-                          </div>
-                        )}
+                  <h3 className="text-xl font-bold">{shop.name}</h3>
+                  <p className="text-sm text-gray-600">{shop.address}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">Rating:</span>
+                      <span>{shop.rating} ⭐</span>
+                    </div>
+                    {shop.price && (
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium">Price:</span>
+                        <span>{shop.price}</span>
                       </div>
-                      {shop.image_url && (
-                        <img
-                          src={shop.image_url}
-                          alt={shop.name}
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <p className="text-gray-500">
-                      Select a shop on the map to see details
-                    </p>
+                    )}
+                  </div>
+                  {shop.image_url && (
+                    <img
+                      src={shop.image_url}
+                      alt={shop.name}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
                   )}
                 </div>
               </div>
