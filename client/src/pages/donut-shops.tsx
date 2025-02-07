@@ -121,7 +121,10 @@ export default function DonutShops() {
       city: newCity.city,
       state: newCity.state
     });
-    handleSearch(); // Use the existing search functionality
+    // Add a small delay to ensure state is updated before search
+    setTimeout(() => {
+      handleSearch();
+    }, 100);
   };
 
   const getValidationMessage = () => {
