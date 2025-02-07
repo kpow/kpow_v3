@@ -196,9 +196,9 @@ export default function DonutShops() {
         )}
         <CardContent className="pt-2" />
       </Card>
-      <Card className="lg:col-span-2 order-1 lg:order-2">
-        <CardContent className="pt-2">
-          <div className="h-[500px] w-full rounded-lg">
+      <Card className="lg:col-span-2 order-1 lg:order-2 h-full">
+        <CardContent className="pt-2 h-full">
+          <div className="h-[500px] w-full rounded-lg lg:w-full">
             <DonutShopMap
               shops={shops}
               onShopClick={handleShopClick}
