@@ -178,7 +178,7 @@ export default function DonutShops() {
           variant="outline"
           size="sm"
           onClick={handleRandomCity}
-          className="ml-4"
+          className="ml-4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
         >
           <Shuffle className="h-4 w-4 mr-2" />
           Random City
