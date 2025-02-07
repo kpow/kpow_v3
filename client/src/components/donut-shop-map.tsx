@@ -88,16 +88,18 @@ export function DonutShopMap({
                     <>
                       <h3 className="text-xl font-bold">{shop.name}</h3>
                       <p className="text-sm text-gray-600">{shop.address}</p>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Rating:</span>
-                        <span>{shop.rating} ⭐</span>
-                      </div>
-                      {shop.price && (
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">Price:</span>
-                          <span>{shop.price}</span>
+                          <span className="font-medium">Rating:</span>
+                          <span>{shop.rating} ⭐</span>
                         </div>
-                      )}
+                        {shop.price && (
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">Price:</span>
+                            <span>{shop.price}</span>
+                          </div>
+                        )}
+                      </div>
                       {shop.image_url && (
                         <img
                           src={shop.image_url}
