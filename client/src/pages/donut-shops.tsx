@@ -128,14 +128,14 @@ export default function DonutShops() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <PageTitle size="lg" className="mb-8">
+    <div className="container mx-auto">
+      <PageTitle size="lg" className="mb-4">
         donut tour
       </PageTitle>
 
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="h-[400px] w-full rounded-lg">
+      <Card className="mb-4">
+        <CardContent className="pt-2">
+          <div className="h-[600px] w-full rounded-lg">
             <DonutShopMap
               shops={shops}
               onShopClick={handleShopClick}
@@ -145,7 +145,7 @@ export default function DonutShops() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">        
         <Card className="lg:col-span-2">
           <CardContent className="pt-6">
             <Tabs
@@ -237,39 +237,7 @@ export default function DonutShops() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-4">
-              {selectedShop ? (
-                <>
-                  <h3 className="text-xl font-bold">{selectedShop.name}</h3>
-                  <p className="text-sm text-gray-600">{selectedShop.address}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Rating:</span>
-                    <span>{selectedShop.rating} ⭐</span>
-                  </div>
-                  {selectedShop.price && (
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">Price:</span>
-                      <span>{selectedShop.price}</span>
-                    </div>
-                  )}
-                  {selectedShop.image_url && (
-                    <img
-                      src={selectedShop.image_url}
-                      alt={selectedShop.name}
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
-                  )}
-                </>
-              ) : (
-                <p className="text-gray-500">
-                  Select a shop on the map to see details
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+       
       </div>
     </div>
   );

@@ -83,8 +83,35 @@ export function DonutShopMap({
           >
             <Popup>
               <div className="p-2">
-                <h3 className="font-bold mb-1">{shop.name}</h3>
-                <p className="text-sm">{shop.address}</p>
+                <div className="space-y-4">
+                  {shop ? (
+                    <>
+                      <h3 className="text-xl font-bold">{shop.name}</h3>
+                      <p className="text-sm text-gray-600">{shop.address}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Rating:</span>
+                        <span>{shop.rating} ⭐</span>
+                      </div>
+                      {shop.price && (
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Price:</span>
+                          <span>{shop.price}</span>
+                        </div>
+                      )}
+                      {shop.image_url && (
+                        <img
+                          src={shop.image_url}
+                          alt={shop.name}
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-gray-500">
+                      Select a shop on the map to see details
+                    </p>
+                  )}
+                </div>
               </div>
             </Popup>
           </Marker>
