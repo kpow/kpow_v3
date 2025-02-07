@@ -320,21 +320,9 @@ export default function Home() {
 
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">book feed</h2>
-          <Link key="BookFeed" href="books">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more books
-            </button>
-          </Link>
-        </div>
-        <BookFeed />
-      </div>
-
-      <div className="h-px bg-gray-200 my-4" />
-
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">donut tour</h2>
+          <h2 className="text-2xl font-bold font-slackey">
+            donut tour {shops && shops.length > 0 ? '- San Francisco, CA' : ''}
+          </h2>
           <Link href="/donut-shops">
             <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
               explore donut shops
