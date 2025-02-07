@@ -130,12 +130,11 @@ export default function DonutShops() {
   return (
     <div className="container mx-auto p-4">
       <PageTitle size="lg" className="mb-8">
-        Donut Shop Finder
+        donut tour
       </PageTitle>
 
       <Card className="mb-8">
         <CardContent className="pt-6">
-          <h2 className="text-2xl font-slackey mb-6">Shop Map</h2>
           <div className="h-[400px] w-full rounded-lg">
             <DonutShopMap
               shops={shops}
@@ -240,7 +239,6 @@ export default function DonutShops() {
 
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-2xl font-slackey mb-6">Shop Details</h2>
             <div className="space-y-4">
               {selectedShop ? (
                 <>
