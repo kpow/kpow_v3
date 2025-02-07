@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -15,20 +15,17 @@ const ShopIcon = L.icon({
 // Component to handle map bounds updates
 function MapUpdater({ shops, searchId }: { shops: Shop[], searchId: string }) {
   const map = useMap();
-  const hasUpdatedRef = useRef<string | null>(null);
 
+  // Only update bounds when searchId changes (new search performed)
   useEffect(() => {
-    // Only update bounds if we have shops and haven't updated for this search yet
-    if (shops.length > 0 && hasUpdatedRef.current !== searchId) {
+    if (shops.length > 0 && searchId) {
       const bounds = L.latLngBounds(
         shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
       );
-
       const paddedBounds = bounds.pad(0.2); // 20% padding
       map.fitBounds(paddedBounds);
-      hasUpdatedRef.current = searchId;
     }
-  }, [shops, map, searchId]);
+  }, [searchId]);  // Only depend on searchId changes
 
   return null;
 }
@@ -57,8 +54,6 @@ export function DonutShopMap({
   searchId,
   onShopClick 
 }: DonutShopMapProps) {
-  console.log('DonutShopMap received:', { shops });
-
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
