@@ -194,36 +194,35 @@ export default function DonutShops() {
             <ShopSlider shops={shops} onShopClick={handleShopClick} />
           </div>
         )}
-        <CardContent className="pt-2" />
-      </Card>
-      <Card className="lg:col-span-2 order-1 lg:order-2 h-full">
-        <CardContent className="pt-2 h-full">
-          <div className="h-[500px] w-full rounded-lg lg:w-full">
-            <DonutShopMap
-              shops={shops}
-              onShopClick={handleShopClick}
-              shouldFitBounds={shouldFitBounds}
-              selectedShopId={selectedShopId}
-            />
-          </div>
-        </CardContent>
-        <div className="m-4 mt-0 flex flex-col justify-center">
-          <Label className="mb-2">Minimum Rating</Label>
-          <div className="flex items-center gap-4">
-            <Slider
-              value={[minRating]}
-              onValueChange={handleRatingChange}
-              max={5}
-              step={0.1}
-              className="flex-1"
-            />
-            <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
-          </div>
-        </div>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
-        <Card className="lg:col-span-1 order-2 lg:order-1">
+        <Card className="lg:col-span-2">
+          <CardContent className="pt-2">
+            <div className="h-[500px] w-full rounded-lg">
+              <DonutShopMap
+                shops={shops}
+                onShopClick={handleShopClick}
+                shouldFitBounds={shouldFitBounds}
+                selectedShopId={selectedShopId}
+              />
+            </div>
+          </CardContent>
+          <div className="m-4 mt-0 flex flex-col justify-center">
+            <Label className="mb-2">Minimum Rating</Label>
+            <div className="flex items-center gap-4">
+              <Slider
+                value={[minRating]}
+                onValueChange={handleRatingChange}
+                max={5}
+                step={0.1}
+                className="flex-1"
+              />
+              <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
+            </div>
+          </div>
+        </Card>
+        <Card className="lg:col-span-1">
           <CardContent className="pt-4">
             <Tabs
               defaultValue="city"
