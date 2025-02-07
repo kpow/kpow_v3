@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -15,19 +15,20 @@ const ShopIcon = L.icon({
 // Component to handle map bounds updates
 function MapUpdater({ shops, searchId }: { shops: Shop[], searchId: string }) {
   const map = useMap();
+  const hasUpdatedRef = useRef<string | null>(null);
 
-  // Update markers whenever shops change
   useEffect(() => {
-    if (shops.length === 0) return;
-
-    // Only update bounds when searchId changes (new search performed)
-    if (searchId) {
+    // Only update bounds if we have shops and haven't updated for this search yet
+    if (shops.length > 0 && hasUpdatedRef.current !== searchId) {
       const bounds = L.latLngBounds(
         shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
       );
-      map.fitBounds(bounds.pad(0.2)); // 20% padding
+
+      const paddedBounds = bounds.pad(0.2); // 20% padding
+      map.fitBounds(paddedBounds);
+      hasUpdatedRef.current = searchId;
     }
-  }, [shops, searchId, map]); // Keep shops dependency for marker updates
+  }, [shops, map, searchId]);
 
   return null;
 }
@@ -56,11 +57,13 @@ export function DonutShopMap({
   searchId,
   onShopClick 
 }: DonutShopMapProps) {
+  console.log('DonutShopMap received:', { shops });
+
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
-        center={[40.7128, -74.0060]} // Default center (NYC)
-        zoom={11}
+        center={[40.7128, -74.0060]} // Default center, will be adjusted by MapUpdater
+        zoom={11} // Default zoom, will be adjusted by MapUpdater
         style={{ height: '100%', width: '100%' }}
       >
         <MapUpdater shops={shops} searchId={searchId} />
