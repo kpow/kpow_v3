@@ -40,11 +40,11 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
 
   if (orientation === 'vertical') {
     return (
-      <div className="relative flex flex-col">
+      <div className="flex flex-col gap-2">
         <Button 
           variant="ghost" 
-          size="icon" 
-          className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+          size="icon"
+          className="h-8 w-full bg-background/80 backdrop-blur-sm border-0"
           onClick={scrollPrev}
         >
           <ChevronUp className="h-4 w-4" />
@@ -55,7 +55,7 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
             {shops.map((shop) => (
               <div key={shop.id} className="min-h-0">
                 <Card 
-                  className="relative h-[70px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02] m-0"
+                  className="relative h-[70px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02] m-0 rounded-none border-0"
                   onClick={() => onShopClick(shop)}
                 >
             <div
@@ -82,7 +82,7 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
       <Button 
         variant="ghost" 
         size="icon" 
-        className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+        className="h-8 w-full bg-background/80 backdrop-blur-sm border-0"
         onClick={scrollNext}
       >
         <ChevronDown className="h-4 w-4" />
