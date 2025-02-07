@@ -63,8 +63,8 @@ export function DonutShopMap({
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
-        center={[40.7128, -74.0060]} // Default center, will be adjusted by MapUpdater
-        zoom={11} // Default zoom, will be adjusted by MapUpdater
+        center={[39.8283, -98.5795]} // Geographic center of the continental United States
+        zoom={4} // Zoom level to show the continental United States
         style={{ height: '100%', width: '100%' }}
       >
         <MapUpdater shops={shops} shouldFitBounds={shouldFitBounds} />
