@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { DonutShopMap } from "@/components/donut-shop-map";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,15 +28,18 @@ interface SearchState {
   zipCode?: string;
   latitude?: number;
   longitude?: number;
+  minRating?: number;
 }
 
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
-  const [searchState, setSearchState] = useState<SearchState>({});
+  const [searchState, setSearchState] = useState<SearchState>({
+    minRating: 0
+  });
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const { toast } = useToast();
 
-  const { data: shops = [], isLoading, refetch } = useQuery({
+  const { data: allShops = [], isLoading, refetch } = useQuery({
     queryKey: ["donutShops", searchState],
     queryFn: async () => {
       console.log("Search state:", searchState);
@@ -66,6 +70,11 @@ export default function DonutShops() {
     },
     enabled: false // Don't run query automatically
   });
+
+  // Filter shops based on minimum rating
+  const shops = allShops.filter(shop => 
+    !searchState.minRating || shop.rating >= searchState.minRating
+  );
 
   const handleSearch = async () => {
     // Validate search input
@@ -107,6 +116,10 @@ export default function DonutShops() {
     setSelectedShop(shop);
   };
 
+  const handleRatingChange = (value: number[]) => {
+    handleInputChange(value[0], 'minRating');
+  };
+
   return (
     <div className="container mx-auto p-4">
       <PageTitle size="lg" className="mb-8">Donut Shop Finder</PageTitle>
@@ -115,7 +128,9 @@ export default function DonutShops() {
         <CardContent className="pt-6">
           <Tabs defaultValue="city" onValueChange={(value) => {
             setSearchType(value);
-            setSearchState({}); // Clear previous search state when changing type
+            setSearchState(prev => ({ 
+              minRating: prev.minRating // Preserve rating filter
+            })); // Clear previous search state when changing type
           }}>
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="city">City Search</TabsTrigger>
@@ -167,6 +182,23 @@ export default function DonutShops() {
                 </div>
               </div>
             </TabsContent>
+
+            {/* Rating Filter */}
+            <div className="mt-6 space-y-4">
+              <Label>Minimum Rating</Label>
+              <div className="flex items-center gap-4">
+                <Slider
+                  value={[searchState.minRating || 0]}
+                  onValueChange={handleRatingChange}
+                  max={5}
+                  step={0.5}
+                  className="flex-1"
+                />
+                <span className="min-w-[4rem] text-sm">
+                  {searchState.minRating || 0} ⭐
+                </span>
+              </div>
+            </div>
           </Tabs>
 
           <div className="mt-6">
