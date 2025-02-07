@@ -115,15 +115,29 @@ export default function DonutShops() {
     await refetch();
   };
 
-  const handleRandomCity = () => {
+  const handleRandomCity = async () => {
     const newCity = getRandomCity();
     setSearchState({
       city: newCity.city,
-      state: newCity.state
+      state: newCity.state,
+      zipCode: undefined,
+      latitude: undefined,
+      longitude: undefined
     });
-    setSelectedShopId(null); // Clear selected shop
-    setShouldFitBounds(true); // Reset map bounds
-    refetch(); // Refetch data for new city
+    setSelectedShopId(null);
+    setShouldFitBounds(true);
+    setMinRating(0); // Reset rating filter
+    setSearchType("city"); // Ensure we're in city search mode
+
+    try {
+      await refetch();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load shops for the new city",
+        variant: "destructive",
+      });
+    }
   };
 
   const getValidationMessage = () => {
