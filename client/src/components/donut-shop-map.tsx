@@ -82,19 +82,19 @@ export function DonutShopMap({
             }}
           >
             <Popup>
-              <div className="p-2">
-                <div className="space-y-4">
+              <div className="p-1">
+                <div className="space-y-2">
                   {shop ? (
                     <>
                       <h3 className="text-xl font-bold">{shop.name}</h3>
                       <p className="text-sm text-gray-600">{shop.address}</p>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <span className="font-medium">Rating:</span>
                           <span>{shop.rating} ⭐</span>
                         </div>
                         {shop.price && (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <span className="font-medium">Price:</span>
                             <span>{shop.price}</span>
                           </div>
