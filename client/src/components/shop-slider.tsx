@@ -2,7 +2,7 @@ import { useRef, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "lucide-react";
 
 interface Shop {
   id: string;
@@ -40,13 +40,24 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
 
   if (orientation === 'vertical') {
     return (
-      <div className="flex flex-col gap-4">
-        {shops.map((shop) => (
-          <Card 
-            key={shop.id}
-            className="relative h-[140px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
-            onClick={() => onShopClick(shop)}
-          >
+      <div className="relative flex flex-col">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+          onClick={scrollPrev}
+        >
+          <ChevronUp className="h-4 w-4" />
+        </Button>
+
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex flex-col">
+            {shops.map((shop) => (
+              <div key={shop.id} className="min-h-0">
+                <Card 
+                  className="relative h-[70px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02] m-0"
+                  onClick={() => onShopClick(shop)}
+                >
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
@@ -62,11 +73,23 @@ export function ShopSlider({ shops, onShopClick, orientation = 'horizontal' }: S
                 {shop.name}
               </h3>
             </div>
-          </Card>
-        ))}
+              </Card>
+            </div>
+          ))}
+        </div>
       </div>
-    );
-  }
+
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+        onClick={scrollNext}
+      >
+        <ChevronDown className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
 
   return (
     <div className="relative">
