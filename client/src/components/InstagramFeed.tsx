@@ -1,9 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-modal';
-import { Button } from './ui/button';
 import { Card } from './ui/card';
-import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Types for Instagram media
 interface InstagramMediaChild {
@@ -30,7 +27,6 @@ interface InstagramMedia {
   };
 }
 
-// Update the props interface to include modal properties
 interface InstagramFeedProps {
   posts: InstagramMedia[];
   onLoadMore: () => void;
@@ -43,79 +39,13 @@ interface InstagramFeedProps {
 
 export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   posts = [],
-  onLoadMore,
-  hasMore,
-  isLoadingMore,
   initialPostIndex = 0,
   isOpen = false,
   onClose
 }) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: 'start',
-    containScroll: 'trimSnaps',
-    slidesToScroll: 1,
-    dragFree: false
-  });
-
   const [modalIsOpen, setModalIsOpen] = useState(isOpen);
   const [currentPostIndex, setCurrentPostIndex] = useState(initialPostIndex);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
-
-  // Reset state when posts change or component unmounts
-  useEffect(() => {
-    setCurrentPostIndex(initialPostIndex);
-    setCurrentMediaIndex(0);
-    setModalIsOpen(isOpen);
-
-    // Reset scroll states when posts change
-    if (emblaApi) {
-      setCanScrollPrev(emblaApi.canScrollPrev());
-      setCanScrollNext(emblaApi.canScrollNext());
-    }
-  }, [posts, emblaApi, initialPostIndex, isOpen]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-
-    // Update scroll states whenever slides change
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    // Initial scroll state update
-    onSelect();
-
-    // Subscribe to select events
-    emblaApi.on('select', onSelect);
-    // Subscribe to settle events to update states after animations
-    emblaApi.on('settle', onSelect);
-
-    return () => {
-      emblaApi.off('select', onSelect);
-      emblaApi.off('settle', onSelect);
-    };
-  }, [emblaApi, onSelect]);
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) {
-      const curIndexes = emblaApi.slidesInView();
-      const curIndex = curIndexes[0];
-      emblaApi.scrollTo(curIndex - 4);
-    }
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) {
-      const curIndexes = emblaApi.slidesInView();
-      const curIndex = curIndexes[curIndexes.length - 1];
-      emblaApi.scrollTo(curIndex);
-    }
-  }, [emblaApi]);
 
   const handleOpenModal = (postIndex: number) => {
     if (postIndex >= 0 && postIndex < posts.length) {
@@ -159,16 +89,6 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     }
   };
 
-  const handlePreviousPost = () => {
-    setCurrentPostIndex(prev => (prev > 0 ? prev - 1 : posts.length - 1));
-    setCurrentMediaIndex(0);
-  };
-
-  const handleNextPost = () => {
-    setCurrentPostIndex(prev => (prev < posts.length - 1 ? prev + 1 : 0));
-    setCurrentMediaIndex(0);
-  };
-
   const renderMedia = (media: InstagramMedia | InstagramMediaChild | null, inModal: boolean = false) => {
     if (!media) return null;
 
@@ -204,33 +124,8 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     );
   };
 
-  const shouldLoadMore = useCallback(() => {
-    if (!emblaApi || !hasMore || isLoadingMore) return false;
-    const lastSlideInView = emblaApi.slidesInView().slice(-1)[0];
-    const totalSlides = emblaApi.scrollSnapList().length;
-    return lastSlideInView >= totalSlides - 4;
-  }, [emblaApi, hasMore, isLoadingMore]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const onScroll = () => {
-      if (shouldLoadMore()) {
-        onLoadMore();
-      }
-    };
-
-    emblaApi.on('scroll', onScroll);
-    emblaApi.on('settle', onScroll);
-
-    return () => {
-      emblaApi.off('scroll', onScroll);
-      emblaApi.off('settle', onScroll);
-    };
-  }, [emblaApi, shouldLoadMore, onLoadMore]);
-
   // Set modal app element for accessibility
-  useEffect(() => {
+  React.useEffect(() => {
     Modal.setAppElement('#root');
   }, []);
 
@@ -239,51 +134,23 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <div className="relative">
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex">
-            {posts.map((post, index) => (
-              <div key={`${post.id}-${index}`} className="flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%] lg:flex-[0_0_25%] min-w-0 px-2">
-                <Card
-                  className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
-                  onClick={() => handleOpenModal(index)}
-                >
-                  {renderMedia(post)}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-70 transition-opacity group-hover:opacity-90" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <p className="font-slackey text-sm line-clamp-2">
-                      {post.caption}
-                    </p>
-                  </div>
-                </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {posts.map((post, index) => (
+          <div key={`${post.id}-${index}`}>
+            <Card
+              className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
+              onClick={() => handleOpenModal(index)}
+            >
+              {renderMedia(post)}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-70 transition-opacity group-hover:opacity-90" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                <p className="font-slackey text-sm line-clamp-2">
+                  {post.caption}
+                </p>
               </div>
-            ))}
+            </Card>
           </div>
-        </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-blue-600 hover:bg-blue-700 text-primary-foreground -left-5 ${
-            !canScrollPrev ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          onClick={scrollPrev}
-          disabled={!canScrollPrev}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-blue-600 hover:bg-blue-700 text-primary-foreground -right-5 ${
-            !canScrollNext ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          onClick={scrollNext}
-          disabled={!canScrollNext}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        ))}
       </div>
 
       <Modal
@@ -294,56 +161,33 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
       >
         {currentPost && currentMedia && (
           <div className="relative flex flex-col">
-            <Button
-              variant="outline"
-              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/75 text-white"
+            <button
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/75 text-white p-2 rounded"
               onClick={handleCloseModal}
             >
               ✕
-            </Button>
+            </button>
 
             <div className="relative">
               {renderMedia(currentMedia, true)}
 
-              {posts.length > 1 && (
-                <>
-                  <Button
-                    variant="outline"
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
-                    onClick={handlePreviousPost}
-                  >
-                    ←
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
-                    onClick={handleNextPost}
-                  >
-                    →
-                  </Button>
-                </>
-              )}
-
               {currentPost.media_type === 'CAROUSEL_ALBUM' && currentPost.children && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  <Button
-                    variant="outline"
+                  <button
                     onClick={handlePreviousMedia}
-                    className="p-2 bg-black/50 hover:bg-black/75 text-white"
+                    className="p-2 bg-black/50 hover:bg-black/75 text-white rounded"
                   >
                     ←
-                  </Button>
+                  </button>
                   <span className="bg-black/50 text-white px-3 py-1 rounded">
                     {currentMediaIndex + 1} / {currentPost.children.data.length}
                   </span>
-                  <Button
-                    variant="outline"
+                  <button
                     onClick={handleNextMedia}
-                    className="p-2 bg-black/50 hover:bg-black/75 text-white"
+                    className="p-2 bg-black/50 hover:bg-black/75 text-white rounded"
                   >
                     →
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>

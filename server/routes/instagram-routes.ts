@@ -27,7 +27,8 @@ router.get('/feed', async (req, res) => {
   try {
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 100; 
+    const pageSize = parseInt(req.query.pageSize as string) || 100;
+    const random = req.query.random === 'true';
 
     if (!accessToken) {
       throw new Error('Instagram access token not found');
@@ -39,13 +40,16 @@ router.get('/feed', async (req, res) => {
     const response = await axios.get(url);
     const allPosts = response.data.data;
 
-    // Randomly shuffle the array
-    const shuffledPosts = [...allPosts].sort(() => Math.random() - 0.5);
+    // Only shuffle for homepage requests
+    let posts = allPosts;
+    if (random) {
+      posts = [...allPosts].sort(() => Math.random() - 0.5);
+    }
 
     // Get the requested page of data
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const paginatedPosts = shuffledPosts.slice(start, end);
+    const paginatedPosts = posts.slice(start, end);
 
     res.json({
       posts: paginatedPosts,
