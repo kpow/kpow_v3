@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import axios from "axios";
@@ -45,7 +45,6 @@ export default function Instagram() {
   const { toast } = useToast();
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [randomizedPosts, setRandomizedPosts] = useState<InstagramPost[]>([]);
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
@@ -64,17 +63,6 @@ export default function Instagram() {
       }
     },
   });
-
-  // Only randomize posts when not on the Instagram page
-  useEffect(() => {
-    if (data?.posts) {
-      // Sort posts by timestamp in descending order (newest first)
-      const sortedPosts = [...data.posts].sort((a, b) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      );
-      setRandomizedPosts(sortedPosts);
-    }
-  }, [data]);
 
   if (error) {
     toast({
@@ -102,7 +90,7 @@ export default function Instagram() {
   };
 
   return (
-    <div className="container mx-auto px-2 py-4">
+    <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
         <PageTitle size="lg">instagram feed</PageTitle>
         <CustomPagination
@@ -114,7 +102,7 @@ export default function Instagram() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="bg-gray-200 aspect-square rounded-lg" />
@@ -133,8 +121,8 @@ export default function Instagram() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {randomizedPosts.map((post, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {data?.posts.map((post, index) => (
               <div key={post.id} className="aspect-square">
                 <InstagramCard
                   {...post}
@@ -144,9 +132,9 @@ export default function Instagram() {
             ))}
           </div>
 
-          {modalIsOpen && randomizedPosts && selectedPostIndex !== null && (
+          {modalIsOpen && data?.posts && selectedPostIndex !== null && (
             <InstagramFeed
-              posts={[randomizedPosts[selectedPostIndex]]}
+              posts={[data.posts[selectedPostIndex]]}
               onLoadMore={() => {}}
               hasMore={false}
               isLoadingMore={false}
