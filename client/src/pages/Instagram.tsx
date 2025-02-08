@@ -38,6 +38,7 @@ interface InstagramResponse {
   pagination: {
     next_token?: string;
     has_next_page: boolean;
+    total_count: number;
   };
 }
 
@@ -53,9 +54,10 @@ export default function Instagram() {
   const [pageTokens, setPageTokens] = useState<PageTokens>({});
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const { data, isLoading, error } = useQuery<InstagramResponse>({
-    queryKey: ["instagram", page, pageTokens[page - 1]],
+  const { data, isLoading, error, refetch } = useQuery<InstagramResponse>({
+    queryKey: ["instagram", page],
     queryFn: async () => {
       const response = await axios.get<InstagramResponse>('/api/instagram/feed', {
         params: {
@@ -63,8 +65,16 @@ export default function Instagram() {
           pageToken: pageTokens[page - 1] || "",
         },
       });
+
+      // Calculate total pages based on total count
+      if (response.data.pagination.total_count) {
+        const total = Math.ceil(response.data.pagination.total_count / ITEMS_PER_PAGE);
+        setTotalPages(total);
+      }
+
       return response.data;
-    }
+    },
+    enabled: true,
   });
 
   useEffect(() => {
@@ -78,7 +88,8 @@ export default function Instagram() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [page]);
+    refetch();
+  }, [page, refetch]);
 
   if (error) {
     toast({
@@ -89,8 +100,7 @@ export default function Instagram() {
   }
 
   const handlePageChange = (newPage: number) => {
-    if (newPage < 1) return;
-    if (!data?.pagination?.has_next_page && newPage > page) return;
+    if (newPage < 1 || newPage > totalPages) return;
     setLocation(newPage === 1 ? "/instagram" : `/instagram/page/${newPage}`);
   };
 
@@ -104,8 +114,6 @@ export default function Instagram() {
     setModalIsOpen(false);
   };
 
-  const hasNextPage = data?.pagination?.has_next_page ?? false;
-
   const breakpointCols = {
     default: 3,
     1100: 2,
@@ -118,7 +126,7 @@ export default function Instagram() {
         <PageTitle size="lg">instagram feed</PageTitle>
         <CustomPagination
           currentPage={page}
-          totalPages={hasNextPage ? page + 1 : page}
+          totalPages={totalPages}
           baseUrl="/instagram"
           onPageChange={handlePageChange}
         />
@@ -175,7 +183,7 @@ export default function Instagram() {
 
       <CustomPagination
         currentPage={page}
-        totalPages={hasNextPage ? page + 1 : page}
+        totalPages={totalPages}
         baseUrl="/instagram"
         onPageChange={handlePageChange}
         className="mt-8"
