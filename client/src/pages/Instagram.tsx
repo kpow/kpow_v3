@@ -56,7 +56,7 @@ export default function Instagram() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { data, isLoading, error, refetch } = useQuery<InstagramResponse>({
+  const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
     queryFn: async () => {
       const response = await axios.get<InstagramResponse>('/api/instagram/feed', {
@@ -65,31 +65,32 @@ export default function Instagram() {
           pageToken: pageTokens[page - 1] || "",
         },
       });
-
-      // Calculate total pages based on total count
-      if (response.data.pagination.total_count) {
-        const total = Math.ceil(response.data.pagination.total_count / ITEMS_PER_PAGE);
-        setTotalPages(total);
-      }
-
       return response.data;
     },
-    enabled: true,
   });
 
+  // Update totalPages when data changes
+  useEffect(() => {
+    if (data?.pagination?.total_count) {
+      const total = Math.ceil(data.pagination.total_count / ITEMS_PER_PAGE);
+      setTotalPages(total);
+    }
+  }, [data]);
+
+  // Update page tokens when new data arrives
   useEffect(() => {
     if (data?.pagination?.next_token) {
       setPageTokens((prev) => ({
         ...prev,
-        [page]: data.pagination.next_token,
+        [page]: data.pagination.next_token!,
       }));
     }
   }, [data, page]);
 
+  // Scroll to top on page change
   useEffect(() => {
     window.scrollTo(0, 0);
-    refetch();
-  }, [page, refetch]);
+  }, [page]);
 
   if (error) {
     toast({
@@ -143,12 +144,6 @@ export default function Instagram() {
               </div>
             </div>
           ))}
-        </div>
-      ) : error ? (
-        <div className="text-center py-8">
-          <p className="text-red-500">
-            Error loading Instagram feed. Please try again later.
-          </p>
         </div>
       ) : (
         <>
