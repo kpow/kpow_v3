@@ -54,7 +54,6 @@ export default function Instagram() {
           params: {
             page,
             pageSize: ITEMS_PER_PAGE,
-            random: false // Ensure chronological order for the Instagram page
           },
         });
         return response.data;
