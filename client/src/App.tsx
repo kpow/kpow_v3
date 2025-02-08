@@ -10,10 +10,11 @@ import Books from "@/pages/Books";
 import StarredArticles from "@/pages/StarredArticles";
 import PMonk from "@/pages/PMonk";
 import Videos from "@/pages/Videos";
+import Instagram from "@/pages/Instagram";
 import NotFound from "@/pages/not-found";
 import { HeroBattle } from "@/components/HeroBattle";
 import Battle from "@/pages/Battle";
-import DonutShops from "@/pages/donut-shops"; // Added import for DonutShops page
+import DonutShops from "@/pages/donut-shops";
 
 function Router() {
   return (
@@ -28,9 +29,11 @@ function Router() {
         <Route path="/starred-articles" component={StarredArticles} />
         <Route path="/videos/page/:page" component={Videos} />
         <Route path="/videos" component={Videos} />
+        <Route path="/instagram/page/:page" component={Instagram} />
+        <Route path="/instagram" component={Instagram} />
         <Route path="/pmonk" component={PMonk} />
         <Route path="/battle" component={Battle} />
-        <Route path="/donut-shops" component={DonutShops} /> {/* Added DonutShops route */}
+        <Route path="/donut-shops" component={DonutShops} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
