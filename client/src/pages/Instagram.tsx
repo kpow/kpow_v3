@@ -29,7 +29,7 @@ export default function Instagram() {
   const [pageTokens, setPageTokens] = useState<PageTokens>({});
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
-    queryKey: ["instagram", page],
+    queryKey: ["instagram", page, pageTokens[page - 1]],
     queryFn: async () => {
       const response = await axios.get('/api/instagram/feed', {
         params: {
@@ -37,15 +37,15 @@ export default function Instagram() {
           pageToken: pageTokens[page - 1] || "",
         },
       });
-
-      if (response.data.pagination.next_token) {
-        setPageTokens((prev: PageTokens) => ({
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.pagination.next_token) {
+        setPageTokens((prev) => ({
           ...prev,
-          [page]: response.data.pagination.next_token,
+          [page]: data.pagination.next_token,
         }));
       }
-
-      return response.data;
     },
   });
 
