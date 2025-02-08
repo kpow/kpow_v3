@@ -18,16 +18,11 @@ interface InstagramMedia {
   permalink: string;
   caption?: string;
   timestamp: string;
-  location?: {
-    id: string;
-    name: string;
-  };
   children?: {
     data: InstagramMediaChild[];
   };
 }
 
-// Get Instagram feed with pagination
 router.get('/feed', async (req, res) => {
   try {
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
@@ -46,23 +41,13 @@ router.get('/feed', async (req, res) => {
     // Calculate pagination
     const offset = (page - 1) * pageSize;
 
-    // Then get the actual page of data with location included in fields
-    const url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,location{id,name},children{media_type,media_url,thumbnail_url}&limit=${pageSize * page}&access_token=${accessToken}`;
+    // Get the actual page of data
+    const url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,children{media_type,media_url,thumbnail_url}&limit=${pageSize * page}&access_token=${accessToken}`;
 
-    console.log('Instagram API URL:', url.replace(accessToken, 'REDACTED'));
     const response = await axios.get(url);
     const posts = response.data.data;
-
-    // Log raw response data
-    console.log('Raw Instagram API response:', JSON.stringify(posts[0], null, 2));
-
-    // Get the current page's worth of posts
     const paginatedPosts = posts.slice(offset, offset + pageSize);
 
-    // Log processed posts
-    console.log('Processed posts sample:', JSON.stringify(paginatedPosts[0], null, 2));
-
-    // Return both the posts and pagination info
     res.json({
       posts: paginatedPosts,
       pagination: {
@@ -74,7 +59,10 @@ router.get('/feed', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching Instagram feed:', error);
-    res.status(500).json({ error: 'Failed to fetch Instagram feed' });
+    res.status(500).json({ 
+      error: 'Failed to fetch Instagram feed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 });
 
