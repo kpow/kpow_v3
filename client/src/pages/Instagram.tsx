@@ -36,14 +36,10 @@ interface InstagramPost {
 interface InstagramResponse {
   posts: InstagramPost[];
   pagination: {
-    next_token?: string;
+    next_token: string | null;
     has_next_page: boolean;
     total_count: number;
   };
-}
-
-interface PageTokens {
-  [key: number]: string;
 }
 
 export default function Instagram() {
@@ -51,10 +47,8 @@ export default function Instagram() {
   const [, params] = useRoute("/instagram/page/:page");
   const page = params?.page ? parseInt(params.page) : 1;
   const { toast } = useToast();
-  const [pageTokens, setPageTokens] = useState<PageTokens>({});
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
@@ -62,30 +56,12 @@ export default function Instagram() {
       const response = await axios.get<InstagramResponse>('/api/instagram/feed', {
         params: {
           pageSize: ITEMS_PER_PAGE,
-          pageToken: pageTokens[page - 1] || "",
+          pageToken: page > 1 ? data?.pagination?.next_token : undefined,
         },
       });
       return response.data;
     },
   });
-
-  // Update totalPages when data changes
-  useEffect(() => {
-    if (data?.pagination?.total_count) {
-      const total = Math.ceil(data.pagination.total_count / ITEMS_PER_PAGE);
-      setTotalPages(total);
-    }
-  }, [data]);
-
-  // Update page tokens when new data arrives
-  useEffect(() => {
-    if (data?.pagination?.next_token) {
-      setPageTokens((prev) => ({
-        ...prev,
-        [page]: data.pagination.next_token!,
-      }));
-    }
-  }, [data, page]);
 
   // Scroll to top on page change
   useEffect(() => {
@@ -101,6 +77,7 @@ export default function Instagram() {
   }
 
   const handlePageChange = (newPage: number) => {
+    const totalPages = data ? Math.ceil(data.pagination.total_count / ITEMS_PER_PAGE) : 1;
     if (newPage < 1 || newPage > totalPages) return;
     setLocation(newPage === 1 ? "/instagram" : `/instagram/page/${newPage}`);
   };
@@ -120,6 +97,8 @@ export default function Instagram() {
     1100: 2,
     700: 1,
   };
+
+  const totalPages = data ? Math.ceil(data.pagination.total_count / ITEMS_PER_PAGE) : 1;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -152,7 +131,7 @@ export default function Instagram() {
             className="flex -ml-4 w-auto"
             columnClassName="pl-4 bg-clip-padding"
           >
-            {data?.posts.map((post, index) => (
+            {data?.posts.slice(0, ITEMS_PER_PAGE).map((post, index) => (
               <div key={post.id} className="mb-4">
                 <InstagramCard
                   {...post}
