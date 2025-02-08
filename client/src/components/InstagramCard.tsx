@@ -1,5 +1,5 @@
+
 import { Card } from "./ui/card";
-import { Button } from "./ui/button";
 import { formatDistanceToNow } from "date-fns";
 
 interface InstagramCardProps {
@@ -21,19 +21,22 @@ export function InstagramCard({
   onClick,
 }: InstagramCardProps) {
   return (
-    <Card className="overflow-hidden">
-      <div className="relative aspect-square">
+    <Card 
+      className="overflow-hidden cursor-pointer transform transition-transform duration-300 hover:scale-[1.02]" 
+      onClick={onClick}
+    >
+      <div className="relative aspect-square overflow-hidden">
         {media_type === 'VIDEO' ? (
           <img
             src={thumbnail_url || media_url}
             alt={caption || "Instagram video"}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-110"
           />
         ) : (
           <img
             src={media_url}
             alt={caption || "Instagram post"}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-110"
           />
         )}
         {media_type === 'VIDEO' && (
@@ -47,16 +50,10 @@ export function InstagramCard({
           </div>
         )}
       </div>
-      <div className="p-2 h-[135px] flex flex-col items-center">
-        <p className="font-slackey text-lg item-left leading-snug text-gray-600 line-clamp-3 mb-2 flex-1">
+      <div className="p-2 h-[100px]">
+        <p className="font-slackey text-lg item-left leading-snug text-gray-600 line-clamp-3">
           {caption || "No caption"}
         </p>
-        {/* <div className="text-sm text-gray-500">
-          {formatDistanceToNow(new Date(timestamp), { addSuffix: true })}
-        </div> */}
-        <Button onClick={onClick} className="w-3/4 mt-4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-          View Post
-        </Button>
       </div>
     </Card>
   );
