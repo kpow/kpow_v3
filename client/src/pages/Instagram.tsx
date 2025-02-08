@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import axios from "axios";
@@ -45,6 +45,7 @@ export default function Instagram() {
   const { toast } = useToast();
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [randomizedPosts, setRandomizedPosts] = useState<InstagramPost[]>([]);
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
@@ -63,6 +64,14 @@ export default function Instagram() {
       }
     },
   });
+
+  // Randomize posts when data changes
+  useEffect(() => {
+    if (data?.posts) {
+      const shuffled = [...data.posts].sort(() => Math.random() - 0.5);
+      setRandomizedPosts(shuffled);
+    }
+  }, [data]);
 
   if (error) {
     toast({
@@ -122,7 +131,7 @@ export default function Instagram() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {data?.posts.map((post, index) => (
+            {randomizedPosts.map((post, index) => (
               <div key={post.id} className="aspect-square">
                 <InstagramCard
                   {...post}
@@ -132,9 +141,9 @@ export default function Instagram() {
             ))}
           </div>
 
-          {modalIsOpen && data?.posts && selectedPostIndex !== null && (
+          {modalIsOpen && randomizedPosts && selectedPostIndex !== null && (
             <InstagramFeed
-              posts={[data.posts[selectedPostIndex]]}
+              posts={[randomizedPosts[selectedPostIndex]]}
               onLoadMore={() => {}}
               hasMore={false}
               isLoadingMore={false}
