@@ -280,14 +280,7 @@ export default function Home() {
 
       {/* {instagram} */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">k-showz on insta</h2>
-          <Link key="StarFeed" href="/instagram">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more shows
-            </button>
-          </Link>
-        </div>
+        <h2 className="text-2xl font-bold font-slackey">k-showz on insta</h2>
         {isLoadingInstagram ? (
           <div className="grid grid-cols-2 md:grid-cols-3  h-[400px] lg:grid-cols-4 gap-4">
             <Skeleton
@@ -371,7 +364,7 @@ export default function Home() {
           </h2>
           <Link href="/donut-shops">
             <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more donuts
+              explore donut shops
             </button>
           </Link>
         </div>
