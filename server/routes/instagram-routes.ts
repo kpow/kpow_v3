@@ -39,13 +39,10 @@ router.get('/feed', async (req, res) => {
     const response = await axios.get(url);
     const allPosts = response.data.data;
 
-    // Randomly shuffle the array
-    const shuffledPosts = [...allPosts].sort(() => Math.random() - 0.5);
-
     // Get the requested page of data
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const paginatedPosts = shuffledPosts.slice(start, end);
+    const paginatedPosts = allPosts.slice(start, end);
 
     res.json({
       posts: paginatedPosts,
