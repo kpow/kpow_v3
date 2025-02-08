@@ -9,8 +9,30 @@ import { useToast } from "@/hooks/use-toast";
 
 const ITEMS_PER_PAGE = 9;
 
+interface InstagramPost {
+  id: string;
+  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  media_url: string;
+  thumbnail_url?: string;
+  permalink: string;
+  caption?: string;
+  timestamp: string;
+  location?: {
+    id: string;
+    name: string;
+  };
+  children?: {
+    data: Array<{
+      id: string;
+      media_type: 'IMAGE' | 'VIDEO';
+      media_url: string;
+      thumbnail_url?: string;
+    }>;
+  };
+}
+
 interface InstagramResponse {
-  posts: any[];
+  posts: InstagramPost[];
   pagination: {
     next_token?: string;
     has_next_page: boolean;
@@ -31,23 +53,24 @@ export default function Instagram() {
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page, pageTokens[page - 1]],
     queryFn: async () => {
-      const response = await axios.get('/api/instagram/feed', {
+      const response = await axios.get<InstagramResponse>('/api/instagram/feed', {
         params: {
           pageSize: ITEMS_PER_PAGE,
           pageToken: pageTokens[page - 1] || "",
         },
       });
       return response.data;
-    },
-    onSuccess: (data) => {
-      if (data.pagination.next_token) {
-        setPageTokens((prev) => ({
-          ...prev,
-          [page]: data.pagination.next_token,
-        }));
-      }
-    },
+    }
   });
+
+  useEffect(() => {
+    if (data?.pagination?.next_token) {
+      setPageTokens((prev) => ({
+        ...prev,
+        [page]: data.pagination.next_token,
+      }));
+    }
+  }, [data, page]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -63,9 +86,11 @@ export default function Instagram() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1) return;
-    if (!data?.pagination.has_next_page && newPage > page) return;
+    if (!data?.pagination?.has_next_page && newPage > page) return;
     setLocation(newPage === 1 ? "/instagram" : `/instagram/page/${newPage}`);
   };
+
+  const hasNextPage = data?.pagination?.has_next_page ?? false;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -73,7 +98,7 @@ export default function Instagram() {
         <PageTitle size="lg">instagram feed</PageTitle>
         <CustomPagination
           currentPage={page}
-          totalPages={data?.pagination.has_next_page ? page + 1 : page}
+          totalPages={hasNextPage ? page + 1 : page}
           baseUrl="/instagram"
           onPageChange={handlePageChange}
         />
@@ -102,7 +127,7 @@ export default function Instagram() {
           <InstagramFeed
             posts={data?.posts || []}
             onLoadMore={() => {}}
-            hasMore={data?.pagination.has_next_page || false}
+            hasMore={hasNextPage}
             isLoadingMore={false}
           />
         </>
@@ -110,7 +135,7 @@ export default function Instagram() {
 
       <CustomPagination
         currentPage={page}
-        totalPages={data?.pagination.has_next_page ? page + 1 : page}
+        totalPages={hasNextPage ? page + 1 : page}
         baseUrl="/instagram"
         onPageChange={handlePageChange}
         className="mt-8"
