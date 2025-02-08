@@ -4,6 +4,7 @@ import { useRoute, useLocation } from "wouter";
 import axios from "axios";
 import Masonry from "react-masonry-css";
 import { InstagramCard } from "../components/InstagramCard";
+import { InstagramFeed } from "../components/InstagramFeed";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
@@ -50,7 +51,8 @@ export default function Instagram() {
   const page = params?.page ? parseInt(params.page) : 1;
   const { toast } = useToast();
   const [pageTokens, setPageTokens] = useState<PageTokens>({});
-  const [selectedPost, setSelectedPost] = useState<string | null>(null);
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page, pageTokens[page - 1]],
@@ -90,6 +92,16 @@ export default function Instagram() {
     if (newPage < 1) return;
     if (!data?.pagination?.has_next_page && newPage > page) return;
     setLocation(newPage === 1 ? "/instagram" : `/instagram/page/${newPage}`);
+  };
+
+  const handleOpenModal = (index: number) => {
+    setSelectedPostIndex(index);
+    setModalIsOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPostIndex(null);
+    setModalIsOpen(false);
   };
 
   const hasNextPage = data?.pagination?.has_next_page ?? false;
@@ -137,15 +149,27 @@ export default function Instagram() {
             className="flex -ml-4 w-auto"
             columnClassName="pl-4 bg-clip-padding"
           >
-            {data?.posts.map((post) => (
+            {data?.posts.map((post, index) => (
               <div key={post.id} className="mb-4">
                 <InstagramCard
                   {...post}
-                  onClick={() => window.open(post.permalink, '_blank')}
+                  onClick={() => handleOpenModal(index)}
                 />
               </div>
             ))}
           </Masonry>
+
+          {modalIsOpen && data?.posts && selectedPostIndex !== null && (
+            <InstagramFeed
+              posts={[data.posts[selectedPostIndex]]}
+              onLoadMore={() => {}}
+              hasMore={false}
+              isLoadingMore={false}
+              initialPostIndex={0}
+              isOpen={modalIsOpen}
+              onClose={handleCloseModal}
+            />
+          )}
         </>
       )}
 

@@ -30,18 +30,25 @@ interface InstagramMedia {
   };
 }
 
+// Update the props interface to include modal properties
 interface InstagramFeedProps {
   posts: InstagramMedia[];
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
+  initialPostIndex?: number;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export const InstagramFeed: React.FC<InstagramFeedProps> = ({
-  posts = [],  // Provide default empty array
+  posts = [],
   onLoadMore,
   hasMore,
-  isLoadingMore
+  isLoadingMore,
+  initialPostIndex = 0,
+  isOpen = false,
+  onClose
 }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
@@ -50,24 +57,24 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     dragFree: false
   });
 
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [currentPostIndex, setCurrentPostIndex] = useState(0);
+  const [modalIsOpen, setModalIsOpen] = useState(isOpen);
+  const [currentPostIndex, setCurrentPostIndex] = useState(initialPostIndex);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
 
   // Reset state when posts change or component unmounts
   useEffect(() => {
-    setCurrentPostIndex(0);
+    setCurrentPostIndex(initialPostIndex);
     setCurrentMediaIndex(0);
-    setModalIsOpen(false);
+    setModalIsOpen(isOpen);
 
     // Reset scroll states when posts change
     if (emblaApi) {
       setCanScrollPrev(emblaApi.canScrollPrev());
       setCanScrollNext(emblaApi.canScrollNext());
     }
-  }, [posts, emblaApi]);
+  }, [posts, emblaApi, initialPostIndex, isOpen]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -121,6 +128,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   const handleCloseModal = () => {
     setModalIsOpen(false);
     setCurrentMediaIndex(0);
+    if (onClose) onClose();
   };
 
   const getCurrentMedia = () => {
@@ -136,7 +144,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   const handlePreviousMedia = () => {
     const post = posts[currentPostIndex];
     if (post?.media_type === 'CAROUSEL_ALBUM' && post.children) {
-      setCurrentMediaIndex(prev => 
+      setCurrentMediaIndex(prev =>
         prev > 0 ? prev - 1 : post.children!.data.length - 1
       );
     }
@@ -145,7 +153,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   const handleNextMedia = () => {
     const post = posts[currentPostIndex];
     if (post?.media_type === 'CAROUSEL_ALBUM' && post.children) {
-      setCurrentMediaIndex(prev => 
+      setCurrentMediaIndex(prev =>
         prev < post.children!.data.length - 1 ? prev + 1 : 0
       );
     }
@@ -167,7 +175,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     if (inModal) {
       if (media.media_type === 'VIDEO') {
         return (
-          <video 
+          <video
             src={media.media_url}
             controls
             className="w-full aspect-video object-contain bg-black"
@@ -178,7 +186,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     } else {
       if (media.media_type === 'VIDEO' && media.thumbnail_url) {
         return (
-          <img 
+          <img
             src={media.thumbnail_url}
             alt={('caption' in media && media.caption) || 'Instagram video thumbnail'}
             className="w-full h-full object-cover"
@@ -188,7 +196,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     }
 
     return (
-      <img 
+      <img
         src={media.media_url}
         alt={('caption' in media && media.caption) || 'Instagram post'}
         className={inModal ? "w-full aspect-video object-contain bg-black" : "w-full h-full object-cover"}
@@ -236,7 +244,7 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
           <div className="flex">
             {posts.map((post, index) => (
               <div key={`${post.id}-${index}`} className="flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%] lg:flex-[0_0_25%] min-w-0 px-2">
-                <Card 
+                <Card
                   className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative group"
                   onClick={() => handleOpenModal(index)}
                 >
@@ -297,21 +305,25 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
             <div className="relative">
               {renderMedia(currentMedia, true)}
 
-              <Button
-                variant="outline"
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
-                onClick={handlePreviousPost}
-              >
-                ←
-              </Button>
+              {posts.length > 1 && (
+                <>
+                  <Button
+                    variant="outline"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
+                    onClick={handlePreviousPost}
+                  >
+                    ←
+                  </Button>
 
-              <Button
-                variant="outline"
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
-                onClick={handleNextPost}
-              >
-                →
-              </Button>
+                  <Button
+                    variant="outline"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
+                    onClick={handleNextPost}
+                  >
+                    →
+                  </Button>
+                </>
+              )}
 
               {currentPost.media_type === 'CAROUSEL_ALBUM' && currentPost.children && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
