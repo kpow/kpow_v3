@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import axios from "axios";
@@ -36,9 +36,10 @@ interface InstagramPost {
 interface InstagramResponse {
   posts: InstagramPost[];
   pagination: {
-    next_token: string | null;
-    has_next_page: boolean;
+    current_page: number;
+    total_pages: number;
     total_count: number;
+    has_next_page: boolean;
   };
 }
 
@@ -53,20 +54,17 @@ export default function Instagram() {
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
     queryFn: async () => {
+      console.log('Fetching page:', page); // Debug log
       const response = await axios.get<InstagramResponse>('/api/instagram/feed', {
         params: {
+          page,
           pageSize: ITEMS_PER_PAGE,
-          pageToken: page > 1 ? data?.pagination?.next_token : undefined,
         },
       });
+      console.log('Response data:', response.data); // Debug log
       return response.data;
     },
   });
-
-  // Scroll to top on page change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [page]);
 
   if (error) {
     toast({
@@ -77,8 +75,9 @@ export default function Instagram() {
   }
 
   const handlePageChange = (newPage: number) => {
-    const totalPages = data ? Math.ceil(data.pagination.total_count / ITEMS_PER_PAGE) : 1;
+    const totalPages = data?.pagination?.total_pages ?? 1;
     if (newPage < 1 || newPage > totalPages) return;
+    window.scrollTo(0, 0);
     setLocation(newPage === 1 ? "/instagram" : `/instagram/page/${newPage}`);
   };
 
@@ -98,15 +97,13 @@ export default function Instagram() {
     700: 1,
   };
 
-  const totalPages = data ? Math.ceil(data.pagination.total_count / ITEMS_PER_PAGE) : 1;
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
         <PageTitle size="lg">instagram feed</PageTitle>
         <CustomPagination
           currentPage={page}
-          totalPages={totalPages}
+          totalPages={data?.pagination?.total_pages ?? 1}
           baseUrl="/instagram"
           onPageChange={handlePageChange}
         />
@@ -131,7 +128,7 @@ export default function Instagram() {
             className="flex -ml-4 w-auto"
             columnClassName="pl-4 bg-clip-padding"
           >
-            {data?.posts.slice(0, ITEMS_PER_PAGE).map((post, index) => (
+            {data?.posts.map((post, index) => (
               <div key={post.id} className="mb-4">
                 <InstagramCard
                   {...post}
@@ -157,7 +154,7 @@ export default function Instagram() {
 
       <CustomPagination
         currentPage={page}
-        totalPages={totalPages}
+        totalPages={data?.pagination?.total_pages ?? 1}
         baseUrl="/instagram"
         onPageChange={handlePageChange}
         className="mt-8"

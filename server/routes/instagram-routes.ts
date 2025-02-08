@@ -18,6 +18,10 @@ interface InstagramMedia {
   permalink: string;
   caption?: string;
   timestamp: string;
+  location?: {
+    id: string;
+    name: string;
+  };
   children?: {
     data: InstagramMediaChild[];
   };
@@ -27,8 +31,8 @@ interface InstagramMedia {
 router.get('/feed', async (req, res) => {
   try {
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 9;
-    const pageToken = req.query.pageToken as string;
 
     if (!accessToken) {
       throw new Error('Instagram access token not found');
@@ -39,22 +43,26 @@ router.get('/feed', async (req, res) => {
     const countResponse = await axios.get(countUrl);
     const totalCount = countResponse.data.data.length;
 
-    // Then get the actual page of data
-    let url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,children{media_type,media_url,thumbnail_url}&limit=${pageSize}&access_token=${accessToken}`;
+    // Calculate pagination
+    const offset = (page - 1) * pageSize;
 
-    if (pageToken) {
-      url += `&after=${pageToken}`;
-    }
+    // Then get the actual page of data with location included in fields
+    const url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,location,children{media_type,media_url,thumbnail_url}&limit=${pageSize * page}&access_token=${accessToken}`;
 
     const response = await axios.get(url);
+    const posts = response.data.data;
+
+    // Get the current page's worth of posts
+    const paginatedPosts = posts.slice(offset, offset + pageSize);
 
     // Return both the posts and pagination info
     res.json({
-      posts: response.data.data.slice(0, pageSize), // Ensure we only return pageSize items
+      posts: paginatedPosts,
       pagination: {
-        next_token: response.data.paging?.cursors?.after || null,
-        has_next_page: !!response.data.paging?.next,
-        total_count: totalCount
+        current_page: page,
+        total_pages: Math.ceil(totalCount / pageSize),
+        total_count: totalCount,
+        has_next_page: offset + pageSize < totalCount
       }
     });
   } catch (error) {
