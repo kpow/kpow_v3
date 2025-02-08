@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import axios from "axios";
-import { InstagramFeed } from "../components/InstagramFeed";
+import Masonry from "react-masonry-css";
+import { InstagramCard } from "../components/InstagramCard";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
@@ -49,6 +50,7 @@ export default function Instagram() {
   const page = params?.page ? parseInt(params.page) : 1;
   const { toast } = useToast();
   const [pageTokens, setPageTokens] = useState<PageTokens>({});
+  const [selectedPost, setSelectedPost] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page, pageTokens[page - 1]],
@@ -92,6 +94,12 @@ export default function Instagram() {
 
   const hasNextPage = data?.pagination?.has_next_page ?? false;
 
+  const breakpointCols = {
+    default: 3,
+    1100: 2,
+    700: 1,
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
@@ -124,12 +132,20 @@ export default function Instagram() {
         </div>
       ) : (
         <>
-          <InstagramFeed
-            posts={data?.posts || []}
-            onLoadMore={() => {}}
-            hasMore={hasNextPage}
-            isLoadingMore={false}
-          />
+          <Masonry
+            breakpointCols={breakpointCols}
+            className="flex -ml-4 w-auto"
+            columnClassName="pl-4 bg-clip-padding"
+          >
+            {data?.posts.map((post) => (
+              <div key={post.id} className="mb-4">
+                <InstagramCard
+                  {...post}
+                  onClick={() => window.open(post.permalink, '_blank')}
+                />
+              </div>
+            ))}
+          </Masonry>
         </>
       )}
 
