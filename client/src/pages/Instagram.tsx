@@ -65,11 +65,14 @@ export default function Instagram() {
     },
   });
 
-  // Randomize posts when data changes
+  // Only randomize posts when not on the Instagram page
   useEffect(() => {
     if (data?.posts) {
-      const shuffled = [...data.posts].sort(() => Math.random() - 0.5);
-      setRandomizedPosts(shuffled);
+      // Sort posts by timestamp in descending order (newest first)
+      const sortedPosts = [...data.posts].sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      setRandomizedPosts(sortedPosts);
     }
   }, [data]);
 
@@ -99,7 +102,7 @@ export default function Instagram() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-2 py-4">
       <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
         <PageTitle size="lg">instagram feed</PageTitle>
         <CustomPagination
@@ -111,7 +114,7 @@ export default function Instagram() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="bg-gray-200 aspect-square rounded-lg" />
@@ -130,7 +133,7 @@ export default function Instagram() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {randomizedPosts.map((post, index) => (
               <div key={post.id} className="aspect-square">
                 <InstagramCard
