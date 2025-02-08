@@ -1,18 +1,18 @@
-import { Router } from 'express';
-import axios from 'axios';
+import { Router } from "express";
+import axios from "axios";
 
 const router = Router();
 
 interface InstagramMediaChild {
   id: string;
-  media_type: 'IMAGE' | 'VIDEO';
+  media_type: "IMAGE" | "VIDEO";
   media_url: string;
   thumbnail_url?: string;
 }
 
 interface InstagramMedia {
   id: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
   media_url: string;
   thumbnail_url?: string;
   permalink: string;
@@ -23,14 +23,14 @@ interface InstagramMedia {
   };
 }
 
-router.get('/feed', async (req, res) => {
+router.get("/feed", async (req, res) => {
   try {
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 100; 
+    const pageSize = parseInt(req.query.pageSize as string) || 100;
 
     if (!accessToken) {
-      throw new Error('Instagram access token not found');
+      throw new Error("Instagram access token not found");
     }
 
     // Get maximum allowed items (100) in one request
@@ -40,12 +40,12 @@ router.get('/feed', async (req, res) => {
     const allPosts = response.data.data;
 
     // Randomly shuffle the array
-    const shuffledPosts = [...allPosts].sort(() => Math.random() - 0.5);
+    // const shuffledPosts = [...allPosts].sort(() => Math.random() - 0.5);
 
     // Get the requested page of data
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const paginatedPosts = shuffledPosts.slice(start, end);
+    const paginatedPosts = allPosts.slice(start, end);
 
     res.json({
       posts: paginatedPosts,
@@ -53,14 +53,14 @@ router.get('/feed', async (req, res) => {
         current_page: page,
         total_pages: Math.ceil(allPosts.length / pageSize),
         total_count: allPosts.length,
-        has_next_page: end < allPosts.length
-      }
+        has_next_page: end < allPosts.length,
+      },
     });
   } catch (error) {
-    console.error('Error fetching Instagram feed:', error);
-    res.status(500).json({ 
-      error: 'Failed to fetch Instagram feed',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Error fetching Instagram feed:", error);
+    res.status(500).json({
+      error: "Failed to fetch Instagram feed",
+      details: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });

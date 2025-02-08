@@ -22,7 +22,7 @@ export function InstagramCard({
 }: InstagramCardProps) {
   return (
     <Card 
-      className="overflow-hidden cursor-pointer transform transition-transform duration-300 hover:scale-[1.02]" 
+      className="overflow-hidden flex flex-col h-full cursor-pointer transform transition-transform duration-300 hover:scale-[1.02]" 
       onClick={onClick}
     >
       <div className="relative aspect-square overflow-hidden">
@@ -50,7 +50,7 @@ export function InstagramCard({
           </div>
         )}
       </div>
-      <div className="p-2 h-[100px]">
+      <div className="p-2">
         <p className="font-slackey text-lg item-left leading-snug text-gray-600 line-clamp-3">
           {caption || "No caption"}
         </p>

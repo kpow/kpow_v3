@@ -102,7 +102,7 @@ export default function Instagram() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="bg-gray-200 aspect-square rounded-lg" />
@@ -121,7 +121,7 @@ export default function Instagram() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {data?.posts.map((post, index) => (
               <div key={post.id} className="aspect-square">
                 <InstagramCard
@@ -132,6 +132,7 @@ export default function Instagram() {
             ))}
           </div>
 
+          {/* this runs the modal on this page kinda weird */}
           {modalIsOpen && data?.posts && selectedPostIndex !== null && (
             <InstagramFeed
               posts={[data.posts[selectedPostIndex]]}

@@ -126,7 +126,8 @@ export default function Home() {
         if (data.paging?.cursors?.after) {
           setInstagramAfter(data.paging.cursors.after);
         }
-        setAllInstagramPosts(data.posts);
+        const shuffledPosts = [...data.posts].sort(() => Math.random() - 0.5);
+        setAllInstagramPosts(shuffledPosts);
         return data;
       },
     });
@@ -289,10 +290,10 @@ export default function Home() {
           </Link>
         </div>
         {isLoadingInstagram ? (
-          <div className="grid grid-cols-2 md:grid-cols-3  h-[400px] lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3  h-[180px] lg:grid-cols-4 gap-4">
             <Skeleton
               key={"skellywelly"}
-              className="w-full h-[400px] rounded-lg"
+              className="w-full h-[180px] rounded-lg"
             />
           </div>
         ) : (
