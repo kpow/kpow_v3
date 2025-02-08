@@ -1,6 +1,6 @@
-# KPOW - Digital Content & Local Discovery Platform
+# KPOW - Into The Singularity
 
-A comprehensive cross-domain media and location analytics platform, specializing in donut shop exploration with advanced search, mapping, and interactive discovery features.
+This site tracks my digital footprint and will serve as my launching point in the singularity!
 
 ## Tech Stack
 
@@ -19,6 +19,8 @@ A comprehensive cross-domain media and location analytics platform, specializing
   - Goodreads API
   - Feedbin API
   - Instagram Graph API
+  - Youtube API
+  - Google Mail API
 - Drizzle ORM with PostgreSQL
 
 ## Core Features
