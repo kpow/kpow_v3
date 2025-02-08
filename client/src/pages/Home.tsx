@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { ShopSlider } from "@/components/shop-slider";
 import { cities } from "@/data/cities";
 import { useToast } from "@/hooks/use-toast";
+import SectionHeader from "@/components/SectionHeader";
 
 interface Author {
   name: string[];
@@ -276,26 +277,20 @@ export default function Home() {
           <ContentSection key={section.title} {...section} />
         ))}
       </div>
-
       <div className="h-px bg-gray-200 my-4" />
 
       {/* {instagram} */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">k-shows</h2>
-          <Link key="StarFeed" href="/instagram">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more insta
-            </button>
-          </Link>
-        </div>
+        <SectionHeader
+          title="k-shows"
+          buttonText="more insta"
+          linkHref="instagram"
+        />
         {isLoadingInstagram ? (
-          <div className="grid grid-cols-2 md:grid-cols-3  h-[180px] lg:grid-cols-4 gap-4">
-            <Skeleton
-              key={"skellywelly"}
-              className="w-full h-[180px] rounded-lg"
-            />
-          </div>
+          <Skeleton
+            key={"skellywelly"}
+            className="w-full h-[180px] rounded-lg"
+          />
         ) : (
           <>
             <InstagramFeed
@@ -307,18 +302,15 @@ export default function Home() {
           </>
         )}
       </div>
-
       <div className="h-px bg-gray-200 my-4" />
+
       {/* {starred} */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">star feed</h2>
-          <Link key="StarFeed" href="starred-articles">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more articles
-            </button>
-          </Link>
-        </div>
+        <SectionHeader
+          title="star feed"
+          buttonText="more articles"
+          linkHref="starred-articles"
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {isLoadingStarred
             ? Array.from({ length: 3 }).map((_, i) => (
@@ -339,49 +331,37 @@ export default function Home() {
               ))}
         </div>
       </div>
-
       <div className="h-px bg-gray-200 my-4" />
 
       {/* {recentPlays} */}
+      <SectionHeader title="Recently Played" />
       <RecentPlays />
-
       <div className="h-px bg-gray-200 my-4" />
 
       {/* {books} */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">book feed</h2>
-          <Link key="BookFeed" href="books">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more books
-            </button>
-          </Link>
-        </div>
-        <BookFeed />
-      </div>
+
+      <SectionHeader
+        title="book feed"
+        buttonText="more books"
+        linkHref="books"
+      />
+      <BookFeed />
 
       <div className="h-px bg-gray-200 my-4" />
+
       {/* {donuts} */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold font-slackey">
-            donut tour{" "}
-            {shops && shops.length > 0
-              ? `- ${currentCity.city}, ${currentCity.state}`
-              : ""}
-          </h2>
-          <Link href="/donut-shops">
-            <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              more donuts
-            </button>
-          </Link>
-        </div>
+        <SectionHeader
+          title={`donut tour${shops && shops.length > 0 ? ` - ${currentCity.city}, ${currentCity.state}` : ""}`}
+          buttonText="more donuts"
+          linkHref="donut-shops"
+        />
         {isLoadingShops ? (
           <div className="w-full">
             <Skeleton className="h-[300px] w-full" />
           </div>
         ) : shops && shops.length > 0 ? (
-          <div className="h-full w-full rounded-lg overflow-hidden">
+          <div className="h-full w-full overflow-hidden">
             <ShopSlider
               shops={shops}
               onShopClick={(shop) => {

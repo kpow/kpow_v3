@@ -59,10 +59,6 @@ export function RecentPlays() {
 
   return (
     <div className="w-full px-2 py-0">
-      <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-2xl font-bold">Recently Played</h2>
-      </div>
-
       <Carousel
         opts={{
           align: "start",
