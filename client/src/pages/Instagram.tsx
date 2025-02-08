@@ -2,14 +2,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import axios from "axios";
-import Masonry from "react-masonry-css";
 import { InstagramCard } from "../components/InstagramCard";
 import { InstagramFeed } from "../components/InstagramFeed";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 12;
 
 interface InstagramPost {
   id: string;
@@ -90,12 +89,6 @@ export default function Instagram() {
     setModalIsOpen(false);
   };
 
-  const breakpointCols = {
-    default: 3,
-    1100: 2,
-    700: 1,
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
@@ -109,7 +102,7 @@ export default function Instagram() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="bg-gray-200 aspect-square rounded-lg" />
@@ -128,20 +121,16 @@ export default function Instagram() {
         </div>
       ) : (
         <>
-          <Masonry
-            breakpointCols={breakpointCols}
-            className="flex -ml-4 w-auto"
-            columnClassName="pl-4 bg-clip-padding"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {data?.posts.map((post, index) => (
-              <div key={post.id} className="mb-4">
+              <div key={post.id} className="aspect-square">
                 <InstagramCard
                   {...post}
                   onClick={() => handleOpenModal(index)}
                 />
               </div>
             ))}
-          </Masonry>
+          </div>
 
           {modalIsOpen && data?.posts && selectedPostIndex !== null && (
             <InstagramFeed
