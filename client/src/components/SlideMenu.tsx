@@ -74,7 +74,7 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     {
       icon: <Code className="w-4 h-4" />,
       label: "2012 version",
-      href: "https://2012.kpow-wow.com/",
+      href: "http://2012.kpow.com/#/home",
       className: "text-blue-600",
     },
   ];
