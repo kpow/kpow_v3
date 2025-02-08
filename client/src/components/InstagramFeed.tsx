@@ -95,11 +95,19 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   }, [emblaApi, onSelect]);
 
   const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
+    if (emblaApi) {
+      const curIndexes = emblaApi.slidesInView();
+      const curIndex = curIndexes[0];
+      emblaApi.scrollTo(curIndex - 4);
+    }
   }, [emblaApi]);
 
   const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
+    if (emblaApi) {
+      const curIndexes = emblaApi.slidesInView();
+      const curIndex = curIndexes[curIndexes.length - 1];
+      emblaApi.scrollTo(curIndex);
+    }
   }, [emblaApi]);
 
   const handleOpenModal = (postIndex: number) => {

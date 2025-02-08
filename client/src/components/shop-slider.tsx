@@ -29,11 +29,19 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
   });
 
   const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
+    if (emblaApi) {
+      const curIndexes = emblaApi.slidesInView();
+      const curIndex = curIndexes[0];
+      emblaApi.scrollTo(curIndex - 4);
+    }
   }, [emblaApi]);
 
   const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
+    if (emblaApi) {
+      const curIndexes = emblaApi.slidesInView();
+      const curIndex = curIndexes[curIndexes.length - 1];
+      emblaApi.scrollTo(curIndex);
+    }
   }, [emblaApi]);
 
   return (
@@ -52,12 +60,9 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
       <div className="w-full overflow-hidden" ref={emblaRef}>
         <div className="flex gap-2">
           {shops.map((shop) => (
-            <div
-              key={shop.id}
-              className="flex-[0_0_180px] min-w-0"
-            >
-              <Card 
-                className="relative h-[140px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
+            <div key={shop.id} className="flex-[0_0_220px] min-w-0">
+              <Card
+                className="relative h-[180px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
                 onClick={() => onShopClick(shop)}
               >
                 <div
