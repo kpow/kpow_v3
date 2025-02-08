@@ -47,14 +47,14 @@ export function InstagramCard({
           </div>
         )}
       </div>
-      <div className="p-4 h-[175px] flex flex-col">
-        <p className="text-sm text-gray-600 line-clamp-3 mb-2 flex-1">
+      <div className="p-2 h-[135px] flex flex-col items-center">
+        <p className="font-slackey text-lg item-left leading-snug text-gray-600 line-clamp-3 mb-2 flex-1">
           {caption || "No caption"}
         </p>
-        <div className="text-sm text-gray-500">
+        {/* <div className="text-sm text-gray-500">
           {formatDistanceToNow(new Date(timestamp), { addSuffix: true })}
-        </div>
-        <Button onClick={onClick} className="w-full mt-4">
+        </div> */}
+        <Button onClick={onClick} className="w-3/4 mt-4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
           View Post
         </Button>
       </div>
