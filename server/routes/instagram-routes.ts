@@ -47,13 +47,20 @@ router.get('/feed', async (req, res) => {
     const offset = (page - 1) * pageSize;
 
     // Then get the actual page of data with location included in fields
-    const url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,location,children{media_type,media_url,thumbnail_url}&limit=${pageSize * page}&access_token=${accessToken}`;
+    const url = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp,location{id,name},children{media_type,media_url,thumbnail_url}&limit=${pageSize * page}&access_token=${accessToken}`;
 
+    console.log('Instagram API URL:', url.replace(accessToken, 'REDACTED'));
     const response = await axios.get(url);
     const posts = response.data.data;
 
+    // Log raw response data
+    console.log('Raw Instagram API response:', JSON.stringify(posts[0], null, 2));
+
     // Get the current page's worth of posts
     const paginatedPosts = posts.slice(offset, offset + pageSize);
+
+    // Log processed posts
+    console.log('Processed posts sample:', JSON.stringify(paginatedPosts[0], null, 2));
 
     // Return both the posts and pagination info
     res.json({

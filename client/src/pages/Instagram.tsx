@@ -54,14 +54,15 @@ export default function Instagram() {
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
     queryFn: async () => {
-      console.log('Fetching page:', page); // Debug log
+      console.log('Fetching page:', page);
       const response = await axios.get<InstagramResponse>('/api/instagram/feed', {
         params: {
           page,
           pageSize: ITEMS_PER_PAGE,
         },
       });
-      console.log('Response data:', response.data); // Debug log
+      // Log the first post to see if location data is present
+      console.log('First post data:', JSON.stringify(response.data.posts[0], null, 2));
       return response.data;
     },
   });
@@ -128,14 +129,17 @@ export default function Instagram() {
             className="flex -ml-4 w-auto"
             columnClassName="pl-4 bg-clip-padding"
           >
-            {data?.posts.map((post, index) => (
-              <div key={post.id} className="mb-4">
-                <InstagramCard
-                  {...post}
-                  onClick={() => handleOpenModal(index)}
-                />
-              </div>
-            ))}
+            {data?.posts.map((post, index) => {
+              console.log(`Post ${index} location:`, post.location);
+              return (
+                <div key={post.id} className="mb-4">
+                  <InstagramCard
+                    {...post}
+                    onClick={() => handleOpenModal(index)}
+                  />
+                </div>
+              );
+            })}
           </Masonry>
 
           {modalIsOpen && data?.posts && selectedPostIndex !== null && (
