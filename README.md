@@ -1,4 +1,4 @@
-# KPOW - Into The Singularity
+# KPOW - Into the Singularity
 
 This site tracks my digital footprint and will serve as my launching point in the singularity!
 

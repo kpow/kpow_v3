@@ -372,7 +372,7 @@ export default function Home() {
           </h2>
           <Link href="/donut-shops">
             <button className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded">
-              explore donut shops
+              more donuts
             </button>
           </Link>
         </div>
