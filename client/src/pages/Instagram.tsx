@@ -8,11 +8,11 @@ import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 9;
 
 interface InstagramPost {
   id: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
   media_url: string;
   thumbnail_url?: string;
   permalink: string;
@@ -21,7 +21,7 @@ interface InstagramPost {
   children?: {
     data: Array<{
       id: string;
-      media_type: 'IMAGE' | 'VIDEO';
+      media_type: "IMAGE" | "VIDEO";
       media_url: string;
       thumbnail_url?: string;
     }>;
@@ -43,22 +43,28 @@ export default function Instagram() {
   const [, params] = useRoute("/instagram/page/:page");
   const page = params?.page ? parseInt(params.page) : 1;
   const { toast } = useToast();
-  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(
+    null,
+  );
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
     queryFn: async () => {
       try {
-        const response = await axios.get<InstagramResponse>('/api/instagram/feed', {
-          params: {
-            page,
-            pageSize: ITEMS_PER_PAGE,
+        const response = await axios.get<InstagramResponse>(
+          "/api/instagram/feed",
+          {
+            params: {
+              page,
+              pageSize: ITEMS_PER_PAGE,
+            },
           },
-        });
+        );
         return response.data;
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch Instagram feed';
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch Instagram feed";
         throw new Error(errorMessage);
       }
     },
@@ -67,7 +73,8 @@ export default function Instagram() {
   if (error) {
     toast({
       title: "Error loading Instagram feed",
-      description: error instanceof Error ? error.message : "Please try again later",
+      description:
+        error instanceof Error ? error.message : "Please try again later",
       variant: "destructive",
     });
   }
