@@ -33,9 +33,6 @@ interface InstagramMedia {
 // Update the props interface to include modal properties
 interface InstagramFeedProps {
   posts: InstagramMedia[];
-  onLoadMore: () => void;
-  hasMore: boolean;
-  isLoadingMore: boolean;
   initialPostIndex?: number;
   isOpen?: boolean;
   onClose?: () => void;
@@ -43,9 +40,6 @@ interface InstagramFeedProps {
 
 export const InstagramFeed: React.FC<InstagramFeedProps> = ({
   posts = [],
-  onLoadMore,
-  hasMore,
-  isLoadingMore,
   initialPostIndex = 0,
   isOpen = false,
   onClose
@@ -203,31 +197,6 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
       />
     );
   };
-
-  const shouldLoadMore = useCallback(() => {
-    if (!emblaApi || !hasMore || isLoadingMore) return false;
-    const lastSlideInView = emblaApi.slidesInView().slice(-1)[0];
-    const totalSlides = emblaApi.scrollSnapList().length;
-    return lastSlideInView >= totalSlides - 4;
-  }, [emblaApi, hasMore, isLoadingMore]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const onScroll = () => {
-      if (shouldLoadMore()) {
-        onLoadMore();
-      }
-    };
-
-    emblaApi.on('scroll', onScroll);
-    emblaApi.on('settle', onScroll);
-
-    return () => {
-      emblaApi.off('scroll', onScroll);
-      emblaApi.off('settle', onScroll);
-    };
-  }, [emblaApi, shouldLoadMore, onLoadMore]);
 
   // Set modal app element for accessibility
   useEffect(() => {

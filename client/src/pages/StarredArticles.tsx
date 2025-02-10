@@ -67,29 +67,53 @@ export default function StarredArticles({
     }
   };
 
+  const articles =
+    data?.articles.map((article: StarredArticle) => ({
+      title: article.title ?? "Untitled Article",
+      subtitle: `by ${article.author ?? "Unknown Author"}`,
+      author: article.author ?? "Unknown Author",
+      date: new Date(article.published).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      }),
+      imageSrc: article.lead_image_url ?? "/placeholder-star.png",
+      type: "star" as const,
+      url: article.url ?? "#",
+      excerpt: article.summary ?? "No excerpt available",
+    })) ?? [];
+
+  function PaginationLoader() {
+    return (
+      <>
+        <Button
+          variant="outline"
+          size="icon"
+          disabled
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="text-sm">Loading</span>
+        <Button
+          variant="outline"
+          size="icon"
+          disabled
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold mb-3">star feed</h1>
           <div className="flex justify-center gap-2 items-center mb-6">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled
-              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm">Loading</span>
-            <Button
-              variant="outline"
-              size="icon"
-              disabled
-              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            <PaginationLoader />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -104,42 +128,11 @@ export default function StarredArticles({
           ))}
         </div>
         <div className="flex justify-center gap-2 items-center mt-6">
-          <Button
-            variant="outline"
-            size="icon"
-            disabled
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">Loading</span>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <PaginationLoader />
         </div>
       </div>
     );
   }
-
-  const articles =
-    data?.articles.map((article: StarredArticle) => ({
-      title: article.title ?? "Untitled Article",
-      subtitle: `by ${article.author ?? "Unknown Author"}`,
-      author: article.author ?? "Unknown Author",
-      date: new Date(article.published).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
-      imageSrc: article.lead_image_url ?? "/placeholder-star.png",
-      type: "star" as const,
-      url: article.url ?? "#",
-      excerpt: article.summary ?? "No excerpt available",
-    })) ?? [];
 
   return (
     <div className="container mx-auto p-4">
