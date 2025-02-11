@@ -34,6 +34,18 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     { icon: <Info className="w-4 h-4" />, label: "about kpow", href: "/about" },
     { icon: <Fish className="w-4 h-4" />, label: "phashboard", href: "/stats" },
     {
+      icon: <Gamepad2 className="w-4 h-4" />,
+      label: "hero battle",
+      href: "/battle",
+    },
+    {
+      icon: <Youtube className="w-4 h-4" />,
+      label: "youtube live",
+      href: "/videos",
+    },
+    { icon: <Music className="w-4 h-4" />, label: "pmonk", href: "/pmonk" },
+    { icon: <Music className="w-4 h-4" />, label: "kpow musicgram", href: "/instagram" },
+    {
       icon: <Star className="w-4 h-4" />,
       label: "star feed",
       href: "/starred-articles",
@@ -42,18 +54,7 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       icon: <Book className="w-4 h-4" />,
       label: "book feed",
       href: "/books",
-    },
-    {
-      icon: <Youtube className="w-4 h-4" />,
-      label: "youtube live",
-      href: "/videos",
-    },
-    {
-      icon: <Gamepad2 className="w-4 h-4" />,
-      label: "hero battle",
-      href: "/battle",
-    },
-    { icon: <Music className="w-4 h-4" />, label: "pmonk", href: "/pmonk" },
+    },    
     {
       icon: <Circle className="w-4 h-4" />,
       label: "donut tour",

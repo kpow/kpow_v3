@@ -188,17 +188,17 @@ export default function DonutShops() {
         </Button>
       </div>
 
-      <Card className="mb-4">
+      <div className="mb-4">
         {shops.length > 0 && (
-          <div className="h-full w-full rounded-lg overflow-hidden">
+          <div className="h-full w-full overflow-hidden">
             <ShopSlider shops={shops} onShopClick={handleShopClick} />
           </div>
         )}
-      </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
         <Card className="lg:col-span-2">
-          <CardContent className="pt-2">
+          <CardContent className="p-0 m-0">
             <div className="h-[500px] w-full rounded-lg">
               <DonutShopMap
                 shops={shops}

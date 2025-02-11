@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { ShopSlider } from "@/components/shop-slider";
 import { cities } from "@/data/cities";
 import SectionHeader from "@/components/SectionHeader";
+import HorizontalDivider from "@/components/HorizontalDivider";
 
 interface InstagramMediaChild {
   id: string;
@@ -66,7 +67,6 @@ export default function Home() {
     city: initialCity.city,
     state: initialCity.state,
   });
-
   const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>(
     [],
   );
@@ -174,7 +174,7 @@ export default function Home() {
           <ContentSection key={section.title} {...section} />
         ))}
       </div>
-      <div className="h-px bg-gray-200 my-4" />
+      <HorizontalDivider />
 
       {/* {instagram} */}
       <div>
@@ -194,7 +194,7 @@ export default function Home() {
           </>
         )}
       </div>
-      <div className="h-px bg-gray-200 my-4" />
+      <HorizontalDivider />
 
       {/* {starred} */}
       <div>
@@ -223,12 +223,12 @@ export default function Home() {
               ))}
         </div>
       </div>
-      <div className="h-px bg-gray-200 my-4" />
+      <HorizontalDivider />
 
       {/* {recentPlays} */}
       <SectionHeader title="Recently Played" />
       <RecentPlays />
-      <div className="h-px bg-gray-200 my-4" />
+      <HorizontalDivider />
 
       {/* {books} */}
 
@@ -239,7 +239,7 @@ export default function Home() {
       />
       <BookFeed />
 
-      <div className="h-px bg-gray-200 my-4" />
+      <HorizontalDivider />
 
       {/* {donuts} */}
       <div>
@@ -264,11 +264,9 @@ export default function Home() {
         ) : null}
       </div>
 
-      <div className="h-px bg-gray-200 my-4" />
+      <HorizontalDivider />
       {/* {gitHubz} */}
       <GitHubSection />
-
-      <div className="h-px bg-gray-200 my-4" />
     </div>
   );
 }
