@@ -250,7 +250,7 @@ export default function Home() {
         />
         {isLoadingShops ? (
           <div className="w-full">
-            <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-[200px] w-full" />
           </div>
         ) : shops && shops.length > 0 ? (
           <div className="h-full w-full rounded-lg overflow-hidden">
