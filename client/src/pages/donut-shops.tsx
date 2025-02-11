@@ -12,6 +12,7 @@ import { ShopSlider } from "@/components/shop-slider";
 import { useToast } from "@/hooks/use-toast";
 import { cities } from "@/data/cities";
 import { Shuffle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Shop {
   id: string;
@@ -189,11 +190,15 @@ export default function DonutShops() {
       </div>
 
       <div className="mb-4">
-        {shops.length > 0 && (
-          <div className="h-full w-full overflow-hidden">
+        <div className="h-full w-full overflow-hidden">
+          {shops.length > 0 ? (
             <ShopSlider shops={shops} onShopClick={handleShopClick} />
-          </div>
-        )}
+          ) : (
+            <div className="w-full">
+              <Skeleton className="h-[300px] w-full" />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
