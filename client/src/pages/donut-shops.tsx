@@ -195,7 +195,7 @@ export default function DonutShops() {
             <ShopSlider shops={shops} onShopClick={handleShopClick} />
           ) : (
             <div className="w-full">
-              <Skeleton className="h-[300px] w-full" />
+              <Skeleton className="h-[180px] w-full animate-pulse" />
             </div>
           )}
         </div>

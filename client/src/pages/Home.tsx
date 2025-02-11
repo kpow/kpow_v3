@@ -176,24 +176,9 @@ export default function Home() {
       </div>
       <HorizontalDivider />
 
-      {/* {instagram} */}
-      <div>
-        <SectionHeader
-          title="k-shows"
-          buttonText="more insta"
-          linkHref="instagram"
-        />
-        {isLoadingInstagram ? (
-          <Skeleton
-            key={"skellywelly"}
-            className="w-full h-[180px] rounded-lg"
-          />
-        ) : (
-          <>
-            <InstagramFeed posts={allInstagramPosts} />
-          </>
-        )}
-      </div>
+      {/* {recentPlays} */}
+      <SectionHeader title="Recently Played" />
+      <RecentPlays />
       <HorizontalDivider />
 
       {/* {starred} */}
@@ -225,10 +210,25 @@ export default function Home() {
       </div>
       <HorizontalDivider />
 
-      {/* {recentPlays} */}
-      <SectionHeader title="Recently Played" />
-      <RecentPlays />
-      <HorizontalDivider />
+       {/* {instagram} */}
+        <div>
+          <SectionHeader
+            title="k-shows"
+            buttonText="more insta"
+            linkHref="instagram"
+          />
+          {isLoadingInstagram ? (
+            <div className="w-full">
+              <Skeleton className="h-[180px] w-full animate-pulse" />
+            </div>
+          ) : (
+            <>
+              <InstagramFeed posts={allInstagramPosts} />
+            </>
+          )}
+        </div>
+        <HorizontalDivider />
+
 
       {/* {books} */}
 
