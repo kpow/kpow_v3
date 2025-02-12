@@ -2,44 +2,15 @@ import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
-import { InstagramModal } from "@/components/InstagramModal";
 import { InstagramCarousel } from "@/components/InstagramCarousel";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ShopSlider } from "@/components/shop-slider";
 import { cities } from "@/data/cities";
 import SectionHeader from "@/components/SectionHeader";
 import HorizontalDivider from "@/components/HorizontalDivider";
-
-interface InstagramMediaChild {
-  id: string;
-  media_type: "IMAGE" | "VIDEO";
-  media_url: string;
-  thumbnail_url?: string;
-}
-
-interface InstagramMedia {
-  id: string;
-  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
-  media_url: string;
-  thumbnail_url?: string;
-  permalink: string;
-  caption?: string;
-  timestamp: string;
-  location?: {
-    id: string;
-    name: string;
-  };
-  children?: {
-    data: InstagramMediaChild[];
-  };
-}
-
-interface InstagramResponse {
-  posts: InstagramMedia[];
-}
 
 interface Shop {
   id: string;
@@ -63,31 +34,12 @@ export default function Home() {
       state: cities[randomIndex].state,
     };
   };
+
   const initialCity = getRandomCity();
   const [currentCity, setCurrentCity] = useState({
     city: initialCity.city,
     state: initialCity.state,
   });
-  const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>(
-    [],
-  );
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
-
-  const { data: instagramData, isLoading: isLoadingInstagram } =
-    useQuery<InstagramResponse>({
-      queryKey: ["/api/instagram/feed"],
-      queryFn: async () => {
-        const response = await fetch("/api/instagram/feed");
-        if (!response.ok) {
-          throw new Error("Failed to fetch Instagram feed");
-        }
-        const data = await response.json();
-        const shuffledPosts = [...data.posts].sort(() => Math.random() - 0.5);
-        setAllInstagramPosts(shuffledPosts);
-        return data;
-      },
-    });
 
   const { data: shops, isLoading: isLoadingShops } = useQuery<Shop[]>({
     queryKey: ["/api/yelp/search", currentCity],
@@ -220,48 +172,17 @@ export default function Home() {
           buttonText="more insta"
           linkHref="instagram"
         />
-        {isLoadingInstagram ? (
-          <div className="w-full">
-            <Skeleton className="h-[180px] w-full animate-pulse" />
-          </div>
-        ) : (
-          <>
-            <InstagramCarousel 
-              posts={allInstagramPosts}
-              onPostClick={(post) => {
-                const postIndex = allInstagramPosts.findIndex(p => p.id === post.id);
-                if (postIndex !== -1) {
-                  setSelectedPostIndex(postIndex);
-                  setModalIsOpen(true);
-                }
-              }} 
-            />
-            {modalIsOpen && allInstagramPosts && selectedPostIndex !== null && (
-              <InstagramModal
-                posts={[allInstagramPosts[selectedPostIndex]]}
-                initialPostIndex={0}
-                isOpen={modalIsOpen}
-                onClose={() => {
-                  setModalIsOpen(false);
-                  setSelectedPostIndex(null);
-                }}
-              />
-            )}
-          </>
-        )}
+        <InstagramCarousel />
       </div>
       <HorizontalDivider />
 
-
       {/* {books} */}
-
       <SectionHeader
         title="book feed"
         buttonText="more books"
         linkHref="books"
       />
       <BookFeed />
-
       <HorizontalDivider />
 
       {/* {donuts} */}
