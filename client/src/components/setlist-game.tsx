@@ -84,7 +84,7 @@ export function SetlistGame() {
           if (prev <= 1) {
             if (gameState === 'viewing') {
               setGameState('guessing');
-              return 5;
+              return 15; // Changed from 5 to 15 seconds for guessing phase
             } else {
               setGameState('results');
             }
@@ -107,7 +107,7 @@ export function SetlistGame() {
 
     // Determine the actual tour based on the show date
     const month = new Date(currentSetlist.showdate).getMonth();
-    const actualTour = 
+    const actualTour =
       month >= 5 && month <= 7 ? 'summer' :
       month >= 8 && month <= 10 ? 'fall' :
       month >= 11 || month <= 1 ? 'winter' : 'spring';
