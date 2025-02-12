@@ -310,11 +310,32 @@ export function registerPhishRoutes(router: Router) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
-  // Add this new endpoint after the existing routes
   router.get("/api/shows/all", async (_req, res) => {
     try {
-      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'allshows.json');
-      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
+      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'all-phish-shows.json');
+      let showsData;
+
+      // Try to read existing shows data
+      if (fs.existsSync(showsFilePath)) {
+        showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8'));
+      } else {
+        // If file doesn't exist, fetch from API and save
+        console.log("Fetching shows from Phish API...");
+        showsData = await fetchPhishData("/shows/artist/phish?order_by=showdate");
+
+        // Ensure the directory exists
+        const assetsDir = path.join(process.cwd(), 'attached_assets');
+        if (!fs.existsSync(assetsDir)) {
+          fs.mkdirSync(assetsDir, { recursive: true });
+        }
+
+        // Save the data
+        fs.writeFileSync(showsFilePath, JSON.stringify(showsData, null, 2));
+      }
+
+      if (!Array.isArray(showsData)) {
+        throw new Error('Invalid shows data format');
+      }
 
       const formattedShows = showsData.map((show: any) => ({
         id: show.showid,
