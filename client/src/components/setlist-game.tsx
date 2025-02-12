@@ -13,18 +13,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getSetlist } from "@/lib/phish-api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface GameFormValues {
   year: string;
   tour: 'summer' | 'fall' | 'winter' | 'spring';
 }
 
+interface ShowData {
+  showid: string;
+  showdate: string;
+  venue: string;
+  setlistdata: string;
+}
+
 export function SetlistGame() {
-  const [gameState, setGameState] = useState<'idle' | 'viewing' | 'guessing' | 'results'>('idle');
-  const [currentSetlist, setCurrentSetlist] = useState<any>(null);
+  const [gameState, setGameState] = useState<'idle' | 'loading' | 'viewing' | 'guessing' | 'results'>('idle');
+  const [currentSetlist, setCurrentSetlist] = useState<ShowData | null>(null);
   const [score, setScore] = useState(0);
   const [timer, setTimer] = useState(5);
-  
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm<GameFormValues>({
     defaultValues: {
       year: '',
@@ -32,23 +41,43 @@ export function SetlistGame() {
     }
   });
 
-  const startGame = async () => {
-    setGameState('viewing');
-    setTimer(5);
-    // Fetch random setlist here
-    // For now using a placeholder
-    const randomShowId = "1234"; // We'll implement random selection
+  const fetchRandomShow = async () => {
     try {
-      const setlist = await getSetlist(randomShowId);
-      setCurrentSetlist(setlist);
-    } catch (error) {
-      console.error("Error fetching setlist:", error);
+      setGameState('loading');
+      // Get a list of shows from the API
+      const response = await fetch('/api/shows');
+      if (!response.ok) throw new Error('Failed to fetch shows');
+      const data = await response.json();
+
+      // Pick a random show from the list
+      const shows = data.shows;
+      const randomShow = shows[Math.floor(Math.random() * shows.length)];
+
+      // Get the setlist for this show
+      const setlist = await getSetlist(randomShow.showid);
+      setCurrentSetlist({
+        showid: randomShow.showid,
+        showdate: randomShow.showdate,
+        venue: randomShow.venue,
+        setlistdata: setlist.setlistdata
+      });
+      setGameState('viewing');
+      setTimer(5);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start game');
+      setGameState('idle');
     }
+  };
+
+  const startGame = () => {
+    setScore(0);
+    setError(null);
+    fetchRandomShow();
   };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
+
     if (gameState === 'viewing' || gameState === 'guessing') {
       interval = setInterval(() => {
         setTimer((prev) => {
@@ -69,14 +98,22 @@ export function SetlistGame() {
   }, [gameState]);
 
   const onSubmit = (values: GameFormValues) => {
+    if (!currentSetlist) return;
+
     // Calculate score based on year proximity and correct tour
-    const actualYear = new Date(currentSetlist.date).getFullYear();
+    const actualYear = new Date(currentSetlist.showdate).getFullYear();
     const yearDiff = Math.abs(parseInt(values.year) - actualYear);
     const yearScore = Math.max(0, 50 - yearDiff * 10); // Lose 10 points for each year off
-    
-    // For tour scoring - we'll need to determine the actual tour
-    const tourScore = 50; // Placeholder for tour scoring logic
-    
+
+    // Determine the actual tour based on the show date
+    const month = new Date(currentSetlist.showdate).getMonth();
+    const actualTour = 
+      month >= 5 && month <= 7 ? 'summer' :
+      month >= 8 && month <= 10 ? 'fall' :
+      month >= 11 || month <= 1 ? 'winter' : 'spring';
+
+    const tourScore = values.tour === actualTour ? 50 : 0;
+
     setScore(yearScore + tourScore);
     setGameState('results');
   };
@@ -85,6 +122,15 @@ export function SetlistGame() {
     <Card className="w-full max-w-2xl mx-auto">
       <CardContent className="p-6">
         <motion.div className="space-y-6">
+          {error && (
+            <div className="text-red-500 text-center p-4">
+              {error}
+              <Button onClick={() => setError(null)} className="ml-2">
+                Dismiss
+              </Button>
+            </div>
+          )}
+
           {gameState === 'idle' && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -92,10 +138,20 @@ export function SetlistGame() {
               className="text-center"
             >
               <h2 className="text-2xl font-bold mb-4">Phish Setlist Game</h2>
+              <p className="mb-4 text-muted-foreground">
+                View a setlist for 5 seconds, then guess the year and tour!
+              </p>
               <Button onClick={startGame} size="lg">
                 Start Game
               </Button>
             </motion.div>
+          )}
+
+          {gameState === 'loading' && (
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
           )}
 
           <AnimatePresence>
@@ -166,7 +222,7 @@ export function SetlistGame() {
               </motion.div>
             )}
 
-            {gameState === 'results' && (
+            {gameState === 'results' && currentSetlist && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -174,8 +230,8 @@ export function SetlistGame() {
               >
                 <h3 className="text-2xl font-bold">Your Score: {score}</h3>
                 <div className="space-y-2">
-                  <p>Actual Show Date: {currentSetlist?.showdate}</p>
-                  <p>Venue: {currentSetlist?.venue}</p>
+                  <p>Show Date: {new Date(currentSetlist.showdate).toLocaleDateString()}</p>
+                  <p>Venue: {currentSetlist.venue}</p>
                 </div>
                 <Button onClick={() => {
                   setGameState('idle');
