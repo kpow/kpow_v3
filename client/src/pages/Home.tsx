@@ -131,15 +131,9 @@ export default function Home() {
       </div>
       <HorizontalDivider />
 
-      {/* {instagram} */}
-      <div>
-        <SectionHeader
-          title="k-shows"
-          buttonText="more insta"
-          linkHref="instagram"
-        />
-        <InstagramCarousel />
-      </div>
+      {/* {recentPlays} */}
+      <SectionHeader title="Recently Played" />
+      <RecentPlays />
       <HorizontalDivider />
 
       {/* {starred} */}
@@ -171,11 +165,17 @@ export default function Home() {
       </div>
       <HorizontalDivider />
 
-      {/* {recentPlays} */}
-      <SectionHeader title="Recently Played" />
-      <RecentPlays />
+      {/* {instagram} */}
+      <div>
+        <SectionHeader
+          title="k-shows"
+          buttonText="more insta"
+          linkHref="instagram"
+        />
+        <InstagramCarousel />
+      </div>
       <HorizontalDivider />
-      
+
       {/* {books} */}
       <SectionHeader
         title="book feed"
