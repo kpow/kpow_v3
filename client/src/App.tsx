@@ -15,6 +15,7 @@ import NotFound from "@/pages/not-found";
 import { HeroBattle } from "@/components/HeroBattle";
 import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/donut-shops";
+import SetlistGame from "@/pages/setlist-game";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function Router() {
         <Route path="/pmonk" component={PMonk} />
         <Route path="/battle" component={Battle} />
         <Route path="/donut-shops" component={DonutShops} />
+        <Route path="/setlist-game" component={SetlistGame} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
