@@ -172,7 +172,7 @@ export default function Home() {
           buttonText="more insta"
           linkHref="instagram"
         />
-        <InstagramCarousel />
+        <InstagramCarousel onPostClick={(post) => window.open(post.permalink, "_blank")} />
       </div>
       <HorizontalDivider />
 
