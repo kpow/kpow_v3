@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import axios from "axios";
-import { InstagramCard } from "../components/InstagramCard";
+import { InstagramPerformanceCard } from "../components/InstagramPerformanceCard";
 import { InstagramModal } from "@/components/InstagramModal";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
@@ -43,24 +43,19 @@ export default function Instagram() {
   const [, params] = useRoute("/instagram/page/:page");
   const page = params?.page ? parseInt(params.page) : 1;
   const { toast } = useToast();
-  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(
-    null,
-  );
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery<InstagramResponse>({
     queryKey: ["instagram", page],
     queryFn: async () => {
       try {
-        const response = await axios.get<InstagramResponse>(
-          "/api/instagram/feed",
-          {
-            params: {
-              page,
-              pageSize: ITEMS_PER_PAGE,
-            },
+        const response = await axios.get<InstagramResponse>("/api/instagram/feed", {
+          params: {
+            page,
+            pageSize: ITEMS_PER_PAGE,
           },
-        );
+        });
         return response.data;
       } catch (err) {
         const errorMessage =
@@ -111,12 +106,8 @@ export default function Instagram() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="bg-gray-200 aspect-square rounded-lg" />
-              <div className="space-y-2 mt-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
-              </div>
+            <div key={i} className="animate-pulse aspect-[4/3]">
+              <div className="bg-gray-200 h-full w-full rounded-lg" />
             </div>
           ))}
         </div>
@@ -130,8 +121,8 @@ export default function Instagram() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {data?.posts.map((post, index) => (
-              <div key={post.id} className="aspect-square">
-                <InstagramCard
+              <div key={post.id} className="aspect-[4/3]">
+                <InstagramPerformanceCard
                   {...post}
                   onClick={() => handleOpenModal(index)}
                 />
@@ -139,7 +130,6 @@ export default function Instagram() {
             ))}
           </div>
 
-          {/* this runs the modal on this page kinda weird */}
           {modalIsOpen && data?.posts && selectedPostIndex !== null && (
             <InstagramModal
               posts={[data.posts[selectedPostIndex]]}
