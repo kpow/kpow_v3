@@ -139,13 +139,15 @@ export default function Instagram() {
             ))}
           </div>
 
-          {/* this runs the modal on this page kinda weird */}
-          {modalIsOpen && data?.posts && selectedPostIndex !== null && (
+          {modalIsOpen && data.posts && selectedPostIndex !== null && (
             <InstagramModal
               posts={[data.posts[selectedPostIndex]]}
               initialPostIndex={0}
               isOpen={modalIsOpen}
-              onClose={handleCloseModal}
+              onClose={() => {
+                setModalIsOpen(false);
+                setSelectedPostIndex(null);
+              }}
             />
           )}
         </>

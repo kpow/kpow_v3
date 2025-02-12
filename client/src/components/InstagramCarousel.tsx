@@ -42,7 +42,7 @@ interface InstagramResponse {
 export function InstagramCarousel() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
-
+  
   const { data, isLoading } = useQuery<InstagramResponse>({
     queryKey: ["/api/instagram/feed"],
     queryFn: async () => {
@@ -50,6 +50,7 @@ export function InstagramCarousel() {
       if (!response.ok) {
         throw new Error("Failed to fetch Instagram feed");
       }
+      
       const data = await response.json();
       return data;
     },
@@ -71,6 +72,15 @@ export function InstagramCarousel() {
     return null;
   }
 
+  const shuffleArray = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+    return array;
+  };
+  const shuffledPosts = shuffleArray([...data.posts]);
+  
   const handlePostClick = (post: InstagramMedia) => {
     const postIndex = data.posts.findIndex(p => p.id === post.id);
     if (postIndex !== -1) {
@@ -93,7 +103,7 @@ export function InstagramCarousel() {
           className="w-full"
         >
           <CarouselContent>
-            {data.posts.map((post) => (
+            {shuffledPosts.map((post) => (
               <CarouselItem key={post.id} className="md:basis-1/3 lg:basis-1/4">
                 <div onClick={() => handlePostClick(post)}>
                   <InstagramCard
