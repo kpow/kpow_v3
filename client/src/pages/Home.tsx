@@ -3,6 +3,7 @@ import { RecentPlays } from "@/components/RecentPlays";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
 import { InstagramFeed } from "@/components/InstagramFeed";
+import { InstagramCarousel } from "@/components/InstagramCarousel";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
@@ -70,6 +71,8 @@ export default function Home() {
   const [allInstagramPosts, setAllInstagramPosts] = useState<InstagramMedia[]>(
     [],
   );
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
 
   const { data: instagramData, isLoading: isLoadingInstagram } =
     useQuery<InstagramResponse>({
@@ -210,24 +213,44 @@ export default function Home() {
       </div>
       <HorizontalDivider />
 
-       {/* {instagram} */}
-        <div>
-          <SectionHeader
-            title="k-shows"
-            buttonText="more insta"
-            linkHref="instagram"
-          />
-          {isLoadingInstagram ? (
-            <div className="w-full">
-              <Skeleton className="h-[180px] w-full animate-pulse" />
-            </div>
-          ) : (
-            <>
-              <InstagramFeed posts={allInstagramPosts} />
-            </>
-          )}
-        </div>
-        <HorizontalDivider />
+      {/* {instagram} */}
+      <div>
+        <SectionHeader
+          title="k-shows"
+          buttonText="more insta"
+          linkHref="instagram"
+        />
+        {isLoadingInstagram ? (
+          <div className="w-full">
+            <Skeleton className="h-[180px] w-full animate-pulse" />
+          </div>
+        ) : (
+          <>
+            <InstagramCarousel 
+              posts={allInstagramPosts}
+              onPostClick={(post) => {
+                const postIndex = allInstagramPosts.findIndex(p => p.id === post.id);
+                if (postIndex !== -1) {
+                  setSelectedPostIndex(postIndex);
+                  setModalIsOpen(true);
+                }
+              }} 
+            />
+            {modalIsOpen && allInstagramPosts && selectedPostIndex !== null && (
+              <InstagramFeed
+                posts={[allInstagramPosts[selectedPostIndex]]}
+                initialPostIndex={0}
+                isOpen={modalIsOpen}
+                onClose={() => {
+                  setModalIsOpen(false);
+                  setSelectedPostIndex(null);
+                }}
+              />
+            )}
+          </>
+        )}
+      </div>
+      <HorizontalDivider />
 
 
       {/* {books} */}
