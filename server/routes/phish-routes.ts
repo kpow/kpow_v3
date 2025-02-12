@@ -310,7 +310,8 @@ export function registerPhishRoutes(router: Router) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
-  // Add this new endpoint after the existing routes
+
+  // The main endpoint for all shows
   router.get("/api/shows/all", async (_req, res) => {
     try {
       const showsFilePath = path.join(process.cwd(), 'attached_assets', 'allshows.json');
