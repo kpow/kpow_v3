@@ -1,4 +1,3 @@
-
 import { Card } from "./ui/card";
 import { formatDistanceToNow } from "date-fns";
 
@@ -8,7 +7,7 @@ interface InstagramCardProps {
   thumbnail_url?: string;
   caption?: string;
   timestamp: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
   onClick: () => void;
 }
 
@@ -21,40 +20,28 @@ export function InstagramCard({
   onClick,
 }: InstagramCardProps) {
   return (
-    <Card 
-      className="overflow-hidden flex flex-col h-full cursor-pointer transform transition-transform duration-300 hover:scale-[1.02]" 
-      onClick={onClick}
-    >
-      <div className="relative aspect-square overflow-hidden">
-        {media_type === 'VIDEO' ? (
+    <div className="group relative aspect-[4/3] cursor-pointer">
+      <div className="absolute inset-0 overflow-hidden rounded-lg">
+        {media_type === "VIDEO" ? (
           <img
             src={thumbnail_url || media_url}
             alt={caption || "Instagram video"}
-            className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <img
             src={media_url}
             alt={caption || "Instagram post"}
-            className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         )}
-        {media_type === 'VIDEO' && (
-          <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-sm">
-            Video
-          </div>
-        )}
-        {media_type === 'CAROUSEL_ALBUM' && (
-          <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-sm">
-            Album
-          </div>
-        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
       </div>
-      <div className="p-2">
-        <p className="font-slackey text-lg item-left leading-snug text-gray-600 line-clamp-3">
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <h3 className="text-l font-bold font-slackey text-white mb-1">
           {caption || "No caption"}
-        </p>
+        </h3>
       </div>
-    </Card>
+    </div>
   );
 }
