@@ -49,12 +49,20 @@ export function SetlistGame() {
       if (!response.ok) throw new Error('Failed to fetch shows');
       const data = await response.json();
 
+      if (!data.shows || !Array.isArray(data.shows) || data.shows.length === 0) {
+        throw new Error('No shows data available');
+      }
+
       // Pick a random show from the list
       const shows = data.shows;
       const randomShow = shows[Math.floor(Math.random() * shows.length)];
 
       // Get the setlist for this show
       const setlist = await getSetlist(randomShow.id);
+      if (!setlist) {
+        throw new Error('Failed to fetch setlist');
+      }
+
       setCurrentSetlist({
         showid: randomShow.id,
         showdate: randomShow.date,
@@ -64,6 +72,7 @@ export function SetlistGame() {
       setGameState('viewing');
       setTimer(5);
     } catch (err) {
+      console.error('Game error:', err);
       setError(err instanceof Error ? err.message : 'Failed to start game');
       setGameState('idle');
     }

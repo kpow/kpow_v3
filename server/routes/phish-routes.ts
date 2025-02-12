@@ -310,6 +310,30 @@ export function registerPhishRoutes(router: Router) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
+  // Add this new endpoint after the existing routes
+  router.get("/api/shows/all", async (_req, res) => {
+    try {
+      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'allshows.json');
+      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
+
+      const formattedShows = showsData.map((show: any) => ({
+        id: show.showid,
+        date: show.showdate,
+        venue: show.venue,
+        city: show.city,
+        state: show.state,
+        country: show.country
+      }));
+
+      res.json({ shows: formattedShows });
+    } catch (error) {
+      console.error("Error fetching all shows:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch shows",
+        details: error instanceof Error ? error.stack : undefined
+      });
+    }
+  });
 }
 
 function formatSongUrl(songName: string): string {
