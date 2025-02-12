@@ -44,8 +44,8 @@ export function SetlistGame() {
   const fetchRandomShow = async () => {
     try {
       setGameState('loading');
-      // Get a list of shows from the API
-      const response = await fetch('/api/shows');
+      // Get a list of all Phish shows from the API
+      const response = await fetch('/api/shows/all');
       if (!response.ok) throw new Error('Failed to fetch shows');
       const data = await response.json();
 
@@ -54,10 +54,10 @@ export function SetlistGame() {
       const randomShow = shows[Math.floor(Math.random() * shows.length)];
 
       // Get the setlist for this show
-      const setlist = await getSetlist(randomShow.showid);
+      const setlist = await getSetlist(randomShow.id);
       setCurrentSetlist({
-        showid: randomShow.showid,
-        showdate: randomShow.showdate,
+        showid: randomShow.id,
+        showdate: randomShow.date,
         venue: randomShow.venue,
         setlistdata: setlist.setlistdata
       });
