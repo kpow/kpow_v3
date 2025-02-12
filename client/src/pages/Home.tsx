@@ -123,20 +123,15 @@ export default function Home() {
 
   return (
     <div className="space-y-8 mt-4">
-      {/* main cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {mainSections.map((section) => (
           <ContentSection key={section.title} {...section} />
         ))}
       </div>
       <HorizontalDivider />
-
-      {/* {recentPlays} */}
       <SectionHeader title="Recently Played" />
       <RecentPlays />
       <HorizontalDivider />
-
-      {/* {starred} */}
       <div>
         <SectionHeader
           title="star feed"
@@ -164,8 +159,6 @@ export default function Home() {
         </div>
       </div>
       <HorizontalDivider />
-
-      {/* {instagram} */}
       <div>
         <SectionHeader
           title="k-shows"
@@ -175,8 +168,6 @@ export default function Home() {
         <InstagramCarousel />
       </div>
       <HorizontalDivider />
-
-      {/* {books} */}
       <SectionHeader
         title="book feed"
         buttonText="more books"
@@ -184,11 +175,11 @@ export default function Home() {
       />
       <BookFeed />
       <HorizontalDivider />
-
-      {/* {donuts} */}
       <div>
         <SectionHeader
-          title={`donut tour${shops && shops.length > 0 ? ` - ${currentCity.city}, ${currentCity.state}` : ""}`}
+          title={`donut tour${
+            shops && shops.length > 0 ? ` - ${currentCity.city}, ${currentCity.state}` : ""
+          }`}
           buttonText="more donuts"
           linkHref="donut-shops"
         />
@@ -207,9 +198,7 @@ export default function Home() {
           </div>
         ) : null}
       </div>
-
       <HorizontalDivider />
-      {/* {gitHubz} */}
       <GitHubSection />
     </div>
   );
