@@ -84,7 +84,7 @@ export function InstagramCarousel({ onPostClick }: InstagramCarouselProps) {
       >
         <CarouselContent>
           {data.posts.map((post) => (
-            <CarouselItem key={post.id} className="md:basis-1/4 lg:basis-1/5">
+            <CarouselItem key={post.id} className="md:basis-1/3 lg:basis-1/4">
               <div onClick={() => onPostClick(post)}>
                 <InstagramCard
                   id={post.id}

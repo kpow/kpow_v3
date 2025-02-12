@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import axios from "axios";
 import { InstagramCard } from "../components/InstagramCard";
-import { InstagramFeed } from "../components/InstagramFeed";
+import { InstagramModal } from "@/components/InstagramModal";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
@@ -141,11 +141,8 @@ export default function Instagram() {
 
           {/* this runs the modal on this page kinda weird */}
           {modalIsOpen && data?.posts && selectedPostIndex !== null && (
-            <InstagramFeed
+            <InstagramModal
               posts={[data.posts[selectedPostIndex]]}
-              onLoadMore={() => {}}
-              hasMore={false}
-              isLoadingMore={false}
               initialPostIndex={0}
               isOpen={modalIsOpen}
               onClose={handleCloseModal}

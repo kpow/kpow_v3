@@ -2,7 +2,7 @@ import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
-import { InstagramFeed } from "@/components/InstagramFeed";
+import { InstagramModal } from "@/components/InstagramModal";
 import { InstagramCarousel } from "@/components/InstagramCarousel";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -237,7 +237,7 @@ export default function Home() {
               }} 
             />
             {modalIsOpen && allInstagramPosts && selectedPostIndex !== null && (
-              <InstagramFeed
+              <InstagramModal
                 posts={[allInstagramPosts[selectedPostIndex]]}
                 initialPostIndex={0}
                 isOpen={modalIsOpen}
