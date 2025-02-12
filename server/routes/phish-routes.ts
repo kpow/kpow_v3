@@ -310,21 +310,11 @@ export function registerPhishRoutes(router: Router) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
-  //Replacing the original /api/shows/all route with the improved version
+  // Add this new endpoint after the existing routes
   router.get("/api/shows/all", async (_req, res) => {
     try {
-      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'all-phish-shows.json');
-      if (!fs.existsSync(showsFilePath)) {
-        return res.status(500).json({
-          message: "Shows data file not found. Please generate the data first.",
-          details: "Missing file: all-phish-shows.json"
-        });
-      }
-
-      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8'));
-      if (!Array.isArray(showsData)) {
-        throw new Error('Invalid shows data format');
-      }
+      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'allshows.json');
+      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
 
       const formattedShows = showsData.map((show: any) => ({
         id: show.showid,
@@ -344,7 +334,6 @@ export function registerPhishRoutes(router: Router) {
       });
     }
   });
-
 }
 
 function formatSongUrl(songName: string): string {
