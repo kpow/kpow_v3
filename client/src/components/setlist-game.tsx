@@ -43,6 +43,16 @@ export function SetlistGame() {
   const [timer, setTimer] = useState(5);
   const [error, setError] = useState<string | null>(null);
   const [gamesPlayed, setGamesPlayed] = useState(0);
+  const [cumulativeScore, setCumulativeScore] = useState(0);
+  const [lastGuess, setLastGuess] = useState<{
+    guessedYear: string;
+    actualYear: string;
+    yearScore: number;
+    guessedTour: string;
+    actualTour: string;
+    tourScore: number;
+    totalScore: number;
+  } | null>(null);
 
   const form = useForm<GameFormValues>({
     defaultValues: {
@@ -54,8 +64,10 @@ export function SetlistGame() {
   useEffect(() => {
     const savedHighScore = localStorage.getItem('phishSetlistHighScore');
     const savedGamesPlayed = localStorage.getItem('phishSetlistGamesPlayed');
+    const savedCumulativeScore = localStorage.getItem('phishSetlistCumulativeScore');
     if (savedHighScore) setHighScore(parseInt(savedHighScore));
     if (savedGamesPlayed) setGamesPlayed(parseInt(savedGamesPlayed));
+    if (savedCumulativeScore) setCumulativeScore(parseInt(savedCumulativeScore));
   }, []);
 
   const fetchRandomShow = async () => {
@@ -145,10 +157,28 @@ export function SetlistGame() {
     const totalScore = yearScore + tourScore;
 
     setScore(totalScore);
+    setCumulativeScore(prev => {
+      const newScore = prev + totalScore;
+      localStorage.setItem('phishSetlistCumulativeScore', newScore.toString());
+      return newScore;
+    });
+
     if (totalScore > highScore) {
       setHighScore(totalScore);
       localStorage.setItem('phishSetlistHighScore', totalScore.toString());
     }
+
+    // Save the values for the results screen
+    setLastGuess({
+      guessedYear: values.year,
+      actualYear: actualYear.toString(),
+      yearScore,
+      guessedTour: values.tour,
+      actualTour,
+      tourScore,
+      totalScore
+    });
+
     setGameState("results");
   };
 
@@ -284,18 +314,56 @@ export function SetlistGame() {
               </motion.div>
             )}
 
-            {gameState === "results" && currentSetlist && (
+            {gameState === "results" && currentSetlist && lastGuess && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center space-y-6"
               >
                 <div className="text-4xl font-bold mb-2">
-                  Score: {score} points!
-                  {score === highScore && score > 0 && (
+                  Score: {lastGuess.totalScore} points!
+                  {lastGuess.totalScore === highScore && lastGuess.totalScore > 0 && (
                     <div className="text-xl text-blue-500 mt-2">New High Score! 🎉</div>
                   )}
                 </div>
+
+                <div className="space-y-4 bg-muted/50 p-6 rounded-lg">
+                  <div className="grid grid-cols-3 gap-4 text-left">
+                    <div className="col-span-3 font-bold text-lg border-b pb-2">Score Breakdown</div>
+
+                    <div>Year Guess</div>
+                    <div className="text-right">{lastGuess.guessedYear}</div>
+                    <div className="text-right font-semibold">{lastGuess.yearScore} pts</div>
+
+                    <div>Actual Year</div>
+                    <div className="text-right">{lastGuess.actualYear}</div>
+                    <div className="text-right text-muted-foreground text-sm">
+                      {Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} year(s) off
+                    </div>
+
+                    <div>Tour Guess</div>
+                    <div className="text-right capitalize">{lastGuess.guessedTour}</div>
+                    <div className="text-right font-semibold">{lastGuess.tourScore} pts</div>
+
+                    <div>Actual Tour</div>
+                    <div className="text-right capitalize">{lastGuess.actualTour}</div>
+                    <div className="text-right text-muted-foreground text-sm">
+                      {lastGuess.tourScore > 0 ? "Correct!" : "Incorrect"}
+                    </div>
+
+                    <div className="col-span-3 border-t pt-2">
+                      <div className="flex justify-between items-center">
+                        <span>Total Score</span>
+                        <span className="font-bold">{lastGuess.totalScore} pts</span>
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <span>Cumulative Score</span>
+                        <span className="font-bold">{cumulativeScore} pts</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2 bg-muted/50 p-6 rounded-lg">
                   <p className="text-xl">
                     Show Date:{" "}
@@ -307,6 +375,7 @@ export function SetlistGame() {
                   </p>
                   <p className="text-xl">Venue: {currentSetlist.venue}</p>
                 </div>
+
                 <Button
                   onClick={() => {
                     setGameState("idle");
