@@ -252,7 +252,7 @@ export function registerPhishRoutes(router: Router) {
         return res.status(400).json({ message: "Invalid month or day parameters" });
       }
 
-      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'allshows.json');
+      const showsFilePath = path.join(process.cwd(), 'client', 'src', 'data', 'allshows.json');
       const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
 
       const showsOnDate = showsData.filter((show: any) => {
@@ -314,7 +314,7 @@ export function registerPhishRoutes(router: Router) {
   // The main endpoint for all shows
   router.get("/api/shows/all", async (_req, res) => {
     try {
-      const showsFilePath = path.join(process.cwd(), 'attached_assets', 'allshows.json');
+      const showsFilePath = path.join(process.cwd(), 'client', 'src', 'data', 'allshows.json');
       const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
 
       const formattedShows = showsData.map((show: any) => ({
