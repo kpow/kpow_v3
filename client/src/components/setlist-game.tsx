@@ -429,6 +429,7 @@ export function SetlistGame() {
           </AnimatePresence>
         </motion.div>
       </div>
+      </CardContent>
       <div className={footerStyle}></div>
     </Card>
   );
