@@ -1,5 +1,6 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
+import { SetlistGame } from "@/components/setlist-game";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
 import { InstagramCarousel } from "@/components/InstagramCarousel";
@@ -124,11 +125,18 @@ export default function Home() {
 
   return (
     <div className="space-y-8 mt-4">
-      {/* main cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {mainSections.map((section) => (
-          <ContentSection key={section.title} {...section} />
-        ))}
+      {/* main cards and setlist game */}
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="lg:w-1/2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {mainSections.map((section) => (
+              <ContentSection key={section.title} {...section} />
+            ))}
+          </div>
+        </div>
+        <div className="lg:w-1/2">
+          <SetlistGame />
+        </div>
       </div>
       <HorizontalDivider />
 
