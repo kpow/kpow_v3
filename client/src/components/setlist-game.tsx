@@ -225,38 +225,38 @@ export function SetlistGame() {
             </div>
           )}
 
-          {gameState === "idle" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center h-full flex flex-col items-center justify-center"
-            >
-              <h2 className="text-2xl font-bold mb-4">
-                Ready to test your Phish knowledge?
-              </h2>
-              <p className="mb-6 text-muted-foreground">
-                You'll get 10 seconds to study a setlist,
-                <br />
-                then 15 seconds to guess the year and tour!
-              </p>
-              <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg"
-                onClick={startGame}
-                size="lg"
-              >
-                Start Game
-              </Button>
-            </motion.div>
-          )}
-
-          {gameState === "loading" && (
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-24 w-full" />
-            </div>
-          )}
-
           <AnimatePresence mode="wait">
+            {gameState === "idle" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center h-full flex flex-col items-center justify-center"
+              >
+                <h2 className="text-2xl font-bold mb-4">
+                  Ready to test your Phish knowledge?
+                </h2>
+                <p className="mb-6 text-muted-foreground">
+                  You'll get 10 seconds to study a setlist,
+                  <br />
+                  then 15 seconds to guess the year and tour!
+                </p>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg"
+                  onClick={startGame}
+                  size="lg"
+                >
+                  Start Game
+                </Button>
+              </motion.div>
+            )}
+
+            {gameState === "loading" && (
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+            )}
+
             {gameState === "viewing" && currentSetlist && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -350,12 +350,11 @@ export function SetlistGame() {
               >
                 <div className="text-2xl font-bold mb-2">
                   Score: {lastGuess.totalScore} points!
-                  {lastGuess.totalScore === highScore &&
-                    lastGuess.totalScore > 0 && (
-                      <div className="text-sm text-blue-500 mt-0">
-                        New High Score! 🎉
-                      </div>
-                    )}
+                  {lastGuess.totalScore === highScore && lastGuess.totalScore > 0 && (
+                    <div className="text-sm text-blue-500 mt-0">
+                      New High Score! 🎉
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-4 bg-muted/50 p-2 rounded-lg">
@@ -366,12 +365,7 @@ export function SetlistGame() {
                     <div className="text-right">
                       {lastGuess.yearScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
-                        (
-                        {Math.abs(
-                          parseInt(lastGuess.guessedYear) -
-                            parseInt(lastGuess.actualYear),
-                        )}{" "}
-                        off)
+                        ({Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} off)
                       </span>
                     </div>
 
@@ -384,29 +378,16 @@ export function SetlistGame() {
                         ({lastGuess.tourScore > 0 ? "✓" : "✗"})
                       </span>
                     </div>
-
-                    {/* <div className="col-span-2 border-t mt-1 pt-1">
-                      <div className="flex justify-between items-center text-base">
-                        <span className="text-sm">Total / Cumulative</span>
-                        <span className="font-bold">
-                          {lastGuess.totalScore} / {cumulativeScore} pts
-                        </span>
-                      </div>
-                    </div> */}
                   </div>
                 </div>
 
                 <div className="space-y-1 bg-muted/50 p-2 rounded-lg">
                   <p className="text-sm">
-                    Show Date:{" "}
-                    {new Date(currentSetlist.showdate).toLocaleDateString(
-                      undefined,
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      },
-                    )}
+                    Show Date: {new Date(currentSetlist.showdate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </p>
                   <p className="text-sm">Venue: {currentSetlist.venue}</p>
                 </div>
