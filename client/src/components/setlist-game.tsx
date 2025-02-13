@@ -39,8 +39,10 @@ export function SetlistGame() {
   >("idle");
   const [currentSetlist, setCurrentSetlist] = useState<ShowData | null>(null);
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
   const [timer, setTimer] = useState(5);
   const [error, setError] = useState<string | null>(null);
+  const [gamesPlayed, setGamesPlayed] = useState(0);
 
   const form = useForm<GameFormValues>({
     defaultValues: {
@@ -49,27 +51,27 @@ export function SetlistGame() {
     },
   });
 
+  useEffect(() => {
+    const savedHighScore = localStorage.getItem('phishSetlistHighScore');
+    const savedGamesPlayed = localStorage.getItem('phishSetlistGamesPlayed');
+    if (savedHighScore) setHighScore(parseInt(savedHighScore));
+    if (savedGamesPlayed) setGamesPlayed(parseInt(savedGamesPlayed));
+  }, []);
+
   const fetchRandomShow = async () => {
     try {
       setGameState("loading");
-      // Get a list of all Phish shows from the API
       const response = await fetch("/api/shows/all");
       if (!response.ok) throw new Error("Failed to fetch shows");
       const data = await response.json();
 
-      if (
-        !data.shows ||
-        !Array.isArray(data.shows) ||
-        data.shows.length === 0
-      ) {
+      if (!data.shows || !Array.isArray(data.shows) || data.shows.length === 0) {
         throw new Error("No shows data available");
       }
 
-      // Pick a random show from the list
       const shows = data.shows;
       const randomShow = shows[Math.floor(Math.random() * shows.length)];
 
-      // Get the setlist for this show
       const setlist = await getSetlist(randomShow.id);
       if (!setlist) {
         throw new Error("Failed to fetch setlist");
@@ -91,8 +93,12 @@ export function SetlistGame() {
   };
 
   const startGame = () => {
-    setScore(0);
     setError(null);
+    setGamesPlayed(prev => {
+      const newGamesPlayed = prev + 1;
+      localStorage.setItem('phishSetlistGamesPlayed', newGamesPlayed.toString());
+      return newGamesPlayed;
+    });
     fetchRandomShow();
   };
 
@@ -105,7 +111,7 @@ export function SetlistGame() {
           if (prev <= 1) {
             if (gameState === "viewing") {
               setGameState("guessing");
-              return 15; // Changed from 5 to 15 seconds for guessing phase
+              return 15;
             } else {
               setGameState("results");
             }
@@ -121,12 +127,10 @@ export function SetlistGame() {
   const onSubmit = (values: GameFormValues) => {
     if (!currentSetlist) return;
 
-    // Calculate score based on year proximity and correct tour
     const actualYear = new Date(currentSetlist.showdate).getFullYear();
     const yearDiff = Math.abs(parseInt(values.year) - actualYear);
-    const yearScore = Math.max(0, 70 - yearDiff * 10); // Lose 10 points for each year off
+    const yearScore = Math.max(0, 70 - yearDiff * 10);
 
-    // Determine the actual tour based on the show date
     const month = new Date(currentSetlist.showdate).getMonth();
     const actualTour =
       month >= 5 && month <= 7
@@ -137,16 +141,32 @@ export function SetlistGame() {
             ? "winter"
             : "spring";
 
-    const tourScore = values.tour === actualTour ? 8 : 0;
+    const tourScore = values.tour === actualTour ? 30 : 0;
+    const totalScore = yearScore + tourScore;
 
-    setScore(yearScore + tourScore);
+    setScore(totalScore);
+    if (totalScore > highScore) {
+      setHighScore(totalScore);
+      localStorage.setItem('phishSetlistHighScore', totalScore.toString());
+    }
     setGameState("results");
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardContent className="p-6">
-        <motion.div className="space-y-6">
+    <Card className="w-full h-full">
+      <CardContent className="p-6 flex flex-col h-full">
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-2xl font-slackey">phish setlist game</div>
+          <div className="flex gap-4 items-center">
+            <div className="text-sm text-muted-foreground">Games: {gamesPlayed}</div>
+            <div className="text-sm text-muted-foreground">High Score: {highScore}</div>
+            {gameState !== "idle" && (
+              <div className="text-sm font-bold">Score: {score}</div>
+            )}
+          </div>
+        </div>
+
+        <motion.div className="flex-grow">
           {error && (
             <div className="text-red-500 text-center p-4">
               {error}
@@ -160,16 +180,15 @@ export function SetlistGame() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center"
+              className="text-center h-full flex flex-col items-center justify-center"
             >
-              <h2 className="text-2xl font-bold mb-4">Phish Guess The Year!</h2>
-              <p className="mb-4 text-muted-foreground">
-                scoop a setlist for 10 seconds,
-                <br />
+              <h2 className="text-2xl font-bold mb-4">Ready to test your Phish knowledge?</h2>
+              <p className="mb-6 text-muted-foreground">
+                You'll get 10 seconds to study a setlist,<br />
                 then 15 seconds to guess the year and tour!
               </p>
               <Button
-                className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg"
                 onClick={startGame}
                 size="lg"
               >
@@ -185,7 +204,7 @@ export function SetlistGame() {
             </div>
           )}
 
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {gameState === "viewing" && currentSetlist && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -193,10 +212,10 @@ export function SetlistGame() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4"
               >
-                <div className="text-center text-2xl font-bold mb-4">
+                <div className="text-center text-3xl font-bold mb-4">
                   Time remaining: {timer}s
                 </div>
-                <div className="whitespace-pre-wrap font-mono">
+                <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 rounded-lg">
                   {currentSetlist.setlistdata}
                 </div>
               </motion.div>
@@ -208,25 +227,26 @@ export function SetlistGame() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-4"
               >
-                <div className="text-center text-2xl font-bold mb-4">
+                <div className="text-center text-3xl font-bold mb-4">
                   Make your guess! {timer}s
                 </div>
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4"
+                    className="space-y-6 max-w-md mx-auto"
                   >
                     <FormField
                       control={form.control}
                       name="year"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Year</FormLabel>
+                          <FormLabel className="text-lg">Year</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               min="1983"
                               max="2025"
+                              className="text-lg h-12"
                               {...field}
                             />
                           </FormControl>
@@ -238,12 +258,12 @@ export function SetlistGame() {
                       name="tour"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Tour</FormLabel>
+                          <FormLabel className="text-lg">Tour</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="h-12">
                               <SelectValue placeholder="Select tour" />
                             </SelectTrigger>
                             <SelectContent>
@@ -256,7 +276,7 @@ export function SetlistGame() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
+                    <Button type="submit" className="w-full h-12 text-lg">
                       Submit Guess
                     </Button>
                   </form>
@@ -268,21 +288,31 @@ export function SetlistGame() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center space-y-4"
+                className="text-center space-y-6"
               >
-                <h3 className="text-2xl font-bold">Your Score: {score}</h3>
-                <div className="space-y-2">
-                  <p>
+                <div className="text-4xl font-bold mb-2">
+                  Score: {score} points!
+                  {score === highScore && score > 0 && (
+                    <div className="text-xl text-blue-500 mt-2">New High Score! 🎉</div>
+                  )}
+                </div>
+                <div className="space-y-2 bg-muted/50 p-6 rounded-lg">
+                  <p className="text-xl">
                     Show Date:{" "}
-                    {new Date(currentSetlist.showdate).toLocaleDateString()}
+                    {new Date(currentSetlist.showdate).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
                   </p>
-                  <p>Venue: {currentSetlist.venue}</p>
+                  <p className="text-xl">Venue: {currentSetlist.venue}</p>
                 </div>
                 <Button
                   onClick={() => {
                     setGameState("idle");
                     form.reset();
                   }}
+                  className="text-lg px-8 py-3"
                 >
                   Play Again
                 </Button>
