@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,7 +50,7 @@ export function BookFeed() {
   }
 
   const isMobile = useIsMobile();
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {(isMobile ? randomReviews.slice(0, 1) : randomReviews).map((review, index) => {
