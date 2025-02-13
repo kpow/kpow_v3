@@ -53,7 +53,9 @@ export function SetlistGame() {
     totalScore: number;
   } | null>(null);
 
-  const years = Array.from({ length: 2025 - 1988 + 1 }, (_, i) => 2025 - i).map(String);
+  const years = Array.from({ length: 2025 - 1988 + 1 }, (_, i) => 2025 - i).map(
+    String,
+  );
 
   const form = useForm<GameFormValues>({
     defaultValues: {
@@ -63,12 +65,15 @@ export function SetlistGame() {
   });
 
   useEffect(() => {
-    const savedHighScore = localStorage.getItem('phishSetlistHighScore');
-    const savedGamesPlayed = localStorage.getItem('phishSetlistGamesPlayed');
-    const savedCumulativeScore = localStorage.getItem('phishSetlistCumulativeScore');
+    const savedHighScore = localStorage.getItem("phishSetlistHighScore");
+    const savedGamesPlayed = localStorage.getItem("phishSetlistGamesPlayed");
+    const savedCumulativeScore = localStorage.getItem(
+      "phishSetlistCumulativeScore",
+    );
     if (savedHighScore) setHighScore(parseInt(savedHighScore));
     if (savedGamesPlayed) setGamesPlayed(parseInt(savedGamesPlayed));
-    if (savedCumulativeScore) setCumulativeScore(parseInt(savedCumulativeScore));
+    if (savedCumulativeScore)
+      setCumulativeScore(parseInt(savedCumulativeScore));
   }, []);
 
   const fetchRandomShow = async () => {
@@ -78,7 +83,11 @@ export function SetlistGame() {
       if (!response.ok) throw new Error("Failed to fetch shows");
       const data = await response.json();
 
-      if (!data.shows || !Array.isArray(data.shows) || data.shows.length === 0) {
+      if (
+        !data.shows ||
+        !Array.isArray(data.shows) ||
+        data.shows.length === 0
+      ) {
         throw new Error("No shows data available");
       }
 
@@ -107,9 +116,12 @@ export function SetlistGame() {
 
   const startGame = () => {
     setError(null);
-    setGamesPlayed(prev => {
+    setGamesPlayed((prev) => {
       const newGamesPlayed = prev + 1;
-      localStorage.setItem('phishSetlistGamesPlayed', newGamesPlayed.toString());
+      localStorage.setItem(
+        "phishSetlistGamesPlayed",
+        newGamesPlayed.toString(),
+      );
       return newGamesPlayed;
     });
     fetchRandomShow();
@@ -142,7 +154,7 @@ export function SetlistGame() {
 
     const actualYear = new Date(currentSetlist.showdate).getFullYear();
     const yearDiff = Math.abs(parseInt(values.year) - actualYear);
-    const yearScore = Math.max(0, 70 - yearDiff * 10);
+    const yearScore = Math.max(0, 50 - yearDiff * 5);
 
     const month = new Date(currentSetlist.showdate).getMonth();
     const actualTour =
@@ -154,19 +166,19 @@ export function SetlistGame() {
             ? "winter"
             : "spring";
 
-    const tourScore = values.tour === actualTour ? 30 : 0;
+    const tourScore = values.tour === actualTour ? 15 : 0;
     const totalScore = yearScore + tourScore;
 
     setScore(totalScore);
-    setCumulativeScore(prev => {
+    setCumulativeScore((prev) => {
       const newScore = prev + totalScore;
-      localStorage.setItem('phishSetlistCumulativeScore', newScore.toString());
+      localStorage.setItem("phishSetlistCumulativeScore", newScore.toString());
       return newScore;
     });
 
     if (totalScore > highScore) {
       setHighScore(totalScore);
-      localStorage.setItem('phishSetlistHighScore', totalScore.toString());
+      localStorage.setItem("phishSetlistHighScore", totalScore.toString());
     }
 
     setLastGuess({
@@ -176,7 +188,7 @@ export function SetlistGame() {
       guessedTour: values.tour,
       actualTour,
       tourScore,
-      totalScore
+      totalScore,
     });
 
     setGameState("results");
@@ -184,13 +196,19 @@ export function SetlistGame() {
 
   return (
     <Card className="w-full h-full">
-      <CardContent className="p-6 flex flex-col h-full">
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-2xl font-slackey">phish setlist game</div>
+      <CardContent className="p-4 flex flex-col h-full">
+        <div className="text-2xl font-slackey">phish setlist game</div>
+        <div className="flex justify-between items-center mt-1 mb-4">
           <div className="flex gap-4 items-center">
-            <div className="text-sm text-muted-foreground">Games: {gamesPlayed}</div>
-            <div className="text-sm text-muted-foreground">High Score: {highScore}</div>
-            <div className="text-sm text-muted-foreground">Total Score: {cumulativeScore}</div>
+            <div className="text-sm text-muted-foreground">
+              Games: {gamesPlayed}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              High Score: {highScore}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Total Score: {cumulativeScore}
+            </div>
             {gameState !== "idle" && (
               <div className="text-sm font-bold">Current: {score}</div>
             )}
@@ -213,9 +231,12 @@ export function SetlistGame() {
               animate={{ opacity: 1 }}
               className="text-center h-full flex flex-col items-center justify-center"
             >
-              <h2 className="text-2xl font-bold mb-4">Ready to test your Phish knowledge?</h2>
+              <h2 className="text-2xl font-bold mb-4">
+                Ready to test your Phish knowledge?
+              </h2>
               <p className="mb-6 text-muted-foreground">
-                You'll get 10 seconds to study a setlist,<br />
+                You'll get 10 seconds to study a setlist,
+                <br />
                 then 15 seconds to guess the year and tour!
               </p>
               <Button
@@ -327,26 +348,36 @@ export function SetlistGame() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center space-y-6"
               >
-                <div className="text-4xl font-bold mb-2">
+                <div className="text-2xl font-bold mb-2">
                   Score: {lastGuess.totalScore} points!
-                  {lastGuess.totalScore === highScore && lastGuess.totalScore > 0 && (
-                    <div className="text-xl text-blue-500 mt-2">New High Score! 🎉</div>
-                  )}
+                  {lastGuess.totalScore === highScore &&
+                    lastGuess.totalScore > 0 && (
+                      <div className="text-sm text-blue-500 mt-0">
+                        New High Score! 🎉
+                      </div>
+                    )}
                 </div>
 
-                <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
+                <div className="space-y-4 bg-muted/50 p-2 rounded-lg">
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="col-span-2 font-bold border-b pb-1 mb-2">Score Breakdown</div>
-
-                    <div>Year: {lastGuess.guessedYear} → {lastGuess.actualYear}</div>
+                    <div>
+                      Year: {lastGuess.guessedYear} → {lastGuess.actualYear}
+                    </div>
                     <div className="text-right">
                       {lastGuess.yearScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
-                        ({Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} off)
+                        (
+                        {Math.abs(
+                          parseInt(lastGuess.guessedYear) -
+                            parseInt(lastGuess.actualYear),
+                        )}{" "}
+                        off)
                       </span>
                     </div>
 
-                    <div>Tour: {lastGuess.guessedTour} → {lastGuess.actualTour}</div>
+                    <div>
+                      Tour: {lastGuess.guessedTour} → {lastGuess.actualTour}
+                    </div>
                     <div className="text-right">
                       {lastGuess.tourScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
@@ -354,25 +385,30 @@ export function SetlistGame() {
                       </span>
                     </div>
 
-                    <div className="col-span-2 border-t mt-1 pt-1">
+                    {/* <div className="col-span-2 border-t mt-1 pt-1">
                       <div className="flex justify-between items-center text-base">
-                        <span>Total / Cumulative</span>
-                        <span className="font-bold">{lastGuess.totalScore} / {cumulativeScore} pts</span>
+                        <span className="text-sm">Total / Cumulative</span>
+                        <span className="font-bold">
+                          {lastGuess.totalScore} / {cumulativeScore} pts
+                        </span>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
-                <div className="space-y-2 bg-muted/50 p-6 rounded-lg">
-                  <p className="text-xl">
+                <div className="space-y-1 bg-muted/50 p-2 rounded-lg">
+                  <p className="text-sm">
                     Show Date:{" "}
-                    {new Date(currentSetlist.showdate).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {new Date(currentSetlist.showdate).toLocaleDateString(
+                      undefined,
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
                   </p>
-                  <p className="text-xl">Venue: {currentSetlist.venue}</p>
+                  <p className="text-sm">Venue: {currentSetlist.venue}</p>
                 </div>
 
                 <Button
@@ -380,7 +416,7 @@ export function SetlistGame() {
                     setGameState("idle");
                     form.reset();
                   }}
-                  className="text-lg px-8 py-3"
+                  className="text-lg px-8 py-1"
                 >
                   Play Again
                 </Button>
