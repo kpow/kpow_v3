@@ -10,12 +10,9 @@ export function registerPhishRoutes(router: Router) {
       const showsData = await fetchPhishData("/shows/artist/phish?order_by=showdate");
       console.log(`Received shows data. Length: ${Array.isArray(showsData) ? showsData.length : 'Not an array'}`);
 
-      const assetsDir = path.join(process.cwd(), 'attached_assets');
-      if (!fs.existsSync(assetsDir)) {
-        fs.mkdirSync(assetsDir, { recursive: true });
-      }
-      const showsFilePath = path.join(assetsDir, 'all-phish-shows.json');
-      fs.writeFileSync(showsFilePath, JSON.stringify(showsData, null, 2));
+      const showsFilePath = path.join(process.cwd(), 'client', 'src', 'data', 'allshows.json');
+      fs.writeFileSync(showsFilePath, JSON.stringify({ data: showsData }, null, 2));
+
       res.json({ 
         message: "Shows data has been saved to JSON file", 
         count: Array.isArray(showsData) ? showsData.length : 0,
@@ -23,12 +20,6 @@ export function registerPhishRoutes(router: Router) {
       });
     } catch (error) {
       console.error("Error generating shows JSON:", error);
-      if (error instanceof Error) {
-        console.error("Error details:", {
-          message: error.message,
-          stack: error.stack
-        });
-      }
       res.status(500).json({ 
         message: error instanceof Error ? error.message : "Unknown error occurred",
         details: error instanceof Error ? error.stack : undefined
@@ -311,7 +302,6 @@ export function registerPhishRoutes(router: Router) {
     }
   });
 
-  // The main endpoint for all shows
   router.get("/api/shows/all", async (_req, res) => {
     try {
       const showsFilePath = path.join(process.cwd(), 'client', 'src', 'data', 'allshows.json');
