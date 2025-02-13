@@ -195,22 +195,22 @@ export function SetlistGame() {
   };
 
   return (
-    <Card className="w-full h-full">
-      <CardContent className="p-4 flex flex-col h-full">
-        <div className="text-2xl font-slackey">phish setlist game</div>
-        <div className="flex justify-between items-center mt-1 mb-4">
-          <div className="flex gap-4 items-center">
-            <div className="text-sm text-muted-foreground">
+    <Card className="w-full">
+      <CardContent className="p-4 md:p-6 lg:p-8 flex flex-col h-full">
+        <div className="text-2xl md:text-3xl lg:text-4xl font-slackey">phish setlist game</div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 mb-4 md:mb-6 lg:mb-8">
+          <div className="flex flex-wrap gap-4 items-center text-sm md:text-base">
+            <div className="text-muted-foreground">
               Games: {gamesPlayed}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-muted-foreground">
               High Score: {highScore}
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-muted-foreground">
               Total Score: {cumulativeScore}
             </div>
             {gameState !== "idle" && (
-              <div className="text-sm font-bold">Current: {score}</div>
+              <div className="font-bold">Current: {score}</div>
             )}
           </div>
         </div>
@@ -230,18 +230,18 @@ export function SetlistGame() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center h-full flex flex-col items-center justify-center"
+                className="text-center h-full flex flex-col items-center justify-center py-8 md:py-12 lg:py-16"
               >
-                <h2 className="text-2xl font-bold mb-4">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6">
                   Ready to test your Phish knowledge?
                 </h2>
-                <p className="mb-6 text-muted-foreground">
+                <p className="mb-6 text-muted-foreground text-base md:text-lg lg:text-xl">
                   You'll get 10 seconds to study a setlist,
                   <br />
                   then 15 seconds to guess the year and tour!
                 </p>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg animate-pulse"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg md:text-xl lg:text-2xl animate-pulse"
                   onClick={startGame}
                   size="lg"
                 >
@@ -251,7 +251,7 @@ export function SetlistGame() {
             )}
 
             {gameState === "loading" && (
-              <div className="space-y-4">
+              <div className="space-y-4 p-4">
                 <Skeleton className="h-8 w-full" />
                 <Skeleton className="h-24 w-full" />
               </div>
@@ -262,12 +262,12 @@ export function SetlistGame() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
+                className="space-y-4 p-4"
               >
-                <div className="text-center text-3xl font-bold mb-4">
+                <div className="text-center text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
                   Time remaining: {timer}s
                 </div>
-                <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 rounded-lg">
+                <div className="whitespace-pre-wrap font-mono text-sm md:text-base lg:text-lg bg-muted/50 p-4 md:p-6 lg:p-8 rounded-lg max-h-[60vh] overflow-y-auto">
                   {currentSetlist.setlistdata}
                 </div>
               </motion.div>
@@ -277,66 +277,68 @@ export function SetlistGame() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
+                className="space-y-4 p-4"
               >
-                <div className="text-center text-3xl font-bold mb-4">
+                <div className="text-center text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
                   Make your guess! {timer}s
                 </div>
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6 max-w-md mx-auto"
+                    className="space-y-6 max-w-2xl mx-auto"
                   >
-                    <FormField
-                      control={form.control}
-                      name="year"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-lg">Year</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="h-12">
-                              <SelectValue placeholder="Select year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {years.map((year) => (
-                                <SelectItem key={year} value={year}>
-                                  {year}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="tour"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-lg">Tour</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="h-12">
-                              <SelectValue placeholder="Select tour" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="summer">Summer</SelectItem>
-                              <SelectItem value="fall">Fall</SelectItem>
-                              <SelectItem value="winter">Winter</SelectItem>
-                              <SelectItem value="spring">Spring</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="year"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-lg md:text-xl">Year</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger className="h-12 text-base md:text-lg">
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {years.map((year) => (
+                                  <SelectItem key={year} value={year}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="tour"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-lg md:text-xl">Tour</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger className="h-12 text-base md:text-lg">
+                                <SelectValue placeholder="Select tour" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="summer">Summer</SelectItem>
+                                <SelectItem value="fall">Fall</SelectItem>
+                                <SelectItem value="winter">Winter</SelectItem>
+                                <SelectItem value="spring">Spring</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                     <Button
                       type="submit"
-                      className="w-full text-lg animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-6 rounded-lg text-lg"
+                      className="w-full text-lg md:text-xl animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
                     >
                       Submit Guess
                     </Button>
@@ -349,32 +351,26 @@ export function SetlistGame() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center space-y-6"
+                className="text-center space-y-6 p-4 md:p-6 lg:p-8"
               >
-                <div className="text-3xl font-bold mb-2">
+                <div className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">
                   Score: {lastGuess.totalScore} points!
-                  {lastGuess.totalScore === highScore &&
-                    lastGuess.totalScore > 0 && (
-                      <div className="text-sm text-blue-500 mt-0">
-                        New High Score! 🎉
-                      </div>
-                    )}
+                  {lastGuess.totalScore === highScore && lastGuess.totalScore > 0 && (
+                    <div className="text-sm md:text-base text-blue-500 mt-0">
+                      New High Score! 🎉
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-4 bg-muted/50 p-2 rounded-lg">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="space-y-4 bg-muted/50 p-4 md:p-6 rounded-lg">
+                  <div className="grid grid-cols-2 gap-4 text-sm md:text-base">
                     <div>
                       Year: {lastGuess.guessedYear} → {lastGuess.actualYear}
                     </div>
                     <div className="text-right">
                       {lastGuess.yearScore} pts
-                      <span className="text-muted-foreground text-xs ml-1">
-                        (
-                        {Math.abs(
-                          parseInt(lastGuess.guessedYear) -
-                            parseInt(lastGuess.actualYear),
-                        )}{" "}
-                        off)
+                      <span className="text-muted-foreground text-xs md:text-sm ml-1">
+                        ({Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} off)
                       </span>
                     </div>
 
@@ -383,26 +379,23 @@ export function SetlistGame() {
                     </div>
                     <div className="text-right">
                       {lastGuess.tourScore} pts
-                      <span className="text-muted-foreground text-xs ml-1">
+                      <span className="text-muted-foreground text-xs md:text-sm ml-1">
                         ({lastGuess.tourScore > 0 ? "✓" : "✗"})
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-1 bg-muted/50 p-2 rounded-lg">
-                  <p className="font-bold">
+                <div className="space-y-1 bg-muted/50 p-4 md:p-6 rounded-lg">
+                  <p className="font-bold text-base md:text-lg">
                     Show Date:{" "}
-                    {new Date(currentSetlist.showdate).toLocaleDateString(
-                      undefined,
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      },
-                    )}
+                    {new Date(currentSetlist.showdate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </p>
-                  <p className="text-sm">Venue: {currentSetlist.venue}</p>
+                  <p className="text-sm md:text-base">Venue: {currentSetlist.venue}</p>
                 </div>
 
                 <Button
@@ -410,7 +403,7 @@ export function SetlistGame() {
                     setGameState("idle");
                     form.reset();
                   }}
-                  className="w-full text-lg animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-6 rounded-lg text-lg"
+                  className="w-full max-w-md mx-auto text-lg md:text-xl animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
                 >
                   Play Again
                 </Button>
