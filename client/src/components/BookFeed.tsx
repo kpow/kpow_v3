@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
@@ -52,7 +53,6 @@ export function BookFeed() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {(useIsMobile() ? randomReviews.slice(0, 1) : randomReviews).map((review, index) => {
-      {randomReviews.map((review, index) => {
         const title = review.book[0].title_without_series?.[0] ?? "Untitled";
         const description =
           review.book[0].description[0]?.replace(/<[^>]*>/g, "") ?? "";
