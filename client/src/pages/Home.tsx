@@ -134,7 +134,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div className="lg:w-1/2 h-full">
+        <div className="lg:w-1/2">
           <SetlistGame />
         </div>
       </div>
