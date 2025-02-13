@@ -327,38 +327,30 @@ export function SetlistGame() {
                   )}
                 </div>
 
-                <div className="space-y-4 bg-muted/50 p-6 rounded-lg">
-                  <div className="grid grid-cols-3 gap-4 text-left">
-                    <div className="col-span-3 font-bold text-lg border-b pb-2">Score Breakdown</div>
+                <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="col-span-2 font-bold border-b pb-1 mb-2">Score Breakdown</div>
 
-                    <div>Year Guess</div>
-                    <div className="text-right">{lastGuess.guessedYear}</div>
-                    <div className="text-right font-semibold">{lastGuess.yearScore} pts</div>
-
-                    <div>Actual Year</div>
-                    <div className="text-right">{lastGuess.actualYear}</div>
-                    <div className="text-right text-muted-foreground text-sm">
-                      {Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} year(s) off
+                    <div>Year: {lastGuess.guessedYear} → {lastGuess.actualYear}</div>
+                    <div className="text-right">
+                      {lastGuess.yearScore} pts
+                      <span className="text-muted-foreground text-xs ml-1">
+                        ({Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} off)
+                      </span>
                     </div>
 
-                    <div>Tour Guess</div>
-                    <div className="text-right capitalize">{lastGuess.guessedTour}</div>
-                    <div className="text-right font-semibold">{lastGuess.tourScore} pts</div>
-
-                    <div>Actual Tour</div>
-                    <div className="text-right capitalize">{lastGuess.actualTour}</div>
-                    <div className="text-right text-muted-foreground text-sm">
-                      {lastGuess.tourScore > 0 ? "Correct!" : "Incorrect"}
+                    <div>Tour: {lastGuess.guessedTour} → {lastGuess.actualTour}</div>
+                    <div className="text-right">
+                      {lastGuess.tourScore} pts
+                      <span className="text-muted-foreground text-xs ml-1">
+                        ({lastGuess.tourScore > 0 ? "✓" : "✗"})
+                      </span>
                     </div>
 
-                    <div className="col-span-3 border-t pt-2">
-                      <div className="flex justify-between items-center">
-                        <span>Total Score</span>
-                        <span className="font-bold">{lastGuess.totalScore} pts</span>
-                      </div>
-                      <div className="flex justify-between items-center mt-2">
-                        <span>Cumulative Score</span>
-                        <span className="font-bold">{cumulativeScore} pts</span>
+                    <div className="col-span-2 border-t mt-1 pt-1">
+                      <div className="flex justify-between items-center text-base">
+                        <span>Total / Cumulative</span>
+                        <span className="font-bold">{lastGuess.totalScore} / {cumulativeScore} pts</span>
                       </div>
                     </div>
                   </div>
