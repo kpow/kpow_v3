@@ -31,14 +31,10 @@ interface GoodreadsResponse {
 }
 
 export function BookFeed() {
+  const isMobile = useIsMobile();
   const { data, isLoading } = useQuery<GoodreadsResponse>({
     queryKey: ["/api/books?per_page=50"],
   });
-
-  const reviews = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
-  const randomReviews = reviews.length > 2 
-    ? reviews.sort(() => Math.random() - 0.5).slice(0, 2) 
-    : reviews;
 
   if (isLoading) {
     return (
@@ -49,11 +45,16 @@ export function BookFeed() {
     );
   }
 
-  const isMobile = useIsMobile();
+  const reviews = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
+  const randomReviews = reviews.length > 2 
+    ? reviews.sort(() => Math.random() - 0.5).slice(0, 2) 
+    : reviews;
+
+  const displayReviews = isMobile ? randomReviews.slice(0, 1) : randomReviews;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {(isMobile ? randomReviews.slice(0, 1) : randomReviews).map((review, index) => {
+      {displayReviews.map((review, index) => {
         const title = review.book[0].title_without_series?.[0] ?? "Untitled";
         const description =
           review.book[0].description[0]?.replace(/<[^>]*>/g, "") ?? "";
@@ -66,57 +67,32 @@ export function BookFeed() {
         const averageRating = parseFloat(review.ratings?.average_rating ?? "0");
 
         return (
-          <Card key={index} className="overflow-hidden">
+          <Card key={index}>
             <CardContent className="p-4">
               <div className="flex flex-col md:flex-row gap-4">
-                <img
-                  src={imageUrl}
-                  alt={title}
-                  className="w-full md:w-40 h-54 object-cover"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    by {author}
-                  </p>
-                  <div className="flex gap-4 mt-2">
-                    <div className="flex flex-col">
-                      <span className="text-xs text-muted-foreground">Your Rating</span>
-                      <div className="flex gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={`user-${i}`}
-                            className={`text-sm ${i < userRating ? "text-yellow-400" : "text-gray-300"}`}
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-xs text-muted-foreground">Average</span>
-                      <div className="flex gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={`avg-${i}`}
-                            className={`text-sm ${i < averageRating ? "text-yellow-400" : "text-gray-300"}`}
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                <div className="flex-shrink-0">
+                  <img
+                    src={imageUrl}
+                    alt={title}
+                    className="w-[150px] h-[200px] object-cover rounded-lg"
+                  />
+                </div>
+                <div className="flex-grow">
+                  <h3 className="text-lg font-bold mb-2">{title}</h3>
+                  <p className="text-sm text-gray-600 mb-2">by {author}</p>
+                  <p className="text-sm line-clamp-3">{description}</p>
+                  <div className="mt-2">
+                    <span className="text-sm">
+                      Rating: {userRating} / {averageRating}
+                    </span>
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-6 mt-2">
-                    {description}
-                  </p>
                   <a
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                    className="text-blue-600 hover:underline text-sm mt-2 block"
                   >
-                    View on Goodreads →
+                    View on Goodreads
                   </a>
                 </div>
               </div>
