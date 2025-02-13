@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { ShopSlider } from "@/components/shop-slider";
 import { cities } from "@/data/cities";
 import SectionHeader from "@/components/SectionHeader";
@@ -151,7 +152,7 @@ export default function Home() {
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {isLoadingStarred
-            ? Array.from({ length: 3 }).map((_, i) => (
+            ? Array.from({ length: useIsMobile() ? 1 : 3 }).map((_, i) => (
                 <div key={i} className="space-y-4">
                   <Skeleton className="h-48 w-full" />
                   <div className="space-y-2">
@@ -160,7 +161,7 @@ export default function Home() {
                   </div>
                 </div>
               ))
-            : starFeed.map((star) => (
+            : (useIsMobile() ? starFeed.slice(0, 1) : starFeed).map((star) => (
                 <ContentSection
                   key={star.title}
                   {...star}
