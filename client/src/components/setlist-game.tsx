@@ -3,7 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface GameFormValues {
   year: string;
-  tour: 'summer' | 'fall' | 'winter' | 'spring';
+  tour: "summer" | "fall" | "winter" | "spring";
 }
 
 interface ShowData {
@@ -28,7 +34,9 @@ interface ShowData {
 }
 
 export function SetlistGame() {
-  const [gameState, setGameState] = useState<'idle' | 'loading' | 'viewing' | 'guessing' | 'results'>('idle');
+  const [gameState, setGameState] = useState<
+    "idle" | "loading" | "viewing" | "guessing" | "results"
+  >("idle");
   const [currentSetlist, setCurrentSetlist] = useState<ShowData | null>(null);
   const [score, setScore] = useState(0);
   const [timer, setTimer] = useState(5);
@@ -36,21 +44,25 @@ export function SetlistGame() {
 
   const form = useForm<GameFormValues>({
     defaultValues: {
-      year: '',
-      tour: 'summer'
-    }
+      year: "",
+      tour: "summer",
+    },
   });
 
   const fetchRandomShow = async () => {
     try {
-      setGameState('loading');
+      setGameState("loading");
       // Get a list of all Phish shows from the API
-      const response = await fetch('/api/shows/all');
-      if (!response.ok) throw new Error('Failed to fetch shows');
+      const response = await fetch("/api/shows/all");
+      if (!response.ok) throw new Error("Failed to fetch shows");
       const data = await response.json();
 
-      if (!data.shows || !Array.isArray(data.shows) || data.shows.length === 0) {
-        throw new Error('No shows data available');
+      if (
+        !data.shows ||
+        !Array.isArray(data.shows) ||
+        data.shows.length === 0
+      ) {
+        throw new Error("No shows data available");
       }
 
       // Pick a random show from the list
@@ -60,21 +72,21 @@ export function SetlistGame() {
       // Get the setlist for this show
       const setlist = await getSetlist(randomShow.id);
       if (!setlist) {
-        throw new Error('Failed to fetch setlist');
+        throw new Error("Failed to fetch setlist");
       }
 
       setCurrentSetlist({
         showid: randomShow.id,
         showdate: randomShow.date,
         venue: randomShow.venue,
-        setlistdata: setlist.setlistdata
+        setlistdata: setlist.setlistdata,
       });
-      setGameState('viewing');
-      setTimer(5);
+      setGameState("viewing");
+      setTimer(10);
     } catch (err) {
-      console.error('Game error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to start game');
-      setGameState('idle');
+      console.error("Game error:", err);
+      setError(err instanceof Error ? err.message : "Failed to start game");
+      setGameState("idle");
     }
   };
 
@@ -87,15 +99,15 @@ export function SetlistGame() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (gameState === 'viewing' || gameState === 'guessing') {
+    if (gameState === "viewing" || gameState === "guessing") {
       interval = setInterval(() => {
         setTimer((prev) => {
           if (prev <= 1) {
-            if (gameState === 'viewing') {
-              setGameState('guessing');
+            if (gameState === "viewing") {
+              setGameState("guessing");
               return 15; // Changed from 5 to 15 seconds for guessing phase
             } else {
-              setGameState('results');
+              setGameState("results");
             }
           }
           return prev - 1;
@@ -112,19 +124,23 @@ export function SetlistGame() {
     // Calculate score based on year proximity and correct tour
     const actualYear = new Date(currentSetlist.showdate).getFullYear();
     const yearDiff = Math.abs(parseInt(values.year) - actualYear);
-    const yearScore = Math.max(0, 50 - yearDiff * 10); // Lose 10 points for each year off
+    const yearScore = Math.max(0, 70 - yearDiff * 10); // Lose 10 points for each year off
 
     // Determine the actual tour based on the show date
     const month = new Date(currentSetlist.showdate).getMonth();
     const actualTour =
-      month >= 5 && month <= 7 ? 'summer' :
-      month >= 8 && month <= 10 ? 'fall' :
-      month >= 11 || month <= 1 ? 'winter' : 'spring';
+      month >= 5 && month <= 7
+        ? "summer"
+        : month >= 8 && month <= 10
+          ? "fall"
+          : month >= 11 || month <= 1
+            ? "winter"
+            : "spring";
 
-    const tourScore = values.tour === actualTour ? 50 : 0;
+    const tourScore = values.tour === actualTour ? 8 : 0;
 
     setScore(yearScore + tourScore);
-    setGameState('results');
+    setGameState("results");
   };
 
   return (
@@ -140,23 +156,29 @@ export function SetlistGame() {
             </div>
           )}
 
-          {gameState === 'idle' && (
+          {gameState === "idle" && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-center"
             >
-              <h2 className="text-2xl font-bold mb-4">Phish Setlist Game</h2>
+              <h2 className="text-2xl font-bold mb-4">Phish Guess The Year!</h2>
               <p className="mb-4 text-muted-foreground">
-                View a setlist for 5 seconds, then guess the year and tour!
+                scoop a setlist for 10 seconds,
+                <br />
+                then 15 seconds to guess the year and tour!
               </p>
-              <Button onClick={startGame} size="lg">
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                onClick={startGame}
+                size="lg"
+              >
                 Start Game
               </Button>
             </motion.div>
           )}
 
-          {gameState === 'loading' && (
+          {gameState === "loading" && (
             <div className="space-y-4">
               <Skeleton className="h-8 w-full" />
               <Skeleton className="h-24 w-full" />
@@ -164,7 +186,7 @@ export function SetlistGame() {
           )}
 
           <AnimatePresence>
-            {gameState === 'viewing' && currentSetlist && (
+            {gameState === "viewing" && currentSetlist && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -180,7 +202,7 @@ export function SetlistGame() {
               </motion.div>
             )}
 
-            {gameState === 'guessing' && (
+            {gameState === "guessing" && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -190,7 +212,10 @@ export function SetlistGame() {
                   Make your guess! {timer}s
                 </div>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-4"
+                  >
                     <FormField
                       control={form.control}
                       name="year"
@@ -198,7 +223,12 @@ export function SetlistGame() {
                         <FormItem>
                           <FormLabel>Year</FormLabel>
                           <FormControl>
-                            <Input type="number" min="1983" max="2025" {...field} />
+                            <Input
+                              type="number"
+                              min="1983"
+                              max="2025"
+                              {...field}
+                            />
                           </FormControl>
                         </FormItem>
                       )}
@@ -209,7 +239,10 @@ export function SetlistGame() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Tour</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Select tour" />
                             </SelectTrigger>
@@ -231,7 +264,7 @@ export function SetlistGame() {
               </motion.div>
             )}
 
-            {gameState === 'results' && currentSetlist && (
+            {gameState === "results" && currentSetlist && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -239,13 +272,18 @@ export function SetlistGame() {
               >
                 <h3 className="text-2xl font-bold">Your Score: {score}</h3>
                 <div className="space-y-2">
-                  <p>Show Date: {new Date(currentSetlist.showdate).toLocaleDateString()}</p>
+                  <p>
+                    Show Date:{" "}
+                    {new Date(currentSetlist.showdate).toLocaleDateString()}
+                  </p>
                   <p>Venue: {currentSetlist.venue}</p>
                 </div>
-                <Button onClick={() => {
-                  setGameState('idle');
-                  form.reset();
-                }}>
+                <Button
+                  onClick={() => {
+                    setGameState("idle");
+                    form.reset();
+                  }}
+                >
                   Play Again
                 </Button>
               </motion.div>

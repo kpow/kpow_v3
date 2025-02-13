@@ -27,7 +27,7 @@ import {
   type Bet,
 } from "@/lib/battle-service";
 import { PageTitle } from "@/components/ui/page-title";
-import heroes from "../../../attached_assets/superheros-prod.js";
+import heroes from "../data/superheros-prod.js";
 
 const STORAGE_KEY = "hero-battle-stash";
 const BATTLE_STEPS = ["Data", "AI", "FIGHT!"];
@@ -66,20 +66,25 @@ export function HeroBattle() {
     }
 
     await new Promise((resolve) => setTimeout(resolve, STEP_DURATION));
-    const { winner: battleWinner, isMiracleWin } = determineBattleWinner(hero1, hero2);
+    const { winner: battleWinner, isMiracleWin } = determineBattleWinner(
+      hero1,
+      hero2,
+    );
     setWinner(battleWinner);
     setIsBattling(false);
     setBattleStep(-1);
 
     if (mode === "random" && selectedHero) {
       const newStash =
-        selectedHero === battleWinner.id ? stash + (isMiracleWin ? bet * 3 : bet) : stash - bet;
+        selectedHero === battleWinner.id
+          ? stash + (isMiracleWin ? bet * 3 : bet)
+          : stash - bet;
       setStash(newStash);
     }
 
     // Show miracle win message
     if (isMiracleWin) {
-      const winnerDiv = document.querySelector('.winner-message');
+      const winnerDiv = document.querySelector(".winner-message");
       if (winnerDiv) {
         winnerDiv.textContent = `${battleWinner.name} Wins! (MIRACLE WIN!)`;
       }

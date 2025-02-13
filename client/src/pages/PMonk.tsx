@@ -1,5 +1,5 @@
 import Masonry from "react-masonry-css";
-import imageData from "../../../attached_assets/pmonk";
+import imageData from "../data/pmonk.js";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -146,7 +146,9 @@ export const PMonk = () => {
   return (
     <>
       <div className="p-4">
-        <PageTitle size="default" className="mb-6">pmonk</PageTitle>
+        <PageTitle size="default" className="mb-6">
+          pmonk
+        </PageTitle>
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="flex -ml-4 w-auto"

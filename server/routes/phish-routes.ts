@@ -7,34 +7,40 @@ export function registerPhishRoutes(router: Router) {
   router.post("/api/admin/generate-shows-json", async (_req, res) => {
     try {
       console.log("Fetching all Phish shows...");
-      const showsData = await fetchPhishData("/shows/artist/phish?order_by=showdate");
-      console.log(`Received shows data. Length: ${Array.isArray(showsData) ? showsData.length : 'Not an array'}`);
+      const showsData = await fetchPhishData(
+        "/shows/artist/phish?order_by=showdate",
+      );
+      console.log(
+        `Received shows data. Length: ${Array.isArray(showsData) ? showsData.length : "Not an array"}`,
+      );
 
-      const assetsDir = path.join(process.cwd(), 'attached_assets');
+      const assetsDir = path.join(process.cwd(), "attached_assets");
       if (!fs.existsSync(assetsDir)) {
         fs.mkdirSync(assetsDir, { recursive: true });
       }
-      const showsFilePath = path.join(assetsDir, 'all-phish-shows.json');
+      const showsFilePath = path.join(assetsDir, "allshows.json");
       fs.writeFileSync(showsFilePath, JSON.stringify(showsData, null, 2));
-      res.json({ 
-        message: "Shows data has been saved to JSON file", 
+      res.json({
+        message: "Shows data has been saved to JSON file",
         count: Array.isArray(showsData) ? showsData.length : 0,
-        path: showsFilePath 
+        path: showsFilePath,
       });
     } catch (error) {
       console.error("Error generating shows JSON:", error);
       if (error instanceof Error) {
         console.error("Error details:", {
           message: error.message,
-          stack: error.stack
+          stack: error.stack,
         });
       }
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-        details: error instanceof Error ? error.stack : undefined
+      res.status(500).json({
+        message:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        details: error instanceof Error ? error.stack : undefined,
       });
     }
   });
+
   router.get("/api/shows", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
@@ -159,7 +165,8 @@ export function registerPhishRoutes(router: Router) {
           venue: firstSong.venue,
           location: `${firstSong.city}, ${firstSong.state}`,
           setlistdata: setlistText,
-          setlistnotes: firstSong.setlistnotes?.replace(/<\/?[^>]+(>|$)/g, "") || "",
+          setlistnotes:
+            firstSong.setlistnotes?.replace(/<\/?[^>]+(>|$)/g, "") || "",
         });
       } else {
         res.status(404).json({ message: "Setlist not found" });
@@ -249,23 +256,30 @@ export function registerPhishRoutes(router: Router) {
       const day = parseInt(req.query.day as string);
 
       if (isNaN(month) || isNaN(day)) {
-        return res.status(400).json({ message: "Invalid month or day parameters" });
+        return res
+          .status(400)
+          .json({ message: "Invalid month or day parameters" });
       }
 
-      const showsFilePath = path.join(process.cwd(), 'client', 'src', 'data', 'allshows.json');
-      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
+      const showsFilePath = path.join(
+        process.cwd(),
+        "client",
+        "src",
+        "data",
+        "allshows.json",
+      );
+      const showsData = JSON.parse(
+        fs.readFileSync(showsFilePath, "utf-8"),
+      ).data;
 
       const showsOnDate = showsData.filter((show: any) => {
         const showDate = new Date(show.showdate);
-        return (
-          showDate.getMonth() + 1 === month && 
-          showDate.getDate() === day
-        );
+        return showDate.getMonth() + 1 === month && showDate.getDate() === day;
       });
 
       const sortedShows = showsOnDate.sort(
         (a: any, b: any) =>
-          new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
+          new Date(b.showdate).getTime() - new Date(a.showdate).getTime(),
       );
 
       const formattedShows = sortedShows.map((show: any) => ({
@@ -301,8 +315,9 @@ export function registerPhishRoutes(router: Router) {
           country: show.country,
           notes: show.notes,
         }))
-        .sort((a: any, b: any) => 
-          new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.showdate).getTime() - new Date(a.showdate).getTime(),
         );
 
       res.json(venueShows);
@@ -314,8 +329,16 @@ export function registerPhishRoutes(router: Router) {
   // The main endpoint for all shows
   router.get("/api/shows/all", async (_req, res) => {
     try {
-      const showsFilePath = path.join(process.cwd(), 'client', 'src', 'data', 'allshows.json');
-      const showsData = JSON.parse(fs.readFileSync(showsFilePath, 'utf-8')).data;
+      const showsFilePath = path.join(
+        process.cwd(),
+        "client",
+        "src",
+        "data",
+        "allshows.json",
+      );
+      const showsData = JSON.parse(
+        fs.readFileSync(showsFilePath, "utf-8"),
+      ).data;
 
       const formattedShows = showsData.map((show: any) => ({
         id: show.showid,
@@ -323,15 +346,16 @@ export function registerPhishRoutes(router: Router) {
         venue: show.venue,
         city: show.city,
         state: show.state,
-        country: show.country
+        country: show.country,
       }));
 
       res.json({ shows: formattedShows });
     } catch (error) {
       console.error("Error fetching all shows:", error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to fetch shows",
-        details: error instanceof Error ? error.stack : undefined
+      res.status(500).json({
+        message:
+          error instanceof Error ? error.message : "Failed to fetch shows",
+        details: error instanceof Error ? error.stack : undefined,
       });
     }
   });
