@@ -1,5 +1,5 @@
+
 import { useQuery } from "@tanstack/react-query";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -31,7 +31,6 @@ interface GoodreadsResponse {
 }
 
 export function BookFeed() {
-  const isMobile = useIsMobile();
   const { data, isLoading } = useQuery<GoodreadsResponse>({
     queryKey: ["/api/books?per_page=50"],
   });
@@ -46,11 +45,9 @@ export function BookFeed() {
   }
 
   const reviews = data?.GoodreadsResponse?.reviews?.[0]?.review || [];
-  const randomReviews = reviews.length > 2 
+  const displayReviews = reviews.length > 2 
     ? reviews.sort(() => Math.random() - 0.5).slice(0, 2) 
     : reviews;
-
-  const displayReviews = isMobile ? randomReviews.slice(0, 1) : randomReviews;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
