@@ -168,7 +168,6 @@ export function SetlistGame() {
       localStorage.setItem('phishSetlistHighScore', totalScore.toString());
     }
 
-    // Save the values for the results screen
     setLastGuess({
       guessedYear: values.year,
       actualYear: actualYear.toString(),
@@ -190,8 +189,9 @@ export function SetlistGame() {
           <div className="flex gap-4 items-center">
             <div className="text-sm text-muted-foreground">Games: {gamesPlayed}</div>
             <div className="text-sm text-muted-foreground">High Score: {highScore}</div>
+            <div className="text-sm text-muted-foreground">Total Score: {cumulativeScore}</div>
             {gameState !== "idle" && (
-              <div className="text-sm font-bold">Score: {score}</div>
+              <div className="text-sm font-bold">Current: {score}</div>
             )}
           </div>
         </div>
