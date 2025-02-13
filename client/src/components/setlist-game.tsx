@@ -195,9 +195,9 @@ export function SetlistGame() {
   };
 
   return (
-    <Card className="w-full h-full">
-      <CardContent className="p-4 flex flex-col h-full">
-        <div className="text-2xl font-slackey">phish setlist game</div>
+    <Card className="w-full h-full max-w-4xl mx-auto">
+      <CardContent className="p-6 md:p-8 flex flex-col h-full">
+        <div className="text-2xl md:text-3xl lg:text-4xl font-slackey">phish setlist game</div>
         <div className="flex justify-between items-center mt-1 mb-4">
           <div className="flex gap-4 items-center">
             <div className="text-sm text-muted-foreground">
@@ -267,7 +267,7 @@ export function SetlistGame() {
                 <div className="text-center text-3xl font-bold mb-4">
                   Time remaining: {timer}s
                 </div>
-                <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 rounded-lg">
+                <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 md:p-8 rounded-lg text-sm md:text-base max-w-3xl mx-auto w-full">
                   {currentSetlist.setlistdata}
                 </div>
               </motion.div>
@@ -285,7 +285,7 @@ export function SetlistGame() {
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6 max-w-md mx-auto"
+                    className="space-y-6 max-w-xl mx-auto w-full"
                   >
                     <FormField
                       control={form.control}
