@@ -134,11 +134,7 @@ export default function Home() {
 
       {/* {instagram} */}
       <div>
-        <SectionHeader
-          title="k-shows"
-          buttonText="more insta"
-          linkHref="instagram"
-        />
+        <SectionHeader title="k-shows" />
         <InstagramCarousel />
       </div>
       <HorizontalDivider />
