@@ -10,7 +10,6 @@ import {
   FormLabel,
   FormControl,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -53,6 +52,8 @@ export function SetlistGame() {
     tourScore: number;
     totalScore: number;
   } | null>(null);
+
+  const years = Array.from({ length: 2025 - 1988 + 1 }, (_, i) => 2025 - i).map(String);
 
   const form = useForm<GameFormValues>({
     defaultValues: {
@@ -271,15 +272,21 @@ export function SetlistGame() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-lg">Year</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="1983"
-                              max="2025"
-                              className="text-lg h-12"
-                              {...field}
-                            />
-                          </FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger className="h-12">
+                              <SelectValue placeholder="Select year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {years.map((year) => (
+                                <SelectItem key={year} value={year}>
+                                  {year}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </FormItem>
                       )}
                     />
