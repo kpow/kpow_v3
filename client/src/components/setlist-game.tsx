@@ -36,6 +36,9 @@ export function SetlistGame() {
   const [gameState, setGameState] = useState<
     "idle" | "loading" | "viewing" | "guessing" | "results"
   >("idle");
+
+  const headerStyle = "bg-black text-white p-4";
+  const footerStyle = "bg-black w-full h-16 fixed bottom-0 left-0";
   const [currentSetlist, setCurrentSetlist] = useState<ShowData | null>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
@@ -196,9 +199,10 @@ export function SetlistGame() {
 
   return (
     <Card className="w-full h-full">
-      <CardContent className="p-4 flex flex-col h-full">
-        <div className="text-2xl font-slackey">phish setlist game</div>
-        <div className="flex justify-between items-center mt-1 mb-4">
+      <div className={headerStyle}>
+        <div className="container mx-auto">
+          <div className="text-2xl font-slackey mb-2">phish setlist game</div>
+          <div className="flex justify-between items-center">
           <div className="flex gap-4 items-center">
             <div className="text-sm text-muted-foreground">
               Games: {gamesPlayed}
@@ -425,6 +429,7 @@ export function SetlistGame() {
           </AnimatePresence>
         </motion.div>
       </CardContent>
+      <div className={footerStyle}></div>
     </Card>
   );
 }
