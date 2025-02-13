@@ -241,7 +241,7 @@ export function SetlistGame() {
                   then 15 seconds to guess the year and tour!
                 </p>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg animate-pulse"
                   onClick={startGame}
                   size="lg"
                 >
@@ -334,7 +334,10 @@ export function SetlistGame() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full h-12 text-lg">
+                    <Button
+                      type="submit"
+                      className="w-full text-lg animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-6 rounded-lg text-lg"
+                    >
                       Submit Guess
                     </Button>
                   </form>
@@ -348,13 +351,14 @@ export function SetlistGame() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center space-y-6"
               >
-                <div className="text-2xl font-bold mb-2">
+                <div className="text-3xl font-bold mb-2">
                   Score: {lastGuess.totalScore} points!
-                  {lastGuess.totalScore === highScore && lastGuess.totalScore > 0 && (
-                    <div className="text-sm text-blue-500 mt-0">
-                      New High Score! 🎉
-                    </div>
-                  )}
+                  {lastGuess.totalScore === highScore &&
+                    lastGuess.totalScore > 0 && (
+                      <div className="text-sm text-blue-500 mt-0">
+                        New High Score! 🎉
+                      </div>
+                    )}
                 </div>
 
                 <div className="space-y-4 bg-muted/50 p-2 rounded-lg">
@@ -365,7 +369,12 @@ export function SetlistGame() {
                     <div className="text-right">
                       {lastGuess.yearScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
-                        ({Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} off)
+                        (
+                        {Math.abs(
+                          parseInt(lastGuess.guessedYear) -
+                            parseInt(lastGuess.actualYear),
+                        )}{" "}
+                        off)
                       </span>
                     </div>
 
@@ -382,12 +391,16 @@ export function SetlistGame() {
                 </div>
 
                 <div className="space-y-1 bg-muted/50 p-2 rounded-lg">
-                  <p className="text-sm">
-                    Show Date: {new Date(currentSetlist.showdate).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                  <p className="font-bold">
+                    Show Date:{" "}
+                    {new Date(currentSetlist.showdate).toLocaleDateString(
+                      undefined,
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
                   </p>
                   <p className="text-sm">Venue: {currentSetlist.venue}</p>
                 </div>
@@ -397,7 +410,7 @@ export function SetlistGame() {
                     setGameState("idle");
                     form.reset();
                   }}
-                  className="text-lg px-8 py-1"
+                  className="w-full text-lg animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-6 rounded-lg text-lg"
                 >
                   Play Again
                 </Button>
