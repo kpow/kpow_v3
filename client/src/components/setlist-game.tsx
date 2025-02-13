@@ -144,8 +144,8 @@ export function SetlistGame() {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardContent className="p-6">
+    <Card className="w-full max-w-2xl mx-auto h-full flex flex-col">
+      <CardContent className="p-6 flex-grow flex flex-col">
         <motion.div className="space-y-6">
           {error && (
             <div className="text-red-500 text-center p-4">
