@@ -130,14 +130,13 @@ export default function DonutShops() {
   const handleRandomCity = () => {
     try {
       const newCity = getRandomCity();
+      const newLocation = `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`;
       setSearchState({
         city: newCity.city,
         state: newCity.state,
       });
-      setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
-      setTimeout(() => {
-        handleSearch();
-      }, 100);
+      setLocation(newLocation);
+      handleSearch();
     } catch (error) {
       toast({
         title: "Error",
