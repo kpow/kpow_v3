@@ -17,6 +17,7 @@ import { HeroBattle } from "@/components/HeroBattle";
 import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/donut-shops";
 import SetlistGame from "@/pages/setlist-game";
+import { SEO } from "@/components/SEO";
 
 function Router() {
   return (
@@ -28,7 +29,10 @@ function Router() {
         <Route path="/stats" component={ShowStats} />
         <Route path="/books/page/:page" component={Books} />
         <Route path="/books" component={Books} />
-        <Route path="/starred-articles/page/:page" component={StarredArticles} />
+        <Route
+          path="/starred-articles/page/:page"
+          component={StarredArticles}
+        />
         <Route path="/starred-articles" component={StarredArticles} />
         <Route path="/videos/page/:page" component={Videos} />
         <Route path="/videos" component={Videos} />
