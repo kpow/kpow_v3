@@ -187,6 +187,7 @@ export default function Home() {
         <SectionHeader title="Recently Played" />
         <RecentPlays />
         <HorizontalDivider />
+        
         {/* {books} */}
         <SectionHeader
           title="book feed"
