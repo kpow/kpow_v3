@@ -1,8 +1,11 @@
-import { useRef, useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Shop {
   id: string;
@@ -23,44 +26,19 @@ interface ShopSliderProps {
 }
 
 export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    containScroll: "trimSnaps",
-  });
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) {
-      const curIndexes = emblaApi.slidesInView();
-      const curIndex = curIndexes[0];
-      emblaApi.scrollTo(curIndex - 4);
-    }
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) {
-      const curIndexes = emblaApi.slidesInView();
-      const curIndex = curIndexes[curIndexes.length - 1];
-      emblaApi.scrollTo(curIndex);
-    }
-  }, [emblaApi]);
-
   return (
-    <div className="relative">
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4"
-          onClick={scrollPrev}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <div className="w-full overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-2">
+    <div className="w-full px-2 py-0">
+      <Carousel
+        opts={{
+          align: "start",
+          loop: true,
+          skipSnaps: true,
+        }}
+        className="w-full"
+      >
+        <CarouselContent>
           {shops.map((shop) => (
-            <div key={shop.id} className="flex-[0_0_220px] min-w-0">
+            <CarouselItem key={shop.id} className="md:basis-1/4 lg:basis-1/5">
               <Card
                 className="relative h-[180px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
                 onClick={() => onShopClick(shop)}
@@ -81,21 +59,12 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
                   </h3>
                 </div>
               </Card>
-            </div>
+            </CarouselItem>
           ))}
-        </div>
-      </div>
-
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4"
-          onClick={scrollNext}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+        </CarouselContent>
+        <CarouselPrevious className="bg-blue-600 hover:bg-blue-700 text-primary-foreground -left-3" />
+        <CarouselNext className="bg-blue-600 hover:bg-blue-700 text-primary-foreground -right-3" />
+      </Carousel>
     </div>
   );
 }
