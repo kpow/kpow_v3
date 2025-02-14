@@ -55,6 +55,9 @@ export default function Home() {
       }
       return response.json();
     },
+    enabled: Boolean(currentCity.city && currentCity.state),
+    retry: 1,
+    refetchOnWindowFocus: false
   });
 
   const mainSections = [
