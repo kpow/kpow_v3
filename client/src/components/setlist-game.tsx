@@ -207,24 +207,8 @@ export function SetlistGame() {
   return (
     <Card className="w-full h-full">
       <CardContent className="p-2 flex flex-col h-full">
-        <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-lg p-1 pl-4 m-0 mb-2">
-          <div className="text-2xl font-slackey mr-4">phish list</div>
-          <div className="flex justify-between items-center mt-1 mb-1">
-            <div className="flex gap-4 items-center">
-              <div className="text-sm">
-                Games: {gamesPlayed}
-              </div>
-              <div className="text-sm">
-                High Score: {highScore}
-              </div>
-              <div className="text-sm">
-                Total Score: {cumulativeScore}
-              </div>
-              {gameState !== "idle" && (
-                <div className="text-sm font-bold">Current: {score}</div>
-              )}
-            </div>
-          </div>
+        <div className="justify-center flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-sm p-1 pl-4 m-0 mb-4">
+          <div className="text-2xl font-slackey mr-4">guess the setlist</div>
         </div>
 
         <motion.div className="flex-grow">
@@ -430,6 +414,24 @@ export function SetlistGame() {
             )}
           </AnimatePresence>
         </motion.div>
+        <div className="justify-center flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-sm p-1 pl-4 m-0 mt-8">
+          <div className="flex justify-between items-center mt-1 mb-1">
+            <div className="flex gap-4 items-center">
+              <div className="text-sm">
+                Games: {gamesPlayed}
+              </div>
+              <div className="text-sm">
+                High Score: {highScore}
+              </div>
+              <div className="text-sm">
+                Total Score: {cumulativeScore}
+              </div>
+              {gameState !== "idle" && (
+                <div className="text-sm font-bold">Current: {score}</div>
+              )}
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
