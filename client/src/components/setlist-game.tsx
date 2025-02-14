@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ShowDetailsModal } from "@/components/show-details-modal";
 import {
   Form,
   FormField,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { getSetlist } from "@/lib/phish-api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Info } from "lucide-react";
 
 interface GameFormValues {
   year: string;
@@ -58,6 +60,7 @@ export function SetlistGame() {
     tourScore: number;
     totalScore: number;
   } | null>(null);
+  const [showDetailsOpen, setShowDetailsOpen] = useState(false);
 
   const years = Array.from({ length: 2025 - 1984 + 1 }, (_, i) => 2025 - i).map(
     String,
@@ -376,12 +379,7 @@ export function SetlistGame() {
                     <div className="text-right text-sm md:text lg:text-sm xl:text-xl font-bold">
                       {lastGuess.yearScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
-                        (
-                        {Math.abs(
-                          parseInt(lastGuess.guessedYear) -
-                            parseInt(lastGuess.actualYear),
-                        )}{" "}
-                        off)
+                        ({Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} off)
                       </span>
                     </div>
 
@@ -397,19 +395,24 @@ export function SetlistGame() {
                   </div>
                 </div>
 
-                <div className="space-y-1 bg-muted/50 p-2 rounded-lg">
+                <div className="space-y-1 bg-muted/50 p-2 rounded-lg relative">
                   <p className="font-bold">
                     Show Date:{" "}
-                    {new Date(currentSetlist.showdate).toLocaleDateString(
-                      undefined,
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      },
-                    )}
+                    {new Date(currentSetlist.showdate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </p>
                   <p className="text-sm">Venue: {currentSetlist.venue}</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={() => setShowDetailsOpen(true)}
+                  >
+                    <Info className="h-4 w-4" />
+                  </Button>
                 </div>
 
                 <Button
@@ -421,6 +424,19 @@ export function SetlistGame() {
                 >
                   Play Again
                 </Button>
+
+                <ShowDetailsModal
+                  show={{
+                    showid: currentSetlist.showid,
+                    showdate: currentSetlist.showdate,
+                    venue: currentSetlist.venue,
+                    city: "",
+                    state: "",
+                    country: "" // Adding the required country field
+                  }}
+                  isOpen={showDetailsOpen}
+                  onClose={() => setShowDetailsOpen(false)}
+                />
               </motion.div>
             )}
           </AnimatePresence>
