@@ -82,10 +82,33 @@ export function BookFeed() {
                   <h3 className="text-lg font-bold mb-2">{title}</h3>
                   <p className="text-sm text-gray-600 mb-2">by {author}</p>
                   <p className="text-sm line-clamp-3">{description}</p>
-                  <div className="mt-2">
-                    <span className="text-sm">
-                      Rating: {userRating} / {averageRating}
-                    </span>
+                  <div className="flex gap-4 mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground">Your Rating</span>
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={`user-${i}`}
+                            className={`text-sm ${i < userRating ? "text-yellow-400" : "text-gray-300"}`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted-foreground">Average</span>
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={`avg-${i}`}
+                            className={`text-sm ${i < averageRating ? "text-yellow-400" : "text-gray-300"}`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <a
                     href={link}
