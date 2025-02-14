@@ -41,7 +41,7 @@ function MapController({
 }: MapControllerProps) {
   const map = useMap();
 
-  // Handle bounds fitting
+  // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
       const bounds = L.latLngBounds(
@@ -50,7 +50,7 @@ function MapController({
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
-  }, [shops, shouldFitBounds, map]);
+  }, [shouldFitBounds]); // Only depend on shouldFitBounds
 
   // Handle selected shop updates
   useEffect(() => {

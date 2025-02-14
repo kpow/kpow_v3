@@ -132,7 +132,9 @@ export default function DonutShops() {
     if (searchState.city && searchState.state) {
       setLocation(`/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`);
     }
+    setShouldFitBounds(true);
     await refetch();
+    setTimeout(() => setShouldFitBounds(false), 100);
   };
 
   const [, setLocation] = useLocation();
