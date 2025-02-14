@@ -46,7 +46,11 @@ const getRandomCity = () => {
 
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
-  const initialCity = getRandomCity();
+  const [searchParams] = new URLSearchParams(window.location.search);
+  const urlCity = searchParams.get('city');
+  const urlState = searchParams.get('state');
+  
+  const initialCity = urlCity && urlState ? { city: urlCity, state: urlState } : getRandomCity();
   const [searchState, setSearchState] = useState<SearchState>({
     city: initialCity.city,
     state: initialCity.state,

@@ -149,6 +149,7 @@ export default function Home() {
             title={`donut tour${shops && shops.length > 0 ? ` - ${currentCity.city}, ${currentCity.state}` : ""}`}
             buttonText="more donuts"
             linkHref="donut-tour"
+            currentCity={currentCity}
           />
           {isLoadingShops ? (
             <div className="w-full">
