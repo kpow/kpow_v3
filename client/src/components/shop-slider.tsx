@@ -2,7 +2,7 @@ import { useRef, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Shop {
   id: string;
@@ -61,13 +61,10 @@ export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
         <div className="flex gap-2">
           {shops.map((shop) => (
             <div key={shop.id} className="flex-[0_0_220px] min-w-0">
-              <Card className="relative h-[180px] overflow-hidden">
-                <button
-                  onClick={() => onShopClick(shop)}
-                  className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/90 hover:bg-white transition-colors"
-                >
-                  <ExternalLink className="h-4 w-4 text-gray-700" />
-                </button>
+              <Card
+                className="relative h-[180px] overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
+                onClick={() => onShopClick(shop)}
+              >
                 <div
                   className="absolute inset-0 bg-cover bg-center"
                   style={{
