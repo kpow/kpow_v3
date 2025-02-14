@@ -138,7 +138,14 @@ export function SetlistGame() {
               setGameState("guessing");
               return 15;
             } else {
-              setGameState("results");
+              // If no guess was made (lastGuess is null), go back to idle state
+              if (!lastGuess) {
+                setError("Time's up! You didn't make a guess.");
+                setGameState("idle");
+                form.reset();
+              } else {
+                setGameState("results");
+              }
             }
           }
           return prev - 1;
@@ -147,7 +154,7 @@ export function SetlistGame() {
     }
 
     return () => clearInterval(interval);
-  }, [gameState]);
+  }, [gameState, lastGuess, form]);
 
   const onSubmit = (values: GameFormValues) => {
     if (!currentSetlist || !values.year || !values.tour) {
