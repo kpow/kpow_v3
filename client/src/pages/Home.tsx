@@ -6,14 +6,13 @@ import { GitHubSection } from "@/components/GitHubSection";
 import { InstagramCarousel } from "@/components/InstagramCarousel";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
 import { useState } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { ShopSlider } from "@/components/shop-slider";
 import { cities } from "@/data/cities";
 import SectionHeader from "@/components/SectionHeader";
 import HorizontalDivider from "@/components/HorizontalDivider";
 import { SEO } from "@/components/SEO";
+import { StarFeed } from "@/components/StarFeed";
 
 interface Shop {
   id: string;
@@ -26,7 +25,7 @@ interface Shop {
     longitude: number;
   };
   image_url?: string;
-  url: string;  // Added this property to fix the type error
+  url: string;
 }
 
 export default function Home() {
@@ -58,11 +57,6 @@ export default function Home() {
     },
   });
 
-  const { data: starredData, isLoading: isLoadingStarred } = useStarredArticles(
-    1,
-    3,
-  );
-
   const mainSections = [
     {
       title: "phashboard",
@@ -91,36 +85,6 @@ export default function Home() {
       imageSrc: "/pmonk.jpg",
       type: "main" as const,
       link: "/pmonk",
-    },
-  ];
-
-  const starFeed = starredData?.articles ?? [
-    {
-      title: "Loading...",
-      subtitle: "Please wait",
-      author: "Loading",
-      date: "Loading",
-      imageSrc: "/placeholder-star.png",
-      type: "star" as const,
-      excerpt: "Loading content...",
-    },
-    {
-      title: "Loading...",
-      subtitle: "Please wait",
-      author: "Loading",
-      date: "Loading",
-      imageSrc: "/placeholder-star.png",
-      type: "star" as const,
-      excerpt: "Loading content...",
-    },
-    {
-      title: "Loading...",
-      subtitle: "Please wait",
-      author: "Loading",
-      date: "Loading",
-      imageSrc: "/placeholder-star.png",
-      type: "star" as const,
-      excerpt: "Loading content...",
     },
   ];
 
@@ -161,25 +125,7 @@ export default function Home() {
             buttonText="more articles"
             linkHref="starred-articles"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {isLoadingStarred
-              ? Array.from({ length: useIsMobile() ? 1 : 3 }).map((_, i) => (
-                  <div key={i} className="space-y-4">
-                    <Skeleton className="h-48 w-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="h-4 w-1/2" />
-                    </div>
-                  </div>
-                ))
-              : (useIsMobile() ? starFeed.slice(0, 1) : starFeed).map((star) => (
-                  <ContentSection
-                    key={star.title}
-                    {...star}
-                    excerpt={star.excerpt}
-                  />
-                ))}
-          </div>
+          <StarFeed />
         </div>
         <HorizontalDivider />
 
@@ -187,7 +133,7 @@ export default function Home() {
         <SectionHeader title="Recently Played" />
         <RecentPlays />
         <HorizontalDivider />
-        
+
         {/* {books} */}
         <SectionHeader
           title="book feed"
