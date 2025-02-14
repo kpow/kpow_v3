@@ -53,6 +53,16 @@ export default function DonutShops() {
     city: decodeURIComponent(params.city), 
     state: decodeURIComponent(params.state) 
   } : getRandomCity();
+
+  useEffect(() => {
+    if (params) {
+      setSearchState({
+        city: decodeURIComponent(params.city),
+        state: decodeURIComponent(params.state)
+      });
+      refetch();
+    }
+  }, [params]);
   const [searchState, setSearchState] = useState<SearchState>({
     city: initialCity.city,
     state: initialCity.state,
@@ -127,16 +137,15 @@ export default function DonutShops() {
 
   const [, setLocation] = useLocation();
   
-  const handleRandomCity = () => {
+  const handleRandomCity = async () => {
     try {
       const newCity = getRandomCity();
-      const newLocation = `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`;
       setSearchState({
         city: newCity.city,
         state: newCity.state,
       });
-      setLocation(newLocation);
-      handleSearch();
+      await setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
+      await refetch();
     } catch (error) {
       toast({
         title: "Error",
