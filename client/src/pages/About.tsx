@@ -1,6 +1,10 @@
 import { Briefcase, Users2, Code2, Coffee, Download, Link } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function About() {
+  const pageTitle = "About Kevin - Digital Architect & Developer";
+  const pageDescription = "Digital Architect, Leader, and Developer with 20+ years of experience in designing solutions and managing development resources. Learn more about my work and interests.";
+  const pageImage = "/kpow_about.jpg";
   const skills = [
     {
       icon: <Briefcase className="w-4 h-4" />,
@@ -29,7 +33,14 @@ export default function About() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-4">
+    <>
+      <SEO 
+        title={pageTitle}
+        description={pageDescription}
+        image={pageImage}
+        type="profile"
+      />
+      <div className="max-w-2xl mx-auto px-4 py-4">
       {/* Header section */}
       <div className="bg-white rounded-xl p-8 mb-8 shadow-[0_0_15px_rgba(0,0,0,0.05)] text-center">
         <h1 className="text-[2.5rem] leading-tight font-slackey mb-4">

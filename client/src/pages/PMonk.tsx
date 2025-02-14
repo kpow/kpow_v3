@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { PageTitle } from "@/components/ui/page-title";
+import { SEO } from "@/components/SEO"; // Added SEO import
 
 interface ImageData {
   src: string;
@@ -145,6 +146,7 @@ export const PMonk = () => {
 
   return (
     <>
+      <SEO title="pmonk" /> {/* Added SEO component */}
       <div className="p-4">
         <PageTitle size="default" className="mb-6">
           pmonk
