@@ -10,7 +10,7 @@ interface SEOProps {
 }
 
 export function SEO({
-  title = "KPOW - Into the Singularity",
+  title = "kpow - into the singularity",
   description = "A comprehensive cross-domain media and location analytics platform featuring an interactive Phish setlist guessing game that provides an engaging music trivia experience.",
   image = "/phash.jpg",
   url = typeof window !== "undefined" ? window.location.href : "",

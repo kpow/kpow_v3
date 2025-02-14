@@ -36,7 +36,6 @@ function Router() {
         <Route path="/pmonk" component={PMonk} />
         <Route path="/battle" component={Battle} />
         <Route path="/donut-shops" component={DonutShops} />
-        <Route path="/setlist-game" component={SetlistGame} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
