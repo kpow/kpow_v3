@@ -32,7 +32,11 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
   const menuItems = [
     { icon: <Home className="w-4 h-4" />, label: "home", href: "/" },
     { icon: <Info className="w-4 h-4" />, label: "about kpow", href: "/about" },
-    { icon: <Fish className="w-4 h-4" />, label: "phashboard", href: "/stats" },
+    {
+      icon: <Fish className="w-4 h-4" />,
+      label: "phashboard",
+      href: "/phashboard",
+    },
     {
       icon: <Gamepad2 className="w-4 h-4" />,
       label: "hero battle",
@@ -44,7 +48,6 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       href: "/videos",
     },
     { icon: <Music className="w-4 h-4" />, label: "pmonk", href: "/pmonk" },
-    { icon: <Music className="w-4 h-4" />, label: "kpow musicgram", href: "/instagram" },
     {
       icon: <Star className="w-4 h-4" />,
       label: "star feed",
@@ -54,11 +57,11 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       icon: <Book className="w-4 h-4" />,
       label: "book feed",
       href: "/books",
-    },    
+    },
     {
       icon: <Circle className="w-4 h-4" />,
       label: "donut tour",
-      href: "/donut-shops",
+      href: "/donut-tour",
     },
     {
       icon: <Code className="w-4 h-4" />,

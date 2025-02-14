@@ -63,7 +63,7 @@ export default function Home() {
       subtitle: "DIG IN",
       imageSrc: "/phash.jpg",
       type: "main" as const,
-      link: "/stats",
+      link: "/phashboard",
     },
     {
       title: "battle",
@@ -90,7 +90,7 @@ export default function Home() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="KPOW - Into the Singularity"
         description="A comprehensive cross-domain media and location analytics platform featuring an interactive Phish setlist guessing game that provides an engaging music trivia experience."
         image="/phash.jpg"
@@ -148,7 +148,7 @@ export default function Home() {
           <SectionHeader
             title={`donut tour${shops && shops.length > 0 ? ` - ${currentCity.city}, ${currentCity.state}` : ""}`}
             buttonText="more donuts"
-            linkHref="donut-shops"
+            linkHref="donut-tour"
           />
           {isLoadingShops ? (
             <div className="w-full">

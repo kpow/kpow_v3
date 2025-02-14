@@ -6,17 +6,14 @@ import { Layout } from "@/components/Layout";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
-import ShowStats from "@/pages/show-stats";
+import ShowStats from "@/pages/Phashboard";
 import Books from "@/pages/Books";
 import StarredArticles from "@/pages/StarredArticles";
 import PMonk from "@/pages/PMonk";
 import Videos from "@/pages/Videos";
-import Instagram from "@/pages/Instagram";
 import NotFound from "@/pages/not-found";
-import { HeroBattle } from "@/components/HeroBattle";
 import Battle from "@/pages/Battle";
-import DonutShops from "@/pages/donut-shops";
-import SetlistGame from "@/pages/setlist-game";
+import DonutShops from "@/pages/DonutShops";
 import { SEO } from "@/components/SEO";
 
 function Router() {
@@ -26,7 +23,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
-        <Route path="/stats" component={ShowStats} />
+        <Route path="/phashboard" component={ShowStats} />
         <Route path="/books/page/:page" component={Books} />
         <Route path="/books" component={Books} />
         <Route
@@ -36,11 +33,9 @@ function Router() {
         <Route path="/starred-articles" component={StarredArticles} />
         <Route path="/videos/page/:page" component={Videos} />
         <Route path="/videos" component={Videos} />
-        <Route path="/instagram/page/:page" component={Instagram} />
-        <Route path="/instagram" component={Instagram} />
         <Route path="/pmonk" component={PMonk} />
         <Route path="/battle" component={Battle} />
-        <Route path="/donut-shops" component={DonutShops} />
+        <Route path="/donut-tour" component={DonutShops} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

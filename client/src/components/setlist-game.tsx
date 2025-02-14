@@ -206,22 +206,24 @@ export function SetlistGame() {
 
   return (
     <Card className="w-full h-full">
-      <CardContent className="p-4 flex flex-col h-full">
-        <div className="text-2xl font-slackey">phish setlist game</div>
-        <div className="flex justify-between items-center mt-1 mb-4">
-          <div className="flex gap-4 items-center">
-            <div className="text-sm text-muted-foreground">
-              Games: {gamesPlayed}
+      <CardContent className="p-2 flex flex-col h-full">
+        <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-lg p-1 pl-4 m-0 mb-2">
+          <div className="text-2xl font-slackey mr-4">phish list</div>
+          <div className="flex justify-between items-center mt-1 mb-1">
+            <div className="flex gap-4 items-center">
+              <div className="text-sm">
+                Games: {gamesPlayed}
+              </div>
+              <div className="text-sm">
+                High Score: {highScore}
+              </div>
+              <div className="text-sm">
+                Total Score: {cumulativeScore}
+              </div>
+              {gameState !== "idle" && (
+                <div className="text-sm font-bold">Current: {score}</div>
+              )}
             </div>
-            <div className="text-sm text-muted-foreground">
-              High Score: {highScore}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Total Score: {cumulativeScore}
-            </div>
-            {gameState !== "idle" && (
-              <div className="text-sm font-bold">Current: {score}</div>
-            )}
           </div>
         </div>
 
@@ -242,7 +244,7 @@ export function SetlistGame() {
                 animate={{ opacity: 1 }}
                 className="text-center h-full flex flex-col items-center justify-center"
               >
-                <h2 className="text-2xl font-bold mb-4">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
                   Ready to test your Phish knowledge?
                 </h2>
                 <p className="mb-6 text-muted-foreground">
@@ -274,7 +276,7 @@ export function SetlistGame() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4"
               >
-                <div className="text-center text-3xl font-bold mb-4">
+                <div className="text-center text-3xl font-bold m-4">
                   Time remaining: {timer}s
                 </div>
                 <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 rounded-lg">
@@ -361,7 +363,7 @@ export function SetlistGame() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center space-y-6"
               >
-                <div className="text-3xl font-bold mb-2">
+                <div className="text-2xl md:text-3xl lg:text-3xl xl:text-5xl font-bold m-4">
                   Score: {lastGuess.totalScore} points!
                   {lastGuess.totalScore === highScore &&
                     lastGuess.totalScore > 0 && (
@@ -373,10 +375,10 @@ export function SetlistGame() {
 
                 <div className="space-y-4 bg-muted/50 p-2 rounded-lg">
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
+                    <div className="text-sm md:text lg:text-sm xl:text-xl font-bold">
                       Year: {lastGuess.guessedYear} → {lastGuess.actualYear}
                     </div>
-                    <div className="text-right">
+                    <div className="text-right text-sm md:text lg:text-sm xl:text-xl font-bold">
                       {lastGuess.yearScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
                         (
@@ -388,10 +390,10 @@ export function SetlistGame() {
                       </span>
                     </div>
 
-                    <div>
+                    <div className="text-sm md:text lg:text-sm xl:text-xl font-bold">
                       Tour: {lastGuess.guessedTour} → {lastGuess.actualTour}
                     </div>
-                    <div className="text-right">
+                    <div className="text-right text-sm md:text lg:text-sm xl:text-xl font-bold">
                       {lastGuess.tourScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
                         ({lastGuess.tourScore > 0 ? "✓" : "✗"})
@@ -420,7 +422,7 @@ export function SetlistGame() {
                     setGameState("idle");
                     form.reset();
                   }}
-                  className="w-full text-lg animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-6 rounded-lg text-lg"
+                  className="w-3/4 text-lg animate-pulse bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-6 rounded-lg text-lg"
                 >
                   Play Again
                 </Button>

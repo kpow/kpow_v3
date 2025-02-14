@@ -2,9 +2,9 @@ import { HeroBattle } from "@/components/HeroBattle";
 import { SEO } from "@/components/SEO";
 
 export default function Battle() {
-  const pageTitle = "Hero Battle - Choose Your Champion";
+  const pageTitle = "Battle - Choose Your Champion";
   const pageDescription =
-    "Enter the arena and battle with your favorite heroes. An interactive experience testing different hero combinations and their powers.";
+    "Enter the arena and battle with your favorite heroes and villians. An interactive experience testing different hero/villian combinations and their powers.";
   const pageImage = "/battle.jpg";
   return (
     <>
