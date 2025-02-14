@@ -3,11 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ShowDetailsModal } from "@/components/show-details-modal";
 import {
   Form,
@@ -379,7 +375,12 @@ export function SetlistGame() {
                     <div className="text-right text-sm md:text lg:text-sm xl:text-xl font-bold">
                       {lastGuess.yearScore} pts
                       <span className="text-muted-foreground text-xs ml-1">
-                        ({Math.abs(parseInt(lastGuess.guessedYear) - parseInt(lastGuess.actualYear))} off)
+                        (
+                        {Math.abs(
+                          parseInt(lastGuess.guessedYear) -
+                            parseInt(lastGuess.actualYear),
+                        )}{" "}
+                        off)
                       </span>
                     </div>
 
@@ -398,21 +399,23 @@ export function SetlistGame() {
                 <div className="space-y-1 bg-muted/50 p-2 rounded-lg relative">
                   <p className="font-bold">
                     Show Date:{" "}
-                    {new Date(currentSetlist.showdate).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {new Date(currentSetlist.showdate).toLocaleDateString(
+                      undefined,
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowDetailsOpen(true)}
+                    >
+                      <Info className="h-4 w-4" />
+                    </Button>
                   </p>
                   <p className="text-sm">Venue: {currentSetlist.venue}</p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={() => setShowDetailsOpen(true)}
-                  >
-                    <Info className="h-4 w-4" />
-                  </Button>
                 </div>
 
                 <Button
@@ -432,7 +435,7 @@ export function SetlistGame() {
                     venue: currentSetlist.venue,
                     city: "",
                     state: "",
-                    country: "" // Adding the required country field
+                    country: "", // Adding the required country field
                   }}
                   isOpen={showDetailsOpen}
                   onClose={() => setShowDetailsOpen(false)}
