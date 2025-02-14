@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface GameFormValues {
   year: string;
-  tour: "summer" | "fall" | "winter" | "spring";
+  tour: "summer" | "fall" | "winter" | "spring" | "";
 }
 
 interface ShowData {
@@ -53,14 +53,14 @@ export function SetlistGame() {
     totalScore: number;
   } | null>(null);
 
-  const years = Array.from({ length: 2025 - 1988 + 1 }, (_, i) => 2025 - i).map(
+  const years = Array.from({ length: 2025 - 1984 + 1 }, (_, i) => 2025 - i).map(
     String,
   );
 
   const form = useForm<GameFormValues>({
     defaultValues: {
       year: "",
-      tour: "summer",
+      tour: "",
     },
   });
 
@@ -150,7 +150,10 @@ export function SetlistGame() {
   }, [gameState]);
 
   const onSubmit = (values: GameFormValues) => {
-    if (!currentSetlist) return;
+    if (!currentSetlist || !values.year || !values.tour) {
+      setError("Please select both a year and a tour before submitting");
+      return;
+    }
 
     const actualYear = new Date(currentSetlist.showdate).getFullYear();
     const yearDiff = Math.abs(parseInt(values.year) - actualYear);
@@ -322,7 +325,7 @@ export function SetlistGame() {
                             defaultValue={field.value}
                           >
                             <SelectTrigger className="h-12">
-                              <SelectValue placeholder="Select tour" />
+                              <SelectValue placeholder="Choose one" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="summer">Summer</SelectItem>
