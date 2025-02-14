@@ -1,7 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ExternalLink } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 // Custom donut shop marker icon
@@ -24,7 +23,6 @@ interface Shop {
     longitude: number;
   };
   image_url?: string;
-  url: string;
 }
 
 interface MapControllerProps {
@@ -114,15 +112,7 @@ export function DonutShopMap({
             <Popup>
               <div className="p-1">
                 <div className="space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-bold">{shop.name}</h3>
-                    <button
-                      onClick={() => onShopClick?.(shop)}
-                      className="p-1.5 rounded-full bg-white/90 hover:bg-white transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4 text-gray-700" />
-                    </button>
-                  </div>
+                  <h3 className="text-xl font-bold">{shop.name}</h3>
                   <p className="text-sm text-gray-600">{shop.address}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">

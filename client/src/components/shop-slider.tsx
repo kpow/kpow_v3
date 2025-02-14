@@ -15,7 +15,6 @@ interface Shop {
     longitude: number;
   };
   image_url?: string;
-  url: string;
 }
 
 interface ShopSliderProps {
