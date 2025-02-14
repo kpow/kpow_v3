@@ -4,6 +4,11 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Form,
   FormField,
   FormItem,
@@ -43,6 +48,7 @@ export function SetlistGame() {
   const [error, setError] = useState<string | null>(null);
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [cumulativeScore, setCumulativeScore] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [lastGuess, setLastGuess] = useState<{
     guessedYear: string;
     actualYear: string;
@@ -107,6 +113,7 @@ export function SetlistGame() {
       });
       setGameState("viewing");
       setTimer(10);
+      setIsModalOpen(true);
     } catch (err) {
       console.error("Game error:", err);
       setError(err instanceof Error ? err.message : "Failed to start game");
@@ -135,10 +142,10 @@ export function SetlistGame() {
         setTimer((prev) => {
           if (prev <= 1) {
             if (gameState === "viewing") {
+              setIsModalOpen(false);
               setGameState("guessing");
               return 15;
             } else {
-              // If no guess was made (lastGuess is null), go back to idle state
               if (!lastGuess) {
                 setError("Time's up! You didn't make a guess.");
                 setGameState("idle");
@@ -246,28 +253,32 @@ export function SetlistGame() {
               </motion.div>
             )}
 
-            {gameState === "loading" && (
-              <div className="space-y-4">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-24 w-full" />
-              </div>
-            )}
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                <DialogTitle className="text-center text-3xl font-bold">
+                  Study the Setlist! {timer}s
+                </DialogTitle>
+                {gameState === "loading" && (
+                  <div className="space-y-4">
+                    <Skeleton className="h-8 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                  </div>
+                )}
 
-            {gameState === "viewing" && currentSetlist && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
-              >
-                <div className="text-center text-3xl font-bold m-4">
-                  Time remaining: {timer}s
-                </div>
-                <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 rounded-lg">
-                  {currentSetlist.setlistdata}
-                </div>
-              </motion.div>
-            )}
+                {gameState === "viewing" && currentSetlist && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="space-y-4"
+                  >
+                    <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 rounded-lg">
+                      {currentSetlist.setlistdata}
+                    </div>
+                  </motion.div>
+                )}
+              </DialogContent>
+            </Dialog>
 
             {gameState === "guessing" && (
               <motion.div
@@ -417,15 +428,9 @@ export function SetlistGame() {
         <div className="justify-center flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-sm p-1 pl-4 m-0 mt-8">
           <div className="flex justify-between items-center mt-1 mb-1">
             <div className="flex gap-4 items-center">
-              <div className="text-sm">
-                Games: {gamesPlayed}
-              </div>
-              <div className="text-sm">
-                High Score: {highScore}
-              </div>
-              <div className="text-sm">
-                Total Score: {cumulativeScore}
-              </div>
+              <div className="text-sm">Games: {gamesPlayed}</div>
+              <div className="text-sm">High Score: {highScore}</div>
+              <div className="text-sm">Total Score: {cumulativeScore}</div>
               {gameState !== "idle" && (
                 <div className="text-sm font-bold">Current: {score}</div>
               )}
