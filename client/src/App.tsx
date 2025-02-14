@@ -21,6 +21,7 @@ import SetlistGame from "@/pages/setlist-game";
 function Router() {
   return (
     <Layout>
+      <SEO />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
