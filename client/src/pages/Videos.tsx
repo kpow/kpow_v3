@@ -4,10 +4,11 @@ import { useRoute, useLocation } from "wouter";
 import axios from "axios";
 import Masonry from "react-masonry-css";
 import { VideoCard } from "../components/VideoCard";
-import { VideoModal } from "../components/VideoModal";
+import { VideoModal } from "@/components/VideoModal";
 import { useState } from "react";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
+import { SEO } from "@/components/SEO";
 
 const ITEMS_PER_PAGE = 9;
 const PLAYLIST_ID = "PLLnMxi7_aEL7eyC1HiZ2d1d4ce5irHaTQ";
@@ -64,66 +65,90 @@ export default function Videos() {
     setLocation(newPage === 1 ? "/videos" : `/videos/page/${newPage}`);
   };
 
+  const getPageTitle = () => {
+    return `KPOW YouTube Videos ${page > 1 ? `- Page ${page}` : ''}`;
+  };
+
+  const getPageDescription = () => {
+    if (data?.items?.length > 0) {
+      const firstVideoTitles = data.items.slice(0, 3).map(video => video.title).join(', ');
+      return `Watch the latest videos including: ${firstVideoTitles}. Page ${page} of my video collection.`;
+    }
+    return "Explore my collection of YouTube videos featuring music, tech, and more.";
+  };
+
+  const getPreviewImage = () => {
+    return data?.items?.[0]?.thumbnail ?? "/video-placeholder.png";
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
-        <PageTitle size="lg">youtubez live</PageTitle>
+    <>
+      <SEO
+        title={getPageTitle()}
+        description={getPageDescription()}
+        image={getPreviewImage()}
+        type="video.other"
+      />
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
+          <PageTitle size="lg">youtubez live</PageTitle>
+          <CustomPagination
+            currentPage={page}
+            totalPages={data?.hasNextPage ? page + 1 : page}
+            baseUrl="/videos"
+            onPageChange={() => {}}
+          />
+        </div>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+              <div key={i} className="animate-pulse h-[300px]">
+                <div className="bg-gray-200 h-[100px] w-full aspect-video rounded-lg mb-10" />
+                <div className="h-4 bg-gray-200 h-[100px] rounded w-full mb-2" />
+                <div className="h-4 bg-gray-200 h-[100px] rounded w-full" />
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-8">
+            <p className="text-red-500">
+              Error loading videos. Please try again later.
+            </p>
+          </div>
+        ) : (
+          <>
+            <Masonry
+              breakpointCols={breakpointCols}
+              className="flex -ml-4 w-auto"
+              columnClassName="pl-4 bg-clip-padding"
+            >
+              {data?.items.map((video: Video) => (
+                <div key={video.id} className="mb-4">
+                  <VideoCard
+                    {...video}
+                    onPlay={() => setSelectedVideo(video.id)}
+                  />
+                </div>
+              ))}
+            </Masonry>
+          </>
+        )}
+
         <CustomPagination
           currentPage={page}
           totalPages={data?.hasNextPage ? page + 1 : page}
           baseUrl="/videos"
           onPageChange={() => {}}
+          className="mt-4"
+        />
+
+        <VideoModal
+          videoId={selectedVideo || ""}
+          isOpen={!!selectedVideo}
+          onClose={() => setSelectedVideo(null)}
         />
       </div>
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-            <div key={i} className="animate-pulse h-[300px]">
-              <div className="bg-gray-200 h-[100px] w-full aspect-video rounded-lg mb-10" />
-              <div className="h-4 bg-gray-200 h-[100px] rounded w-full mb-2" />
-              <div className="h-4 bg-gray-200 h-[100px] rounded w-full" />
-            </div>
-          ))}
-        </div>
-      ) : error ? (
-        <div className="text-center py-8">
-          <p className="text-red-500">
-            Error loading videos. Please try again later.
-          </p>
-        </div>
-      ) : (
-        <>
-          <Masonry
-            breakpointCols={breakpointCols}
-            className="flex -ml-4 w-auto"
-            columnClassName="pl-4 bg-clip-padding"
-          >
-            {data?.items.map((video: Video) => (
-              <div key={video.id} className="mb-4">
-                <VideoCard
-                  {...video}
-                  onPlay={() => setSelectedVideo(video.id)}
-                />
-              </div>
-            ))}
-          </Masonry>
-        </>
-      )}
-
-      <CustomPagination
-        currentPage={page}
-        totalPages={data?.hasNextPage ? page + 1 : page}
-        baseUrl="/videos"
-        onPageChange={() => {}}
-        className="mt-4"
-      />
-
-      <VideoModal
-        videoId={selectedVideo || ""}
-        isOpen={!!selectedVideo}
-        onClose={() => setSelectedVideo(null)}
-      />
-    </div>
+    </>
   );
 }

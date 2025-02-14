@@ -8,6 +8,7 @@ import { StarredArticle } from "@/lib/hooks/use-starred-articles";
 import { useToast } from "@/hooks/use-toast";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
+import { SEO } from "@/components/SEO";
 
 interface PaginationData {
   current_page: number;
@@ -83,6 +84,11 @@ export default function StarredArticles({
       excerpt: article.summary ?? "No excerpt available",
     })) ?? [];
 
+  // Get the first article's image for the SEO preview, if available
+  const previewImage = articles[0]?.imageSrc ?? "/placeholder-star.png";
+  const pageTitle = `Star Feed ${currentPage > 1 ? `- Page ${currentPage}` : ''}`;
+  const pageDescription = `Curated collection of starred articles. ${articles.slice(0, 3).map(a => a.title).join(', ')}`;
+
   function PaginationLoader() {
     return (
       <>
@@ -135,37 +141,45 @@ export default function StarredArticles({
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center flex-col sm:flex-row">
-        <PageTitle size="lg" alignment="left">
-          star feed
-        </PageTitle>
+    <>
+      <SEO 
+        title={pageTitle}
+        description={pageDescription}
+        image={previewImage}
+        type="article"
+      />
+      <div className="container mx-auto p-4">
+        <div className="flex justify-between items-center flex-col sm:flex-row">
+          <PageTitle size="lg" alignment="left">
+            star feed
+          </PageTitle>
+          <CustomPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            baseUrl="/starred-articles"
+            onPageChange={handlePageChange}
+            className="mb-6"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {articles.map((article) => (
+            <ContentSection
+              key={article.url}
+              {...article}
+              excerpt={article.excerpt}
+            />
+          ))}
+        </div>
+
         <CustomPagination
           currentPage={currentPage}
           totalPages={totalPages}
           baseUrl="/starred-articles"
           onPageChange={handlePageChange}
-          className="mb-6"
+          className="mt-6"
         />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {articles.map((article) => (
-          <ContentSection
-            key={article.url}
-            {...article}
-            excerpt={article.excerpt}
-          />
-        ))}
-      </div>
-
-      <CustomPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        baseUrl="/starred-articles"
-        onPageChange={handlePageChange}
-        className="mt-6"
-      />
-    </div>
+    </>
   );
 }

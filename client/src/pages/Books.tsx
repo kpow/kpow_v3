@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { BookCard } from "@/components/BookCard";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
+import { SEO } from "@/components/SEO";
 
 interface Book {
   book: {
@@ -84,6 +85,26 @@ export default function Books({ params }: { params?: { page?: string } }) {
     gcTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
+  const getPageTitle = () => {
+    return `KPOW Book Collection ${currentPage > 1 ? `- Page ${currentPage}` : ''}`;
+  };
+
+  const getPageDescription = () => {
+    if (data?.GoodreadsResponse?.reviews?.[0]?.review) {
+      const recentBooks = data.GoodreadsResponse.reviews[0].review
+        .slice(0, 3)
+        .map(review => review.book.title[0])
+        .join(', ');
+      return `Currently reading and recently finished books including: ${recentBooks}. Page ${currentPage} of my book collection.`;
+    }
+    return "Explore my reading list and book recommendations. Updated regularly with new discoveries and favorite reads.";
+  };
+
+  const getPreviewImage = () => {
+    const firstBook = data?.GoodreadsResponse?.reviews?.[0]?.review?.[0]?.book;
+    return firstBook?.image_url?.[0] ?? "/book-placeholder.png";
+  };
+
   if (error) {
     return (
       <div className="container mx-auto p-4">
@@ -161,32 +182,40 @@ export default function Books({ params }: { params?: { page?: string } }) {
   const totalBooks = pagination?.total ?? 0;
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center flex-col sm:flex-row">
-        <PageTitle size="lg" alignment="left">
-          book feed
-        </PageTitle>
+    <>
+      <SEO 
+        title={getPageTitle()}
+        description={getPageDescription()}
+        image={getPreviewImage()}
+        type="books.reads"
+      />
+      <div className="container mx-auto p-4">
+        <div className="flex justify-between items-center flex-col sm:flex-row">
+          <PageTitle size="lg" alignment="left">
+            book feed
+          </PageTitle>
+          <CustomPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            baseUrl="/books"
+            onPageChange={() => {}}
+            className="mb-3"
+          />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
+          {books.map((review: Book, index: number) => (
+            <BookCard key={`${currentPage}-${index}`} review={review} />
+          ))}
+        </div>
+
         <CustomPagination
           currentPage={currentPage}
           totalPages={totalPages}
           baseUrl="/books"
           onPageChange={() => {}}
-          className="mb-3"
         />
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
-        {books.map((review: Book, index: number) => (
-          <BookCard key={`${currentPage}-${index}`} review={review} />
-        ))}
-      </div>
-
-      <CustomPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        baseUrl="/books"
-        onPageChange={() => {}}
-      />
-    </div>
+    </>
   );
 }

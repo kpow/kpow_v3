@@ -16,6 +16,7 @@ import { VenueShowsModal } from "@/components/venue-shows-modal";
 import { SongStats } from "@/components/song-stats";
 import { PageTitle } from "@/components/ui/page-title";
 import { VenueMap } from "@/components/venue-map";
+import { SEO } from "@/components/SEO";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -66,160 +67,179 @@ export default function ShowStats() {
     ));
   };
 
-  return (
-    <div className="container mx-auto p-2">
-      <PageTitle size="lg" className="mb-8">phashboard</PageTitle>
+  const getPageTitle = () => {
+    return "Phish Show Statistics Dashboard | Phashboard";
+  };
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="text-lg font-slackey mb-4">venues</h2>
-            <div className="space-y-3">
-              {venuesData?.venues.map((venue) => (
-                <div
-                  key={venue.venue}
-                  className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-                  onClick={() => {
-                    setSelectedVenue(venue.venue);
-                    setIsVenueModalOpen(true);
-                  }}
-                >
-                  <span className="font-medium">{venue.venue}</span>
-                  <span className="text-muted-foreground">
-                    {venue.count} shows
-                  </span>
-                </div>
-              ))}
-            </div>
-            {venuesData && venuesData.total > VENUES_PER_PAGE && (
-              <div className="mt-4 flex justify-between items-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVenuesPage((p) => Math.max(1, p - 1))}
-                  disabled={venuesPage === 1 || venuesLoading}
-                  className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                >
-                  Previous
-                </Button>
-                <span className="text-sm">Page {venuesPage}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                  onClick={() => setVenuesPage((p) => p + 1)}
-                  disabled={
-                    venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) ||
-                    venuesLoading
-                  }
-                >
-                  Next
-                </Button>
+  const getPageDescription = () => {
+    const showCount = stats?.totalShows || 0;
+    const venueCount = stats?.uniqueVenues || 0;
+    const songCount = setlistStats?.uniqueSongs || 0;
+    return `Track ${showCount} Phish shows across ${venueCount} venues and ${songCount} unique songs. Interactive venue mapping, setlist analysis, and show statistics.`;
+  };
+
+  return (
+    <>
+      <SEO 
+        title={getPageTitle()}
+        description={getPageDescription()}
+        image="/phash-stats.jpg"
+        type="website"
+      />
+      <div className="container mx-auto p-2">
+        <PageTitle size="lg" className="mb-8">phashboard</PageTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="text-lg font-slackey mb-4">venues</h2>
+              <div className="space-y-3">
+                {venuesData?.venues.map((venue) => (
+                  <div
+                    key={venue.venue}
+                    className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
+                    onClick={() => {
+                      setSelectedVenue(venue.venue);
+                      setIsVenueModalOpen(true);
+                    }}
+                  >
+                    <span className="font-medium">{venue.venue}</span>
+                    <span className="text-muted-foreground">
+                      {venue.count} shows
+                    </span>
+                  </div>
+                ))}
               </div>
-            )}
+              {venuesData && venuesData.total > VENUES_PER_PAGE && (
+                <div className="mt-4 flex justify-between items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setVenuesPage((p) => Math.max(1, p - 1))}
+                    disabled={venuesPage === 1 || venuesLoading}
+                    className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm">Page {venuesPage}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                    onClick={() => setVenuesPage((p) => p + 1)}
+                    disabled={
+                      venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) ||
+                      venuesLoading
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="space-y-4">
+            <OnThisDayShows />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="md:col-span-2">
+            <Card className="h-full">
+              <CardContent className="pt-6">
+                <h2 className="text-2xl font-slackey mb-6">venue map</h2>
+                <VenueMap />
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-4">
+            <Card>
+              <CardContent className="pt-6">
+                <h2 className="text-lg font-slackey mb-2">total shows</h2>
+                <div className="text-4xl font-bold">
+                  {statsLoading ? (
+                    <Skeleton className="h-10 w-20" />
+                  ) : (
+                    stats?.totalShows || 0
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <h2 className="text-lg font-slackey mb-2">total venues</h2>
+                <div className="text-4xl font-bold">
+                  {statsLoading ? (
+                    <Skeleton className="h-10 w-20" />
+                  ) : (
+                    stats?.uniqueVenues || 0
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <h2 className="text-lg font-slackey mb-2">total songs</h2>
+                <div className="text-4xl font-bold">
+                  {setlistStatsLoading ? (
+                    <Skeleton className="h-10 w-20" />
+                  ) : (
+                    setlistStats?.uniqueSongs || 0
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <Card className="mb-8">
+          <CardContent className="pt-6 p-4">
+            <h2 className="text-2xl font-slackey mb-6">shows</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {renderShowsContent()}
+            </div>
+            <div className="mt-6 flex justify-between items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowsPage((p) => Math.max(1, p - 1))}
+                disabled={showsPage === 1 || showsLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+              >
+                Previous
+              </Button>
+              <span className="text-sm">Page {showsPage}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                onClick={() => setShowsPage((p) => p + 1)}
+                disabled={
+                  showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
+                  showsLoading
+                }
+              >
+                Next
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          <OnThisDayShows />
-        </div>
+        <SongStats />
+
+        <VenueShowsModal
+          isOpen={isVenueModalOpen}
+          onClose={() => {
+            setIsVenueModalOpen(false);
+            setSelectedVenue(null);
+          }}
+          venue={selectedVenue || ""}
+          shows={venueShows || []}
+        />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        <div className="md:col-span-2">
-          <Card className="h-full">
-            <CardContent className="pt-6">
-              <h2 className="text-2xl font-slackey mb-6">venue map</h2>
-              <VenueMap />
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">total shows</h2>
-              <div className="text-4xl font-bold">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-20" />
-                ) : (
-                  stats?.totalShows || 0
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">total venues</h2>
-              <div className="text-4xl font-bold">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-20" />
-                ) : (
-                  stats?.uniqueVenues || 0
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-2">total songs</h2>
-              <div className="text-4xl font-bold">
-                {setlistStatsLoading ? (
-                  <Skeleton className="h-10 w-20" />
-                ) : (
-                  setlistStats?.uniqueSongs || 0
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      <Card className="mb-8">
-        <CardContent className="pt-6 p-4">
-          <h2 className="text-2xl font-slackey mb-6">shows</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {renderShowsContent()}
-          </div>
-          <div className="mt-6 flex justify-between items-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowsPage((p) => Math.max(1, p - 1))}
-              disabled={showsPage === 1 || showsLoading}
-              className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-            >
-              Previous
-            </Button>
-            <span className="text-sm">Page {showsPage}</span>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-              onClick={() => setShowsPage((p) => p + 1)}
-              disabled={
-                showsPage * SHOWS_PER_PAGE >= (showsData?.total || 0) ||
-                showsLoading
-              }
-            >
-              Next
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <SongStats />
-
-      <VenueShowsModal
-        isOpen={isVenueModalOpen}
-        onClose={() => {
-          setIsVenueModalOpen(false);
-          setSelectedVenue(null);
-        }}
-        venue={selectedVenue || ""}
-        shows={venueShows || []}
-      />
-    </div>
+    </>
   );
 }

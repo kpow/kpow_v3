@@ -7,6 +7,7 @@ import { InstagramModal } from "@/components/InstagramModal";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { useToast } from "@/hooks/use-toast";
+import { SEO } from "@/components/SEO";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -96,70 +97,102 @@ export default function Instagram() {
     setModalIsOpen(false);
   };
 
+  const getPageTitle = () => {
+    return `KPOW Instagram Feed ${page > 1 ? `- Page ${page}` : ''}`;
+  };
+
+  const getPageDescription = () => {
+    if (data?.posts?.length > 0) {
+      const recentCaptions = data.posts
+        .slice(0, 3)
+        .map(post => post.caption?.slice(0, 50))
+        .filter(Boolean)
+        .join(' | ');
+      return `Latest Instagram posts: ${recentCaptions}...`;
+    }
+    return "Check out my latest Instagram photos and videos featuring music, events, and more.";
+  };
+
+  const getPreviewImage = () => {
+    if (data?.posts?.length > 0) {
+      const firstPost = data.posts[0];
+      return firstPost.media_type === "VIDEO" ? firstPost.thumbnail_url : firstPost.media_url;
+    }
+    return "/instagram-placeholder.png";
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
-        <PageTitle size="lg">instagram feed</PageTitle>
+    <>
+      <SEO
+        title={getPageTitle()}
+        description={getPageDescription()}
+        image={getPreviewImage()}
+        type="website"
+      />
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
+          <PageTitle size="lg">instagram feed</PageTitle>
+          <CustomPagination
+            currentPage={page}
+            totalPages={data?.pagination?.total_pages ?? 1}
+            baseUrl="/instagram"
+            onPageChange={handlePageChange}
+          />
+        </div>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-gray-200 aspect-square rounded-lg" />
+                <div className="space-y-2 mt-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-8">
+            <p className="text-red-500">
+              Error loading Instagram feed. Please try again later.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {data?.posts.map((post, index) => (
+                <div key={post.id} className="aspect-square">
+                  <InstagramCard
+                    {...post}
+                    onClick={() => handleOpenModal(index)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {modalIsOpen && data.posts && selectedPostIndex !== null && (
+              <InstagramModal
+                posts={[data.posts[selectedPostIndex]]}
+                initialPostIndex={0}
+                isOpen={modalIsOpen}
+                onClose={() => {
+                  setModalIsOpen(false);
+                  setSelectedPostIndex(null);
+                }}
+              />
+            )}
+          </>
+        )}
+
         <CustomPagination
           currentPage={page}
           totalPages={data?.pagination?.total_pages ?? 1}
           baseUrl="/instagram"
           onPageChange={handlePageChange}
+          className="mt-8"
         />
       </div>
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="bg-gray-200 aspect-square rounded-lg" />
-              <div className="space-y-2 mt-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : error ? (
-        <div className="text-center py-8">
-          <p className="text-red-500">
-            Error loading Instagram feed. Please try again later.
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data?.posts.map((post, index) => (
-              <div key={post.id} className="aspect-square">
-                <InstagramCard
-                  {...post}
-                  onClick={() => handleOpenModal(index)}
-                />
-              </div>
-            ))}
-          </div>
-
-          {modalIsOpen && data.posts && selectedPostIndex !== null && (
-            <InstagramModal
-              posts={[data.posts[selectedPostIndex]]}
-              initialPostIndex={0}
-              isOpen={modalIsOpen}
-              onClose={() => {
-                setModalIsOpen(false);
-                setSelectedPostIndex(null);
-              }}
-            />
-          )}
-        </>
-      )}
-
-      <CustomPagination
-        currentPage={page}
-        totalPages={data?.pagination?.total_pages ?? 1}
-        baseUrl="/instagram"
-        onPageChange={handlePageChange}
-        className="mt-8"
-      />
-    </div>
+    </>
   );
 }

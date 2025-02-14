@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cities } from "@/data/cities";
 import { Shuffle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SEO } from "@/components/SEO";
 
 interface Shop {
   id: string;
@@ -95,11 +96,10 @@ export default function DonutShops() {
   });
 
   useEffect(() => {
-    // Only trigger search when refetch is available
     if (refetch) {
       refetch();
     }
-  }, [refetch]); // Dependency on refetch ensures it's available
+  }, [refetch]);
 
   const shops = allShops.filter((shop) => shop.rating >= minRating);
 
@@ -123,8 +123,6 @@ export default function DonutShops() {
         city: newCity.city,
         state: newCity.state,
       });
-      // Add a small delay to ensure React state updates complete
-      // before triggering the search - this prevents race conditions
       setTimeout(() => {
         handleSearch();
       }, 100);
@@ -169,163 +167,197 @@ export default function DonutShops() {
     setMinRating(value[0]);
   };
 
-  return (
-    <div className="container mx-auto max-w-[1800px]">
-      <div className="flex justify-between items-center mb-4">
-        <PageTitle size="lg">
-          donut tour{" "}
-          {searchState.city && searchState.state
-            ? `- ${searchState.city}, ${searchState.state}`
-            : ""}
-        </PageTitle>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRandomCity}
-          className="ml-4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-        >
-          <Shuffle className="h-4 w-4 mr-2" />
-          Random City
-        </Button>
-      </div>
+  // Get SEO content based on current state
+  const getPageTitle = () => {
+    if (searchType === "city" && searchState.city && searchState.state) {
+      return `Donut Shops in ${searchState.city}, ${searchState.state}`;
+    }
+    if (searchType === "zipcode" && searchState.zipCode) {
+      return `Donut Shops near ${searchState.zipCode}`;
+    }
+    return "Find Local Donut Shops";
+  };
 
-      <div className="mb-4">
-        <div className="h-full w-full overflow-hidden">
-          {shops.length > 0 ? (
-            <ShopSlider shops={shops} onShopClick={handleShopClick} />
-          ) : (
-            <div className="w-full">
-              <Skeleton className="h-[180px] w-full animate-pulse" />
-            </div>
-          )}
+  const getPageDescription = () => {
+    const shopCount = shops.length;
+    const locationText = searchState.city && searchState.state 
+      ? `${searchState.city}, ${searchState.state}`
+      : searchState.zipCode 
+      ? `ZIP code ${searchState.zipCode}`
+      : "your area";
+
+    return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
+  };
+
+  const getPreviewImage = () => {
+    return shops[0]?.image_url ?? "/donut-placeholder.png";
+  };
+
+  return (
+    <>
+      <SEO
+        title={getPageTitle()}
+        description={getPageDescription()}
+        image={getPreviewImage()}
+        type="website"
+      />
+      <div className="container mx-auto max-w-[1800px]">
+        <div className="flex justify-between items-center mb-4">
+          <PageTitle size="lg">
+            donut tour{" "}
+            {searchState.city && searchState.state
+              ? `- ${searchState.city}, ${searchState.state}`
+              : ""}
+          </PageTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRandomCity}
+            className="ml-4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+          >
+            <Shuffle className="h-4 w-4 mr-2" />
+            Random City
+          </Button>
+        </div>
+
+        <div className="mb-4">
+          <div className="h-full w-full overflow-hidden">
+            {shops.length > 0 ? (
+              <ShopSlider shops={shops} onShopClick={handleShopClick} />
+            ) : (
+              <div className="w-full">
+                <Skeleton className="h-[180px] w-full animate-pulse" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
+          <Card className="lg:col-span-2">
+            <CardContent className="p-0 m-0">
+              <div className="h-[500px] w-full rounded-lg">
+                <DonutShopMap
+                  shops={shops}
+                  onShopClick={handleShopClick}
+                  shouldFitBounds={shouldFitBounds}
+                  selectedShopId={selectedShopId}
+                />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="lg:col-span-1">
+            <CardContent className="pt-4">
+              <div className="mb-4 flex flex-col justify-center">
+                <Label className="mb-2">Minimum Rating</Label>
+                <div className="flex items-center gap-4">
+                  <Slider
+                    value={[minRating]}
+                    onValueChange={handleRatingChange}
+                    max={5}
+                    step={0.1}
+                    className="flex-1"
+                  />
+                  <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
+                </div>
+              </div>
+              <Tabs
+                defaultValue="city"
+                onValueChange={(value) => {
+                  setSearchType(value);
+                  setSearchState({});
+                }}
+              >
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="city">City Search</TabsTrigger>
+                  <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
+                  <TabsTrigger value="coords">Coordinates</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="city" className="space-y-4">
+                  <div className="grid gap-4">
+                    <div className="grid gap-2">
+                      <Label>City Name</Label>
+                      <Input
+                        placeholder="Enter city name"
+                        value={searchState.city || ""}
+                        onChange={(e) =>
+                          handleInputChange(e.target.value, "city")
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>State</Label>
+                      <Input
+                        placeholder="Enter state (e.g., CA)"
+                        value={searchState.state || ""}
+                        onChange={(e) =>
+                          handleInputChange(e.target.value, "state")
+                        }
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="zipcode" className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label>Zip Code</Label>
+                    <Input
+                      placeholder="Enter zip code"
+                      value={searchState.zipCode || ""}
+                      onChange={(e) =>
+                        handleInputChange(e.target.value, "zipCode")
+                      }
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="coords" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label>Latitude</Label>
+                      <Input
+                        type="number"
+                        placeholder="Enter latitude"
+                        value={searchState.latitude || ""}
+                        onChange={(e) =>
+                          handleInputChange(
+                            parseFloat(e.target.value),
+                            "latitude",
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Longitude</Label>
+                      <Input
+                        type="number"
+                        placeholder="Enter longitude"
+                        value={searchState.longitude || ""}
+                        onChange={(e) =>
+                          handleInputChange(
+                            parseFloat(e.target.value),
+                            "longitude",
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <div className="mt-6">
+                  <Button
+                    onClick={handleSearch}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Searching..." : "Search Donut Shops"}
+                  </Button>
+                </div>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
-        <Card className="lg:col-span-2">
-          <CardContent className="p-0 m-0">
-            <div className="h-[500px] w-full rounded-lg">
-              <DonutShopMap
-                shops={shops}
-                onShopClick={handleShopClick}
-                shouldFitBounds={shouldFitBounds}
-                selectedShopId={selectedShopId}
-              />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-1">
-          <CardContent className="pt-4">
-            <div className="mb-4 flex flex-col justify-center">
-              <Label className="mb-2">Minimum Rating</Label>
-              <div className="flex items-center gap-4">
-                <Slider
-                  value={[minRating]}
-                  onValueChange={handleRatingChange}
-                  max={5}
-                  step={0.1}
-                  className="flex-1"
-                />
-                <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
-              </div>
-            </div>
-            <Tabs
-              defaultValue="city"
-              onValueChange={(value) => {
-                setSearchType(value);
-                setSearchState({});
-              }}
-            >
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="city">City Search</TabsTrigger>
-                <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
-                <TabsTrigger value="coords">Coordinates</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="city" className="space-y-4">
-                <div className="grid gap-4">
-                  <div className="grid gap-2">
-                    <Label>City Name</Label>
-                    <Input
-                      placeholder="Enter city name"
-                      value={searchState.city || ""}
-                      onChange={(e) =>
-                        handleInputChange(e.target.value, "city")
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>State</Label>
-                    <Input
-                      placeholder="Enter state (e.g., CA)"
-                      value={searchState.state || ""}
-                      onChange={(e) =>
-                        handleInputChange(e.target.value, "state")
-                      }
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="zipcode" className="space-y-4">
-                <div className="grid gap-2">
-                  <Label>Zip Code</Label>
-                  <Input
-                    placeholder="Enter zip code"
-                    value={searchState.zipCode || ""}
-                    onChange={(e) =>
-                      handleInputChange(e.target.value, "zipCode")
-                    }
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="coords" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label>Latitude</Label>
-                    <Input
-                      type="number"
-                      placeholder="Enter latitude"
-                      value={searchState.latitude || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          parseFloat(e.target.value),
-                          "latitude",
-                        )
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Longitude</Label>
-                    <Input
-                      type="number"
-                      placeholder="Enter longitude"
-                      value={searchState.longitude || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          parseFloat(e.target.value),
-                          "longitude",
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-
-              <div className="mt-6">
-                <Button
-                  onClick={handleSearch}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Searching..." : "Search Donut Shops"}
-                </Button>
-              </div>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    </>
   );
 }

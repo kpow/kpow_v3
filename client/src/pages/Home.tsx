@@ -13,6 +13,7 @@ import { ShopSlider } from "@/components/shop-slider";
 import { cities } from "@/data/cities";
 import SectionHeader from "@/components/SectionHeader";
 import HorizontalDivider from "@/components/HorizontalDivider";
+import { SEO } from "@/components/SEO";
 
 interface Shop {
   id: string;
@@ -25,7 +26,7 @@ interface Shop {
     longitude: number;
   };
   image_url?: string;
-  url: string;
+  url: string;  // Added this property to fix the type error
 }
 
 export default function Home() {
@@ -124,97 +125,104 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-8 mt-4">
-      {/* main cards and setlist game */}
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-1/2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {mainSections.map((section) => (
-              <ContentSection key={section.title} {...section} />
-            ))}
-          </div>
-        </div>
-        <div className="lg:w-1/2">
-          <SetlistGame />
-        </div>
-      </div>
-      <HorizontalDivider />
-
-      {/* {instagram} */}
-      <div>
-        <SectionHeader title="k-shows" />
-        <InstagramCarousel />
-      </div>
-      <HorizontalDivider />
-
-      {/* {starred} */}
-      <div>
-        <SectionHeader
-          title="star feed"
-          buttonText="more articles"
-          linkHref="starred-articles"
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {isLoadingStarred
-            ? Array.from({ length: useIsMobile() ? 1 : 3 }).map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <Skeleton className="h-48 w-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
-                </div>
-              ))
-            : (useIsMobile() ? starFeed.slice(0, 1) : starFeed).map((star) => (
-                <ContentSection
-                  key={star.title}
-                  {...star}
-                  excerpt={star.excerpt}
-                />
-              ))}
-        </div>
-      </div>
-      <HorizontalDivider />
-
-      {/* {recentPlays} */}
-      <SectionHeader title="Recently Played" />
-      <RecentPlays />
-      <HorizontalDivider />
-      {/* {books} */}
-      <SectionHeader
-        title="book feed"
-        buttonText="more books"
-        linkHref="books"
+    <>
+      <SEO 
+        title="KPOW - Into the Singularity"
+        description="A comprehensive cross-domain media and location analytics platform featuring an interactive Phish setlist guessing game that provides an engaging music trivia experience."
+        image="/phash.jpg"
       />
-      <BookFeed />
-      <HorizontalDivider />
+      <div className="space-y-8 mt-4">
+        {/* main cards and setlist game */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="lg:w-1/2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {mainSections.map((section) => (
+                <ContentSection key={section.title} {...section} />
+              ))}
+            </div>
+          </div>
+          <div className="lg:w-1/2">
+            <SetlistGame />
+          </div>
+        </div>
+        <HorizontalDivider />
 
-      {/* {donuts} */}
-      <div>
+        {/* {instagram} */}
+        <div>
+          <SectionHeader title="k-shows" />
+          <InstagramCarousel />
+        </div>
+        <HorizontalDivider />
+
+        {/* {starred} */}
+        <div>
+          <SectionHeader
+            title="star feed"
+            buttonText="more articles"
+            linkHref="starred-articles"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {isLoadingStarred
+              ? Array.from({ length: useIsMobile() ? 1 : 3 }).map((_, i) => (
+                  <div key={i} className="space-y-4">
+                    <Skeleton className="h-48 w-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  </div>
+                ))
+              : (useIsMobile() ? starFeed.slice(0, 1) : starFeed).map((star) => (
+                  <ContentSection
+                    key={star.title}
+                    {...star}
+                    excerpt={star.excerpt}
+                  />
+                ))}
+          </div>
+        </div>
+        <HorizontalDivider />
+
+        {/* {recentPlays} */}
+        <SectionHeader title="Recently Played" />
+        <RecentPlays />
+        <HorizontalDivider />
+        {/* {books} */}
         <SectionHeader
-          title={`donut tour${shops && shops.length > 0 ? ` - ${currentCity.city}, ${currentCity.state}` : ""}`}
-          buttonText="more donuts"
-          linkHref="donut-shops"
+          title="book feed"
+          buttonText="more books"
+          linkHref="books"
         />
-        {isLoadingShops ? (
-          <div className="w-full">
-            <Skeleton className="h-[200px] w-full" />
-          </div>
-        ) : shops && shops.length > 0 ? (
-          <div className="h-full w-full rounded-lg overflow-hidden">
-            <ShopSlider
-              shops={shops}
-              onShopClick={(shop) => {
-                window.open(shop.url, "_blank");
-              }}
-            />
-          </div>
-        ) : null}
-      </div>
+        <BookFeed />
+        <HorizontalDivider />
 
-      <HorizontalDivider />
-      {/* {gitHubz} */}
-      <GitHubSection />
-    </div>
+        {/* {donuts} */}
+        <div>
+          <SectionHeader
+            title={`donut tour${shops && shops.length > 0 ? ` - ${currentCity.city}, ${currentCity.state}` : ""}`}
+            buttonText="more donuts"
+            linkHref="donut-shops"
+          />
+          {isLoadingShops ? (
+            <div className="w-full">
+              <Skeleton className="h-[200px] w-full" />
+            </div>
+          ) : shops && shops.length > 0 ? (
+            <div className="h-full w-full rounded-lg overflow-hidden">
+              <ShopSlider
+                shops={shops}
+                onShopClick={(shop) => {
+                  window.open(shop.url, "_blank");
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
+
+        <HorizontalDivider />
+        {/* {gitHubz} */}
+        <GitHubSection />
+      </div>
+    </>
   );
 }
