@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -119,9 +119,14 @@ export default function DonutShops() {
       });
       return;
     }
+    if (searchState.city && searchState.state) {
+      setLocation(`/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`);
+    }
     await refetch();
   };
 
+  const [, setLocation] = useLocation();
+  
   const handleRandomCity = () => {
     try {
       const newCity = getRandomCity();
@@ -129,6 +134,7 @@ export default function DonutShops() {
         city: newCity.city,
         state: newCity.state,
       });
+      setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
       setTimeout(() => {
         handleSearch();
       }, 100);
