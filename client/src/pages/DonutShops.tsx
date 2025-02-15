@@ -12,16 +12,22 @@ import { DonutShopMap } from "@/components/donut-shop-map";
 import { ShopSlider } from "@/components/shop-slider";
 import { useToast } from "@/hooks/use-toast";
 import { cities } from "@/data/cities";
-import { Shuffle } from "lucide-react";
+import { Check, ChevronsUpDown, Shuffle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface Shop {
   id: string;
@@ -380,21 +386,47 @@ export default function DonutShops() {
                     </div>
                     <div className="grid gap-2">
                       <Label>State</Label>
-                      <Select
-                        value={searchState.state || ""}
-                        onValueChange={(value) => handleInputChange(value, "state")}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a state" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {states.map((state) => (
-                            <SelectItem key={state.value} value={state.value}>
-                              {state.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className="w-full justify-between"
+                          >
+                            {searchState.state
+                              ? states.find((state) => state.value === searchState.state)?.label
+                              : "Select a state"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                          <Command>
+                            <CommandInput placeholder="Search states..." className="h-9" />
+                            <CommandEmpty>No state found.</CommandEmpty>
+                            <CommandGroup>
+                              {states.map((state) => (
+                                <CommandItem
+                                  key={state.value}
+                                  value={state.value}
+                                  onSelect={(value) => {
+                                    handleInputChange(value, "state");
+                                  }}
+                                >
+                                  {state.label}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      searchState.state === state.value 
+                                        ? "opacity-100" 
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
                 </TabsContent>
