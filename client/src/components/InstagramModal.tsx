@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { Button } from './ui/button';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
-// Types for Instagram media
 interface InstagramMediaChild {
   id: string;
   media_type: 'IMAGE' | 'VIDEO';
@@ -43,7 +43,6 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
   const [currentPostIndex, setCurrentPostIndex] = useState(initialPostIndex);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
-  // Reset state when posts change or component unmounts
   useEffect(() => {
     setCurrentPostIndex(initialPostIndex);
     setCurrentMediaIndex(0);
@@ -112,7 +111,6 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
     );
   };
 
-  // Set modal app element for accessibility
   useEffect(() => {
     Modal.setAppElement('#root');
   }, []);
@@ -134,7 +132,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
             className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/75 text-white"
             onClick={onClose}
           >
-            ✕
+            <X className="h-4 w-4" />
           </Button>
 
           <div className="relative">
@@ -147,7 +145,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
                   className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
                   onClick={handlePreviousPost}
                 >
-                  ←
+                  <ChevronLeft className="h-4 w-4" />
                 </Button>
 
                 <Button
@@ -155,7 +153,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
                   className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white"
                   onClick={handleNextPost}
                 >
-                  →
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </>
             )}
@@ -167,7 +165,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
                   onClick={handlePreviousMedia}
                   className="p-2 bg-black/50 hover:bg-black/75 text-white"
                 >
-                  ←
+                  <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="bg-black/50 text-white px-3 py-1 rounded">
                   {currentMediaIndex + 1} / {currentPost.children.data.length}
@@ -177,7 +175,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
                   onClick={handleNextMedia}
                   className="p-2 bg-black/50 hover:bg-black/75 text-white"
                 >
-                  →
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             )}

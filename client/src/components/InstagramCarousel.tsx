@@ -42,18 +42,16 @@ interface InstagramResponse {
 export function InstagramCarousel() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
-  
+
   const { data, isLoading } = useQuery<InstagramResponse>({
-    queryKey: ["/api/instagram/feed"],
+    queryKey: ["instagram-feed"],
     queryFn: async () => {
       const response = await fetch("/api/instagram/feed");
       if (!response.ok) {
         throw new Error("Failed to fetch Instagram feed");
       }
-      
-      const data = await response.json();
-      return data;
-    },
+      return response.json();
+    }
   });
 
   if (isLoading) {
@@ -72,15 +70,17 @@ export function InstagramCarousel() {
     return null;
   }
 
-  const shuffleArray = (array: any[]) => {
-    for (let i = array.length - 1; i > 0; i--) {
+  const shuffleArray = (array: InstagramMedia[]) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return array;
+    return shuffled;
   };
-  const shuffledPosts = shuffleArray([...data.posts]);
-  
+
+  const shuffledPosts = shuffleArray(data.posts);
+
   const handlePostClick = (post: InstagramMedia) => {
     const postIndex = data.posts.findIndex(p => p.id === post.id);
     if (postIndex !== -1) {

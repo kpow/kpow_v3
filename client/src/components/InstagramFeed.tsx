@@ -77,6 +77,16 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
     return post;
   };
 
+  const handlePreviousPost = () => {
+    setCurrentPostIndex(prev => (prev > 0 ? prev - 1 : posts.length - 1));
+    setCurrentMediaIndex(0);
+  };
+
+  const handleNextPost = () => {
+    setCurrentPostIndex(prev => (prev < posts.length - 1 ? prev + 1 : 0));
+    setCurrentMediaIndex(0);
+  };
+
   const handlePreviousMedia = () => {
     const post = posts[currentPostIndex];
     if (post?.media_type === 'CAROUSEL_ALBUM' && post.children) {
@@ -93,16 +103,6 @@ export const InstagramFeed: React.FC<InstagramFeedProps> = ({
         prev < post.children!.data.length - 1 ? prev + 1 : 0
       );
     }
-  };
-
-  const handlePreviousPost = () => {
-    setCurrentPostIndex(prev => (prev > 0 ? prev - 1 : posts.length - 1));
-    setCurrentMediaIndex(0);
-  };
-
-  const handleNextPost = () => {
-    setCurrentPostIndex(prev => (prev < posts.length - 1 ? prev + 1 : 0));
-    setCurrentMediaIndex(0);
   };
 
   const renderMedia = (media: InstagramMedia | InstagramMediaChild | null, inModal: boolean = false) => {
