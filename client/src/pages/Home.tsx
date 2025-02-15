@@ -57,7 +57,7 @@ export default function Home() {
     },
     enabled: Boolean(currentCity.city && currentCity.state),
     retry: 1,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
   });
 
   const mainSections = [
