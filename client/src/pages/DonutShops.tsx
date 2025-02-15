@@ -105,12 +105,6 @@ export default function DonutShops() {
 
   const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
 
-  useEffect(() => {
-    if (shouldFitBounds) {
-      const timer = setTimeout(() => setShouldFitBounds(false), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldFitBounds]);
 
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
@@ -208,6 +202,13 @@ export default function DonutShops() {
     return shops[0]?.image_url ?? "/donut-placeholder.png";
   };
 
+  useEffect(() => {
+    if (shouldFitBounds) {
+      const timer = setTimeout(() => setShouldFitBounds(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldFitBounds]);
+  
   useEffect(() => {
     if (params) {
       setSearchState({
