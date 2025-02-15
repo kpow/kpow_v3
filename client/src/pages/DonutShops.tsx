@@ -60,7 +60,7 @@ export default function DonutShops() {
   });
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
-  const [shouldFitBounds, setShouldFitBounds] = useState(false);
+  const [shouldFitBounds, setShouldFitBounds] = useState(true); // Set initial value to true
   const { toast } = useToast();
 
   // Update searchState when URL params change
@@ -70,6 +70,7 @@ export default function DonutShops() {
         city: decodeURIComponent(params.city),
         state: decodeURIComponent(params.state)
       });
+      setShouldFitBounds(true); // Update bounds when params change
     }
   }, [params?.city, params?.state]); 
 
@@ -106,7 +107,7 @@ export default function DonutShops() {
       }
 
       const data = await response.json();
-      setShouldFitBounds(true);
+      setShouldFitBounds(true); // Set bounds to fit when new data arrives
       return data;
     },
     enabled: Boolean(
@@ -117,6 +118,14 @@ export default function DonutShops() {
   });
 
   const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
+
+  // Reset bounds after a short delay
+  useEffect(() => {
+    if (shouldFitBounds) {
+      const timer = setTimeout(() => setShouldFitBounds(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldFitBounds]);
 
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
@@ -133,9 +142,7 @@ export default function DonutShops() {
       setLocation(`/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`);
     }
 
-    setShouldFitBounds(true);
     await refetch();
-    setTimeout(() => setShouldFitBounds(false), 100);
   };
 
   const [, setLocation] = useLocation();
@@ -147,6 +154,7 @@ export default function DonutShops() {
         city: newCity.city,
         state: newCity.state,
       });
+      setShouldFitBounds(true); // Ensure bounds are updated for random city
       await setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
       await refetch();
     } catch (error) {

@@ -50,7 +50,7 @@ function MapController({
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds]); // Only depend on shouldFitBounds
+  }, [shouldFitBounds, shops]); // Added shops dependency to ensure bounds update with new data
 
   // Handle selected shop updates
   useEffect(() => {
