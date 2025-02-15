@@ -48,21 +48,12 @@ const getRandomCity = () => {
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
-  
+
   const initialCity = params ? { 
     city: decodeURIComponent(params.city), 
     state: decodeURIComponent(params.state) 
   } : getRandomCity();
 
-  useEffect(() => {
-    if (params) {
-      setSearchState({
-        city: decodeURIComponent(params.city),
-        state: decodeURIComponent(params.state)
-      });
-      refetch();
-    }
-  }, [params]);
   const [searchState, setSearchState] = useState<SearchState>({
     city: initialCity.city,
     state: initialCity.state,
@@ -71,6 +62,16 @@ export default function DonutShops() {
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(false);
   const { toast } = useToast();
+
+  // Update searchState when URL params change
+  useEffect(() => {
+    if (params) {
+      setSearchState({
+        city: decodeURIComponent(params.city),
+        state: decodeURIComponent(params.state)
+      });
+    }
+  }, [params?.city, params?.state]); 
 
   const {
     data: allShops = [],
@@ -108,16 +109,14 @@ export default function DonutShops() {
       setShouldFitBounds(true);
       return data;
     },
-    enabled: false,
+    enabled: Boolean(
+      (searchType === "city" && searchState.city && searchState.state) ||
+      (searchType === "zipcode" && searchState.zipCode) ||
+      (searchType === "coords" && searchState.latitude && searchState.longitude)
+    ),
   });
 
-  useEffect(() => {
-    if (refetch) {
-      refetch();
-    }
-  }, [refetch]);
-
-  const shops = allShops.filter((shop) => shop.rating >= minRating);
+  const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
 
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
@@ -129,9 +128,11 @@ export default function DonutShops() {
       });
       return;
     }
+
     if (searchState.city && searchState.state) {
       setLocation(`/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`);
     }
+
     setShouldFitBounds(true);
     await refetch();
     setTimeout(() => setShouldFitBounds(false), 100);
@@ -189,7 +190,6 @@ export default function DonutShops() {
     setMinRating(value[0]);
   };
 
-  // Get SEO content based on current state
   const getPageTitle = () => {
     if (searchType === "city" && searchState.city && searchState.state) {
       return `Donut Shops in ${searchState.city}, ${searchState.state}`;
