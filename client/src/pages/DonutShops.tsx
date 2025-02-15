@@ -15,6 +15,7 @@ import { cities } from "@/data/cities";
 import { Shuffle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
+import { Select } from "@/components/ui/select";
 
 interface Shop {
   id: string;
@@ -37,6 +38,59 @@ interface SearchState {
   longitude?: number;
 }
 
+const states = [
+  { label: "Alabama", value: "AL" },
+  { label: "Alaska", value: "AK" },
+  { label: "Arizona", value: "AZ" },
+  { label: "Arkansas", value: "AR" },
+  { label: "California", value: "CA" },
+  { label: "Colorado", value: "CO" },
+  { label: "Connecticut", value: "CT" },
+  { label: "Delaware", value: "DE" },
+  { label: "Florida", value: "FL" },
+  { label: "Georgia", value: "GA" },
+  { label: "Hawaii", value: "HI" },
+  { label: "Idaho", value: "ID" },
+  { label: "Illinois", value: "IL" },
+  { label: "Indiana", value: "IN" },
+  { label: "Iowa", value: "IA" },
+  { label: "Kansas", value: "KS" },
+  { label: "Kentucky", value: "KY" },
+  { label: "Louisiana", value: "LA" },
+  { label: "Maine", value: "ME" },
+  { label: "Maryland", value: "MD" },
+  { label: "Massachusetts", value: "MA" },
+  { label: "Michigan", value: "MI" },
+  { label: "Minnesota", value: "MN" },
+  { label: "Mississippi", value: "MS" },
+  { label: "Missouri", value: "MO" },
+  { label: "Montana", value: "MT" },
+  { label: "Nebraska", value: "NE" },
+  { label: "Nevada", value: "NV" },
+  { label: "New Hampshire", value: "NH" },
+  { label: "New Jersey", value: "NJ" },
+  { label: "New Mexico", value: "NM" },
+  { label: "New York", value: "NY" },
+  { label: "North Carolina", value: "NC" },
+  { label: "North Dakota", value: "ND" },
+  { label: "Ohio", value: "OH" },
+  { label: "Oklahoma", value: "OK" },
+  { label: "Oregon", value: "OR" },
+  { label: "Pennsylvania", value: "PA" },
+  { label: "Rhode Island", value: "RI" },
+  { label: "South Carolina", value: "SC" },
+  { label: "South Dakota", value: "SD" },
+  { label: "Tennessee", value: "TN" },
+  { label: "Texas", value: "TX" },
+  { label: "Utah", value: "UT" },
+  { label: "Vermont", value: "VT" },
+  { label: "Virginia", value: "VA" },
+  { label: "Washington", value: "WA" },
+  { label: "West Virginia", value: "WV" },
+  { label: "Wisconsin", value: "WI" },
+  { label: "Wyoming", value: "WY" },
+];
+
 const getRandomCity = () => {
   const randomIndex = Math.floor(Math.random() * cities.length);
   return {
@@ -49,10 +103,12 @@ export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
 
-  const initialCity = params ? { 
-    city: decodeURIComponent(params.city), 
-    state: decodeURIComponent(params.state) 
-  } : getRandomCity();
+  const initialCity = params
+    ? {
+        city: decodeURIComponent(params.city),
+        state: decodeURIComponent(params.state),
+      }
+    : getRandomCity();
 
   const [searchState, setSearchState] = useState<SearchState>({
     city: initialCity.city,
@@ -60,7 +116,7 @@ export default function DonutShops() {
   });
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
-  const [shouldFitBounds, setShouldFitBounds] = useState(true); 
+  const [shouldFitBounds, setShouldFitBounds] = useState(true);
   const { toast } = useToast();
 
   const {
@@ -99,8 +155,8 @@ export default function DonutShops() {
       setShouldFitBounds(true);
       return data;
     },
-    enabled: false, 
-    staleTime: Infinity, 
+    enabled: false,
+    staleTime: Infinity,
   });
 
   const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
@@ -124,14 +180,16 @@ export default function DonutShops() {
     }
 
     if (searchState.city && searchState.state) {
-      setLocation(`/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`);
+      setLocation(
+        `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`,
+      );
     }
 
-    await refetch(); 
+    await refetch();
   };
 
   const [, setLocation] = useLocation();
-  
+
   const handleRandomCity = async () => {
     try {
       const newCity = getRandomCity();
@@ -139,8 +197,10 @@ export default function DonutShops() {
         city: newCity.city,
         state: newCity.state,
       });
-      setShouldFitBounds(true); 
-      await setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
+      setShouldFitBounds(true);
+      await setLocation(
+        `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`,
+      );
       await refetch();
     } catch (error) {
       toast({
@@ -195,11 +255,12 @@ export default function DonutShops() {
 
   const getPageDescription = () => {
     const shopCount = shops.length;
-    const locationText = searchState.city && searchState.state 
-      ? `${searchState.city}, ${searchState.state}`
-      : searchState.zipCode 
-      ? `ZIP code ${searchState.zipCode}`
-      : "your area";
+    const locationText =
+      searchState.city && searchState.state
+        ? `${searchState.city}, ${searchState.state}`
+        : searchState.zipCode
+          ? `ZIP code ${searchState.zipCode}`
+          : "your area";
 
     return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
   };
@@ -212,10 +273,10 @@ export default function DonutShops() {
     if (params) {
       setSearchState({
         city: decodeURIComponent(params.city),
-        state: decodeURIComponent(params.state)
+        state: decodeURIComponent(params.state),
       });
       setShouldFitBounds(true);
-      refetch(); 
+      refetch();
     }
   }, [params?.city, params?.state]);
 
@@ -313,6 +374,15 @@ export default function DonutShops() {
                     </div>
                     <div className="grid gap-2">
                       <Label>State</Label>
+                      <Select
+                        options={states}
+                        onChange={(selected) =>
+                          handleInputChange(selected.value, "state")
+                        }
+                        placeholder="Select a state"
+                        getOptionLabel={(option) => option.label}
+                        getOptionValue={(option) => option.value}
+                      />
                       <Input
                         placeholder="Enter state (e.g., CA)"
                         value={searchState.state || ""}
