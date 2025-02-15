@@ -15,7 +15,13 @@ import { cities } from "@/data/cities";
 import { Shuffle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Shop {
   id: string;
@@ -375,14 +381,20 @@ export default function DonutShops() {
                     <div className="grid gap-2">
                       <Label>State</Label>
                       <Select
-                        options={states}
-                        onChange={(selected) =>
-                          handleInputChange(selected.value, "state")
-                        }
-                        placeholder="Select a state"
-                        getOptionLabel={(option) => option.label}
-                        getOptionValue={(option) => option.value}
-                      />
+                        value={searchState.state || ""}
+                        onValueChange={(value) => handleInputChange(value, "state")}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a state" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {states.map((state) => (
+                            <SelectItem key={state.value} value={state.value}>
+                              {state.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <Input
                         placeholder="Enter state (e.g., CA)"
                         value={searchState.state || ""}
