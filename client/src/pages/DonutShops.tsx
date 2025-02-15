@@ -395,13 +395,6 @@ export default function DonutShops() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Input
-                        placeholder="Enter state (e.g., CA)"
-                        value={searchState.state || ""}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, "state")
-                        }
-                      />
                     </div>
                   </div>
                 </TabsContent>
