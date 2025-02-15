@@ -60,19 +60,8 @@ export default function DonutShops() {
   });
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
-  const [shouldFitBounds, setShouldFitBounds] = useState(true); // Set initial value to true
+  const [shouldFitBounds, setShouldFitBounds] = useState(true); 
   const { toast } = useToast();
-
-  // Update searchState when URL params change
-  useEffect(() => {
-    if (params) {
-      setSearchState({
-        city: decodeURIComponent(params.city),
-        state: decodeURIComponent(params.state)
-      });
-      setShouldFitBounds(true); // Update bounds when params change
-    }
-  }, [params?.city, params?.state]); 
 
   const {
     data: allShops = [],
@@ -107,19 +96,15 @@ export default function DonutShops() {
       }
 
       const data = await response.json();
-      setShouldFitBounds(true); // Set bounds to fit when new data arrives
+      setShouldFitBounds(true);
       return data;
     },
-    enabled: Boolean(
-      (searchType === "city" && searchState.city && searchState.state) ||
-      (searchType === "zipcode" && searchState.zipCode) ||
-      (searchType === "coords" && searchState.latitude && searchState.longitude)
-    ),
+    enabled: false, 
+    staleTime: Infinity, 
   });
 
   const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
 
-  // Reset bounds after a short delay
   useEffect(() => {
     if (shouldFitBounds) {
       const timer = setTimeout(() => setShouldFitBounds(false), 100);
@@ -142,7 +127,7 @@ export default function DonutShops() {
       setLocation(`/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`);
     }
 
-    await refetch();
+    await refetch(); 
   };
 
   const [, setLocation] = useLocation();
@@ -154,7 +139,7 @@ export default function DonutShops() {
         city: newCity.city,
         state: newCity.state,
       });
-      setShouldFitBounds(true); // Ensure bounds are updated for random city
+      setShouldFitBounds(true); 
       await setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
       await refetch();
     } catch (error) {
@@ -222,6 +207,17 @@ export default function DonutShops() {
   const getPreviewImage = () => {
     return shops[0]?.image_url ?? "/donut-placeholder.png";
   };
+
+  useEffect(() => {
+    if (params) {
+      setSearchState({
+        city: decodeURIComponent(params.city),
+        state: decodeURIComponent(params.state)
+      });
+      setShouldFitBounds(true);
+      refetch(); 
+    }
+  }, [params?.city, params?.state]);
 
   return (
     <>
