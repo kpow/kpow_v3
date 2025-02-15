@@ -77,7 +77,7 @@ export default function DonutShops() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["donutShops", searchType, searchState.city, searchState.state, searchState.zipCode, searchState.latitude, searchState.longitude],
+    queryKey: ["donutShops", searchState],
     queryFn: async () => {
       const queryString = new URLSearchParams();
 
@@ -112,14 +112,10 @@ export default function DonutShops() {
   });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchState.city || searchState.zipCode || (searchState.latitude && searchState.longitude)) {
-        refetch();
-      }
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [searchState, searchType]);
+    if (refetch) {
+      refetch();
+    }
+  }, [refetch]);
 
   const shops = allShops.filter((shop) => shop.rating >= minRating);
 
