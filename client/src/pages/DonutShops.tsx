@@ -228,8 +228,8 @@ export default function DonutShops() {
         type="website"
       />
       <div className="container mx-auto max-w-[1800px]">
-        <div className="flex justify-between items-center mb-4">
-          <PageTitle size="lg">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-4">
+          <PageTitle size="lg" className="text-2xl sm:text-3xl break-words">
             donut tour{" "}
             {searchState.city && searchState.state
               ? `- ${searchState.city}, ${searchState.state}`
@@ -239,7 +239,7 @@ export default function DonutShops() {
             variant="outline"
             size="sm"
             onClick={handleRandomCity}
-            className="ml-4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+            className="w-full sm:w-auto sm:ml-4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
           >
             <Shuffle className="h-4 w-4 mr-2" />
             Random City
