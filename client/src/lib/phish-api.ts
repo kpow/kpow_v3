@@ -14,6 +14,10 @@ export interface ShowAttendance {
 export interface VenueStat {
   venue: string;
   count: number;
+  topSong?: {
+    name: string;
+    count: number;
+  };
 }
 
 export interface Setlist {
@@ -83,7 +87,7 @@ export async function getPaginatedVenues(
   limit = 10
 ): Promise<{ venues: VenueStat[]; total: number }> {
   const response = await fetch(
-    `${API_BASE}/venues/stats?page=${page}&limit=${limit}`
+    `${API_BASE}/venues/stats?page=${page}&limit=${limit}&include_top_song=true`
   );
 
   if (!response.ok) {
@@ -93,7 +97,7 @@ export async function getPaginatedVenues(
   const data = await response.json();
   return {
     venues: data.venues,
-    total: data.pagination.total * limit // Convert pages to total items
+    total: data.pagination.total * limit
   };
 }
 

@@ -97,16 +97,23 @@ export default function ShowStats() {
                 {venuesData?.venues.map((venue) => (
                   <div
                     key={venue.venue}
-                    className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
+                    className="flex flex-col p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
                     onClick={() => {
                       setSelectedVenue(venue.venue);
                       setIsVenueModalOpen(true);
                     }}
                   >
-                    <span className="font-medium">{venue.venue}</span>
-                    <span className="text-muted-foreground">
-                      {venue.count} shows
-                    </span>
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">{venue.venue}</span>
+                      <span className="text-muted-foreground">
+                        {venue.count} shows
+                      </span>
+                    </div>
+                    {venue.topSong && (
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Top song: {venue.topSong.name} ({venue.topSong.count}x)
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -144,7 +151,6 @@ export default function ShowStats() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 m-0 mb-8">
-         
           <div className="md:col-span-2">
             <Card className="h-full">
               <CardContent className="p-0 m-0">
@@ -152,10 +158,7 @@ export default function ShowStats() {
               </CardContent>
             </Card>
           </div>
-       
-
           <div className="space-y-4">
-
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total venues</h2>
@@ -168,7 +171,6 @@ export default function ShowStats() {
                 </div>
               </CardContent>
             </Card>
-            
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total shows</h2>
@@ -181,9 +183,6 @@ export default function ShowStats() {
                 </div>
               </CardContent>
             </Card>
-
-          
-
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total songs</h2>
