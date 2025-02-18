@@ -93,7 +93,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
     if (data?.GoodreadsResponse?.reviews?.[0]?.review) {
       const recentBooks = data.GoodreadsResponse.reviews[0].review
         .slice(0, 3)
-        .map(review => review.book.title[0])
+        .map(review => review.book?.title?.[0])
         .join(', ');
       return `Currently reading and recently finished books including: ${recentBooks}. Page ${currentPage} of my book collection.`;
     }
@@ -192,7 +192,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center flex-col sm:flex-row">
           <PageTitle size="lg" alignment="left">
-            book feed
+            book feed: {totalBooks} books
           </PageTitle>
           <CustomPagination
             currentPage={currentPage}

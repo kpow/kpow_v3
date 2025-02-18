@@ -6,7 +6,7 @@ export function Footer() {
       <div className="container max-w-6xl mx-auto px-4 flex gap-8 justify-between flex-col sm:flex-row">
         {/* About Section */}
         <div className="flex items-start gap-4 max-w-sm">
-          <div className="flex-shrink-0"></div>
+       
           <div>
             <h3 className="text-xl font-bold mb-1">About kpow</h3>
             <p className="text-sm text-gray-300 leading-relaxed">

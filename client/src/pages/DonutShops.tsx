@@ -105,7 +105,6 @@ export default function DonutShops() {
 
   const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
 
-
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
     if (validationMessage) {
@@ -134,7 +133,7 @@ export default function DonutShops() {
         state: newCity.state,
       });
       setShouldFitBounds(true); 
-      await setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
+      setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
       await refetch();
     } catch (error) {
       toast({
