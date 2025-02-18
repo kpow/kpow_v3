@@ -15,6 +15,7 @@ import { cities } from "@/data/cities";
 import { Shuffle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
+import { CityTagCloud } from "@/components/CityTagCloud";
 
 interface Shop {
   id: string;
@@ -27,6 +28,13 @@ interface Shop {
     longitude: number;
   };
   image_url?: string;
+  url: string;
+  review_count?: number;
+  phone?: string;
+  distance?: number;
+  categories?: any[];
+  is_closed?: boolean;
+  photos?: string[];
 }
 
 interface SearchState {
@@ -58,9 +66,9 @@ export default function DonutShops() {
     city: initialCity.city,
     state: initialCity.state,
   });
-  const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
+  const [selectedShopId, setSelectedShopId] = useState<string | undefined>(undefined);
   const [minRating, setMinRating] = useState(0);
-  const [shouldFitBounds, setShouldFitBounds] = useState(true); 
+  const [shouldFitBounds, setShouldFitBounds] = useState(true);
   const { toast } = useToast();
 
   const {
@@ -378,6 +386,22 @@ export default function DonutShops() {
                   >
                     {isLoading ? "Searching..." : "Search Donut Shops"}
                   </Button>
+                  <div className="mt-4">
+                    <CityTagCloud 
+                      onCitySelect={(city, state) => {
+                        setSearchState({ city, state });
+                        setSearchType("city");
+                        setTimeout(() => {
+                          refetch();
+                        }, 0);
+                      }}
+                      currentCity={
+                        searchState.city && searchState.state 
+                          ? { city: searchState.city, state: searchState.state }
+                          : undefined
+                      }
+                    />
+                  </div>
                 </div>
               </Tabs>
             </CardContent>
