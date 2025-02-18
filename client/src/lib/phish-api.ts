@@ -108,6 +108,28 @@ export async function getVenueTopSong(venue: string): Promise<{
   return data.topSong;
 }
 
+export async function getVenuesTopSongs(venues: string[]): Promise<Record<string, { name: string; count: number } | null>> {
+  const results: Record<string, { name: string; count: number } | null> = {};
+
+  await Promise.all(
+    venues.map(async (venue) => {
+      try {
+        const response = await fetch(`${API_BASE}/venues/${encodeURIComponent(venue)}/top-song`);
+        if (!response.ok) {
+          results[venue] = null;
+          return;
+        }
+        const data = await response.json();
+        results[venue] = data.topSong;
+      } catch (error) {
+        results[venue] = null;
+      }
+    })
+  );
+
+  return results;
+}
+
 export async function getSetlist(showId: string): Promise<SetlistResponse> {
   const response = await fetch(`${API_BASE}/setlists/${showId}`);
 
