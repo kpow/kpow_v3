@@ -145,7 +145,7 @@ export default function ShowStats() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 m-0 mb-8">
          
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 mr-8">
             <Card className="h-full">
               <CardContent className="p-0 m-0">
                 <VenueMap />
