@@ -5,7 +5,6 @@ import {
   getPaginatedVenues,
   getSetlistStats,
   getShowsByVenue,
-  getVenuesTopSongs,
 } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShowCard, ShowCardSkeleton } from "@/components/show-card";
@@ -47,19 +46,15 @@ export default function ShowStats() {
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues/paginated", username, venuesPage],
     queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
-  });
-
-  const { data: topSongsData, isLoading: topSongsLoading } = useQuery({
-    queryKey: ["/api/venues/top-songs", venuesPage],
-    queryFn: () => getVenuesTopSongs((venuesData?.venues || []).map(v => v.venue)),
-    enabled: Boolean(venuesData?.venues?.length),
+    placeholderData: (previousData) => previousData,
   });
 
   const { data: venueShows } = useQuery({
     queryKey: ["/api/venues/shows", username, selectedVenue],
     queryFn: () => selectedVenue ? getShowsByVenue(username, selectedVenue) : Promise.resolve([]),
-    enabled: Boolean(selectedVenue),
+    enabled: !!selectedVenue,
   });
+
 
   const renderShowsContent = () => {
     if (showsLoading) {
@@ -72,48 +67,22 @@ export default function ShowStats() {
     ));
   };
 
-  const renderVenueItem = (venue: any) => (
-    <div
-      key={venue.venue}
-      className="flex flex-col p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-      onClick={() => {
-        setSelectedVenue(venue.venue);
-        setIsVenueModalOpen(true);
-      }}
-    >
-      <div className="flex justify-between items-center">
-        <span className="font-medium">{venue.venue}</span>
-        <span className="text-muted-foreground">
-          {venue.count} shows
-        </span>
-      </div>
-      <div className="mt-1 text-sm text-muted-foreground">
-        {topSongsLoading ? (
-          <span className="text-xs">Loading top song...</span>
-        ) : topSongsData?.[venue.venue] ? (
-          <>Top song: {topSongsData[venue.venue].name} ({topSongsData[venue.venue].count}x)</>
-        ) : null}
-      </div>
-    </div>
-  );
+  const getPageTitle = () => {
+    return "Phish Show Statistics Dashboard | Phashboard";
+  };
 
-  const renderVenues = () => {
-    if (venuesLoading) {
-      return Array.from({ length: VENUES_PER_PAGE }).map((_, index) => (
-        <div key={index} className="p-3 rounded-lg bg-muted/50">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      ));
-    }
-    return venuesData?.venues.map(renderVenueItem);
+  const getPageDescription = () => {
+    const showCount = stats?.totalShows || 0;
+    const venueCount = stats?.uniqueVenues || 0;
+    const songCount = setlistStats?.uniqueSongs || 0;
+    return `Track ${showCount} Phish shows across ${venueCount} venues and ${songCount} unique songs. Interactive venue mapping, setlist analysis, and show statistics.`;
   };
 
   return (
     <>
       <SEO 
-        title="Phish Show Statistics Dashboard | Phashboard"
-        description={`Track ${stats?.totalShows || 0} Phish shows across ${stats?.uniqueVenues || 0} venues and ${setlistStats?.uniqueSongs || 0} unique songs. Interactive venue mapping, setlist analysis, and show statistics.`}
+        title={getPageTitle()}
+        description={getPageDescription()}
         image="/phash-stats.jpg"
         type="website"
       />
@@ -125,7 +94,21 @@ export default function ShowStats() {
             <CardContent className="pt-6">
               <h2 className="text-lg font-slackey mb-4">venues</h2>
               <div className="space-y-3">
-                {renderVenues()}
+                {venuesData?.venues.map((venue) => (
+                  <div
+                    key={venue.venue}
+                    className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
+                    onClick={() => {
+                      setSelectedVenue(venue.venue);
+                      setIsVenueModalOpen(true);
+                    }}
+                  >
+                    <span className="font-medium">{venue.venue}</span>
+                    <span className="text-muted-foreground">
+                      {venue.count} shows
+                    </span>
+                  </div>
+                ))}
               </div>
               {venuesData && venuesData.total > VENUES_PER_PAGE && (
                 <div className="mt-4 flex justify-between items-center">
@@ -160,8 +143,8 @@ export default function ShowStats() {
             <OnThisDayShows />
           </div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 m-0 mb-8">
+         
           <div className="md:col-span-2">
             <Card className="h-full">
               <CardContent className="p-0 m-0">
@@ -169,7 +152,10 @@ export default function ShowStats() {
               </CardContent>
             </Card>
           </div>
+       
+
           <div className="space-y-4">
+
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total venues</h2>
@@ -182,6 +168,7 @@ export default function ShowStats() {
                 </div>
               </CardContent>
             </Card>
+            
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total shows</h2>
@@ -194,6 +181,9 @@ export default function ShowStats() {
                 </div>
               </CardContent>
             </Card>
+
+          
+
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total songs</h2>

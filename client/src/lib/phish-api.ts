@@ -14,10 +14,6 @@ export interface ShowAttendance {
 export interface VenueStat {
   venue: string;
   count: number;
-  topSong?: {
-    name: string;
-    count: number;
-  };
 }
 
 export interface Setlist {
@@ -67,10 +63,17 @@ export async function getShowStats(username: string): Promise<{
 
   const data = await response.json();
 
+  // Get venue stats in a separate call
+  const venueResponse = await fetch(`${API_BASE}/venues/stats`);
+  if (!venueResponse.ok) {
+    throw new Error('Failed to fetch venue statistics');
+  }
+  const venueData = await venueResponse.json();
+
   return {
     totalShows: data.totalShows,
     uniqueVenues: data.uniqueVenues,
-    venueStats: [] // Venue stats are now fetched individually as needed.
+    venueStats: venueData.venues
   };
 }
 
@@ -90,44 +93,8 @@ export async function getPaginatedVenues(
   const data = await response.json();
   return {
     venues: data.venues,
-    total: data.pagination.total * limit
+    total: data.pagination.total * limit // Convert pages to total items
   };
-}
-
-export async function getVenueTopSong(venue: string): Promise<{
-  name: string;
-  count: number;
-} | null> {
-  const response = await fetch(`${API_BASE}/venues/${encodeURIComponent(venue)}/top-song`);
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch venue top song');
-  }
-
-  const data = await response.json();
-  return data.topSong;
-}
-
-export async function getVenuesTopSongs(venues: string[]): Promise<Record<string, { name: string; count: number } | null>> {
-  const results: Record<string, { name: string; count: number } | null> = {};
-
-  await Promise.all(
-    venues.map(async (venue) => {
-      try {
-        const response = await fetch(`${API_BASE}/venues/${encodeURIComponent(venue)}/top-song`);
-        if (!response.ok) {
-          results[venue] = null;
-          return;
-        }
-        const data = await response.json();
-        results[venue] = data.topSong;
-      } catch (error) {
-        results[venue] = null;
-      }
-    })
-  );
-
-  return results;
 }
 
 export async function getSetlist(showId: string): Promise<SetlistResponse> {

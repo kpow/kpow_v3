@@ -89,27 +89,23 @@ export function registerPhishRoutes(router: Router) {
       const limit = parseInt(req.query.limit as string) || 5;
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      // Calculate basic venue statistics
-      const venueStats = new Map();
-      for (const show of shows) {
-        if (!venueStats.has(show.venue)) {
-          venueStats.set(show.venue, {
-            venue: show.venue,
-            count: 0
-          });
-        }
-        const venueStat = venueStats.get(show.venue);
-        venueStat.count++;
-      }
+      const venueStats = shows.reduce(
+        (acc: { [key: string]: number }, show: any) => {
+          acc[show.venue] = (acc[show.venue] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
 
-      const venueArray = Array.from(venueStats.values())
+      const sortedVenues = Object.entries(venueStats)
+        .map(([venue, count]) => ({ venue, count: Number(count) }))
         .sort((a, b) => b.count - a.count);
 
       const start = (page - 1) * limit;
       const end = start + limit;
-      const paginatedVenues = venueArray.slice(start, end);
+      const paginatedVenues = sortedVenues.slice(start, end);
 
-      const total = venueArray.length;
+      const total = sortedVenues.length;
       const totalPages = Math.ceil(total / limit);
 
       res.json({
@@ -121,45 +117,6 @@ export function registerPhishRoutes(router: Router) {
         },
       });
     } catch (error) {
-      console.error("Error in /api/venues/stats:", error);
-      res.status(500).json({ message: (error as Error).message });
-    }
-  });
-
-  router.get("/api/venues/:venue/top-song", async (req, res) => {
-    try {
-      const { venue } = req.params;
-      const shows = await fetchPhishData("/attendance/username/koolyp");
-      const venueShows = shows.filter((show: any) => show.venue === venue);
-
-      const songCounts = new Map<string, number>();
-
-      for (const show of venueShows) {
-        const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`);
-        if (Array.isArray(setlist)) {
-          setlist.forEach((entry: any) => {
-            if (entry.song) {
-              songCounts.set(entry.song, (songCounts.get(entry.song) || 0) + 1);
-            }
-          });
-        }
-      }
-
-      if (songCounts.size === 0) {
-        return res.json({ topSong: null });
-      }
-
-      const topSong = Array.from(songCounts.entries())
-        .sort((a, b) => b[1] - a[1])[0];
-
-      res.json({
-        topSong: {
-          name: topSong[0],
-          count: topSong[1]
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching top song:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
