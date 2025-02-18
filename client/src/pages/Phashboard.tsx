@@ -143,29 +143,18 @@ export default function ShowStats() {
             <OnThisDayShows />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 m-0 mb-8">
+         
           <div className="md:col-span-2">
             <Card className="h-full">
-              <CardContent className="pt-6">
-                <h2 className="text-2xl font-slackey mb-6">venue map</h2>
+              <CardContent className="p-0 m-0">
                 <VenueMap />
               </CardContent>
             </Card>
           </div>
+       
 
           <div className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <h2 className="text-lg font-slackey mb-2">total shows</h2>
-                <div className="text-4xl font-bold">
-                  {statsLoading ? (
-                    <Skeleton className="h-10 w-20" />
-                  ) : (
-                    stats?.totalShows || 0
-                  )}
-                </div>
-              </CardContent>
-            </Card>
 
             <Card>
               <CardContent className="pt-6">
@@ -179,6 +168,21 @@ export default function ShowStats() {
                 </div>
               </CardContent>
             </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <h2 className="text-lg font-slackey mb-2">total shows</h2>
+                <div className="text-4xl font-bold">
+                  {statsLoading ? (
+                    <Skeleton className="h-10 w-20" />
+                  ) : (
+                    stats?.totalShows || 0
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+          
 
             <Card>
               <CardContent className="pt-6">
