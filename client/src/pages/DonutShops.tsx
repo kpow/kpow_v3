@@ -57,16 +57,20 @@ export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
 
-  const initialCity = params ? { 
-    city: decodeURIComponent(params.city), 
-    state: decodeURIComponent(params.state) 
-  } : getRandomCity();
+  const initialCity = params
+    ? {
+        city: decodeURIComponent(params.city),
+        state: decodeURIComponent(params.state),
+      }
+    : getRandomCity();
 
   const [searchState, setSearchState] = useState<SearchState>({
     city: initialCity.city,
     state: initialCity.state,
   });
-  const [selectedShopId, setSelectedShopId] = useState<string | undefined>(undefined);
+  const [selectedShopId, setSelectedShopId] = useState<string | undefined>(
+    undefined,
+  );
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(true);
   const { toast } = useToast();
@@ -107,8 +111,8 @@ export default function DonutShops() {
       setShouldFitBounds(true);
       return data;
     },
-    enabled: false, 
-    staleTime: Infinity, 
+    enabled: false,
+    staleTime: Infinity,
   });
 
   const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
@@ -125,14 +129,16 @@ export default function DonutShops() {
     }
 
     if (searchState.city && searchState.state) {
-      setLocation(`/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`);
+      setLocation(
+        `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`,
+      );
     }
 
-    await refetch(); 
+    await refetch();
   };
 
   const [, setLocation] = useLocation();
-  
+
   const handleRandomCity = async () => {
     try {
       const newCity = getRandomCity();
@@ -140,8 +146,10 @@ export default function DonutShops() {
         city: newCity.city,
         state: newCity.state,
       });
-      setShouldFitBounds(true); 
-      setLocation(`/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`);
+      setShouldFitBounds(true);
+      setLocation(
+        `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`,
+      );
       await refetch();
     } catch (error) {
       toast({
@@ -196,11 +204,12 @@ export default function DonutShops() {
 
   const getPageDescription = () => {
     const shopCount = shops.length;
-    const locationText = searchState.city && searchState.state 
-      ? `${searchState.city}, ${searchState.state}`
-      : searchState.zipCode 
-      ? `ZIP code ${searchState.zipCode}`
-      : "your area";
+    const locationText =
+      searchState.city && searchState.state
+        ? `${searchState.city}, ${searchState.state}`
+        : searchState.zipCode
+          ? `ZIP code ${searchState.zipCode}`
+          : "your area";
 
     return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
   };
@@ -215,15 +224,15 @@ export default function DonutShops() {
       return () => clearTimeout(timer);
     }
   }, [shouldFitBounds]);
-  
+
   useEffect(() => {
     if (params) {
       setSearchState({
         city: decodeURIComponent(params.city),
-        state: decodeURIComponent(params.state)
+        state: decodeURIComponent(params.state),
       });
       setShouldFitBounds(true);
-      refetch(); 
+      refetch();
     }
   }, [params?.city, params?.state]);
 
@@ -269,7 +278,7 @@ export default function DonutShops() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
           <Card className="lg:col-span-2">
             <CardContent className="p-0 m-0">
-              <div className="h-[500px] w-full rounded-lg">
+              <div className="h-[600px] w-full rounded-lg">
                 <DonutShopMap
                   shops={shops}
                   onShopClick={handleShopClick}
@@ -386,8 +395,9 @@ export default function DonutShops() {
                   >
                     {isLoading ? "Searching..." : "Search Donut Shops"}
                   </Button>
-                  <div className="mt-4">
-                    <CityTagCloud 
+                  <div className="mt-2">
+                     <h2 className="text-lg font-slackey mb-2">recent tours . . .</h2>
+                    <CityTagCloud
                       onCitySelect={(city, state) => {
                         setSearchState({ city, state });
                         setSearchType("city");
@@ -396,7 +406,7 @@ export default function DonutShops() {
                         }, 0);
                       }}
                       currentCity={
-                        searchState.city && searchState.state 
+                        searchState.city && searchState.state
                           ? { city: searchState.city, state: searchState.state }
                           : undefined
                       }
