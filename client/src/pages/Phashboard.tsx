@@ -5,6 +5,7 @@ import {
   getPaginatedVenues,
   getSetlistStats,
   getShowsByVenue,
+  getVenueTopSong, // Assumed function
 } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShowCard, ShowCardSkeleton } from "@/components/show-card";
@@ -94,28 +95,38 @@ export default function ShowStats() {
             <CardContent className="pt-6">
               <h2 className="text-lg font-slackey mb-4">venues</h2>
               <div className="space-y-3">
-                {venuesData?.venues.map((venue) => (
-                  <div
-                    key={venue.venue}
-                    className="flex flex-col p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-                    onClick={() => {
-                      setSelectedVenue(venue.venue);
-                      setIsVenueModalOpen(true);
-                    }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">{venue.venue}</span>
-                      <span className="text-muted-foreground">
-                        {venue.count} shows
-                      </span>
-                    </div>
-                    {venue.topSong && (
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        Top song: {venue.topSong.name} ({venue.topSong.count}x)
+                {venuesData?.venues.map((venue) => {
+                  const { data: topSong, isLoading: isTopSongLoading } = useQuery({
+                    queryKey: ["/api/venues/top-song", venue.venue],
+                    queryFn: () => getVenueTopSong(venue.venue),
+                    enabled: !!venue.venue
+                  });
+
+                  return (
+                    <div
+                      key={venue.venue}
+                      className="flex flex-col p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
+                      onClick={() => {
+                        setSelectedVenue(venue.venue);
+                        setIsVenueModalOpen(true);
+                      }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{venue.venue}</span>
+                        <span className="text-muted-foreground">
+                          {venue.count} shows
+                        </span>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        {isTopSongLoading ? (
+                          <span className="text-xs">Loading top song...</span>
+                        ) : topSong ? (
+                          <>Top song: {topSong.name} ({topSong.count}x)</>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
               {venuesData && venuesData.total > VENUES_PER_PAGE && (
                 <div className="mt-4 flex justify-between items-center">

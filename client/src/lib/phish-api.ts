@@ -67,17 +67,10 @@ export async function getShowStats(username: string): Promise<{
 
   const data = await response.json();
 
-  // Get venue stats in a separate call
-  const venueResponse = await fetch(`${API_BASE}/venues/stats`);
-  if (!venueResponse.ok) {
-    throw new Error('Failed to fetch venue statistics');
-  }
-  const venueData = await venueResponse.json();
-
   return {
     totalShows: data.totalShows,
     uniqueVenues: data.uniqueVenues,
-    venueStats: venueData.venues
+    venueStats: [] // Venue stats are now fetched individually as needed.
   };
 }
 
@@ -87,7 +80,7 @@ export async function getPaginatedVenues(
   limit = 10
 ): Promise<{ venues: VenueStat[]; total: number }> {
   const response = await fetch(
-    `${API_BASE}/venues/stats?page=${page}&limit=${limit}&include_top_song=true`
+    `${API_BASE}/venues/stats?page=${page}&limit=${limit}`
   );
 
   if (!response.ok) {
@@ -99,6 +92,20 @@ export async function getPaginatedVenues(
     venues: data.venues,
     total: data.pagination.total * limit
   };
+}
+
+export async function getVenueTopSong(venue: string): Promise<{
+  name: string;
+  count: number;
+} | null> {
+  const response = await fetch(`${API_BASE}/venues/${encodeURIComponent(venue)}/top-song`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch venue top song');
+  }
+
+  const data = await response.json();
+  return data.topSong;
 }
 
 export async function getSetlist(showId: string): Promise<SetlistResponse> {
