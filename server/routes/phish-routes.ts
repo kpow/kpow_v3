@@ -87,25 +87,60 @@ export function registerPhishRoutes(router: Router) {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 5;
+      const includeTopSong = req.query.include_top_song === 'true';
       const shows = await fetchPhishData("/attendance/username/koolyp");
 
-      const venueStats = shows.reduce(
-        (acc: { [key: string]: number }, show: any) => {
-          acc[show.venue] = (acc[show.venue] || 0) + 1;
-          return acc;
-        },
-        {},
-      );
+      // Calculate venue statistics
+      const venueStats = new Map();
+      for (const show of shows) {
+        if (!venueStats.has(show.venue)) {
+          venueStats.set(show.venue, {
+            venue: show.venue,
+            count: 0,
+            songs: new Map()
+          });
+        }
+        const venueStat = venueStats.get(show.venue);
+        venueStat.count++;
 
-      const sortedVenues = Object.entries(venueStats)
-        .map(([venue, count]) => ({ venue, count: Number(count) }))
-        .sort((a, b) => b.count - a.count);
+        // If top song data is requested, fetch and process setlist
+        if (includeTopSong) {
+          const setlist = await fetchPhishData(`/setlists/showid/${show.showid}`);
+          if (Array.isArray(setlist)) {
+            setlist.forEach((entry: any) => {
+              if (entry.song) {
+                const currentCount = venueStat.songs.get(entry.song) || 0;
+                venueStat.songs.set(entry.song, currentCount + 1);
+              }
+            });
+          }
+        }
+      }
+
+      // Convert to array and calculate top songs
+      const venueArray = Array.from(venueStats.values()).map(venue => {
+        const result: any = {
+          venue: venue.venue,
+          count: venue.count
+        };
+
+        if (includeTopSong && venue.songs.size > 0) {
+          const topSong = Array.from(venue.songs.entries())
+            .sort((a, b) => b[1] - a[1])[0];
+          result.topSong = {
+            name: topSong[0],
+            count: topSong[1]
+          };
+        }
+
+        return result;
+      }).sort((a, b) => b.count - a.count);
 
       const start = (page - 1) * limit;
       const end = start + limit;
-      const paginatedVenues = sortedVenues.slice(start, end);
+      const paginatedVenues = venueArray.slice(start, end);
 
-      const total = sortedVenues.length;
+      const total = venueArray.length;
       const totalPages = Math.ceil(total / limit);
 
       res.json({
@@ -117,6 +152,7 @@ export function registerPhishRoutes(router: Router) {
         },
       });
     } catch (error) {
+      console.error("Error in /api/venues/stats:", error);
       res.status(500).json({ message: (error as Error).message });
     }
   });
