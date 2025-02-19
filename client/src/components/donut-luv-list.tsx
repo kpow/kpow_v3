@@ -55,12 +55,12 @@ export function DonutLuvList() {
         {favorites.map((shop) => (
           <Button
             key={shop.id}
-            variant="outline"
-            className="flex items-center gap-2 py-1 px-3 rounded-full"
+            variant="secondary"
+            className="flex items-center gap-2 py-0 px-3 rounded-full"
             onClick={() => removeFavorite(shop.id)}
           >
-            <span className="text-sm">
-              {shop.name} - {shop.city}, {shop.state}
+            <span className="text-xs">
+              {shop.name} - {shop.city}
             </span>
             <Heart className="h-4 w-4 fill-red-500 text-red-500" />
           </Button>
