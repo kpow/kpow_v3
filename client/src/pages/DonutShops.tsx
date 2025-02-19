@@ -245,6 +245,7 @@ export default function DonutShops() {
         type="website"
       />
       <div className="container mx-auto max-w-[1800px]">
+        { /* page title */ }
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-4">
           <PageTitle size="lg" className="text-2xl sm:text-3xl break-words">
             donut tour{" "}
@@ -262,7 +263,8 @@ export default function DonutShops() {
             Random City
           </Button>
         </div>
-
+        
+        { /* shop slider */ }
         <div className="mb-4">
           <div className="h-full w-full overflow-hidden">
             {shops.length > 0 ? (
@@ -274,8 +276,10 @@ export default function DonutShops() {
             )}
           </div>
         </div>
-
+       
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
+          
+           { /* donut map */ }
           <Card className="lg:col-span-2">
             <CardContent className="p-0 m-0">
               <div className="h-[600px] w-full rounded-lg">
@@ -288,6 +292,8 @@ export default function DonutShops() {
               </div>
             </CardContent>
           </Card>
+
+          { /* search form */ }
           <Card className="lg:col-span-1">
             <CardContent className="pt-4">
               <div className="mb-4 flex flex-col justify-center">
@@ -395,28 +401,36 @@ export default function DonutShops() {
                   >
                     {isLoading ? "Searching..." : "Search Donut Shops"}
                   </Button>
-                  <div className="mt-2">
-                     <h2 className="text-lg font-slackey mb-2">recent tours . . .</h2>
-                    <CityTagCloud
-                      onCitySelect={(city, state) => {
-                        setSearchState({ city, state });
-                        setSearchType("city");
-                        setTimeout(() => {
-                          refetch();
-                        }, 0);
-                      }}
-                      currentCity={
-                        searchState.city && searchState.state
-                          ? { city: searchState.city, state: searchState.state }
-                          : undefined
-                      }
-                    />
-                  </div>
+                  
                 </div>
               </Tabs>
             </CardContent>
           </Card>
+          
         </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto mt-4">
+          <Card className="lg:col-span-3">
+            <CardContent className="p-4 m-0">
+              <div className="mt-0">
+                 <h2 className="text-lg font-slackey mb-2">recent tours . . .</h2>
+                <CityTagCloud
+                  onCitySelect={(city, state) => {
+                    setSearchState({ city, state });
+                    setSearchType("city");
+                    setTimeout(() => {
+                      refetch();
+                    }, 0);
+                  }}
+                  currentCity={
+                    searchState.city && searchState.state
+                      ? { city: searchState.city, state: searchState.state }
+                      : undefined
+                  }
+                />
+              </div>
+            </CardContent>
+          </Card>  
+        </div>  
       </div>
     </>
   );
