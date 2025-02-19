@@ -6,19 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
-
-interface Shop {
-  id: string;
-  name: string;
-  rating: number;
-  price?: string;
-  address: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  image_url?: string;
-}
+import { Shop } from '@/types/shop';
 
 interface ShopSliderProps {
   shops: Shop[];

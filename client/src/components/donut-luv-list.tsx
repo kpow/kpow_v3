@@ -10,7 +10,11 @@ interface DonutLuvShop {
   state: string;
 }
 
-export function DonutLuvList() {
+interface DonutLuvListProps {
+  onCitySelect?: (city: string, state: string, shopId?: string) => void;
+}
+
+export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   const [favorites, setFavorites] = useState<DonutLuvShop[]>([]);
 
   const updateFavorites = () => {
@@ -40,13 +44,22 @@ export function DonutLuvList() {
     };
   }, []);
 
-  const removeFavorite = (shopId: string) => {
+  const removeFavorite = (e: React.MouseEvent, shopId: string) => {
+    e.preventDefault(); // Prevent any default action
+    e.stopPropagation(); // Prevent the click from bubbling up to the parent button
+
     const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
     const updatedFavorites = storedFavorites.filter((shop: DonutLuvShop) => shop.id !== shopId);
     localStorage.setItem('donutLuv', JSON.stringify(updatedFavorites));
     setFavorites(updatedFavorites);
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('donutLuvUpdate'));
+  };
+
+  const handleShopClick = (shop: DonutLuvShop) => {
+    if (onCitySelect) {
+      onCitySelect(shop.city, shop.state, shop.id);
+    }
   };
 
   return (
@@ -56,13 +69,16 @@ export function DonutLuvList() {
           <Button
             key={shop.id}
             variant="secondary"
-            className="flex items-center gap-2 py-0 px-3 rounded-full"
-            onClick={() => removeFavorite(shop.id)}
+            className="flex items-center gap-2 py-0 px-3 rounded-full group relative"
+            onClick={() => handleShopClick(shop)}
           >
             <span className="text-xs">
               {shop.name} - {shop.city}
             </span>
-            <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+            <Heart 
+              className="h-4 w-4 fill-red-500 text-red-500 cursor-pointer hover:fill-red-700 hover:text-red-700"
+              onClick={(e) => removeFavorite(e, shop.id)}
+            />
           </Button>
         ))}
       </div>
