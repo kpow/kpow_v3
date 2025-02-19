@@ -16,7 +16,6 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-
 interface MapControllerProps {
   shops: Shop[];
   shouldFitBounds: boolean;
@@ -24,16 +23,9 @@ interface MapControllerProps {
   markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
 }
 
-// MapController component to handle map updates and marker control
-function MapController({ 
-  shops, 
-  shouldFitBounds,
-  selectedShopId,
-  markersRef
-}: MapControllerProps) {
+function MapController({ shops, shouldFitBounds, selectedShopId, markersRef }: MapControllerProps) {
   const map = useMap();
 
-  // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
       const bounds = L.latLngBounds(
@@ -42,9 +34,8 @@ function MapController({
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds, shops, map]); // Added map dependency
+  }, [shouldFitBounds, shops, map]);
 
-  // Handle selected shop updates
   useEffect(() => {
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
@@ -52,13 +43,11 @@ function MapController({
       if (shop) {
         const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
         const isFromFavorites = storedFavorites.some((f: any) => f.id === shop.id);
-        
-        // Center map on the selected shop with different zoom levels
+
         map.setView(
           [shop.coordinates.latitude, shop.coordinates.longitude],
-          isFromFavorites ? 18 : map.getZoom() // Zoom close only for favorites
+          isFromFavorites ? 18 : map.getZoom()
         );
-        // Open the marker popup after a short delay to ensure proper rendering
         setTimeout(() => {
           marker.openPopup();
         }, 100);
@@ -114,16 +103,16 @@ export function DonutShopMap({
     }
 
     setFavorites(new Set(favorites));
-    // Dispatch custom event to notify the list component
     window.dispatchEvent(new Event('donutLuvUpdate'));
   };
 
   return (
-    <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
+    <div className="h-full w-full rounded-lg overflow-hidden relative z-10">
       <MapContainer
         center={[39.8283, -98.5795]}
         zoom={4}
         style={{ height: '100%', width: '100%' }}
+        className="z-20"
       >
         <MapController 
           shops={shops} 
@@ -132,8 +121,10 @@ export function DonutShopMap({
           markersRef={markersRef}
         />
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://stamen.com/">Stamen Design</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+          subdomains={['a', 'b', 'c', 'd']}
+          maxZoom={20}
         />
         {shops.map((shop) => (
           <Marker
