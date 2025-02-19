@@ -1,0 +1,86 @@
+We are pleased to announce that we are partnering with Stadia Maps to provide tile hosting for Stamen map tiles. We think Stadia Maps is the best match for existing users of Stamen map tiles—they are in the business of hosting map tiles based on OpenStreetMap for customers who value all the zany things we do: affordability, flexibility, customizability, autonomy, and of course, great design. We also appreciate the investments they are making in open source communities.
+
+We have recreated and updated the Terrain and Toner styles as native vector styles that work with our tools and workflows. The redeveloped styles, both raster and vector versions, are available through Stadia.
+
+You can find out more about Stadia Maps at stadiamaps.com/stamen. We encourage you to opt in by creating an account; redirects stopped working on October 31, 2023.
+
+Frequently Asked Questions
+Why can't Stamen continue to host tiles?
+
+The Stamen map tiles were originally supported by a two year grant from the Knight Foundation to provide an open mapping platform for journalism, back in 2010, when there were no such offerings available. Since then the landscape has changed: there are many more options for hosting tiles, plus there is a rich network of accessible services for displaying, building, editing and embedding maps on the web and in mobile apps. We are proud of how iconic the Stamen map tiles have become, and love seeing the places they pop up.
+
+Unfortunately, running this free tiling service costs money, upwards of $100,000 - $200,000 a year, too much for the operating budget of a small agency that is fundamentally not in the business of serving tiles. Since Stamen is not a nonprofit, we don't qualify for grants that would allow us to keep maintaining this service in the public interest, and since serving tiles is not our core business, we haven't had the resources to maintain it the way we would like. The maps you have been getting from our tile servers are incomplete and out of date. The maps we are migrating our services to are current, complete, performant, and well supported.
+
+Fundamentally, we provide custom data visualization design and cartography solutions to our customers. We can do this better by outsourcing the tile serving piece to Stadia Maps. As a parting gift, we have lovingly recrafted Toner and Terrain to work with more current mapping stacks and Stadia's tiles, and we will continue to upgrade and update these services for as long as there is sufficient demand.
+
+Can I continue to use Stamen Map Tiles I have downloaded or cached?
+
+Stamen map tiles have always been free to use, governed by Creative Commons Attribution—that isn't changing. If you have the resources to cache and host our existing tiles, you are welcome to host, share, modify, and use the original tiles we have been serving up for over ten years. If you are exclusively interested in Watercolor, the tiles will continue to be available through the Smithsonian catalog, and other enthusiasts may pop up with caches and renderers you can use for original recipe Toner and Terrain. There are more details about this in the answer to the next question.
+
+Can I download legacy Stamen Map Tiles?
+
+Yes, but please note that—as described above—these tiles are outdated and incomplete. They are provided to be accessed and used at your own risk. It has been nearly a decade since the data behind the tiles was updated and the archived tiles do not cover the entire globe at all zoom levels. While we're providing these tiles as a historical snapshot, for most uses you're better off using our updated and complete map styles available through Stadia.
+
+That said, we are providing the tiles in AWS S3 buckets that are set to requester pays. What that means is AWS will charge you for accessing and downloading a copy of the tiles and will not charge Stamen.
+
+We cannot provide support for downloading tiles. You will need an AWS account and will want to follow the directions in the AWS documentation for downloading objects from requester pays S3 buckets.
+
+We also cannot help you calculate the costs of downloading the tiles. Please see AWS S3 pricing for information here and note that each tile will include some bandwidth costs and will count as a separate request. This could be expensive if you download every tile.
+
+Please note that these tiles are under the CC BY 4.0 license. If you use any of these we ask for the following attribution:
+
+For Toner and Terrain:
+
+Map tiles by Stamen Design, under CC BY 4.0. Data by OpenStreetMap, under ODbL.
+For Watercolor:
+
+Map tiles by Stamen Design, under CC BY 4.0. Data by OpenStreetMap, under CC BY SA.
+The tiles can be found in a few different S3 buckets:
+
+Name	Bucket	Prefix	Extension
+Terrain	tile.stamen.com	/terrain	png
+Terrain Background	tile.stamen.com	/terrain-background	png
+Terrain Labels	tile.stamen.com	/terrain-labels	png
+Terrain Lines	tile.stamen.com	/terrain-lines	png
+Toner	long-term.cache.maps.stamen.com	/toner	png
+Toner Background	long-term.cache.maps.stamen.com	/toner-background	png
+Toner Labels	long-term.cache.maps.stamen.com	/toner-labels	png
+Toner Lines	long-term.cache.maps.stamen.com	/toner-lines	png
+Toner Lite	long-term.cache.maps.stamen.com	/toner-lite	png
+Watercolor	long-term.cache.maps.stamen.com	/watercolor	jpg
+Each tile is accessible at an S3 URL with the following format:
+
+s3://{bucket}{prefix}/{z}/{x}/{y}.{extension}
+For example, to get the watercolor tile for zoom 2, x 3, and y 1 you would use:
+
+s3://long-term.cache.maps.stamen.com/watercolor/2/3/1.jpg
+When should I expect to lose service and how will I know?
+
+If you do nothing, you may see disruptions in early August, depending on which tile set you are using, however most will initially see an improvement in coverage, data quality and performance through August and early September as services will have shifted to Stadia Maps. After October 2023, the redirects could stop working and those still pointing to stamen.com or fastly.com URLs will see a blank map.
+
+What do I need to do in order to keep getting tiles after this date?
+
+You can start the migration process at stadiamaps.com/stamen/onboarding/. You'll receive simple instructions for how to point to the new service, and full customer support to ensure you won't experience any disruption in service.
+
+How much does it cost?
+
+Once you have signed up for an account with Stadia, your cost is based on tile usage, meaning how many map tiles are requested through your app or website.
+
+
+If your current usage is less than 200,000 tiles / month—FREE for non-commercial use
+If your usage goes above 200,000 tiles / month or you are a commercial user—plans start at $20/month. The full pricing is here.
+You can reduce costs by upgrading to vector tiles. An in-depth guide to switching is available here.
+
+Are there restrictions on how I can use the Stamen Map Tiles hosted by Stadia Maps?
+
+Nope, not really! As noted above, high volume and commercial users may fall into a paid service tier. Otherwise, you can use these maps anywhere, we just ask that you attribute the work appropriately. Guidelines for how you should attribute Stamen Map Tiles are listed on Stadia's attribution page—these match industry standards and are not significantly different from how we have been asking folks to carry forward attribution and licensure all along.
+
+What other advantages do I get from becoming a Stadia customer?
+
+Signing up for a Stadia account gives you access to all that Stadia Maps provides.
+
+
+Support—all of Stadia's services are backed by real human support and can better support commercial use cases that need SLAs
+Privacy—Stadia is fully GDPR and CCPA compliant, and does not track your users around the internet or build data sets derived from their behavior
+Customizability—if you upgrade to vector tiles, you can easily customize and remix the styles, even dynamically, as permitted in the license for Stamen styles
+Open source ethos—the team at Stadia consistently publish and contribute back to upstream open-source projects, and were instrumental in creating the MapLibre organization
