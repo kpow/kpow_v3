@@ -16,26 +16,28 @@ import { Shuffle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
 import { CityTagCloud } from "@/components/CityTagCloud";
+import { DonutLuvList } from "@/components/donut-luv-list";
+import { Shop } from '@/types/shop';
 
-interface Shop {
-  id: string;
-  name: string;
-  rating: number;
-  price?: string;
-  address: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  image_url?: string;
-  url: string;
-  review_count?: number;
-  phone?: string;
-  distance?: number;
-  categories?: any[];
-  is_closed?: boolean;
-  photos?: string[];
-}
+//interface Shop { //Removed as per instructions
+//  id: string;
+//  name: string;
+//  rating: number;
+//  price?: string;
+//  address: string;
+//  coordinates: {
+//    latitude: number;
+//    longitude: number;
+//  };
+//  image_url?: string;
+//  url: string;
+//  review_count?: number;
+//  phone?: string;
+//  distance?: number;
+//  categories?: any[];
+//  is_closed?: boolean;
+//  photos?: string[];
+//}
 
 interface SearchState {
   city?: string;
@@ -245,7 +247,7 @@ export default function DonutShops() {
         type="website"
       />
       <div className="container mx-auto max-w-[1800px]">
-        { /* page title */ }
+        {/* page title */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-4">
           <PageTitle size="lg" className="text-2xl sm:text-3xl break-words">
             donut tour{" "}
@@ -263,8 +265,8 @@ export default function DonutShops() {
             Random City
           </Button>
         </div>
-        
-        { /* shop slider */ }
+
+        {/* shop slider */}
         <div className="mb-4">
           <div className="h-full w-full overflow-hidden">
             {shops.length > 0 ? (
@@ -276,10 +278,9 @@ export default function DonutShops() {
             )}
           </div>
         </div>
-       
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
-          
-           { /* donut map */ }
+          {/* donut map */}
           <Card className="lg:col-span-2">
             <CardContent className="p-0 m-0">
               <div className="h-[600px] w-full rounded-lg">
@@ -293,7 +294,7 @@ export default function DonutShops() {
             </CardContent>
           </Card>
 
-          { /* search form */ }
+          {/* search form */}
           <Card className="lg:col-span-1">
             <CardContent className="pt-4">
               <div className="mb-4 flex flex-col justify-center">
@@ -401,18 +402,22 @@ export default function DonutShops() {
                   >
                     {isLoading ? "Searching..." : "Search Donut Shops"}
                   </Button>
-                  
+
+                  <div className="mt-4">
+                    <h3 className="text-lg font-medium mb-2">donut luv...</h3>
+                    <DonutLuvList />
+                  </div>
                 </div>
               </Tabs>
             </CardContent>
           </Card>
-          
+
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto mt-4">
           <Card className="lg:col-span-3">
             <CardContent className="p-4 m-0">
               <div className="mt-0">
-                 <h2 className="text-lg font-slackey mb-2">recent tours . . .</h2>
+                <h2 className="text-lg font-slackey mb-2">recent tours . . .</h2>
                 <CityTagCloud
                   onCitySelect={(city, state) => {
                     setSearchState({ city, state });
@@ -429,8 +434,8 @@ export default function DonutShops() {
                 />
               </div>
             </CardContent>
-          </Card>  
-        </div>  
+          </Card>
+        </div>
       </div>
     </>
   );

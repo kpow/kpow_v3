@@ -2,6 +2,10 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useRef } from 'react';
+import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Shop } from '@/types/shop';
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -12,18 +16,6 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-interface Shop {
-  id: string;
-  name: string;
-  rating: number;
-  price?: string;
-  address: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  image_url?: string;
-}
 
 interface MapControllerProps {
   shops: Shop[];
@@ -77,6 +69,40 @@ export function DonutShopMap({
   selectedShopId
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem('donutLuv');
+    if (storedFavorites) {
+      const favoritesArray = JSON.parse(storedFavorites);
+      setFavorites(new Set(favoritesArray.map((f: any) => f.id)));
+    }
+  }, []);
+
+  const toggleFavorite = (shop: Shop) => {
+    const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
+    const isFavorite = favorites.has(shop.id);
+
+    if (isFavorite) {
+      favorites.delete(shop.id);
+      const updatedFavorites = storedFavorites.filter((f: any) => f.id !== shop.id);
+      localStorage.setItem('donutLuv', JSON.stringify(updatedFavorites));
+    } else {
+      favorites.add(shop.id);
+      const [city, state] = shop.address.split(', ').slice(-2);
+      storedFavorites.push({
+        id: shop.id,
+        name: shop.name,
+        city,
+        state
+      });
+      localStorage.setItem('donutLuv', JSON.stringify(storedFavorites));
+    }
+
+    setFavorites(new Set(favorites));
+    // Dispatch custom event to notify the list component
+    window.dispatchEvent(new Event('donutLuvUpdate'));
+  };
 
   return (
     <div className="h-full w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
@@ -112,7 +138,23 @@ export function DonutShopMap({
             <Popup>
               <div className="p-1">
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold">{shop.name}</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold">{shop.name}</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(shop);
+                      }}
+                    >
+                      <Heart
+                        className={`h-4 w-4 ${
+                          favorites.has(shop.id) ? "fill-red-500 text-red-500" : ""
+                        }`}
+                      />
+                    </Button>
+                  </div>
                   <p className="text-sm text-gray-600">{shop.address}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">

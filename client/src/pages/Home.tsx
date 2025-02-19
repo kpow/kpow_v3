@@ -13,20 +13,7 @@ import SectionHeader from "@/components/SectionHeader";
 import HorizontalDivider from "@/components/HorizontalDivider";
 import { SEO } from "@/components/SEO";
 import { StarFeed } from "@/components/StarFeed";
-
-interface Shop {
-  id: string;
-  name: string;
-  rating: number;
-  price?: string;
-  address: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  image_url?: string;
-  url: string;
-}
+import { Shop } from '@/types/shop';
 
 export default function Home() {
   const getRandomCity = () => {
