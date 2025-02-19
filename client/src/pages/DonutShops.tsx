@@ -55,7 +55,6 @@ export default function DonutShops() {
   );
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(true);
-  const [zoomToShop, setZoomToShop] = useState(false);
   const { toast } = useToast();
 
   const {
@@ -168,9 +167,7 @@ export default function DonutShops() {
 
   const handleShopClick = (shop: Shop) => {
     setSelectedShopId(shop.id);
-    setZoomToShop(false); // Explicitly set to false for slider/marker clicks
     setShouldFitBounds(false);
-    console.log('Regular shop click - zoom disabled:', shop.name);
   };
 
   const handleRatingChange = (value: number[]) => {
@@ -225,16 +222,18 @@ export default function DonutShops() {
     setSearchState({ city, state });
     setSearchType("city");
     if (shopId) {
+      // Set selected shop ID before fetching
       setSelectedShopId(shopId);
-      setZoomToShop(true); // Explicitly set to true for favorites
-      console.log('Favorite shop selected - zoom enabled:', shopId);
     }
+    // Set shouldFitBounds to true to ensure map centers on the new location
     setShouldFitBounds(true);
     setTimeout(() => {
       refetch().then(() => {
+        // After fetching shops, make sure to set the selected shop ID again
+        // since the refetch might have reset it
         if (shopId) {
           setSelectedShopId(shopId);
-          setShouldFitBounds(false);
+          setShouldFitBounds(false);  // Prevent map from re-fitting bounds after marker is selected
         }
       });
     }, 0);
@@ -288,7 +287,6 @@ export default function DonutShops() {
                   onShopClick={handleShopClick}
                   shouldFitBounds={shouldFitBounds}
                   selectedShopId={selectedShopId}
-                  zoomToShop={zoomToShop}
                 />
               </div>
             </CardContent>
