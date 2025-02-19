@@ -24,7 +24,7 @@ interface MapControllerProps {
   markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
 }
 
-// Component to handle map updates and marker control
+// MapController component to handle map updates and marker control
 function MapController({ 
   shops, 
   shouldFitBounds,
@@ -42,15 +42,26 @@ function MapController({
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds, shops]); // Added shops dependency to ensure bounds update with new data
+  }, [shouldFitBounds, shops, map]); // Added map dependency
 
   // Handle selected shop updates
   useEffect(() => {
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
-      marker.openPopup();
+      const shop = shops.find(s => s.id === selectedShopId);
+      if (shop) {
+        // Center map on the selected shop
+        map.setView(
+          [shop.coordinates.latitude, shop.coordinates.longitude],
+          15 // Zoom level
+        );
+        // Open the marker popup after a short delay to ensure proper rendering
+        setTimeout(() => {
+          marker.openPopup();
+        }, 100);
+      }
     }
-  }, [selectedShopId, map, markersRef]);
+  }, [selectedShopId, shops, map, markersRef]);
 
   return null;
 }

@@ -222,14 +222,18 @@ export default function DonutShops() {
     setSearchState({ city, state });
     setSearchType("city");
     if (shopId) {
+      // Set selected shop ID before fetching
       setSelectedShopId(shopId);
     }
+    // Set shouldFitBounds to true to ensure map centers on the new location
+    setShouldFitBounds(true);
     setTimeout(() => {
       refetch().then(() => {
         // After fetching shops, make sure to set the selected shop ID again
         // since the refetch might have reset it
         if (shopId) {
           setSelectedShopId(shopId);
+          setShouldFitBounds(false);  // Prevent map from re-fitting bounds after marker is selected
         }
       });
     }, 0);

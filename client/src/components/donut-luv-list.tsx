@@ -27,7 +27,6 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   useEffect(() => {
     updateFavorites();
 
-    // Listen for storage changes from other components
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'donutLuv') {
         updateFavorites();
@@ -35,7 +34,6 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    // Custom event listener for same-window updates
     window.addEventListener('donutLuvUpdate', updateFavorites);
 
     return () => {
@@ -44,15 +42,17 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
     };
   }, []);
 
-  const removeFavorite = (e: React.MouseEvent, shopId: string) => {
-    e.preventDefault(); // Prevent any default action
-    e.stopPropagation(); // Prevent the click from bubbling up to the parent button
+  const removeFavorite = (shopId: string) => {
+    // Create a new array without the removed shop
+    const updatedFavorites = favorites.filter(shop => shop.id !== shopId);
 
-    const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
-    const updatedFavorites = storedFavorites.filter((shop: DonutLuvShop) => shop.id !== shopId);
+    // Update localStorage
     localStorage.setItem('donutLuv', JSON.stringify(updatedFavorites));
+
+    // Update state with the new array
     setFavorites(updatedFavorites);
-    // Dispatch custom event to notify other components
+
+    // Notify other components
     window.dispatchEvent(new Event('donutLuvUpdate'));
   };
 
@@ -66,20 +66,28 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
     <ScrollArea className="h-[200px] w-full rounded-md border p-4">
       <div className="flex flex-wrap gap-2">
         {favorites.map((shop) => (
-          <Button
-            key={shop.id}
-            variant="secondary"
-            className="flex items-center gap-2 py-0 px-3 rounded-full group relative"
-            onClick={() => handleShopClick(shop)}
-          >
-            <span className="text-xs">
-              {shop.name} - {shop.city}
-            </span>
-            <Heart 
-              className="h-4 w-4 fill-red-500 text-red-500 cursor-pointer hover:fill-red-700 hover:text-red-700"
-              onClick={(e) => removeFavorite(e, shop.id)}
-            />
-          </Button>
+          <div key={shop.id} className="inline-flex">
+            <Button
+              variant="secondary"
+              className="flex items-center gap-2 py-0 px-3 rounded-l-full rounded-r-none"
+              onClick={() => handleShopClick(shop)}
+            >
+              <span className="text-xs">
+                {shop.name} - {shop.city}
+              </span>
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-[24px] rounded-l-none rounded-r-full px-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeFavorite(shop.id);
+              }}
+            >
+              <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+            </Button>
+          </div>
         ))}
       </div>
     </ScrollArea>
