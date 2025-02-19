@@ -1,9 +1,9 @@
-
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import venueData from '@db/show-venues.json';
 import 'leaflet/dist/leaflet.css';
 
+// Fix for default marker icons in react-leaflet
 const DefaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
@@ -15,16 +15,17 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 export function VenueMap() {
+  // Calculate bounds based on all venue coordinates
   const bounds = L.latLngBounds(venueData.venues.map(venue => [venue.latitude, venue.longitude]));
-  const paddedBounds = bounds.pad(0.1);
+
+  // Add padding to bounds to ensure all markers are visible
+  const paddedBounds = bounds.pad(0.1); // 10% padding
 
   return (
     <div className="h-[400px] w-full rounded-lg overflow-hidden [&_.leaflet-pane]:!z-[1]">
       <MapContainer
         bounds={paddedBounds}
         style={{ height: '100%', width: '100%' }}
-        zoomControl={true}
-        doubleClickZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -34,11 +35,6 @@ export function VenueMap() {
           <Marker
             key={`${venue.venue}-${index}`}
             position={[venue.latitude, venue.longitude]}
-            eventHandlers={{
-              click: (e) => {
-                e.target.openPopup();
-              }
-            }}
           >
             <Popup>
               <div className="p-2">
