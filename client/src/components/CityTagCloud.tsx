@@ -44,7 +44,7 @@ export function CityTagCloud({ onCitySelect, currentCity }: CityTagCloudProps) {
         const updated = [newCity, ...filtered];
 
         // Keep only last 20 cities
-        const trimmed = updated.slice(0, 15);
+        const trimmed = updated.slice(0, 55);
 
         // Save to localStorage
         localStorage.setItem("visitedCities", JSON.stringify(trimmed));
