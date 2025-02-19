@@ -69,7 +69,7 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
           <div key={shop.id} className="inline-flex">
             <Button
               variant="secondary"
-              className="flex items-center gap-2 py-0 px-3 rounded-l-full rounded-r-none"
+              className="flex items-center h-[24px] px-4 rounded-l-full rounded-r-none"
               onClick={() => handleShopClick(shop)}
             >
               <span className="text-xs">
