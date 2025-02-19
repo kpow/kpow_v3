@@ -28,8 +28,9 @@ export function VenueMap() {
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url={`https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}@2x.png?api_key=${import.meta.env.VITE_STADIA_MAPS_API_KEY}`}
+          tileSize={256}
+          attribution='Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ODbL.'
         />
         {venueData.venues.map((venue, index) => (
           <Marker
