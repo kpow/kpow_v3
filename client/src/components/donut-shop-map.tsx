@@ -50,10 +50,13 @@ function MapController({
       const marker = markersRef.current[selectedShopId];
       const shop = shops.find(s => s.id === selectedShopId);
       if (shop) {
-        // Center map on the selected shop
+        const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
+        const isFromFavorites = storedFavorites.some((f: any) => f.id === shop.id);
+        
+        // Center map on the selected shop with different zoom levels
         map.setView(
           [shop.coordinates.latitude, shop.coordinates.longitude],
-          15 // Zoom level
+          isFromFavorites ? 18 : map.getZoom() // Zoom close only for favorites
         );
         // Open the marker popup after a short delay to ensure proper rendering
         setTimeout(() => {
