@@ -1,10 +1,9 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Shop } from '@/types/shop';
 
 // Custom donut shop marker icon
@@ -16,24 +15,25 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-
 interface MapControllerProps {
   shops: Shop[];
   shouldFitBounds: boolean;
   selectedShopId?: string;
+  zoomToShop: boolean;
   markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
 }
 
-// MapController component to handle map updates and marker control
 function MapController({ 
   shops, 
   shouldFitBounds,
   selectedShopId,
+  zoomToShop,
   markersRef
 }: MapControllerProps) {
   const map = useMap();
+  const prevSelectedIdRef = useRef<string | undefined>();
+  const prevZoomStateRef = useRef<boolean>(false);
 
-  // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
       const bounds = L.latLngBounds(
@@ -42,26 +42,37 @@ function MapController({
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds, shops, map]); // Added map dependency
+  }, [shouldFitBounds, shops, map]);
 
-  // Handle selected shop updates
   useEffect(() => {
-    if (selectedShopId && markersRef.current[selectedShopId]) {
+    // Only trigger zoom effect if selectedShopId or zoomToShop has changed
+    if (selectedShopId && 
+        (selectedShopId !== prevSelectedIdRef.current || zoomToShop !== prevZoomStateRef.current)) {
       const marker = markersRef.current[selectedShopId];
       const shop = shops.find(s => s.id === selectedShopId);
       if (shop) {
-        // Center map on the selected shop
+        const zoomLevel = zoomToShop ? 16 : 13;
+        console.log(`Setting zoom level: ${zoomLevel} for shop ${shop.name} (from ${zoomToShop ? 'favorites' : 'regular click'})`);
+        console.log('Current zoom state:', { zoomToShop, selectedShopId });
+
         map.setView(
           [shop.coordinates.latitude, shop.coordinates.longitude],
-          15 // Zoom level
+          zoomLevel,
+          {
+            animate: true,
+            duration: 1
+          }
         );
-        // Open the marker popup after a short delay to ensure proper rendering
         setTimeout(() => {
           marker.openPopup();
         }, 100);
       }
     }
-  }, [selectedShopId, shops, map, markersRef]);
+
+    // Update refs for next comparison
+    prevSelectedIdRef.current = selectedShopId;
+    prevZoomStateRef.current = zoomToShop;
+  }, [selectedShopId, shops, map, markersRef, zoomToShop]);
 
   return null;
 }
@@ -71,13 +82,15 @@ interface DonutShopMapProps {
   onShopClick?: (shop: Shop) => void;
   shouldFitBounds?: boolean;
   selectedShopId?: string;
+  zoomToShop?: boolean;
 }
 
 export function DonutShopMap({ 
   shops = [], 
   onShopClick,
   shouldFitBounds = false,
-  selectedShopId
+  selectedShopId,
+  zoomToShop = false
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -85,34 +98,40 @@ export function DonutShopMap({
   useEffect(() => {
     const storedFavorites = localStorage.getItem('donutLuv');
     if (storedFavorites) {
-      const favoritesArray = JSON.parse(storedFavorites);
-      setFavorites(new Set(favoritesArray.map((f: any) => f.id)));
+      try {
+        const favoritesArray = JSON.parse(storedFavorites);
+        setFavorites(new Set(favoritesArray.map((f: any) => f.id)));
+      } catch (error) {
+        console.error("Error parsing localStorage favorites:", error);
+      }
     }
   }, []);
 
   const toggleFavorite = (shop: Shop) => {
-    const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
-    const isFavorite = favorites.has(shop.id);
+    try {
+      let storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
+      const isFavorite = favorites.has(shop.id);
 
-    if (isFavorite) {
-      favorites.delete(shop.id);
-      const updatedFavorites = storedFavorites.filter((f: any) => f.id !== shop.id);
-      localStorage.setItem('donutLuv', JSON.stringify(updatedFavorites));
-    } else {
-      favorites.add(shop.id);
-      const [city, state] = shop.address.split(', ').slice(-2);
-      storedFavorites.push({
-        id: shop.id,
-        name: shop.name,
-        city,
-        state
-      });
+      if (isFavorite) {
+        favorites.delete(shop.id);
+        storedFavorites = storedFavorites.filter((f: any) => f.id !== shop.id);
+      } else {
+        favorites.add(shop.id);
+        const [city, state] = shop.address.split(', ').slice(-2);
+        storedFavorites.push({
+          id: shop.id,
+          name: shop.name,
+          city,
+          state
+        });
+      }
+
       localStorage.setItem('donutLuv', JSON.stringify(storedFavorites));
+      setFavorites(new Set(favorites));
+      window.dispatchEvent(new Event('donutLuvUpdate'));
+    } catch (error) {
+      console.error("Error updating localStorage favorites:", error);
     }
-
-    setFavorites(new Set(favorites));
-    // Dispatch custom event to notify the list component
-    window.dispatchEvent(new Event('donutLuvUpdate'));
   };
 
   return (
@@ -126,6 +145,7 @@ export function DonutShopMap({
           shops={shops} 
           shouldFitBounds={shouldFitBounds}
           selectedShopId={selectedShopId}
+          zoomToShop={zoomToShop}
           markersRef={markersRef}
         />
         <TileLayer
