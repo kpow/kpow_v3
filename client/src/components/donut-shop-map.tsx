@@ -1,11 +1,11 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useRef } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Shop } from '@/types/shop';
+import { Shop } from "@/types/shop";
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -16,7 +16,6 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-
 interface MapControllerProps {
   shops: Shop[];
   shouldFitBounds: boolean;
@@ -25,11 +24,11 @@ interface MapControllerProps {
 }
 
 // MapController component to handle map updates and marker control
-function MapController({ 
-  shops, 
+function MapController({
+  shops,
   shouldFitBounds,
   selectedShopId,
-  markersRef
+  markersRef,
 }: MapControllerProps) {
   const map = useMap();
 
@@ -37,7 +36,10 @@ function MapController({
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
       const bounds = L.latLngBounds(
-        shops.map(shop => [shop.coordinates.latitude, shop.coordinates.longitude])
+        shops.map((shop) => [
+          shop.coordinates.latitude,
+          shop.coordinates.longitude,
+        ]),
       );
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
@@ -48,15 +50,19 @@ function MapController({
   useEffect(() => {
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
-      const shop = shops.find(s => s.id === selectedShopId);
+      const shop = shops.find((s) => s.id === selectedShopId);
       if (shop) {
-        const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
-        const isFromFavorites = storedFavorites.some((f: any) => f.id === shop.id);
-        
+        const storedFavorites = JSON.parse(
+          localStorage.getItem("donutLuv") || "[]",
+        );
+        const isFromFavorites = storedFavorites.some(
+          (f: any) => f.id === shop.id,
+        );
+
         // Center map on the selected shop with different zoom levels
         map.setView(
           [shop.coordinates.latitude, shop.coordinates.longitude],
-          isFromFavorites ? 18 : map.getZoom() // Zoom close only for favorites
+          isFromFavorites ? 18 : map.getZoom(), // Zoom close only for favorites
         );
         // Open the marker popup after a short delay to ensure proper rendering
         setTimeout(() => {
@@ -76,17 +82,17 @@ interface DonutShopMapProps {
   selectedShopId?: string;
 }
 
-export function DonutShopMap({ 
-  shops = [], 
+export function DonutShopMap({
+  shops = [],
   onShopClick,
   shouldFitBounds = false,
-  selectedShopId
+  selectedShopId,
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const storedFavorites = localStorage.getItem('donutLuv');
+    const storedFavorites = localStorage.getItem("donutLuv");
     if (storedFavorites) {
       const favoritesArray = JSON.parse(storedFavorites);
       setFavorites(new Set(favoritesArray.map((f: any) => f.id)));
@@ -94,28 +100,32 @@ export function DonutShopMap({
   }, []);
 
   const toggleFavorite = (shop: Shop) => {
-    const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
+    const storedFavorites = JSON.parse(
+      localStorage.getItem("donutLuv") || "[]",
+    );
     const isFavorite = favorites.has(shop.id);
 
     if (isFavorite) {
       favorites.delete(shop.id);
-      const updatedFavorites = storedFavorites.filter((f: any) => f.id !== shop.id);
-      localStorage.setItem('donutLuv', JSON.stringify(updatedFavorites));
+      const updatedFavorites = storedFavorites.filter(
+        (f: any) => f.id !== shop.id,
+      );
+      localStorage.setItem("donutLuv", JSON.stringify(updatedFavorites));
     } else {
       favorites.add(shop.id);
-      const [city, state] = shop.address.split(', ').slice(-2);
+      const [city, state] = shop.address.split(", ").slice(-2);
       storedFavorites.push({
         id: shop.id,
         name: shop.name,
         city,
-        state
+        state,
       });
-      localStorage.setItem('donutLuv', JSON.stringify(storedFavorites));
+      localStorage.setItem("donutLuv", JSON.stringify(storedFavorites));
     }
 
     setFavorites(new Set(favorites));
     // Dispatch custom event to notify the list component
-    window.dispatchEvent(new Event('donutLuvUpdate'));
+    window.dispatchEvent(new Event("donutLuvUpdate"));
   };
 
   return (
@@ -123,17 +133,17 @@ export function DonutShopMap({
       <MapContainer
         center={[39.8283, -98.5795]}
         zoom={4}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: "100%", width: "100%" }}
       >
-        <MapController 
-          shops={shops} 
+        <MapController
+          shops={shops}
           shouldFitBounds={shouldFitBounds}
           selectedShopId={selectedShopId}
           markersRef={markersRef}
         />
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png{z}/{x}/{y}{r}.png?api_key=4b453e75-f6fc-48c0-9c3d-09929795d363"
+          attribution='Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
         />
         {shops.map((shop) => (
           <Marker
@@ -146,7 +156,7 @@ export function DonutShopMap({
               }
             }}
             eventHandlers={{
-              click: () => onShopClick?.(shop)
+              click: () => onShopClick?.(shop),
             }}
           >
             <Popup>
@@ -164,7 +174,9 @@ export function DonutShopMap({
                     >
                       <Heart
                         className={`h-4 w-4 ${
-                          favorites.has(shop.id) ? "fill-red-500 text-red-500" : ""
+                          favorites.has(shop.id)
+                            ? "fill-red-500 text-red-500"
+                            : ""
                         }`}
                       />
                     </Button>
