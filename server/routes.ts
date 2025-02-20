@@ -10,6 +10,8 @@ import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
 import yelpRoutes from "./routes/yelp";
+import path from "path";
+import express from "express";
 
 // Verify required environment variables
 if (!process.env.PHISH_API_KEY) {
@@ -53,6 +55,14 @@ export function registerRoutes(app: Express): Server {
 
   // Register contact routes
   router.use('/', contactRoutes);
+
+  // Serve static files from the cube directory
+  router.use('/cube', express.static(path.join(process.cwd(), 'client', 'public', 'cube')));
+
+  // Serve the cube index.html
+  router.get('/cube', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'client', 'public', 'cube', 'index.html'));
+  });
 
   // Use the router
   app.use(router);
