@@ -142,108 +142,116 @@ export function DonutShopMap({
     openStreetMap: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   };
 
-  // Handle tile layer change
   const handleTileLayerChange = (value: string) => {
     setTileLayer(value);
   };
 
+  const tileLayerNames = {
+    toner: "Toner",
+    "toner-lite": "Toner Lite",
+    terrain: "Terrain",
+    watercolor: "Watercolor",
+    openStreetMap: "OpenStreetMap"
+  };
+
   return (
-    <>
-      <div className="relative h-full w-full rounded-lg overflow-hidden">
-        <div className="absolute top-4 right-4 z-[1000] bg-white rounded-lg shadow-lg">
-          <Select value={tileLayer} onValueChange={handleTileLayerChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select map style" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="toner">Toner</SelectItem>
-              <SelectItem value="toner-lite">Toner Lite</SelectItem>
-              <SelectItem value="terrain">Terrain</SelectItem>
-              <SelectItem value="watercolor">Watercolor</SelectItem>
-              <SelectItem value="openStreetMap">OpenStreetMap</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="h-full w-full [&_.leaflet-pane]:!z-[1]">
-          <MapContainer
-            center={[39.8283, -98.5795]}
-            zoom={4}
-            style={{ height: "100%", width: "100%" }}
-          >
-            <MapController
-              shops={shops}
-              shouldFitBounds={shouldFitBounds}
-              selectedShopId={selectedShopId}
-              markersRef={markersRef}
-            />
-            <TileLayer
-              url={tileLayerOptions[tileLayer]}
-              attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-            />
-            {shops.map((shop) => (
-              <Marker
-                key={shop.id}
-                position={[shop.coordinates.latitude, shop.coordinates.longitude]}
-                icon={ShopIcon}
-                ref={(el) => {
-                  if (el) {
-                    markersRef.current[shop.id] = el;
-                  }
-                }}
-                eventHandlers={{
-                  click: () => onShopClick?.(shop),
-                }}
-              >
-                <Popup>
-                  <div className="p-1">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-bold">{shop.name}</h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(shop);
-                          }}
-                        >
-                          <Heart
-                            className={`h-4 w-4 ${
-                              favorites.has(shop.id)
-                                ? "fill-red-500 text-red-500"
-                                : ""
-                            }`}
-                          />
-                        </Button>
-                      </div>
-                      <p className="text-sm text-gray-600">{shop.address}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                          <span className="font-medium">Rating:</span>
-                          <span>{shop.rating} ⭐</span>
-                        </div>
-                        {shop.price && (
-                          <div className="flex items-center gap-1">
-                            <span className="font-medium">Price:</span>
-                            <span>{shop.price}</span>
-                          </div>
-                        )}
-                      </div>
-                      {shop.image_url && (
-                        <img
-                          src={shop.image_url}
-                          alt={shop.name}
-                          className="w-full h-48 object-cover rounded-lg"
+    <div className="relative h-full w-full">
+      {/* Map Style Selector with improved positioning and z-index */}
+      <div className="absolute top-4 right-4 z-[9999] bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2">
+        <Select value={tileLayer} onValueChange={handleTileLayerChange}>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Select map style" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(tileLayerNames).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Map Container */}
+      <div className="h-full w-full rounded-lg overflow-hidden">
+        <MapContainer
+          center={[39.8283, -98.5795]}
+          zoom={4}
+          style={{ height: "100%", width: "100%" }}
+        >
+          <MapController
+            shops={shops}
+            shouldFitBounds={shouldFitBounds}
+            selectedShopId={selectedShopId}
+            markersRef={markersRef}
+          />
+          <TileLayer
+            url={tileLayerOptions[tileLayer]}
+            attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+          />
+          {shops.map((shop) => (
+            <Marker
+              key={shop.id}
+              position={[shop.coordinates.latitude, shop.coordinates.longitude]}
+              icon={ShopIcon}
+              ref={(el) => {
+                if (el) {
+                  markersRef.current[shop.id] = el;
+                }
+              }}
+              eventHandlers={{
+                click: () => onShopClick?.(shop),
+              }}
+            >
+              <Popup>
+                <div className="p-1">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-bold">{shop.name}</h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(shop);
+                        }}
+                      >
+                        <Heart
+                          className={`h-4 w-4 ${
+                            favorites.has(shop.id)
+                              ? "fill-red-500 text-red-500"
+                              : ""
+                          }`}
                         />
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-600">{shop.address}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium">Rating:</span>
+                        <span>{shop.rating} ⭐</span>
+                      </div>
+                      {shop.price && (
+                        <div className="flex items-center gap-1">
+                          <span className="font-medium">Price:</span>
+                          <span>{shop.price}</span>
+                        </div>
                       )}
                     </div>
+                    {shop.image_url && (
+                      <img
+                        src={shop.image_url}
+                        alt={shop.name}
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    )}
                   </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       </div>
-    </>
+    </div>
   );
 }
