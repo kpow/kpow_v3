@@ -1,4 +1,11 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  LayersControl,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
@@ -6,7 +13,13 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Shop } from "@/types/shop";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -154,6 +167,8 @@ export function DonutShopMap({
     openStreetMap: "OpenStreetMap",
   };
 
+  const { BaseLayer } = LayersControl;
+
   return (
     <div className="relative h-full w-full">
       {/* Map Container - Place it first in the DOM */}
@@ -170,10 +185,45 @@ export function DonutShopMap({
             selectedShopId={selectedShopId}
             markersRef={markersRef}
           />
-          <TileLayer
+          <LayersControl position="topright">
+            {/* Stamen Toner Basemap */}
+            <BaseLayer checked name="Stamen Toner-lite">
+              <TileLayer
+                url="https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+              />
+            </BaseLayer>
+
+            {/* Default Basemap (Carto Light) */}
+            <BaseLayer name="Carto Light">
+              <TileLayer
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://carto.com/">Carto</a>, 
+                             &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+              />
+            </BaseLayer>
+
+            {/* OpenStreetMap Default Basemap */}
+            <BaseLayer name="OpenStreetMap">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+              />
+            </BaseLayer>
+
+            {/* Stamen Toner Basemap */}
+            <BaseLayer name="Watercolor">
+              <TileLayer
+                url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
+                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+              />
+            </BaseLayer>
+          </LayersControl>
+
+          {/* <TileLayer
             url={tileLayerOptions[tileLayer]}
             attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-          />
+          /> */}
           {shops.map((shop) => (
             <Marker
               key={shop.id}
@@ -239,7 +289,7 @@ export function DonutShopMap({
       </div>
 
       {/* Map Style Selector - Place it after the map in the DOM */}
-      <div className="absolute top-4 right-4" style={{ zIndex: 1000 }}>
+      {/* <div className="absolute top-4 right-4" style={{ zIndex: 1000 }}>
         <div className="relative">
           <Select value={tileLayer} onValueChange={handleTileLayerChange}>
             <SelectTrigger className="w-[180px] bg-white/90 backdrop-blur-sm shadow-lg">
@@ -247,14 +297,18 @@ export function DonutShopMap({
             </SelectTrigger>
             <SelectContent className="bg-white/90 backdrop-blur-sm z-[1001]">
               {Object.entries(tileLayerNames).map(([value, label]) => (
-                <SelectItem key={value} value={value} className="cursor-pointer">
+                <SelectItem
+                  key={value}
+                  value={value}
+                  className="cursor-pointer"
+                >
                   {label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
