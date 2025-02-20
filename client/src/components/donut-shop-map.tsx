@@ -151,33 +151,18 @@ export function DonutShopMap({
     "toner-lite": "Toner Lite",
     terrain: "Terrain",
     watercolor: "Watercolor",
-    openStreetMap: "OpenStreetMap"
+    openStreetMap: "OpenStreetMap",
   };
 
   return (
     <div className="relative h-full w-full">
-      {/* Map Style Selector with improved positioning and z-index */}
-      <div className="absolute top-4 right-4 z-[9999] bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2">
-        <Select value={tileLayer} onValueChange={handleTileLayerChange}>
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Select map style" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(tileLayerNames).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Map Container */}
+      {/* Map Container - Place it first in the DOM */}
       <div className="h-full w-full rounded-lg overflow-hidden">
         <MapContainer
           center={[39.8283, -98.5795]}
           zoom={4}
           style={{ height: "100%", width: "100%" }}
+          className="z-0" // Explicitly set base z-index
         >
           <MapController
             shops={shops}
@@ -251,6 +236,24 @@ export function DonutShopMap({
             </Marker>
           ))}
         </MapContainer>
+      </div>
+
+      {/* Map Style Selector - Place it after the map in the DOM */}
+      <div className="absolute top-4 right-4" style={{ zIndex: 1000 }}>
+        <div className="relative">
+          <Select value={tileLayer} onValueChange={handleTileLayerChange}>
+            <SelectTrigger className="w-[180px] bg-white/90 backdrop-blur-sm shadow-lg">
+              <SelectValue placeholder="Select map style" />
+            </SelectTrigger>
+            <SelectContent className="bg-white/90 backdrop-blur-sm z-[1001]">
+              {Object.entries(tileLayerNames).map(([value, label]) => (
+                <SelectItem key={value} value={value} className="cursor-pointer">
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );
