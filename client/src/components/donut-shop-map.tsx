@@ -91,7 +91,7 @@ export function DonutShopMap({
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [tileLayer, setTileLayer] = useState<string>("toner");
+  const [tileLayer, setTileLayer] = useState<string>("toner-lite");
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem("donutLuv");
