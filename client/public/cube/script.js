@@ -82,10 +82,10 @@ class World extends Animation {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.container.appendChild(this.renderer.domElement);
 
-    this.camera = new THREE.PerspectiveCamera(2, 1, 0.1, 10000);
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     this.stage = { width: 2, height: 3 };
-    this.fov = 10;
+    this.fov = 75;
 
     this.createLights();
 
