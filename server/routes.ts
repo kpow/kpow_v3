@@ -6,7 +6,6 @@ import { registerLastFmRoutes } from "./routes/lastfm-routes";
 import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
 import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
-import { registerCubeRoutes } from "./routes/cube-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
@@ -42,7 +41,6 @@ export function registerRoutes(app: Express): Server {
   registerGoodreadsRoutes(router);
   registerFeedbinRoutes(router);
   registerGithubRoutes(router);
-  registerCubeRoutes(router); // Register cube game routes
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
