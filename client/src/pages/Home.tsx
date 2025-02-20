@@ -1,6 +1,7 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
 import { SetlistGame } from "@/components/setlist-game";
+import { CubeFrame } from "@/components/cube-frame";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
 import { InstagramCarousel } from "@/components/InstagramCarousel";
@@ -93,8 +94,13 @@ export default function Home() {
               <ContentSection key={section.title} {...section} />
             ))}
           </div>
-          <div className="w-full">
-            <SetlistGame />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="w-full">
+              <SetlistGame />
+            </div>
+            <div className="w-full">
+              <CubeFrame />
+            </div>
           </div>
         </div>
         <HorizontalDivider />
