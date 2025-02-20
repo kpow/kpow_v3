@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Slackey&display=swap');
+
 @font-face {
   font-family: "BungeeFont";
   font-weight: normal;
@@ -35,7 +38,7 @@ html {
 }
 
 body {
-  font-family: "BungeeFont", sans-serif;
+  font-family: "Slackey", system-ui;
   font-weight: normal;
   font-style: normal;
   line-height: 1;
