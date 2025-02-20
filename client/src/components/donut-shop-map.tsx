@@ -16,7 +16,7 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-// MapController component remains unchanged
+
 interface MapControllerProps {
   shops: Shop[];
   shouldFitBounds: boolean;
@@ -24,6 +24,7 @@ interface MapControllerProps {
   markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
 }
 
+// MapController component to handle map updates and marker control
 function MapController({ 
   shops, 
   shouldFitBounds,
@@ -32,6 +33,7 @@ function MapController({
 }: MapControllerProps) {
   const map = useMap();
 
+  // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
       const bounds = L.latLngBounds(
@@ -40,8 +42,9 @@ function MapController({
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds, shops, map]);
+  }, [shouldFitBounds, shops, map]); // Added map dependency
 
+  // Handle selected shop updates
   useEffect(() => {
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
@@ -49,11 +52,13 @@ function MapController({
       if (shop) {
         const storedFavorites = JSON.parse(localStorage.getItem('donutLuv') || '[]');
         const isFromFavorites = storedFavorites.some((f: any) => f.id === shop.id);
-
+        
+        // Center map on the selected shop with different zoom levels
         map.setView(
           [shop.coordinates.latitude, shop.coordinates.longitude],
-          isFromFavorites ? 18 : map.getZoom()
+          isFromFavorites ? 18 : map.getZoom() // Zoom close only for favorites
         );
+        // Open the marker popup after a short delay to ensure proper rendering
         setTimeout(() => {
           marker.openPopup();
         }, 100);
@@ -109,6 +114,7 @@ export function DonutShopMap({
     }
 
     setFavorites(new Set(favorites));
+    // Dispatch custom event to notify the list component
     window.dispatchEvent(new Event('donutLuvUpdate'));
   };
 
@@ -126,8 +132,8 @@ export function DonutShopMap({
           markersRef={markersRef}
         />
         <TileLayer
-          url="https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.jpg"
-          attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>, &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a>, &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>, &copy; <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {shops.map((shop) => (
           <Marker
