@@ -211,7 +211,7 @@ export function SetlistGame() {
   };
 
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-full min-h-[400px]">
       <CardContent className="p-2 flex flex-col h-full">
         <div className="justify-center flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-sm p-1 pl-4 m-0 mb-4">
           <div className="text-2xl font-slackey mr-4">guess the setlist</div>

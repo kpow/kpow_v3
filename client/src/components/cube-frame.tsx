@@ -2,10 +2,10 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export function CubeFrame() {
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-full min-h-[400px]">
       <CardContent className="p-2 flex flex-col h-full">
         <div className="flex-grow relative">
-          <iframe 
+          <iframe
             src="/cube"
             className="absolute inset-0 w-full h-full border-0"
             title="Cube Display"
