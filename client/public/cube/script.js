@@ -3386,6 +3386,11 @@ class Game {
           }
 
           this.game(SHOW);
+
+          // Set visibility states when the game starts
+          this.dom.texts.timer.style.display = "none"; // Hide timer
+          this.dom.texts.note.style.display = "none"; // Hide note
+          this.dom.texts.title.style.display = "block"; // Ensure title is visible
         } else if (this.state === STATE.Complete) {
           this.complete(HIDE);
         } else if (this.state === STATE.Stats) {
@@ -3447,7 +3452,7 @@ class Game {
       this.transition.buttons(BUTTONS.None, BUTTONS.Menu);
 
       this.transition.zoom(STATE.Playing, duration);
-      this.transition.title(HIDE);
+      //this.transition.title(HIDE);
 
       setTimeout(() => {
         this.transition.timer(SHOW);

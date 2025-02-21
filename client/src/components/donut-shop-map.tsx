@@ -187,7 +187,7 @@ export function DonutShopMap({
           />
           <LayersControl position="topright">
             {/* Stamen Toner Basemap */}
-            <BaseLayer checked name="Stamen Toner-lite">
+            <BaseLayer checked name="Toner-lite">
               <TileLayer
                 url="https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png"
                 attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
@@ -195,7 +195,7 @@ export function DonutShopMap({
             </BaseLayer>
 
             {/* Default Basemap (Carto Light) */}
-            <BaseLayer name="Carto Light">
+            <BaseLayer name="CartoLight">
               <TileLayer
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                 attribution='&copy; <a href="https://carto.com/">Carto</a>, 
