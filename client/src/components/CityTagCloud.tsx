@@ -17,6 +17,35 @@ interface CityTagCloudProps {
 export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) {
   const [visitedCities, setVisitedCities] = useState<VisitedCity[]>([]);
 
+  const saveCity = (city: string, state: string) => {
+    const newCity: VisitedCity = {
+      city,
+      state,
+      timestamp: Date.now(),
+    };
+
+    setVisitedCities((prev) => {
+      const exists = prev.some(
+        (city) => city.city === newCity.city && city.state === newCity.state
+      );
+
+      if (exists) {
+        return prev;
+      }
+
+      const updated = [newCity, ...prev];
+      const trimmed = updated.slice(0, 55);
+      localStorage.setItem("visitedCities", JSON.stringify(trimmed));
+      return trimmed;
+    });
+  };
+
+  useEffect(() => {
+    if (selectedCity?.city && selectedCity?.state) {
+      saveCity(selectedCity.city, selectedCity.state);
+    }
+  }, [selectedCity]);
+
   useEffect(() => {
     // Load visited cities from localStorage
     const storedCities = localStorage.getItem("visitedCities");
@@ -27,31 +56,7 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
 
   const handleCitySelect = (city: string, state: string) => {
     onCitySelect(city, state);
-    
-    const newCity: VisitedCity = {
-      city,
-      state,
-      timestamp: Date.now(),
-    };
-
-    setVisitedCities((prev) => {
-      // Check if city already exists
-      const exists = prev.some(
-        (city) => city.city === newCity.city && city.state === newCity.state
-      );
-
-      if (exists) {
-        return prev; // Don't add duplicate
-      }
-
-      // Add new city at the beginning
-      const updated = [newCity, ...prev];
-      // Keep only last 55 cities
-      const trimmed = updated.slice(0, 55);
-      // Save to localStorage
-      localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-      return trimmed;
-    });
+    saveCity(city, state);
   };
 
   if (visitedCities.length === 0) return null;
