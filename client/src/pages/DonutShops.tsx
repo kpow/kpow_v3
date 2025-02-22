@@ -35,6 +35,29 @@ const getRandomCity = () => {
   };
 };
 
+const saveToVisitedCities = (city: string, state: string) => {
+  const newCity = {
+    city,
+    state,
+    timestamp: Date.now(),
+  };
+
+  const storedCities = localStorage.getItem("visitedCities");
+  const currentCities = storedCities ? JSON.parse(storedCities) : [];
+
+  const exists = currentCities.some(
+    (prevCity: any) => prevCity.city === city && prevCity.state === state
+  );
+
+  if (!exists) {
+    const updated = [newCity, ...currentCities];
+    const trimmed = updated.slice(0, 55);
+    localStorage.setItem("visitedCities", JSON.stringify(trimmed));
+    // Dispatch an event to notify other components
+    window.dispatchEvent(new Event('storage'));
+  }
+};
+
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
@@ -90,6 +113,12 @@ export default function DonutShops() {
       }
 
       const data = await response.json();
+
+      // Only save to visited cities if we got results and it's a city search
+      if (data.length > 0 && searchType === "city" && searchState.city && searchState.state) {
+        saveToVisitedCities(searchState.city, searchState.state);
+      }
+
       setShouldFitBounds(true);
       return data;
     },
@@ -422,7 +451,7 @@ export default function DonutShops() {
                       refetch();
                     }, 0);
                   }}
-                  currentCity={
+                  selectedCity={
                     searchState.city && searchState.state
                       ? { city: searchState.city, state: searchState.state }
                       : undefined

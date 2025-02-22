@@ -23,20 +23,26 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
       timestamp: Date.now(),
     };
 
-    setVisitedCities((prev) => {
-      const exists = prev.some(
-        (prevCity) => prevCity.city === city && prevCity.state === state
-      );
+    // Get the latest cities from localStorage first
+    const storedCities = localStorage.getItem("visitedCities");
+    const currentCities: VisitedCity[] = storedCities ? JSON.parse(storedCities) : [];
 
-      if (exists) {
-        return prev;
-      }
+    // Check if city already exists
+    const exists = currentCities.some(
+      (prevCity) => prevCity.city === city && prevCity.state === state
+    );
 
-      const updated = [newCity, ...prev];
+    if (!exists) {
+      // Add new city to the beginning
+      const updated = [newCity, ...currentCities];
       const trimmed = updated.slice(0, 55);
+
+      // Update localStorage
       localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-      return trimmed;
-    });
+
+      // Update state
+      setVisitedCities(trimmed);
+    }
   };
 
   useEffect(() => {
@@ -45,12 +51,6 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
       setVisitedCities(JSON.parse(storedCities));
     }
   }, []);
-
-  useEffect(() => {
-    if (selectedCity?.city && selectedCity?.state) {
-      saveCity(selectedCity.city, selectedCity.state);
-    }
-  }, [selectedCity]);
 
   const handleCitySelect = (city: string, state: string) => {
     onCitySelect(city, state);
@@ -65,7 +65,7 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
           <Button
             key={`${city.city}-${city.state}-${index}`}
             variant="outline"
-            size="xs"
+            size="sm"
             className="flex items-center justify-center bg-gray-300 text-xs text-black font-medium py-1 px-3 rounded-full hover:bg-gray-400 transition-all"
             onClick={() => handleCitySelect(city.city, city.state)}
           >
