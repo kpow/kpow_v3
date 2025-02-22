@@ -18,7 +18,7 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   const [favorites, setFavorites] = useState<DonutLuvShop[]>([]);
 
   const updateFavorites = () => {
-    const storedFavorites = localStorage.getItem('donutLuv');
+    const storedFavorites = localStorage.getItem("donutLuv");
     if (storedFavorites) {
       setFavorites(JSON.parse(storedFavorites));
     }
@@ -28,32 +28,32 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
     updateFavorites();
 
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'donutLuv') {
+      if (e.key === "donutLuv") {
         updateFavorites();
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('donutLuvUpdate', updateFavorites);
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("donutLuvUpdate", updateFavorites);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('donutLuvUpdate', updateFavorites);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("donutLuvUpdate", updateFavorites);
     };
   }, []);
 
   const removeFavorite = (shopId: string) => {
     // Create a new array without the removed shop
-    const updatedFavorites = favorites.filter(shop => shop.id !== shopId);
+    const updatedFavorites = favorites.filter((shop) => shop.id !== shopId);
 
     // Update localStorage
-    localStorage.setItem('donutLuv', JSON.stringify(updatedFavorites));
+    localStorage.setItem("donutLuv", JSON.stringify(updatedFavorites));
 
     // Update state with the new array
     setFavorites(updatedFavorites);
 
     // Notify other components
-    window.dispatchEvent(new Event('donutLuvUpdate'));
+    window.dispatchEvent(new Event("donutLuvUpdate"));
   };
 
   const handleShopClick = (shop: DonutLuvShop) => {
@@ -63,13 +63,13 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   };
 
   return (
-    <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+    <ScrollArea className="h-[200px] w-full rounded-md border p-2">
       <div className="flex flex-wrap gap-2">
         {favorites.map((shop) => (
           <div key={shop.id} className="inline-flex">
             <Button
               variant="secondary"
-              className="flex items-center h-[24px] px-4 rounded-l-full rounded-r-none"
+              className="flex h-[24px] rounded-l-full rounded-r-none"
               onClick={() => handleShopClick(shop)}
             >
               <span className="text-xs">
@@ -79,7 +79,7 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
             <Button
               variant="secondary"
               size="icon"
-              className="h-[24px] rounded-l-none rounded-r-full px-2"
+              className="h-[24px] rounded-l-none rounded-r-full"
               onClick={(e) => {
                 e.stopPropagation();
                 removeFavorite(shop.id);

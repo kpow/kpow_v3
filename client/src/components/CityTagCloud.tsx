@@ -16,40 +16,31 @@ interface CityTagCloudProps {
 export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) {
   const [visitedCities, setVisitedCities] = useState<VisitedCity[]>([]);
 
-  const saveCity = (city: string, state: string) => {
-    const newCity: VisitedCity = {
-      city,
-      state,
-      timestamp: Date.now(),
-    };
-
-    // Get the latest cities from localStorage first
-    const storedCities = localStorage.getItem("visitedCities");
-    const currentCities: VisitedCity[] = storedCities ? JSON.parse(storedCities) : [];
-
-    // Check if city already exists
-    const exists = currentCities.some(
-      (prevCity) => prevCity.city === city && prevCity.state === state
-    );
-
-    if (!exists) {
-      // Add new city to the beginning
-      const updated = [newCity, ...currentCities];
-      const trimmed = updated.slice(0, 55);
-
-      // Update localStorage
-      localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-
-      // Update state
-      setVisitedCities(trimmed);
-    }
-  };
+  // Remove the saveCity function as it's now handled in DonutShops.tsx
 
   useEffect(() => {
     const storedCities = localStorage.getItem("visitedCities");
     if (storedCities) {
       setVisitedCities(JSON.parse(storedCities));
     }
+
+    // Add storage event listener to update cities when localStorage changes
+    const handleStorageChange = () => {
+      const updatedCities = localStorage.getItem("visitedCities");
+      if (updatedCities) {
+        setVisitedCities(JSON.parse(updatedCities));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also listen to our custom event
+    window.addEventListener('visitedCitiesUpdated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('visitedCitiesUpdated', handleStorageChange);
+    };
   }, []);
 
   const handleCitySelect = (city: string, state: string) => {

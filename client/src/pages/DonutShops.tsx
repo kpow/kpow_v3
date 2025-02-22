@@ -53,8 +53,8 @@ const saveToVisitedCities = (city: string, state: string) => {
     const updated = [newCity, ...currentCities];
     const trimmed = updated.slice(0, 55);
     localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-    // Dispatch an event to notify other components
-    window.dispatchEvent(new Event('storage'));
+    // Dispatch custom event to notify CityTagCloud
+    window.dispatchEvent(new Event('visitedCitiesUpdated'));
   }
 };
 
