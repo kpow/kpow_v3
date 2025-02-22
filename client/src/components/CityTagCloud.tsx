@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
@@ -10,10 +11,10 @@ interface VisitedCity {
 
 interface CityTagCloudProps {
   onCitySelect: (city: string, state: string) => void;
-  currentCity?: { city: string; state: string };
+  selectedCity?: { city: string; state: string };
 }
 
-export function CityTagCloud({ onCitySelect, currentCity }: CityTagCloudProps) {
+export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) {
   const [visitedCities, setVisitedCities] = useState<VisitedCity[]>([]);
 
   useEffect(() => {
@@ -24,34 +25,34 @@ export function CityTagCloud({ onCitySelect, currentCity }: CityTagCloudProps) {
     }
   }, []);
 
-  useEffect(() => {
-    // Update localStorage when current city changes
-    if (currentCity?.city && currentCity?.state) {
-      const newCity: VisitedCity = {
-        city: currentCity.city,
-        state: currentCity.state,
-        timestamp: Date.now(),
-      };
+  const handleCitySelect = (city: string, state: string) => {
+    onCitySelect(city, state);
+    
+    const newCity: VisitedCity = {
+      city,
+      state,
+      timestamp: Date.now(),
+    };
 
-      setVisitedCities((prev) => {
-        // Remove duplicate if exists
-        const filtered = prev.filter(
-          (city) =>
-            !(city.city === newCity.city && city.state === newCity.state),
-        );
+    setVisitedCities((prev) => {
+      // Check if city already exists
+      const exists = prev.some(
+        (city) => city.city === newCity.city && city.state === newCity.state
+      );
 
-        // Add new city at the beginning
-        const updated = [newCity, ...filtered];
+      if (exists) {
+        return prev; // Don't add duplicate
+      }
 
-        // Keep only last 20 cities
-        const trimmed = updated.slice(0, 55);
-
-        // Save to localStorage
-        localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-        return trimmed;
-      });
-    }
-  }, [currentCity?.city, currentCity?.state]);
+      // Add new city at the beginning
+      const updated = [newCity, ...prev];
+      // Keep only last 55 cities
+      const trimmed = updated.slice(0, 55);
+      // Save to localStorage
+      localStorage.setItem("visitedCities", JSON.stringify(trimmed));
+      return trimmed;
+    });
+  };
 
   if (visitedCities.length === 0) return null;
 
@@ -64,7 +65,7 @@ export function CityTagCloud({ onCitySelect, currentCity }: CityTagCloudProps) {
             variant="outline"
             size="xs"
             className="flex items-center justify-center bg-gray-300 text-xs text-black font-medium py-1 px-3 rounded-full hover:bg-gray-400 transition-all"
-            onClick={() => onCitySelect(city.city, city.state)}
+            onClick={() => handleCitySelect(city.city, city.state)}
           >
             {city.city}
           </Button>
