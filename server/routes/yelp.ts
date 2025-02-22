@@ -21,18 +21,16 @@ router.get("/search", async (req, res) => {
 
     // Validate that either location OR coordinates are provided
     if (!location && (!latitude || !longitude)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Either location or coordinates (latitude & longitude) are required",
-        });
+      return res.status(400).json({
+        error:
+          "Either location or coordinates (latitude & longitude) are required",
+      });
     }
 
     // Base parameters
     const baseParams = {
       categories: "donuts",
-      sort_by: "rating",
+      sort_by: "distance",
       limit: 50,
       ...(radius ? { radius: Math.min(Number(radius), 40000) } : {}), // Max 40000 meters (25 miles)
       ...(location
@@ -65,15 +63,18 @@ router.get("/search", async (req, res) => {
       }),
     ]);
 
+    console.log("donutResponse:", donutResponse.data.businesses.length);
+    console.log("doughnutResponse:", doughnutResponse.data.businesses.length);
+
     // Log full responses for debugging
-    console.log(
-      "Donut Search Raw Response:",
-      JSON.stringify(donutResponse.data, null, 2),
-    );
-    console.log(
-      "Doughnut Search Raw Response:",
-      JSON.stringify(doughnutResponse.data, null, 2),
-    );
+    // console.log(
+    //   "Donut Search Raw Response:",
+    //   JSON.stringify(donutResponse.data, null, 2),
+    // );
+    // console.log(
+    //   "Doughnut Search Raw Response:",
+    //   JSON.stringify(doughnutResponse.data, null, 2),
+    // );
 
     // Combine and deduplicate results
     const allBusinesses = [
@@ -86,6 +87,17 @@ router.get("/search", async (req, res) => {
     );
 
     const filteredBusinesses = filterChainStores(uniqueBusinesses);
+
+    const filteredAndCloseBusinesses = filteredBusinesses.filter(
+      (business) => business.distance <= 24140,
+    );
+
+    console.log("filteredBusinesses length:", filteredBusinesses.length);
+
+    console.log(
+      "filteredAndCloseBusinesses length:",
+      filteredAndCloseBusinesses.length,
+    );
 
     const formattedResults = filteredBusinesses.map((business) => ({
       id: business.id,
@@ -108,10 +120,10 @@ router.get("/search", async (req, res) => {
     }));
 
     // Log the final formatted results
-    console.log(
-      "Formatted Results:",
-      JSON.stringify(formattedResults, null, 2),
-    );
+    // console.log(
+    //   "Formatted Results:",
+    //   JSON.stringify(formattedResults, null, 2),
+    // );
 
     res.json(formattedResults);
   } catch (error: any) {
