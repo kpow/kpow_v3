@@ -26,7 +26,7 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
 
     setVisitedCities((prev) => {
       const exists = prev.some(
-        (city) => city.city === newCity.city && city.state === newCity.state
+        (prevCity) => prevCity.city === city && prevCity.state === state
       );
 
       if (exists) {
@@ -39,6 +39,14 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
       return trimmed;
     });
   };
+
+  useEffect(() => {
+    // Load visited cities from localStorage
+    const storedCities = localStorage.getItem("visitedCities");
+    if (storedCities) {
+      setVisitedCities(JSON.parse(storedCities));
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedCity?.city && selectedCity?.state) {
