@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
@@ -41,7 +40,6 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
   };
 
   useEffect(() => {
-    // Load visited cities from localStorage
     const storedCities = localStorage.getItem("visitedCities");
     if (storedCities) {
       setVisitedCities(JSON.parse(storedCities));
@@ -54,17 +52,8 @@ export function CityTagCloud({ onCitySelect, selectedCity }: CityTagCloudProps) 
     }
   }, [selectedCity]);
 
-  useEffect(() => {
-    // Load visited cities from localStorage
-    const storedCities = localStorage.getItem("visitedCities");
-    if (storedCities) {
-      setVisitedCities(JSON.parse(storedCities));
-    }
-  }, []);
-
   const handleCitySelect = (city: string, state: string) => {
     onCitySelect(city, state);
-    saveCity(city, state);
   };
 
   if (visitedCities.length === 0) return null;
