@@ -344,9 +344,9 @@ export default function DonutShops() {
             </Card>
           </div>
 
-          <Card className="lg:col-span-1 h-full">
-            <CardContent className="pt-4 h-full flex flex-col">
-              <div className="mb-4 flex flex-col justify-center flex-grow">
+          <Card className="lg:col-span-1">
+            <CardContent className="pt-4">
+              <div className="mb-4 flex flex-col justify-center">
                 <Label className="mb-2">Minimum Rating</Label>
                 <div className="flex items-center gap-4">
                   <Slider
@@ -443,7 +443,7 @@ export default function DonutShops() {
                   </div>
                 </TabsContent>
 
-                <div className="mt-6 flex-grow flex flex-col">
+                <div className="mt-6">
                   <Button
                     onClick={handleSearch}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
