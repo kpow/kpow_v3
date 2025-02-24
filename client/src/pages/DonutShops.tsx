@@ -312,12 +312,16 @@ export default function DonutShops() {
           <Card className="">
             <CardContent className="p-0 m-0">
               <div className="h-[600px] w-full rounded-lg">
-                <DonutShopMap
-                  shops={shops}
-                  onShopClick={handleShopClick}
-                  shouldFitBounds={shouldFitBounds}
-                  selectedShopId={selectedShopId}
-                />
+                {shops && shops.length > 0 && shops.some(shop => 
+                  shop.coordinates?.latitude && shop.coordinates?.longitude
+                ) && (
+                  <DonutShopMap
+                    shops={shops}
+                    onShopClick={handleShopClick}
+                    shouldFitBounds={shouldFitBounds}
+                    selectedShopId={selectedShopId}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>

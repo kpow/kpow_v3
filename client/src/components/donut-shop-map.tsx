@@ -30,6 +30,27 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
+// Helper function to get map bounds from shops
+const getBoundsFromShops = (shops: Shop[]) => {
+  if (!shops || shops.length === 0) return null;
+  
+  const validShops = shops.filter(shop => 
+    shop.coordinates && 
+    shop.coordinates.latitude && 
+    shop.coordinates.longitude
+  );
+  
+  if (validShops.length === 0) return null;
+
+  const lats = validShops.map(shop => shop.coordinates.latitude);
+  const lngs = validShops.map(shop => shop.coordinates.longitude);
+  
+  return L.latLngBounds(
+    [Math.min(...lats), Math.min(...lngs)],
+    [Math.max(...lats), Math.max(...lngs)]
+  );
+};
+
 interface MapControllerProps {
   shops: Shop[];
   shouldFitBounds: boolean;
