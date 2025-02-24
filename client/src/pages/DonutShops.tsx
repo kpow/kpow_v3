@@ -308,7 +308,7 @@ export default function DonutShops() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
-          <div className="lg:col-span-2 lg:row-span-2 grid gap-4">
+          <div className="lg:col-span-2">
             <Card>
             <CardContent className="p-0 m-0">
               <div className="h-[600px] w-full rounded-lg">
