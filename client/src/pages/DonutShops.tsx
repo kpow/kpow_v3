@@ -19,44 +19,7 @@ import { CityTagCloud } from "@/components/CityTagCloud";
 import { DonutLuvList } from "@/components/donut-luv-list";
 import { Shop } from '@/types/shop';
 
-interface SearchState {
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-const getRandomCity = () => {
-  const randomIndex = Math.floor(Math.random() * cities.length);
-  return {
-    city: cities[randomIndex].city,
-    state: cities[randomIndex].state,
-  };
-};
-
-const saveToVisitedCities = (city: string, state: string) => {
-  const newCity = {
-    city,
-    state,
-    timestamp: Date.now(),
-  };
-
-  const storedCities = localStorage.getItem("visitedCities");
-  const currentCities = storedCities ? JSON.parse(storedCities) : [];
-
-  const exists = currentCities.some(
-    (prevCity: any) => prevCity.city === city && prevCity.state === state
-  );
-
-  if (!exists) {
-    const updated = [newCity, ...currentCities];
-    const trimmed = updated.slice(0, 55);
-    localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-    // Dispatch custom event to notify CityTagCloud
-    window.dispatchEvent(new Event('visitedCitiesUpdated'));
-  }
-};
+// Rest of the imports and interfaces remain unchanged...
 
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
@@ -78,6 +41,7 @@ export default function DonutShops() {
   );
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(true);
+  const [isLoadingShops, setIsLoadingShops] = useState(true); //Added state for loading
   const { toast } = useToast();
 
   const {
@@ -268,6 +232,22 @@ export default function DonutShops() {
     }, 0);
   };
 
+  useEffect(() => {
+    const handleFetchComplete = () => {
+      setIsLoadingShops(false);
+    };
+
+    if(allShops.length > 0){
+      handleFetchComplete();
+    }
+
+    return () => {
+      // Cleanup function (optional)
+    };
+
+  }, [allShops]);
+
+
   return (
     <>
       <SEO
@@ -276,7 +256,7 @@ export default function DonutShops() {
         image={getPreviewImage()}
         type="website"
       />
-      <div className="container mx-auto max-w-[1800px]">
+      <div className="container mx-auto max-w-[1800px] flex flex-col min-h-screen">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-4">
           <PageTitle size="lg" className="text-2xl sm:text-3xl break-words">
             donut tour{" "}
@@ -296,38 +276,45 @@ export default function DonutShops() {
         </div>
 
         <div className="mb-4">
-          <div className="h-full w-full overflow-hidden">
-            {shops.length > 0 ? (
-              <ShopSlider shops={shops} onShopClick={handleShopClick} />
-            ) : (
+          <div className="h-full w-full rounded-lg overflow-hidden">
+            {isLoadingShops ? (
               <div className="w-full">
-                <Skeleton className="h-[180px] w-full animate-pulse" />
+                <Skeleton className="h-[200px] w-full" />
               </div>
-            )}
+            ) : shops && shops.length > 0 ? (
+              <div className="h-full w-full rounded-lg overflow-hidden">
+                <ShopSlider
+                  shops={shops}
+                  onShopClick={(shop) => {
+                    window.open(shop.url, "_blank");
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
-          <div className="lg:col-span-2 lg:row-span-2">
-          <Card className="">
-            <CardContent className="p-0 m-0">
-              <div className="h-[600px] w-full rounded-lg">
-                {shops && shops.length > 0 && shops.some(shop => 
-                  shop.coordinates?.latitude && shop.coordinates?.longitude
-                ) && (
-                  <DonutShopMap
-                    shops={shops}
-                    onShopClick={handleShopClick}
-                    shouldFitBounds={shouldFitBounds}
-                    selectedShopId={selectedShopId}
-                  />
-                )}
-              </div>
-            </CardContent>
-          </Card>
-            <Card className="lg:col-span-3 mt-6">
-              <CardContent className="p-4 m-0">
-                <div className="mt-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto flex-1">
+          <div className="lg:col-span-2 lg:row-span-2 flex flex-col h-full">
+            <Card className="flex-grow">
+              <CardContent className="p-0 h-full">
+                <div className="h-full w-full rounded-lg overflow-hidden">
+                  {shops && shops.length > 0 && shops.some((shop: Shop) =>
+                    shop.coordinates?.latitude && shop.coordinates?.longitude
+                  ) && (
+                    <DonutShopMap
+                      shops={shops}
+                      onShopClick={handleShopClick}
+                      shouldFitBounds={shouldFitBounds}
+                      selectedShopId={selectedShopId}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="mt-6">
+              <CardContent className="p-4">
+                <div>
                   <h2 className="text-lg font-slackey mb-2">recent tours</h2>
                   <CityTagCloud
                     onCitySelect={(city, state) => {
@@ -348,125 +335,169 @@ export default function DonutShops() {
             </Card>
           </div>
 
-          <Card className="lg:col-span-1">
-            <CardContent className="pt-4">
-              <div className="mb-4 flex flex-col justify-center">
-                <Label className="mb-2">Minimum Rating</Label>
-                <div className="flex items-center gap-4">
-                  <Slider
-                    value={[minRating]}
-                    onValueChange={handleRatingChange}
-                    max={5}
-                    step={0.1}
-                    className="flex-1"
-                  />
-                  <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
-                </div>
-              </div>
-              <Tabs
-                defaultValue="city"
-                onValueChange={(value) => {
-                  setSearchType(value);
-                  setSearchState({});
-                }}
-              >
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="city">City Search</TabsTrigger>
-                  <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
-                  <TabsTrigger value="coords">Coordinates</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="city" className="space-y-4">
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label>City Name</Label>
-                      <Input
-                        placeholder="Enter city name"
-                        value={searchState.city || ""}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, "city")
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>State</Label>
-                      <Input
-                        placeholder="Enter state (e.g., CA)"
-                        value={searchState.state || ""}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, "state")
-                        }
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="zipcode" className="space-y-4">
-                  <div className="grid gap-2">
-                    <Label>Zip Code</Label>
-                    <Input
-                      placeholder="Enter zip code"
-                      value={searchState.zipCode || ""}
-                      onChange={(e) =>
-                        handleInputChange(e.target.value, "zipCode")
-                      }
+          <div className="lg:col-span-1 flex flex-col h-full">
+            <Card className="flex-1">
+              <CardContent className="pt-4 h-full flex flex-col">
+                <div className="mb-4">
+                  <Label className="mb-2">Minimum Rating</Label>
+                  <div className="flex items-center gap-4">
+                    <Slider
+                      value={[minRating]}
+                      onValueChange={handleRatingChange}
+                      max={5}
+                      step={0.1}
+                      className="flex-1"
                     />
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="coords" className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label>Latitude</Label>
-                      <Input
-                        type="number"
-                        placeholder="Enter latitude"
-                        value={searchState.latitude || ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            parseFloat(e.target.value),
-                            "latitude",
-                          )
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Longitude</Label>
-                      <Input
-                        type="number"
-                        placeholder="Enter longitude"
-                        value={searchState.longitude || ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            parseFloat(e.target.value),
-                            "longitude",
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <div className="mt-6">
-                  <Button
-                    onClick={handleSearch}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Searching..." : "Search Donut Shops"}
-                  </Button>
-
-                  <div className="mt-4">
-                    <h3 className="text-lg font-medium mb-2">donut luv</h3>
-                    <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
+                    <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
                   </div>
                 </div>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
 
+                <div className="flex-1 flex flex-col">
+                  <Tabs
+                    defaultValue="city"
+                    onValueChange={(value) => {
+                      setSearchType(value);
+                      setSearchState({});
+                    }}
+                    className="flex flex-col h-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-3 mb-6">
+                      <TabsTrigger value="city">City Search</TabsTrigger>
+                      <TabsTrigger value="zipcode">Zip Code</TabsTrigger>
+                      <TabsTrigger value="coords">Coordinates</TabsTrigger>
+                    </TabsList>
+
+                    <div className="flex-1 flex flex-col">
+                      <TabsContent value="city" className="grid gap-4">
+                        <div className="grid gap-2">
+                          <Label>City Name</Label>
+                          <Input
+                            placeholder="Enter city name"
+                            value={searchState.city || ""}
+                            onChange={(e) =>
+                              handleInputChange(e.target.value, "city")
+                            }
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label>State</Label>
+                          <Input
+                            placeholder="Enter state (e.g., CA)"
+                            value={searchState.state || ""}
+                            onChange={(e) =>
+                              handleInputChange(e.target.value, "state")
+                            }
+                          />
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="zipcode">
+                        <div className="grid gap-2">
+                          <Label>Zip Code</Label>
+                          <Input
+                            placeholder="Enter zip code"
+                            value={searchState.zipCode || ""}
+                            onChange={(e) =>
+                              handleInputChange(e.target.value, "zipCode")
+                            }
+                          />
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="coords">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label>Latitude</Label>
+                            <Input
+                              type="number"
+                              placeholder="Enter latitude"
+                              value={searchState.latitude || ""}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  parseFloat(e.target.value),
+                                  "latitude",
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>Longitude</Label>
+                            <Input
+                              type="number"
+                              placeholder="Enter longitude"
+                              value={searchState.longitude || ""}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  parseFloat(e.target.value),
+                                  "longitude",
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      </TabsContent>
+                    </div>
+
+                    <div className="mt-6">
+                      <Button
+                        onClick={handleSearch}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Searching..." : "Search Donut Shops"}
+                      </Button>
+
+                      <div className="mt-4">
+                        <h3 className="text-lg font-medium mb-2">donut luv</h3>
+                        <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
+                      </div>
+                    </div>
+                  </Tabs>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </>
   );
+}
+
+const getRandomCity = () => {
+  const randomIndex = Math.floor(Math.random() * cities.length);
+  return {
+    city: cities[randomIndex].city,
+    state: cities[randomIndex].state,
+  };
+};
+
+const saveToVisitedCities = (city: string, state: string) => {
+  const newCity = {
+    city,
+    state,
+    timestamp: Date.now(),
+  };
+
+  const storedCities = localStorage.getItem("visitedCities");
+  const currentCities = storedCities ? JSON.parse(storedCities) : [];
+
+  const exists = currentCities.some(
+    (prevCity: any) => prevCity.city === city && prevCity.state === state
+  );
+
+  if (!exists) {
+    const updated = [newCity, ...currentCities];
+    const trimmed = updated.slice(0, 55);
+    localStorage.setItem("visitedCities", JSON.stringify(trimmed));
+    // Dispatch custom event to notify CityTagCloud
+    window.dispatchEvent(new Event('visitedCitiesUpdated'));
+  }
+};
+
+interface SearchState {
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  latitude?: number;
+  longitude?: number;
 }
