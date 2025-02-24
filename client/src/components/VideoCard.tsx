@@ -11,10 +11,10 @@ interface VideoCardProps {
 }
 
 function formatDuration(duration: string) {
-  if (!duration) return '';
+  if (!duration) return "";
   // Remove PT prefix
-  duration = duration.replace('PT', '');
-  
+  duration = duration.replace("PT", "");
+
   let hours = 0;
   let minutes = 0;
   let seconds = 0;
@@ -30,9 +30,9 @@ function formatDuration(duration: string) {
 
   // Format the time
   if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
 export function VideoCard({
@@ -60,7 +60,10 @@ export function VideoCard({
         <p className="text-sm text-gray-600 line-clamp-4 mb-2 flex-1 overflow-hidden">
           {description}
         </p>
-        <Button onClick={onPlay} className="w-full">
+        <Button
+          onClick={onPlay}
+          className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+        >
           Play Video
         </Button>
       </div>
