@@ -308,7 +308,8 @@ export default function DonutShops() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto">
-          <Card className="lg:col-span-2 lg:row-span-2">
+          <div className="lg:col-span-2 lg:row-span-2">
+          <Card className="">
             <CardContent className="p-0 m-0">
               <div className="h-[600px] w-full rounded-lg">
                 <DonutShopMap
@@ -320,6 +321,28 @@ export default function DonutShops() {
               </div>
             </CardContent>
           </Card>
+            <Card className="lg:col-span-3 mt-6">
+              <CardContent className="p-4 m-0">
+                <div className="mt-0">
+                  <h2 className="text-lg font-slackey mb-2">recent tours</h2>
+                  <CityTagCloud
+                    onCitySelect={(city, state) => {
+                      setSearchState({ city, state });
+                      setSearchType("city");
+                      setTimeout(() => {
+                        refetch();
+                      }, 0);
+                    }}
+                    selectedCity={
+                      searchState.city && searchState.state
+                        ? { city: searchState.city, state: searchState.state }
+                        : undefined
+                    }
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           <Card className="lg:col-span-1">
             <CardContent className="pt-4">
@@ -438,29 +461,7 @@ export default function DonutShops() {
             </CardContent>
           </Card>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto mt-4">
-          <Card className="lg:col-span-3">
-            <CardContent className="p-4 m-0">
-              <div className="mt-0">
-                <h2 className="text-lg font-slackey mb-2">recent tours</h2>
-                <CityTagCloud
-                  onCitySelect={(city, state) => {
-                    setSearchState({ city, state });
-                    setSearchType("city");
-                    setTimeout(() => {
-                      refetch();
-                    }, 0);
-                  }}
-                  selectedCity={
-                    searchState.city && searchState.state
-                      ? { city: searchState.city, state: searchState.state }
-                      : undefined
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+
       </div>
     </>
   );
