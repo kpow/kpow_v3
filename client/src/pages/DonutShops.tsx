@@ -344,8 +344,8 @@ export default function DonutShops() {
             </Card>
           </div>
 
-          <Card className="lg:col-span-1">
-            <CardContent className="pt-4">
+          <Card className="lg:col-span-1 h-full">
+            <CardContent className="pt-4 h-full flex flex-col">
               <div className="mb-4 flex flex-col justify-center">
                 <Label className="mb-2">Minimum Rating</Label>
                 <div className="flex items-center gap-4">
