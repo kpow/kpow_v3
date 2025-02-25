@@ -292,9 +292,7 @@ export default function DonutShops() {
               <div className="h-full w-full rounded-lg overflow-hidden">
                 <ShopSlider
                   shops={shops}
-                  onShopClick={(shop) => {
-                    window.open(shop.url, "_blank");
-                  }}
+                  onShopClick={handleShopClick}
                 />
               </div>
             ) : null}
@@ -302,7 +300,7 @@ export default function DonutShops() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto flex flex-col items-stretch">
-          
+
           <div className="lg:col-span-2 lg:row-span-2 h-full flex flex-col">
             <Card>
               <CardContent className="p-0 h-full lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
@@ -467,9 +465,9 @@ export default function DonutShops() {
               </div>
             </CardContent>
           </Card>
-          
+
         </div>
-        
+
       </div>
     </>
   );
