@@ -322,25 +322,23 @@ export default function DonutShops() {
             </Card>
             <Card className="mt-6">
               <CardContent className="p-4">
-                <Collapsible>
-                  <CollapsibleTrigger className="flex items-center justify-between w-full">
-                    <h2 className="text-lg font-slackey">donut luv</h2>
-                    <ChevronDown className="h-4 w-4" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-4">
+                <div className="space-y-4">
+                  <Collapsible className="w-full">
+                    <CollapsibleTrigger className="flex items-center justify-between w-full">
+                      <h2 className="text-lg font-slackey">donut luv</h2>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-4">
                       <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                    </CollapsibleContent>
+                  </Collapsible>
 
-                <Collapsible className="mt-6">
-                  <CollapsibleTrigger className="flex items-center justify-between w-full">
-                    <h2 className="text-lg font-slackey">recent tours</h2>
-                    <ChevronDown className="h-4 w-4" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-4">
+                  <Collapsible className="w-full">
+                    <CollapsibleTrigger className="flex items-center justify-between w-full">
+                      <h2 className="text-lg font-slackey">recent tours</h2>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-4">
                       <CityTagCloud
                         onCitySelect={(city, state) => {
                           setSearchState({ city, state });
@@ -355,9 +353,9 @@ export default function DonutShops() {
                             : undefined
                         }
                       />
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
               </CardContent>
             </Card>
           </div>

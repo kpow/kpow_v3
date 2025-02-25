@@ -43,16 +43,9 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   }, []);
 
   const removeFavorite = (shopId: string) => {
-    // Create a new array without the removed shop
     const updatedFavorites = favorites.filter((shop) => shop.id !== shopId);
-
-    // Update localStorage
     localStorage.setItem("donutLuv", JSON.stringify(updatedFavorites));
-
-    // Update state with the new array
     setFavorites(updatedFavorites);
-
-    // Notify other components
     window.dispatchEvent(new Event("donutLuvUpdate"));
   };
 
@@ -65,35 +58,38 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   return (
     <>
       <h3 className="text-lg font-medium mb-2">donut luv</h3>
-
-      <ScrollArea className="h-full w-full rounded-md border p-2">
-        <div className="flex flex-wrap gap-2">
-          {favorites.map((shop) => (
-            <div key={shop.id} className="inline-flex">
-              <Button
-                variant="secondary"
-                className="flex h-[24px] rounded-l-full rounded-r-none"
-                onClick={() => handleShopClick(shop)}
-              >
-                <span className="text-xs">
-                  {shop.name} - {shop.city}
-                </span>
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-[24px] rounded-l-none rounded-r-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeFavorite(shop.id);
-                }}
-              >
-                <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-              </Button>
+      <div className="w-full">
+        <ScrollArea className="w-full rounded-md border">
+          <div className="p-2">
+            <div className="flex flex-wrap gap-2">
+              {favorites.map((shop) => (
+                <div key={shop.id} className="inline-flex">
+                  <Button
+                    variant="secondary"
+                    className="flex h-[24px] rounded-l-full rounded-r-none"
+                    onClick={() => handleShopClick(shop)}
+                  >
+                    <span className="text-xs">
+                      {shop.name} - {shop.city}
+                    </span>
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-[24px] rounded-l-none rounded-r-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFavorite(shop.id);
+                    }}
+                  >
+                    <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                  </Button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </ScrollArea>
+          </div>
+        </ScrollArea>
+      </div>
     </>
   );
 }
