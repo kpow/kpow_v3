@@ -17,15 +17,11 @@ interface DonutLuvListProps {
 export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   const [favorites, setFavorites] = useState<DonutLuvShop[]>([]);
 
-  const updateFavorites = () => {
+  useEffect(() => {
     const storedFavorites = localStorage.getItem("donutLuv");
     if (storedFavorites) {
       setFavorites(JSON.parse(storedFavorites));
     }
-  };
-
-  useEffect(() => {
-    updateFavorites();
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "donutLuv") {
@@ -42,6 +38,13 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
     };
   }, []);
 
+  const updateFavorites = () => {
+    const storedFavorites = localStorage.getItem("donutLuv");
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites));
+    }
+  };
+
   const removeFavorite = (shopId: string) => {
     const updatedFavorites = favorites.filter((shop) => shop.id !== shopId);
     localStorage.setItem("donutLuv", JSON.stringify(updatedFavorites));
@@ -57,9 +60,8 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
 
   return (
     <>
-      <h3 className="text-lg font-medium mb-2">donut luv</h3>
-      <div className="w-full">
-        <ScrollArea className="w-full rounded-md border">
+      <div className="w-full min-w-[300px] sm:min-w-[400px] lg:min-w-[500px]">
+        <ScrollArea className="w-full rounded-md border min-h-[100px]">
           <div className="p-2">
             <div className="flex flex-wrap gap-2">
               {favorites.map((shop) => (

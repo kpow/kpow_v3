@@ -49,11 +49,7 @@ export default function DonutShops() {
   const [isLoadingShops, setIsLoadingShops] = useState(true);
   const { toast } = useToast();
 
-  const {
-    data,
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["donutShops", searchState],
     queryFn: async () => {
       const queryString = new URLSearchParams();
@@ -100,7 +96,9 @@ export default function DonutShops() {
     staleTime: Infinity,
   });
 
-  const shops = (data?.shops || []).filter((shop: Shop) => shop.rating >= minRating);
+  const shops = (data?.shops || []).filter(
+    (shop: Shop) => shop.rating >= minRating,
+  );
 
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
@@ -251,8 +249,7 @@ export default function DonutShops() {
       handleFetchComplete();
     }
 
-    return () => {
-    };
+    return () => {};
   }, [data?.shops]);
 
   return (
@@ -290,26 +287,21 @@ export default function DonutShops() {
               </div>
             ) : shops && shops.length > 0 ? (
               <div className="h-full w-full rounded-lg overflow-hidden">
-                <ShopSlider
-                  shops={shops}
-                  onShopClick={handleShopClick}
-                />
+                <ShopSlider shops={shops} onShopClick={handleShopClick} />
               </div>
             ) : null}
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto flex flex-col items-stretch">
-
           <div className="lg:col-span-2 lg:row-span-2 h-full flex flex-col">
             <Card>
-              <CardContent className="p-0 h-full lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
+              <CardContent className="p-0 h-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[780px] lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
                 {shops &&
                   shops.length > 0 &&
                   shops.some(
                     (shop: Shop) =>
-                      shop.coordinates?.latitude &&
-                      shop.coordinates?.longitude,
+                      shop.coordinates?.latitude && shop.coordinates?.longitude,
                   ) && (
                     <DonutShopMap
                       shops={shops}
@@ -323,12 +315,12 @@ export default function DonutShops() {
             <Card className="mt-6">
               <CardContent className="p-4">
                 <div className="space-y-4">
-                  <Collapsible className="w-full">
+                  <Collapsible className="w-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[1000px]">
                     <CollapsibleTrigger className="flex items-center justify-between w-full">
                       <h2 className="text-lg font-slackey">donut luv</h2>
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4">
+                    <CollapsibleContent className="pt-4 transition-all duration-300">
                       <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
                     </CollapsibleContent>
                   </Collapsible>
@@ -338,18 +330,20 @@ export default function DonutShops() {
                       <h2 className="text-lg font-slackey">recent tours</h2>
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4">
+                    <CollapsibleContent className="pt-4 transition-all duration-300">
                       <CityTagCloud
                         onCitySelect={(city, state) => {
                           setSearchState({ city, state });
-                          setSearchType("city");
                           setTimeout(() => {
                             refetch();
                           }, 0);
                         }}
                         selectedCity={
                           searchState.city && searchState.state
-                            ? { city: searchState.city, state: searchState.state }
+                            ? {
+                                city: searchState.city,
+                                state: searchState.state,
+                              }
                             : undefined
                         }
                       />
@@ -472,16 +466,17 @@ export default function DonutShops() {
                     </Button>
 
                     <div className="mt-4">
-                      <SearchMetrics metrics={data?.metrics} isLoading={isLoading} />
+                      <SearchMetrics
+                        metrics={data?.metrics}
+                        isLoading={isLoading}
+                      />
                     </div>
                   </div>
                 </Tabs>
               </div>
             </CardContent>
           </Card>
-
         </div>
-
       </div>
     </>
   );
