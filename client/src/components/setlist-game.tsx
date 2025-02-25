@@ -236,21 +236,23 @@ export function SetlistGame() {
               >
                 <motion.div className="overflow-hidden">
                   <motion.h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
-                    {"Ready to test your Phish knowledge?".split("").map((char, i) => (
-                      <motion.span
-                        key={i}
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.5,
-                          delay: Math.random() * 0.5 + 0.1,
-                          ease: "circOut"
-                        }}
-                        className="inline-block"
-                      >
-                        {char === " " ? "\u00A0" : char}
-                      </motion.span>
-                    ))}
+                    {"Ready to test your Phish knowledge?"
+                      .split("")
+                      .map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ opacity: 0, y: 50 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.8,
+                            delay: Math.random() * 0.5 + 0.1,
+                            ease: "circOut",
+                          }}
+                          className="inline-block"
+                        >
+                          {char === " " ? "\u00A0" : char}
+                        </motion.span>
+                      ))}
                   </motion.h2>
                 </motion.div>
 
@@ -260,7 +262,7 @@ export function SetlistGame() {
                   transition={{
                     duration: 0.8,
                     delay: 0.8,
-                    ease: "easeOut"
+                    ease: "easeOut",
                   }}
                 >
                   <p className="mb-6 text-muted-foreground">
@@ -271,14 +273,14 @@ export function SetlistGame() {
                 </motion.div>
 
                 <motion.div
-                  initial={{ opacity: 0, y: 50 }}
+                  initial={{ opacity: 0, y: 100 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
-                    duration: 0.8,
-                    delay: 1.2,
+                    duration: 1.5,
+                    delay: 1.5,
                     type: "spring",
                     stiffness: 100,
-                    damping: 15
+                    damping: 15,
                   }}
                 >
                   <Button
