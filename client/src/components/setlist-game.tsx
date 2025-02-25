@@ -232,23 +232,63 @@ export function SetlistGame() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center h-full flex flex-col items-center justify-center"
+                className="text-center h-full flex flex-col items-center justify-center space-y-6"
               >
-                <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
-                  Ready to test your Phish knowledge?
-                </h2>
-                <p className="mb-6 text-muted-foreground">
-                  You'll get 10 seconds to study a setlist,
-                  <br />
-                  then 15 seconds to guess the year and tour!
-                </p>
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg animate-pulse"
-                  onClick={startGame}
-                  size="lg"
+                <motion.div className="overflow-hidden">
+                  <motion.h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
+                    {"Ready to test your Phish knowledge?".split("").map((char, i) => (
+                      <motion.span
+                        key={i}
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: Math.random() * 0.5 + 0.1,
+                          ease: "circOut"
+                        }}
+                        className="inline-block"
+                      >
+                        {char === " " ? "\u00A0" : char}
+                      </motion.span>
+                    ))}
+                  </motion.h2>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: -30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.8,
+                    ease: "easeOut"
+                  }}
                 >
-                  Start Game
-                </Button>
+                  <p className="mb-6 text-muted-foreground">
+                    You'll get 10 seconds to study a setlist,
+                    <br />
+                    then 15 seconds to guess the year and tour!
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 1.2,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15
+                  }}
+                >
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg animate-pulse"
+                    onClick={startGame}
+                    size="lg"
+                  >
+                    Start Game
+                  </Button>
+                </motion.div>
               </motion.div>
             )}
 
@@ -435,7 +475,7 @@ export function SetlistGame() {
                     venue: currentSetlist.venue,
                     city: "",
                     state: "",
-                    country: "", // Adding the required country field
+                    country: "",
                   }}
                   isOpen={showDetailsOpen}
                   onClose={() => setShowDetailsOpen(false)}
