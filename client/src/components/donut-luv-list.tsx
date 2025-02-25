@@ -63,33 +63,37 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   };
 
   return (
-    <ScrollArea className="h-full w-full rounded-md border p-2">
-      <div className="flex flex-wrap gap-2">
-        {favorites.map((shop) => (
-          <div key={shop.id} className="inline-flex">
-            <Button
-              variant="secondary"
-              className="flex h-[24px] rounded-l-full rounded-r-none"
-              onClick={() => handleShopClick(shop)}
-            >
-              <span className="text-xs">
-                {shop.name} - {shop.city}
-              </span>
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="h-[24px] rounded-l-none rounded-r-full"
-              onClick={(e) => {
-                e.stopPropagation();
-                removeFavorite(shop.id);
-              }}
-            >
-              <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-            </Button>
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
+    <>
+      <h3 className="text-lg font-medium mb-2">donut luv</h3>
+
+      <ScrollArea className="h-full w-full rounded-md border p-2">
+        <div className="flex flex-wrap gap-2">
+          {favorites.map((shop) => (
+            <div key={shop.id} className="inline-flex">
+              <Button
+                variant="secondary"
+                className="flex h-[24px] rounded-l-full rounded-r-none"
+                onClick={() => handleShopClick(shop)}
+              >
+                <span className="text-xs">
+                  {shop.name} - {shop.city}
+                </span>
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-[24px] rounded-l-none rounded-r-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFavorite(shop.id);
+                }}
+              >
+                <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </>
   );
 }

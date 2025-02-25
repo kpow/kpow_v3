@@ -19,8 +19,12 @@ import { CityTagCloud } from "@/components/CityTagCloud";
 import { DonutLuvList } from "@/components/donut-luv-list";
 import { Shop } from "@/types/shop";
 import { SearchMetrics } from "@/components/search-metrics";
-
-// Rest of the imports and interfaces remain unchanged...
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
@@ -42,7 +46,7 @@ export default function DonutShops() {
   );
   const [minRating, setMinRating] = useState(0);
   const [shouldFitBounds, setShouldFitBounds] = useState(true);
-  const [isLoadingShops, setIsLoadingShops] = useState(true); //Added state for loading
+  const [isLoadingShops, setIsLoadingShops] = useState(true);
   const { toast } = useToast();
 
   const {
@@ -78,8 +82,8 @@ export default function DonutShops() {
       }
 
       const data = await response.json();
+      console.log("Received API response:", data);
 
-      // Only save to visited cities if we got results and it's a city search
       if (
         data.shops.length > 0 &&
         searchType === "city" &&
@@ -225,18 +229,14 @@ export default function DonutShops() {
     setSearchState({ city, state });
     setSearchType("city");
     if (shopId) {
-      // Set selected shop ID before fetching
       setSelectedShopId(shopId);
     }
-    // Set shouldFitBounds to true to ensure map centers on the new location
     setShouldFitBounds(true);
     setTimeout(() => {
       refetch().then(() => {
-        // After fetching shops, make sure to set the selected shop ID again
-        // since the refetch might have reset it
         if (shopId) {
           setSelectedShopId(shopId);
-          setShouldFitBounds(false); // Prevent map from re-fitting bounds after marker is selected
+          setShouldFitBounds(false);
         }
       });
     }, 0);
@@ -252,7 +252,6 @@ export default function DonutShops() {
     }
 
     return () => {
-      // Cleanup function (optional)
     };
   }, [data?.shops]);
 
@@ -305,43 +304,60 @@ export default function DonutShops() {
           <div className="lg:col-span-2 lg:row-span-2 h-full flex flex-col">
             <Card>
               <CardContent className="p-0 h-full lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
-                <div className="h-full w-full rounded-lg overflow-hidden">
-                  {shops &&
-                    shops.length > 0 &&
-                    shops.some(
-                      (shop: Shop) =>
-                        shop.coordinates?.latitude &&
-                        shop.coordinates?.longitude,
-                    ) && (
-                      <DonutShopMap
-                        shops={shops}
-                        onShopClick={handleShopClick}
-                        shouldFitBounds={shouldFitBounds}
-                        selectedShopId={selectedShopId}
-                      />
-                    )}
-                </div>
+                {shops &&
+                  shops.length > 0 &&
+                  shops.some(
+                    (shop: Shop) =>
+                      shop.coordinates?.latitude &&
+                      shop.coordinates?.longitude,
+                  ) && (
+                    <DonutShopMap
+                      shops={shops}
+                      onShopClick={handleShopClick}
+                      shouldFitBounds={shouldFitBounds}
+                      selectedShopId={selectedShopId}
+                    />
+                  )}
               </CardContent>
             </Card>
             <Card className="mt-6">
-              <CardContent className="p-4 lg:max-h-[300px] sm:max-h-[210px] max-h-[170px] overflow-hidden">
-                <div>
-                  <h2 className="text-lg font-slackey mb-2">recent tours</h2>
-                  <CityTagCloud
-                    onCitySelect={(city, state) => {
-                      setSearchState({ city, state });
-                      setSearchType("city");
-                      setTimeout(() => {
-                        refetch();
-                      }, 0);
-                    }}
-                    selectedCity={
-                      searchState.city && searchState.state
-                        ? { city: searchState.city, state: searchState.state }
-                        : undefined
-                    }
-                  />
-                </div>
+              <CardContent className="p-4">
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full">
+                    <h2 className="text-lg font-slackey">donut luv</h2>
+                    <ChevronDown className="h-4 w-4" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="mt-4">
+                      <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Collapsible className="mt-6">
+                  <CollapsibleTrigger className="flex items-center justify-between w-full">
+                    <h2 className="text-lg font-slackey">recent tours</h2>
+                    <ChevronDown className="h-4 w-4" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="mt-4">
+                      <CityTagCloud
+                        onCitySelect={(city, state) => {
+                          setSearchState({ city, state });
+                          setSearchType("city");
+                          setTimeout(() => {
+                            refetch();
+                          }, 0);
+                        }}
+                        selectedCity={
+                          searchState.city && searchState.state
+                            ? { city: searchState.city, state: searchState.state }
+                            : undefined
+                        }
+                      />
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </CardContent>
             </Card>
           </div>
@@ -458,8 +474,6 @@ export default function DonutShops() {
                     </Button>
 
                     <div className="mt-4">
-                      <h3 className="text-lg font-medium mb-2">donut luv</h3>
-                      <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
                       <SearchMetrics metrics={data?.metrics} isLoading={isLoading} />
                     </div>
                   </div>
@@ -501,7 +515,6 @@ const saveToVisitedCities = (city: string, state: string) => {
     const updated = [newCity, ...currentCities];
     const trimmed = updated.slice(0, 55);
     localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-    // Dispatch custom event to notify CityTagCloud
     window.dispatchEvent(new Event("visitedCitiesUpdated"));
   }
 };

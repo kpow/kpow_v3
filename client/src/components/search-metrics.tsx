@@ -7,6 +7,7 @@ interface SearchMetrics {
   totalUniqueShops: number;
   filteredShops: number;
   nearbyShops: number;
+  chainStoresFiltered: number;
 }
 
 interface SearchMetricsProps {
@@ -47,6 +48,10 @@ export function SearchMetrics({ metrics, isLoading }: SearchMetricsProps) {
         <MetricCard 
           label="Nearby Shops" 
           value={metrics.nearbyShops} 
+        />
+        <MetricCard 
+          label="Chain Stores Filtered" 
+          value={metrics.chainStoresFiltered} 
         />
       </div>
     </div>

@@ -89,6 +89,7 @@ router.get("/search", async (req, res) => {
       totalUniqueShops: uniqueBusinesses.length,
       filteredShops: filteredBusinesses.length,
       nearbyShops: filteredAndCloseBusinesses.length,
+      chainStoresFiltered: uniqueBusinesses.length - filteredBusinesses.length,
     };
 
     console.log("Search metrics being sent:", searchMetrics);

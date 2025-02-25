@@ -16,6 +16,18 @@ import { SEO } from "@/components/SEO";
 import { StarFeed } from "@/components/StarFeed";
 import { Shop } from '@/types/shop';
 
+interface YelpResponse {
+  shops: Shop[];
+  metrics: {
+    donutResults: number;
+    doughnutResults: number;
+    totalUniqueShops: number;
+    filteredShops: number;
+    nearbyShops: number;
+    chainStoresFiltered: number;
+  };
+}
+
 export default function Home() {
   const getRandomCity = () => {
     const randomIndex = Math.floor(Math.random() * cities.length);
@@ -31,7 +43,7 @@ export default function Home() {
     state: initialCity.state,
   });
 
-  const { data: shops, isLoading: isLoadingShops } = useQuery<Shop[]>({
+  const { data, isLoading: isLoadingShops } = useQuery<YelpResponse>({
     queryKey: ["/api/yelp/search", currentCity],
     queryFn: async () => {
       const location = `${currentCity.city}, ${currentCity.state}`;
@@ -47,6 +59,8 @@ export default function Home() {
     retry: 1,
     refetchOnWindowFocus: false,
   });
+
+  const shops = data?.shops || [];
 
   const mainSections = [
     {
