@@ -66,16 +66,6 @@ router.get("/search", async (req, res) => {
     console.log("donutResponse:", donutResponse.data.businesses.length);
     console.log("doughnutResponse:", doughnutResponse.data.businesses.length);
 
-    // Log full responses for debugging
-    // console.log(
-    //   "Donut Search Raw Response:",
-    //   JSON.stringify(donutResponse.data, null, 2),
-    // );
-    // console.log(
-    //   "Doughnut Search Raw Response:",
-    //   JSON.stringify(doughnutResponse.data, null, 2),
-    // );
-
     // Combine and deduplicate results
     const allBusinesses = [
       ...donutResponse.data.businesses,
@@ -92,12 +82,16 @@ router.get("/search", async (req, res) => {
       (business) => business.distance <= 24140,
     );
 
-    console.log("filteredBusinesses length:", filteredBusinesses.length);
+    // Create metrics object
+    const searchMetrics = {
+      donutResults: donutResponse.data.businesses.length,
+      doughnutResults: doughnutResponse.data.businesses.length,
+      totalUniqueShops: uniqueBusinesses.length,
+      filteredShops: filteredBusinesses.length,
+      nearbyShops: filteredAndCloseBusinesses.length,
+    };
 
-    console.log(
-      "filteredAndCloseBusinesses length:",
-      filteredAndCloseBusinesses.length,
-    );
+    console.log("Search metrics being sent:", searchMetrics);
 
     const formattedResults = filteredBusinesses.map((business) => ({
       id: business.id,
@@ -119,13 +113,10 @@ router.get("/search", async (req, res) => {
       photos: business.photos || [business.image_url], // Added photos array
     }));
 
-    // Log the final formatted results
-    // console.log(
-    //   "Formatted Results:",
-    //   JSON.stringify(formattedResults, null, 2),
-    // );
-
-    res.json(formattedResults);
+    res.json({
+      shops: formattedResults,
+      metrics: searchMetrics,
+    });
   } catch (error: any) {
     console.error("Yelp API Error:", error.response?.data || error.message);
     res.status(500).json({

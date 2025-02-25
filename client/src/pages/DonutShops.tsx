@@ -18,6 +18,7 @@ import { SEO } from "@/components/SEO";
 import { CityTagCloud } from "@/components/CityTagCloud";
 import { DonutLuvList } from "@/components/donut-luv-list";
 import { Shop } from "@/types/shop";
+import { SearchMetrics } from "@/components/search-metrics";
 
 // Rest of the imports and interfaces remain unchanged...
 
@@ -45,7 +46,7 @@ export default function DonutShops() {
   const { toast } = useToast();
 
   const {
-    data: allShops = [],
+    data,
     isLoading,
     refetch,
   } = useQuery({
@@ -66,7 +67,7 @@ export default function DonutShops() {
         queryString.append("latitude", searchState.latitude.toString());
         queryString.append("longitude", searchState.longitude.toString());
       } else {
-        return [];
+        return { shops: [], metrics: null };
       }
 
       const response = await fetch(`/api/yelp/search?${queryString}`);
@@ -80,7 +81,7 @@ export default function DonutShops() {
 
       // Only save to visited cities if we got results and it's a city search
       if (
-        data.length > 0 &&
+        data.shops.length > 0 &&
         searchType === "city" &&
         searchState.city &&
         searchState.state
@@ -95,7 +96,7 @@ export default function DonutShops() {
     staleTime: Infinity,
   });
 
-  const shops = allShops.filter((shop: Shop) => shop.rating >= minRating);
+  const shops = (data?.shops || []).filter((shop: Shop) => shop.rating >= minRating);
 
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
@@ -246,14 +247,14 @@ export default function DonutShops() {
       setIsLoadingShops(false);
     };
 
-    if (allShops.length > 0) {
+    if (data?.shops && data.shops.length > 0) {
       handleFetchComplete();
     }
 
     return () => {
       // Cleanup function (optional)
     };
-  }, [allShops]);
+  }, [data?.shops]);
 
   return (
     <>
@@ -459,6 +460,7 @@ export default function DonutShops() {
                     <div className="mt-4">
                       <h3 className="text-lg font-medium mb-2">donut luv</h3>
                       <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
+                      <SearchMetrics metrics={data?.metrics} isLoading={isLoading} />
                     </div>
                   </div>
                 </Tabs>
