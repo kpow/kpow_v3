@@ -63,7 +63,7 @@ export function DonutLuvList({ onCitySelect }: DonutLuvListProps) {
   };
 
   return (
-    <ScrollArea className="h-[200px] w-full rounded-md border p-2">
+    <ScrollArea className="h-full w-full rounded-md border p-2">
       <div className="flex flex-wrap gap-2">
         {favorites.map((shop) => (
           <div key={shop.id} className="inline-flex">
