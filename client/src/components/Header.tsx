@@ -15,7 +15,7 @@ import logo from "../../public/skull.svg";
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const [imageData, setImageData] = useState(null);
+  const [imageData, setImageData] = useState<ImageData | null>(null);
 
   useEffect(() => {
     async function loadDefaultImage() {
@@ -42,17 +42,19 @@ export function Header() {
               <div className="flex items-center gap-2 group">
                 <div className="w-10 h-10">
                   <div style={{ width: "100%", height: "100vh" }}>
-                    <MetallicPaint
-                      imageData={imageData}
-                      params={{
-                        edge: 2,
-                        patternBlur: 0.005,
-                        patternScale: 2,
-                        refraction: 0.015,
-                        speed: 0.3,
-                        liquid: 0.07,
-                      }}
-                    />
+                    {imageData && (
+                      <MetallicPaint
+                        imageData={imageData}
+                        params={{
+                          edge: 2,
+                          patternBlur: 0.005,
+                          patternScale: 2,
+                          refraction: 0.015,
+                          speed: 0.3,
+                          liquid: 0.07,
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
                 {/* <Logo /> */}
