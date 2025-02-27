@@ -7,10 +7,9 @@ import MetallicPaint, {
   parseLogoImage,
 } from "../reactbits/MetallicPaint/MetallicPaint";
 
-// replace with your own SVG
-// NOTE: your SVG should have a bit of padding around the shape, to keep it from being cut off
-// it should also have white fill color, to allow the metallic effect to show through
-import logo from "../../public/skull.svg";
+import logo from "../reactbits/skull-white.svg";
+import Magnet from "../reactbits/Magnet/Magnet";
+import SplashCursor from "../reactbits/SplashCursor/SplashCursor";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,32 +34,31 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-95 text-white">
+      <SplashCursor />
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link key="Home" href="/">
-            <div className="hover:animate-shake">
+            <Magnet padding={6} disabled={false} magnetStrength={6}>
               <div className="flex items-center gap-2 group">
-                <div className="w-10 h-10">
-                  <div style={{ width: "100%", height: "100vh" }}>
-                    {imageData && (
-                      <MetallicPaint
-                        imageData={imageData}
-                        params={{
-                          edge: 2,
-                          patternBlur: 0.005,
-                          patternScale: 2,
-                          refraction: 0.015,
-                          speed: 0.3,
-                          liquid: 0.07,
-                        }}
-                      />
-                    )}
-                  </div>
+                <div className="w-[80px] h-[80px] bg-black rounded-full mt-2">
+                  {imageData && (
+                    <MetallicPaint
+                      imageData={imageData}
+                      params={{
+                        edge: 5,
+                        patternBlur: 0.5,
+                        patternScale: 5,
+                        refraction: 0.6,
+                        speed: 0.25,
+                        liquid: 1,
+                      }}
+                    />
+                  )}
                 </div>
                 {/* <Logo /> */}
                 <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
               </div>
-            </div>
+            </Magnet>
           </Link>
           <nav className="flex items-center gap-4">
             <ContactDialog />
