@@ -13,7 +13,9 @@ import {
   Code,
   Fish,
   Circle,
+  Mail,
 } from "lucide-react";
+import { ContactDialog } from "./ContactDialog";
 
 interface SlideMenuProps {
   isOpen: boolean;
@@ -102,6 +104,21 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
         )}
       >
         <nav className="pt-20 px-4 space-y-1">
+          {/* Contact Dialog for mobile - only shown in mobile view */}
+          <div className="md:hidden mb-2">
+            <div
+              className="flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent closing the slide menu when clicking the contact button
+              }}
+            >
+              <Mail className="w-4 h-4" />
+              <span className="text-[13px]">
+                <ContactDialog />
+              </span>
+            </div>
+          </div>
+
           {menuItems.map((item) =>
             item.href.startsWith("http") ? (
               <a

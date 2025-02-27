@@ -32,17 +32,17 @@ export function Header() {
 
     loadDefaultImage();
   }, []);
-  
+
   // Auto-disable SplashCursor after 10 seconds
   useEffect(() => {
     let timerId: NodeJS.Timeout | null = null;
-    
+
     if (showCursor) {
       timerId = setTimeout(() => {
         setShowCursor(false);
       }, 10000); // 10 seconds in milliseconds
     }
-    
+
     // Cleanup function to clear the timer if component unmounts or showCursor changes
     return () => {
       if (timerId) {
@@ -91,7 +91,10 @@ export function Header() {
             </Magnet>
           </Link>
           <nav className="flex items-center gap-4">
-            <ContactDialog />
+            {/* Hide ContactDialog on mobile using Tailwind's responsive classes */}
+            <div className="hidden md:block">
+              <ContactDialog />
+            </div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
