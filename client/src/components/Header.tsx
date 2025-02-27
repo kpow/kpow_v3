@@ -14,7 +14,7 @@ import SplashCursor from "../reactbits/SplashCursor/SplashCursor";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showCursor, setShowCursor] = useState(true);
+  const [showCursor, setShowCursor] = useState(false);
   const [imageData, setImageData] = useState<ImageData | null>(null);
 
   useEffect(() => {
