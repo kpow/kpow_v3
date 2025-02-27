@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { SlideMenu } from "./SlideMenu";
 import { Link } from "wouter";
 import { ContactDialog } from "./ContactDialog";
-import { Wand2 } from "lucide-react";
 import MetallicPaint, {
   parseLogoImage,
 } from "../reactbits/MetallicPaint/MetallicPaint";
+import { Wand2 } from "lucide-react";
 
 import logo from "../reactbits/skull-white.svg";
 import Magnet from "../reactbits/Magnet/Magnet";
@@ -64,7 +64,9 @@ export function Header() {
                     className="p-2 hover:bg-white/10 rounded-full transition-colors"
                     aria-label="Toggle cursor effects"
                   >
-                    <Wand2 className={`w-5 h-5 ${showCursor ? 'text-purple-400' : 'text-gray-500'}`} />
+                    <Wand2
+                      className={`w-5 h-5 ${showCursor ? "text-purple-400" : "text-gray-500"}`}
+                    />
                   </button>
                 </div>
               </div>
