@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { SlideMenu } from "./SlideMenu";
 import { Link } from "wouter";
 import { ContactDialog } from "./ContactDialog";
+import { Wand2 } from "lucide-react";
 import MetallicPaint, {
   parseLogoImage,
 } from "../reactbits/MetallicPaint/MetallicPaint";
@@ -13,7 +14,7 @@ import SplashCursor from "../reactbits/SplashCursor/SplashCursor";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const [showCursor, setShowCursor] = useState(true);
   const [imageData, setImageData] = useState<ImageData | null>(null);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-95 text-white">
-      <SplashCursor />
+      {showCursor && <SplashCursor />}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link key="Home" href="/">
@@ -56,7 +57,16 @@ export function Header() {
                   )}
                 </div>
                 {/* <Logo /> */}
-                <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
+                <div className="flex items-center gap-2">
+                  <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
+                  <button
+                    onClick={() => setShowCursor(!showCursor)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                    aria-label="Toggle cursor effects"
+                  >
+                    <Wand2 className={`w-5 h-5 ${showCursor ? 'text-purple-400' : 'text-gray-500'}`} />
+                  </button>
+                </div>
               </div>
             </Magnet>
           </Link>
