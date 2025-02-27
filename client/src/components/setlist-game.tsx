@@ -217,7 +217,7 @@ export function SetlistGame() {
           <div className="text-2xl font-slackey mr-4">guess the setlist</div>
         </div>
 
-        <div className="flex-grow">
+        <motion.div className="flex-grow">
           {error && (
             <div className="text-red-500 text-center p-4">
               {error}
@@ -229,24 +229,60 @@ export function SetlistGame() {
 
           <AnimatePresence mode="wait">
             {gameState === "idle" && (
-              <div
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="text-center h-full flex flex-col items-center justify-center space-y-6"
               >
-                <div className="overflow-hidden">
-                  <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
-                    Ready to test your Phish knowledge?
-                  </h2>
-                </div>
+                <motion.div className="overflow-hidden">
+                  <motion.h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
+                    {"Ready to test your Phish knowledge?"
+                      .split("")
+                      .map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ opacity: 0, y: 50 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.8,
+                            delay: Math.random() * 0.5 + 0.1,
+                            ease: "circOut",
+                          }}
+                          className="inline-block"
+                        >
+                          {char === " " ? "\u00A0" : char}
+                        </motion.span>
+                      ))}
+                  </motion.h2>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: -30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.8,
+                    ease: "easeOut",
+                  }}
+                >
                   <p className="mb-6 text-muted-foreground">
                     You'll get 10 seconds to study a setlist,
                     <br />
                     then 15 seconds to guess the year and tour!
                   </p>
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 100 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 1.5,
+                    delay: 1.5,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15,
+                  }}
+                >
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg animate-pulse"
                     onClick={startGame}
@@ -254,8 +290,8 @@ export function SetlistGame() {
                   >
                     Start Game
                   </Button>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -271,19 +307,24 @@ export function SetlistGame() {
                 )}
 
                 {gameState === "viewing" && currentSetlist && (
-                  <div
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
                     className="space-y-4"
                   >
                     <div className="whitespace-pre-wrap font-mono bg-muted/50 p-6 rounded-lg">
                       {currentSetlist.setlistdata}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
               </DialogContent>
             </Dialog>
 
             {gameState === "guessing" && (
-              <div
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="space-y-4"
               >
                 <div className="text-center text-3xl font-bold mb-4">
@@ -349,11 +390,13 @@ export function SetlistGame() {
                     </Button>
                   </form>
                 </Form>
-              </div>
+              </motion.div>
             )}
 
             {gameState === "results" && currentSetlist && lastGuess && (
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                 className="text-center space-y-6"
               >
                 <div className="text-2xl md:text-3xl lg:text-3xl xl:text-5xl font-bold m-4">
@@ -439,10 +482,10 @@ export function SetlistGame() {
                   isOpen={showDetailsOpen}
                   onClose={() => setShowDetailsOpen(false)}
                 />
-              </div>
+              </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
         <div className="justify-center flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-sm p-1 pl-4 m-0 mt-8">
           <div className="flex justify-between items-center mt-1 mb-1">
             <div className="flex gap-4 items-center">
