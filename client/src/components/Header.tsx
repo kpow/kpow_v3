@@ -32,6 +32,24 @@ export function Header() {
 
     loadDefaultImage();
   }, []);
+  
+  // Auto-disable SplashCursor after 10 seconds
+  useEffect(() => {
+    let timerId: NodeJS.Timeout | null = null;
+    
+    if (showCursor) {
+      timerId = setTimeout(() => {
+        setShowCursor(false);
+      }, 10000); // 10 seconds in milliseconds
+    }
+    
+    // Cleanup function to clear the timer if component unmounts or showCursor changes
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [showCursor]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-95 text-white">
