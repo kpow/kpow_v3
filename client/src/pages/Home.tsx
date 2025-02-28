@@ -1,6 +1,6 @@
 import { ContentSection } from "@/components/ContentSection";
 import { RecentPlays } from "@/components/RecentPlays";
-import { SetlistGame } from "@/components/setlist-game";
+import { SetlistGame } from "@/components/setlist-game-static";
 import { CubeFrame } from "@/components/cube-frame";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/GitHubSection";
@@ -14,7 +14,7 @@ import SectionHeader from "@/components/SectionHeader";
 import HorizontalDivider from "@/components/HorizontalDivider";
 import { SEO } from "@/components/SEO";
 import { StarFeed } from "@/components/StarFeed";
-import { Shop } from '@/types/shop';
+import { Shop } from "@/types/shop";
 
 interface YelpResponse {
   shops: Shop[];
