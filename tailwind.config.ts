@@ -88,11 +88,16 @@ export default {
           '90%': { transform: 'translateX(-1px) rotate(0deg)' },
           '100%': { transform: 'translateX(0) rotate(0deg)' },
         },
+        "gentle-bounce": {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shake: "shake 0.6s ease-in-out",
+        "gentle-bounce": "gentle-bounce 2s ease-in-out infinite",
       },
     },
   },
