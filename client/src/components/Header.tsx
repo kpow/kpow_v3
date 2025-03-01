@@ -83,7 +83,7 @@ export function Header() {
                     aria-label="Toggle cursor effects"
                   >
                     <Wand2
-                      className={`w-5 h-5 ${showCursor ? "text-purple-400" : "text-gray-500"}`}
+                      className={`animate-pulse w-5 h-5 ${showCursor ? "text-purple-400" : "text-gray-500"}`}
                     />
                   </button>
                 </div>

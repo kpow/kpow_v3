@@ -271,7 +271,7 @@ export function SetlistGame() {
 
                 <div>
                   <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg animate-pulse"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg animate-gentle-bounce"
                     onClick={startGame}
                     size="lg"
                   >
