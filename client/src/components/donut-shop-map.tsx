@@ -35,21 +35,22 @@ const ShopIcon = L.icon({
 // Helper function to get map bounds from shops
 const getBoundsFromShops = (shops: Shop[]) => {
   if (!shops || shops.length === 0) return null;
-  
-  const validShops = shops.filter(shop => 
-    shop.coordinates && 
-    shop.coordinates.latitude && 
-    shop.coordinates.longitude
+
+  const validShops = shops.filter(
+    (shop) =>
+      shop.coordinates &&
+      shop.coordinates.latitude &&
+      shop.coordinates.longitude,
   );
-  
+
   if (validShops.length === 0) return null;
 
-  const lats = validShops.map(shop => shop.coordinates.latitude);
-  const lngs = validShops.map(shop => shop.coordinates.longitude);
-  
+  const lats = validShops.map((shop) => shop.coordinates.latitude);
+  const lngs = validShops.map((shop) => shop.coordinates.longitude);
+
   return L.latLngBounds(
     [Math.min(...lats), Math.min(...lngs)],
-    [Math.max(...lats), Math.max(...lngs)]
+    [Math.max(...lats), Math.max(...lngs)],
   );
 };
 
@@ -112,11 +113,21 @@ function MapController({
   return null;
 }
 
+// Add type for city coordinates
+interface CityCoordinates {
+  lat: number;
+  lon: number;
+  display_name: string;
+}
+
+// Update DonutShopMapProps interface
 interface DonutShopMapProps {
   shops: Shop[];
   onShopClick?: (shop: Shop) => void;
   shouldFitBounds?: boolean;
   selectedShopId?: string;
+  currentCity?: string;
+  currentState?: string;
 }
 
 export function DonutShopMap({
@@ -124,10 +135,43 @@ export function DonutShopMap({
   onShopClick,
   shouldFitBounds = false,
   selectedShopId,
+  currentCity,
+  currentState,
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [tileLayer, setTileLayer] = useState<string>("toner-lite");
+  const [cityCoordinates, setCityCoordinates] =
+    useState<CityCoordinates | null>(null);
+
+  // Function to fetch city coordinates from Nominatim
+  const fetchCityCoordinates = async (city: string, state: string) => {
+    try {
+      const query = `${city}, ${state}`;
+      const encodedQuery = encodeURIComponent(query);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&limit=1`,
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        setCityCoordinates({
+          lat: parseFloat(data[0].lat),
+          lon: parseFloat(data[0].lon),
+          display_name: data[0].display_name,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching city coordinates:", error);
+    }
+  };
+
+  // Update city coordinates when city/state changes
+  useEffect(() => {
+    if (currentCity && currentState) {
+      fetchCityCoordinates(currentCity, currentState);
+    }
+  }, [currentCity, currentState]);
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem("donutLuv");
@@ -243,15 +287,28 @@ export function DonutShopMap({
             </BaseLayer>
           </LayersControl>
 
-          {/* <TileLayer
-            url={tileLayerOptions[tileLayer]}
-            attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-          /> */}
+          {/* Add city marker */}
+          {cityCoordinates && (
+            <Marker
+              position={[cityCoordinates.lat, cityCoordinates.lon]}
+              icon={markerIcons.green}
+            >
+              <Popup>
+                <div className="p-1">
+                  <h3 className="text-lg font-bold">{currentCity}</h3>
+                  <p className="text-sm text-gray-600">
+                    {cityCoordinates.display_name}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
           {shops.map((shop) => (
             <Marker
               key={shop.id}
               position={[shop.coordinates.latitude, shop.coordinates.longitude]}
-              icon={markerIcons[shop.isNearby ? 'blue' : 'red']}
+              icon={markerIcons[shop.isNearby ? "blue" : "red"]}
               ref={(el) => {
                 if (el) {
                   markersRef.current[shop.id] = el;

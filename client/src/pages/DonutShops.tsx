@@ -113,7 +113,9 @@ export default function DonutShops() {
 
     if (searchState.city && searchState.state) {
       setLocation(
-        `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`,
+        `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(
+          searchState.state,
+        )}`,
       );
     }
 
@@ -131,7 +133,9 @@ export default function DonutShops() {
       });
       setShouldFitBounds(true);
       setLocation(
-        `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`,
+        `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(
+          newCity.state,
+        )}`,
       );
       await refetch();
     } catch (error) {
@@ -191,8 +195,8 @@ export default function DonutShops() {
       searchState.city && searchState.state
         ? `${searchState.city}, ${searchState.state}`
         : searchState.zipCode
-          ? `ZIP code ${searchState.zipCode}`
-          : "your area";
+        ? `ZIP code ${searchState.zipCode}`
+        : "your area";
 
     return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
   };
@@ -308,6 +312,8 @@ export default function DonutShops() {
                       onShopClick={handleShopClick}
                       shouldFitBounds={shouldFitBounds}
                       selectedShopId={selectedShopId}
+                      currentCity={searchState.city}
+                      currentState={searchState.state}
                     />
                   )}
               </CardContent>

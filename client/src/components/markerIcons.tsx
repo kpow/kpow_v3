@@ -10,7 +10,8 @@ export type MarkerColor =
   | "yellow"
   | "violet"
   | "grey"
-  | "black";
+  | "black"
+  | "purple";
 
 // Define an object type for icons
 type MarkerIconsType = Record<MarkerColor, L.Icon>;
@@ -82,6 +83,14 @@ const markerIcons: MarkerIconsType = {
   }),
   black: new L.Icon({
     iconUrl: "/markers/marker-icon-2x-black.png",
+    shadowUrl: "/markers/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  }),
+  purple: new L.Icon({
+    iconUrl: "/markers/marker-icon-2x-purple.png",
     shadowUrl: "/markers/marker-shadow.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
