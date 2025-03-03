@@ -25,7 +25,7 @@ import {
 
 // Custom donut shop marker icon
 const DonutIcon = L.AwesomeMarkers.icon({
-  icon: 'dot-circle',
+  icon: 'utensils',  // Changed to utensils icon
   prefix: 'fa',
   markerColor: 'red',
   iconColor: 'white'
@@ -33,7 +33,7 @@ const DonutIcon = L.AwesomeMarkers.icon({
 
 // City center marker icon
 const CityIcon = L.AwesomeMarkers.icon({
-  icon: 'map-marker',
+  icon: 'star',      // Changed to star icon
   prefix: 'fa',
   markerColor: 'blue',
   iconColor: 'white'
