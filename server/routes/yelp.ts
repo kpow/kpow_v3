@@ -27,35 +27,12 @@ router.get("/search", async (req, res) => {
       });
     }
 
-    // Get coordinates for location if not provided
-    let searchCoordinates;
-    if (location) {
-      try {
-        const geocodeResponse = await axios.get(
-          `https://api.yelp.com/v3/geocode/query`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.YELP_API_KEY}`,
-            },
-            params: {
-              location: location,
-            },
-          }
-        );
-        if (geocodeResponse.data.coordinates) {
-          searchCoordinates = geocodeResponse.data.coordinates;
-        }
-      } catch (error) {
-        console.log("Geocoding error:", error);
-      }
-    }
-
     // Base parameters
     const baseParams = {
       categories: "donuts",
       sort_by: "distance",
       limit: 50,
-      ...(radius ? { radius: Math.min(Number(radius), 40000) } : {}),
+      ...(radius ? { radius: Math.min(Number(radius), 40000) } : {}), // Max 40000 meters (25 miles)
       ...(location
         ? { location }
         : {
@@ -86,6 +63,9 @@ router.get("/search", async (req, res) => {
       }),
     ]);
 
+    console.log("donutResponse:", donutResponse.data.businesses.length);
+    console.log("doughnutResponse:", doughnutResponse.data.businesses.length);
+
     // Combine and deduplicate results
     const allBusinesses = [
       ...donutResponse.data.businesses,
@@ -112,6 +92,8 @@ router.get("/search", async (req, res) => {
       chainStoresFiltered: uniqueBusinesses.length - filteredBusinesses.length,
     };
 
+    console.log("Search metrics being sent:", searchMetrics);
+
     const formattedResults = filteredBusinesses.map((business) => ({
       id: business.id,
       name: business.name,
@@ -126,20 +108,15 @@ router.get("/search", async (req, res) => {
       image_url: business.image_url,
       url: business.url,
       phone: business.display_phone,
-      distance: business.distance,
-      categories: business.categories,
-      is_closed: business.is_closed,
-      photos: business.photos || [business.image_url],
+      distance: business.distance, // Added distance field
+      categories: business.categories, // Added categories
+      is_closed: business.is_closed, // Added operating status
+      photos: business.photos || [business.image_url], // Added photos array
     }));
 
-    // Return the results along with the search coordinates
     res.json({
       shops: formattedResults,
       metrics: searchMetrics,
-      center: searchCoordinates || {
-        latitude: Number(latitude),
-        longitude: Number(longitude),
-      },
     });
   } catch (error: any) {
     console.error("Yelp API Error:", error.response?.data || error.message);

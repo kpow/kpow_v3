@@ -308,14 +308,6 @@ export default function DonutShops() {
                       onShopClick={handleShopClick}
                       shouldFitBounds={shouldFitBounds}
                       selectedShopId={selectedShopId}
-                      cityCenter={
-                        data?.center
-                          ? {
-                              lat: data.center.latitude,
-                              lng: data.center.longitude,
-                            }
-                          : undefined
-                      }
                     />
                   )}
               </CardContent>
