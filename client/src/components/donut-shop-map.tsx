@@ -61,6 +61,7 @@ interface MapControllerProps {
   shouldFitBounds: boolean;
   selectedShopId?: string;
   markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
+  cityCoordinates?: { lat: number; lon: number; display_name: string } | null;
 }
 
 // MapController component to handle map updates and marker control
@@ -69,22 +70,33 @@ function MapController({
   shouldFitBounds,
   selectedShopId,
   markersRef,
+  cityCoordinates,
 }: MapControllerProps) {
   const map = useMap();
 
   // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
     if (shouldFitBounds && shops.length > 0) {
-      const bounds = L.latLngBounds(
-        shops.map((shop) => [
-          shop.coordinates.latitude,
-          shop.coordinates.longitude,
-        ]),
-      );
-      const paddedBounds = bounds.pad(0.2);
+      const shopCoords = shops.map((shop) => [
+        shop.coordinates.latitude,
+        shop.coordinates.longitude,
+      ]);
+      
+      // Create bounds from shop coordinates
+      const bounds = L.latLngBounds(shopCoords);
+      
+      // If we have city coordinates, include them in the bounds
+      if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
+        bounds.extend([cityCoordinates.lat, cityCoordinates.lon]);
+      }
+      
+      // Add padding to the bounds
+      const paddedBounds = bounds.pad(0.3);
+      
+      // Fit the map to the padded bounds
       map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds, shops, map]); // Added map dependency
+  }, [shouldFitBounds, shops, map, cityCoordinates]); // Added cityCoordinates dependency
 
   // Handle selected shop updates
   useEffect(() => {
@@ -256,6 +268,7 @@ export function DonutShopMap({
             shouldFitBounds={shouldFitBounds}
             selectedShopId={selectedShopId}
             markersRef={markersRef}
+            cityCoordinates={cityCoordinates}
           />
           <LayersControl position="topright">
             {/* Stamen Toner Basemap */}
