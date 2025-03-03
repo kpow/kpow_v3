@@ -251,7 +251,7 @@ export function DonutShopMap({
             <Marker
               key={shop.id}
               position={[shop.coordinates.latitude, shop.coordinates.longitude]}
-              icon={markerIcons['red']}
+              icon={markerIcons[shop.isNearby ? 'blue' : 'red']}
               ref={(el) => {
                 if (el) {
                   markersRef.current[shop.id] = el;

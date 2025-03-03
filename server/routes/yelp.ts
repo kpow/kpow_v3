@@ -14,6 +14,13 @@ const filterChainStores = (businesses: any[]) => {
   );
 };
 
+const markNearbyShops = (shops: any[]) => {
+  return shops.map((shop) => ({
+    ...shop,
+    isNearby: shop.distance <= 24140,
+  }));
+};
+
 // Search donut/doughnut shops
 router.get("/search", async (req, res) => {
   try {
@@ -114,8 +121,11 @@ router.get("/search", async (req, res) => {
       photos: business.photos || [business.image_url], // Added photos array
     }));
 
+    const nearbyShops = filteredBusinesses.slice(0,10); //Take top 10
+    const markedShops = markNearbyShops(nearbyShops);
+
     res.json({
-      shops: formattedResults,
+      shops: markedShops,
       metrics: searchMetrics,
     });
   } catch (error: any) {
