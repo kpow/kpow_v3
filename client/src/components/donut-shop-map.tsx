@@ -8,6 +8,8 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
+import "leaflet.awesome-markers";
 import { useEffect, useRef } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,29 +24,36 @@ import {
 } from "@/components/ui/select";
 
 // Custom donut shop marker icon
-const ShopIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
+const DonutIcon = L.AwesomeMarkers.icon({
+  icon: 'dot-circle',
+  prefix: 'fa',
+  markerColor: 'red',
+  iconColor: 'white'
+});
+
+// City center marker icon
+const CityIcon = L.AwesomeMarkers.icon({
+  icon: 'map-marker',
+  prefix: 'fa',
+  markerColor: 'blue',
+  iconColor: 'white'
 });
 
 // Helper function to get map bounds from shops
 const getBoundsFromShops = (shops: Shop[]) => {
   if (!shops || shops.length === 0) return null;
-  
+
   const validShops = shops.filter(shop => 
     shop.coordinates && 
     shop.coordinates.latitude && 
     shop.coordinates.longitude
   );
-  
+
   if (validShops.length === 0) return null;
 
   const lats = validShops.map(shop => shop.coordinates.latitude);
   const lngs = validShops.map(shop => shop.coordinates.longitude);
-  
+
   return L.latLngBounds(
     [Math.min(...lats), Math.min(...lngs)],
     [Math.max(...lats), Math.max(...lngs)]
@@ -56,6 +65,7 @@ interface MapControllerProps {
   shouldFitBounds: boolean;
   selectedShopId?: string;
   markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
+  cityCenter?: { lat: number; lng: number };
 }
 
 // MapController component to handle map updates and marker control
@@ -64,6 +74,7 @@ function MapController({
   shouldFitBounds,
   selectedShopId,
   markersRef,
+  cityCenter,
 }: MapControllerProps) {
   const map = useMap();
 
@@ -79,7 +90,7 @@ function MapController({
       const paddedBounds = bounds.pad(0.2);
       map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds, shops, map]); // Added map dependency
+  }, [shouldFitBounds, shops, map]);
 
   // Handle selected shop updates
   useEffect(() => {
@@ -94,12 +105,10 @@ function MapController({
           (f: any) => f.id === shop.id,
         );
 
-        // Center map on the selected shop with different zoom levels
         map.setView(
           [shop.coordinates.latitude, shop.coordinates.longitude],
-          isFromFavorites ? 18 : map.getZoom(), // Zoom close only for favorites
+          isFromFavorites ? 18 : map.getZoom(),
         );
-        // Open the marker popup after a short delay to ensure proper rendering
         setTimeout(() => {
           marker.openPopup();
         }, 100);
@@ -115,6 +124,7 @@ interface DonutShopMapProps {
   onShopClick?: (shop: Shop) => void;
   shouldFitBounds?: boolean;
   selectedShopId?: string;
+  cityCenter?: { lat: number; lng: number };
 }
 
 export function DonutShopMap({
@@ -122,10 +132,10 @@ export function DonutShopMap({
   onShopClick,
   shouldFitBounds = false,
   selectedShopId,
+  cityCenter,
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [tileLayer, setTileLayer] = useState<string>("toner-lite");
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem("donutLuv");
@@ -160,54 +170,28 @@ export function DonutShopMap({
     }
 
     setFavorites(new Set(favorites));
-    // Dispatch custom event to notify the list component
     window.dispatchEvent(new Event("donutLuvUpdate"));
-  };
-
-  // Define all tile layer options
-  const tileLayerOptions = {
-    toner: "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png",
-    "toner-lite":
-      "https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png",
-    terrain:
-      "https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png",
-    watercolor:
-      "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg",
-    openStreetMap: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  };
-
-  const handleTileLayerChange = (value: string) => {
-    setTileLayer(value);
-  };
-
-  const tileLayerNames = {
-    toner: "Toner",
-    "toner-lite": "Toner Lite",
-    terrain: "Terrain",
-    watercolor: "Watercolor",
-    openStreetMap: "OpenStreetMap",
   };
 
   const { BaseLayer } = LayersControl;
 
   return (
     <div className="relative h-full w-full">
-      {/* Map Container - Place it first in the DOM */}
       <div className="h-full w-full rounded-lg overflow-hidden">
         <MapContainer
           center={[39.8283, -98.5795]}
           zoom={4}
           style={{ height: "100%", width: "100%" }}
-          className="z-0" // Explicitly set base z-index
+          className="z-0"
         >
           <MapController
             shops={shops}
             shouldFitBounds={shouldFitBounds}
             selectedShopId={selectedShopId}
             markersRef={markersRef}
+            cityCenter={cityCenter}
           />
           <LayersControl position="topright">
-            {/* Stamen Toner Basemap */}
             <BaseLayer checked name="Toner-lite">
               <TileLayer
                 url="https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png"
@@ -215,7 +199,6 @@ export function DonutShopMap({
               />
             </BaseLayer>
 
-            {/* Default Basemap (Carto Light) */}
             <BaseLayer name="CartoLight">
               <TileLayer
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -224,7 +207,6 @@ export function DonutShopMap({
               />
             </BaseLayer>
 
-            {/* OpenStreetMap Default Basemap */}
             <BaseLayer name="OpenStreetMap">
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -232,7 +214,6 @@ export function DonutShopMap({
               />
             </BaseLayer>
 
-            {/* Stamen Toner Basemap */}
             <BaseLayer name="Watercolor">
               <TileLayer
                 url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
@@ -241,15 +222,24 @@ export function DonutShopMap({
             </BaseLayer>
           </LayersControl>
 
-          {/* <TileLayer
-            url={tileLayerOptions[tileLayer]}
-            attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-          /> */}
+          {cityCenter && (
+            <Marker
+              position={[cityCenter.lat, cityCenter.lng]}
+              icon={CityIcon}
+            >
+              <Popup>
+                <div className="p-1">
+                  <h3 className="text-lg font-bold">City Center</h3>
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
           {shops.map((shop) => (
             <Marker
               key={shop.id}
               position={[shop.coordinates.latitude, shop.coordinates.longitude]}
-              icon={ShopIcon}
+              icon={DonutIcon}
               ref={(el) => {
                 if (el) {
                   markersRef.current[shop.id] = el;
@@ -308,28 +298,6 @@ export function DonutShopMap({
           ))}
         </MapContainer>
       </div>
-
-      {/* Map Style Selector - Place it after the map in the DOM */}
-      {/* <div className="absolute top-4 right-4" style={{ zIndex: 1000 }}>
-        <div className="relative">
-          <Select value={tileLayer} onValueChange={handleTileLayerChange}>
-            <SelectTrigger className="w-[180px] bg-white/90 backdrop-blur-sm shadow-lg">
-              <SelectValue placeholder="Select map style" />
-            </SelectTrigger>
-            <SelectContent className="bg-white/90 backdrop-blur-sm z-[1001]">
-              {Object.entries(tileLayerNames).map(([value, label]) => (
-                <SelectItem
-                  key={value}
-                  value={value}
-                  className="cursor-pointer"
-                >
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div> */}
     </div>
   );
 }

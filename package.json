@@ -63,6 +63,7 @@
     "googleapis": "^144.0.0",
     "input-otp": "^1.2.4",
     "leaflet": "^1.9.4",
+    "leaflet.awesome-markers": "^2.0.5",
     "lucide-react": "^0.453.0",
     "memorystore": "^1.6.7",
     "nodemailer": "^6.10.0",
