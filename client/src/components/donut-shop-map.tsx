@@ -255,3 +255,6 @@ export function DonutShopMap({ shops, isLoading, error, cityCoordinates, shouldF
     </div>
   );
 }
+
+// Export explicitly
+export default DonutShopMap;

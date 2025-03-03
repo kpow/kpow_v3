@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { DonutShopMap } from '@/components/donut-shop-map';
+import DonutShopMap from '@/components/donut-shop-map';
 import { useQuery } from '@tanstack/react-query';
 import { PageTitle } from '@/components/ui/page-title';
 import { SEO } from '@/components/SEO';
