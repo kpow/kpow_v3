@@ -46,6 +46,17 @@ export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
 
+  /**
+   * Returns a random city from the predefined cities list
+   */
+  const getRandomCity = () => {
+    const randomIndex = Math.floor(Math.random() * cities.length);
+    return {
+      city: cities[randomIndex].city,
+      state: cities[randomIndex].state,
+    };
+  };
+
   // Initialize with a city from URL params or random city
   const initialCity = params
     ? {
@@ -274,17 +285,6 @@ export default function DonutShops() {
       setIsLoadingShops(false);
     }
   }, [data?.shops]);
-
-  /**
-   * Returns a random city from the predefined cities list
-   */
-  const getRandomCity = () => {
-    const randomIndex = Math.floor(Math.random() * cities.length);
-    return {
-      city: cities[randomIndex].city,
-      state: cities[randomIndex].state,
-    };
-  };
 
   // =========================================================================
   // HELPER FUNCTIONS FOR SEO AND DISPLAY
