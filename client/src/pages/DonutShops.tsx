@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
@@ -71,7 +70,7 @@ export default function DonutShops() {
   // =========================================================================
   // DATA FETCHING WITH REACT QUERY
   // =========================================================================
-  
+
   /**
    * Query for fetching donut shop data based on search criteria
    */
@@ -109,16 +108,14 @@ export default function DonutShops() {
   });
 
   // Filter shops based on minimum rating
-  const shops = (data?.shops || []).filter(
-    (shop) => shop.rating >= minRating,
-  );
+  const shops = (data?.shops || []).filter((shop) => shop.rating >= minRating);
 
   const chainStores = data?.chainStores || [];
 
   // =========================================================================
   // EVENT HANDLERS
   // =========================================================================
-  
+
   /**
    * Validates search criteria and initiates search
    */
@@ -243,7 +240,7 @@ export default function DonutShops() {
   // =========================================================================
   // SIDE EFFECTS
   // =========================================================================
-  
+
   // Reset map bounds after a delay
   useEffect(() => {
     if (shouldFitBounds) {
@@ -278,10 +275,21 @@ export default function DonutShops() {
     }
   }, [data?.shops]);
 
+  /**
+   * Returns a random city from the predefined cities list
+   */
+  const getRandomCity = () => {
+    const randomIndex = Math.floor(Math.random() * cities.length);
+    return {
+      city: cities[randomIndex].city,
+      state: cities[randomIndex].state,
+    };
+  };
+
   // =========================================================================
   // HELPER FUNCTIONS FOR SEO AND DISPLAY
   // =========================================================================
-  
+
   /**
    * Generates page title based on search criteria
    */
@@ -304,8 +312,8 @@ export default function DonutShops() {
       searchState.city && searchState.state
         ? `${searchState.city}, ${searchState.state}`
         : searchState.zipCode
-        ? `ZIP code ${searchState.zipCode}`
-        : "your area";
+          ? `ZIP code ${searchState.zipCode}`
+          : "your area";
 
     return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
   };
@@ -329,7 +337,7 @@ export default function DonutShops() {
         image={getPreviewImage()}
         type="website"
       />
-      
+
       <div className="container mx-auto max-w-[1800px] flex flex-col min-h-screen">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-4">
@@ -369,7 +377,6 @@ export default function DonutShops() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto flex flex-col items-stretch">
           {/* Left Content Area (Map and Collections) */}
           <div className="lg:col-span-2 lg:row-span-2 h-full flex flex-col">
-            
             {/* Map Component */}
             <Card>
               <CardContent className="p-0 h-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[780px] lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
@@ -429,11 +436,10 @@ export default function DonutShops() {
                 </div>
               </CardContent>
             </Card>
-            
           </div>
 
           {/* Right Sidebar - Search Component */}
-          <DonutShopSearch 
+          <DonutShopSearch
             searchState={searchState}
             onSearchStateChange={handleInputChange}
             minRating={minRating}
@@ -442,21 +448,8 @@ export default function DonutShops() {
             isLoading={isLoading}
             metricsData={data?.metrics}
           />
-          
         </div>
-        
       </div>
     </>
   );
 }
-
-/**
- * Returns a random city from the predefined cities list
- */
-const getRandomCity = () => {
-  const randomIndex = Math.floor(Math.random() * cities.length);
-  return {
-    city: cities[randomIndex].city,
-    state: cities[randomIndex].state,
-  };
-};
