@@ -34,27 +34,7 @@ const ShopIcon = L.icon({
   popupAnchor: [1, -34],
 });
 
-// Helper function to get map bounds from shops
-const getBoundsFromShops = (shops: Shop[]) => {
-  if (!shops || shops.length === 0) return null;
-
-  const validShops = shops.filter(
-    (shop) =>
-      shop.coordinates &&
-      shop.coordinates.latitude &&
-      shop.coordinates.longitude,
-  );
-
-  if (validShops.length === 0) return null;
-
-  const lats = validShops.map((shop) => shop.coordinates.latitude);
-  const lngs = validShops.map((shop) => shop.coordinates.longitude);
-
-  return L.latLngBounds(
-    [Math.min(...lats), Math.min(...lngs)],
-    [Math.max(...lats), Math.max(...lngs)],
-  );
-};
+// No replacement - removing unused function
 
 interface MapControllerProps {
   shops: Shop[];
@@ -76,27 +56,52 @@ function MapController({
 
   // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
-    if (shouldFitBounds && shops.length > 0) {
-      const shopCoords = shops.map((shop) => [
-        shop.coordinates.latitude,
-        shop.coordinates.longitude,
-      ]);
-      
-      // Create bounds from shop coordinates
-      const bounds = L.latLngBounds(shopCoords);
-      
-      // If we have city coordinates, include them in the bounds
-      if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
-        bounds.extend([cityCoordinates.lat, cityCoordinates.lon]);
+    if (shouldFitBounds) {
+      // Only proceed if we have shops or city coordinates
+      if ((shops.length > 0) || (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon)) {
+        let bounds = null;
+        
+        // If we have shops, start with their bounds
+        if (shops.length > 0) {
+          const shopCoords = shops.map((shop) => [
+            shop.coordinates.latitude,
+            shop.coordinates.longitude,
+          ]);
+          bounds = L.latLngBounds(shopCoords);
+        }
+        
+        // If we have city coordinates
+        if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
+          const cityPoint = [cityCoordinates.lat, cityCoordinates.lon];
+          
+          if (bounds) {
+            // Add city to existing bounds
+            bounds.extend(cityPoint);
+          } else {
+            // Create bounds from city only - with a small area around it
+            bounds = L.latLngBounds([
+              [cityCoordinates.lat - 0.05, cityCoordinates.lon - 0.05],
+              [cityCoordinates.lat + 0.05, cityCoordinates.lon + 0.05]
+            ]);
+          }
+        }
+        
+        if (bounds) {
+          // Add padding to the bounds for better view
+          const paddedBounds = bounds.pad(0.3);
+          
+          // Use a timeout to ensure the map is ready
+          setTimeout(() => {
+            map.invalidateSize();
+            map.fitBounds(paddedBounds);
+          }, 100);
+        }
+      } else if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
+        // If we only have city coordinates, center on city
+        map.setView([cityCoordinates.lat, cityCoordinates.lon], 12);
       }
-      
-      // Add padding to the bounds
-      const paddedBounds = bounds.pad(0.3);
-      
-      // Fit the map to the padded bounds
-      map.fitBounds(paddedBounds);
     }
-  }, [shouldFitBounds, shops, map, cityCoordinates]); // Added cityCoordinates dependency
+  }, [shouldFitBounds, shops, map, cityCoordinates]);
 
   // Handle selected shop updates
   useEffect(() => {
@@ -157,17 +162,22 @@ export function DonutShopMap({
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [showChainStores, setShowChainStores] = useState(false);
-  const [tileLayer, setTileLayer] = useState<string>("toner-lite");
   const [cityCoordinates, setCityCoordinates] =
     useState<CityCoordinates | null>(null);
 
   // Function to fetch city coordinates from Nominatim
   const fetchCityCoordinates = async (city: string, state: string) => {
     try {
-      const query = `${city}, ${state}`;
+      // First try with specific city and state
+      const query = `${city}, ${state}, USA`;
       const encodedQuery = encodeURIComponent(query);
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&limit=1`,
+        `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&limit=1&addressdetails=1`,
+        {
+          headers: {
+            "User-Agent": "DonutTourApp/1.0"
+          }
+        }
       );
       const data = await response.json();
 
@@ -177,6 +187,30 @@ export function DonutShopMap({
           lon: parseFloat(data[0].lon),
           display_name: data[0].display_name,
         });
+        console.log("City coordinates found:", data[0].lat, data[0].lon);
+      } else {
+        // Try again with just the city name
+        const fallbackQuery = encodeURIComponent(city);
+        const fallbackResponse = await fetch(
+          `https://nominatim.openstreetmap.org/search?city=${fallbackQuery}&state=${encodeURIComponent(state)}&country=USA&format=json&limit=1`,
+          {
+            headers: {
+              "User-Agent": "DonutTourApp/1.0"
+            }
+          }
+        );
+        const fallbackData = await fallbackResponse.json();
+        
+        if (fallbackData && fallbackData.length > 0) {
+          setCityCoordinates({
+            lat: parseFloat(fallbackData[0].lat),
+            lon: parseFloat(fallbackData[0].lon),
+            display_name: fallbackData[0].display_name,
+          });
+          console.log("Fallback city coordinates found:", fallbackData[0].lat, fallbackData[0].lon);
+        } else {
+          console.warn("Could not find coordinates for", city, state);
+        }
       }
     } catch (error) {
       console.error("Error fetching city coordinates:", error);
@@ -225,30 +259,6 @@ export function DonutShopMap({
     setFavorites(new Set(favorites));
     // Dispatch custom event to notify the list component
     window.dispatchEvent(new Event("donutLuvUpdate"));
-  };
-
-  // Define all tile layer options
-  const tileLayerOptions = {
-    toner: "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png",
-    "toner-lite":
-      "https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png",
-    terrain:
-      "https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png",
-    watercolor:
-      "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg",
-    openStreetMap: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  };
-
-  const handleTileLayerChange = (value: string) => {
-    setTileLayer(value);
-  };
-
-  const tileLayerNames = {
-    toner: "Toner",
-    "toner-lite": "Toner Lite",
-    terrain: "Terrain",
-    watercolor: "Watercolor",
-    openStreetMap: "OpenStreetMap",
   };
 
   const { BaseLayer } = LayersControl;
@@ -430,27 +440,7 @@ export function DonutShopMap({
         </MapContainer>
       </div>
 
-      {/* Map Style Selector - Place it after the map in the DOM */}
-      {/* <div className="absolute top-4 right-4" style={{ zIndex: 1000 }}>
-        <div className="relative">
-          <Select value={tileLayer} onValueChange={handleTileLayerChange}>
-            <SelectTrigger className="w-[180px] bg-white/90 backdrop-blur-sm shadow-lg">
-              <SelectValue placeholder="Select map style" />
-            </SelectTrigger>
-            <SelectContent className="bg-white/90 backdrop-blur-sm z-[1001]">
-              {Object.entries(tileLayerNames).map(([value, label]) => (
-                <SelectItem
-                  key={value}
-                  value={value}
-                  className="cursor-pointer"
-                >
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div> */}
+      {/* Chain store toggle switch appears below */}
        {/* Chain store toggle switch */}
       <div className="absolute top-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg">
         <div className="flex items-center space-x-2">

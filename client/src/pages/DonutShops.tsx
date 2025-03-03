@@ -208,7 +208,8 @@ export default function DonutShops() {
 
   useEffect(() => {
     if (shouldFitBounds) {
-      const timer = setTimeout(() => setShouldFitBounds(false), 100);
+      // Give the map more time to properly set bounds
+      const timer = setTimeout(() => setShouldFitBounds(false), 500);
       return () => clearTimeout(timer);
     }
   }, [shouldFitBounds]);
