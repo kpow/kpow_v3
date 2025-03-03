@@ -26,15 +26,6 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 
-interface SearchState {
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  latitude?: number;
-  longitude?: number;
-  cityCenter?: { lat: number; lng: number; name: string };
-}
-
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
@@ -89,7 +80,6 @@ export default function DonutShops() {
       const data = await response.json();
       console.log("Received API response:", data);
 
-      // Save to visited cities only for city searches
       if (
         data.shops.length > 0 &&
         searchType === "city" &&
@@ -123,9 +113,7 @@ export default function DonutShops() {
 
     if (searchState.city && searchState.state) {
       setLocation(
-        `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(
-          searchState.state,
-        )}`,
+        `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(searchState.state)}`,
       );
     }
 
@@ -143,9 +131,7 @@ export default function DonutShops() {
       });
       setShouldFitBounds(true);
       setLocation(
-        `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(
-          newCity.state,
-        )}`,
+        `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(newCity.state)}`,
       );
       await refetch();
     } catch (error) {
@@ -205,8 +191,8 @@ export default function DonutShops() {
       searchState.city && searchState.state
         ? `${searchState.city}, ${searchState.state}`
         : searchState.zipCode
-        ? `ZIP code ${searchState.zipCode}`
-        : "your area";
+          ? `ZIP code ${searchState.zipCode}`
+          : "your area";
 
     return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
   };
@@ -266,19 +252,6 @@ export default function DonutShops() {
     return () => {};
   }, [data?.shops]);
 
-  useEffect(() => {
-    if (data && data.shops && data.shops.length > 0 && searchType === "city") {
-      setSearchState((prev) => ({
-        ...prev,
-        cityCenter: {
-          lat: data.shops[0].coordinates.latitude,
-          lng: data.shops[0].coordinates.longitude,
-          name: `${searchState.city}, ${searchState.state}`,
-        },
-      }));
-    }
-  }, [data, searchType, searchState.city, searchState.state]);
-
   return (
     <>
       <SEO
@@ -335,15 +308,6 @@ export default function DonutShops() {
                       onShopClick={handleShopClick}
                       shouldFitBounds={shouldFitBounds}
                       selectedShopId={selectedShopId}
-                      cityCenter={
-                        searchType === "city" && searchState.city && shops.length > 0
-                          ? {
-                              lat: shops[0].coordinates.latitude,
-                              lng: shops[0].coordinates.longitude,
-                              name: `${searchState.city}, ${searchState.state}`,
-                            }
-                          : undefined
-                      }
                     />
                   )}
               </CardContent>
@@ -547,3 +511,11 @@ const saveToVisitedCities = (city: string, state: string) => {
     window.dispatchEvent(new Event("visitedCitiesUpdated"));
   }
 };
+
+interface SearchState {
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  latitude?: number;
+  longitude?: number;
+}
