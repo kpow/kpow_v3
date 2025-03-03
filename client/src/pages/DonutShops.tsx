@@ -26,6 +26,19 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 
+interface YelpResponse {
+  shops: Shop[];
+  chainStores: Shop[];
+  metrics: {
+    donutResults: number;
+    doughnutResults: number;
+    totalUniqueShops: number;
+    filteredShops: number;
+    nearbyShops: number;
+    chainStoresFiltered: number;
+  };
+}
+
 export default function DonutShops() {
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
@@ -49,7 +62,7 @@ export default function DonutShops() {
   const [isLoadingShops, setIsLoadingShops] = useState(true);
   const { toast } = useToast();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, refetch } = useQuery<YelpResponse>({
     queryKey: ["donutShops", searchState],
     queryFn: async () => {
       const queryString = new URLSearchParams();
@@ -67,7 +80,7 @@ export default function DonutShops() {
         queryString.append("latitude", searchState.latitude.toString());
         queryString.append("longitude", searchState.longitude.toString());
       } else {
-        return { shops: [], metrics: null };
+        return { shops: [], chainStores: [], metrics: null };
       }
 
       const response = await fetch(`/api/yelp/search?${queryString}`);
@@ -99,6 +112,8 @@ export default function DonutShops() {
   const shops = (data?.shops || []).filter(
     (shop: Shop) => shop.rating >= minRating,
   );
+
+  const chainStores = data?.chainStores || [];
 
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
@@ -309,6 +324,7 @@ export default function DonutShops() {
                   ) && (
                     <DonutShopMap
                       shops={shops}
+                      chainStores={chainStores}
                       onShopClick={handleShopClick}
                       shouldFitBounds={shouldFitBounds}
                       selectedShopId={selectedShopId}

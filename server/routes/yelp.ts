@@ -6,12 +6,18 @@ const router = express.Router();
 // Function to filter out chain stores
 const filterChainStores = (businesses: any[]) => {
   const chainNames = ["Krispy Kreme", "Dunkin", "Dunkin' Donuts"];
-  return businesses.filter(
+  const chainStores = businesses.filter((business) =>
+    chainNames.some((chain) =>
+      business.name.toLowerCase().includes(chain.toLowerCase()),
+    ),
+  );
+  const nonChainStores = businesses.filter(
     (business) =>
       !chainNames.some((chain) =>
         business.name.toLowerCase().includes(chain.toLowerCase()),
       ),
   );
+  return { chainStores, nonChainStores };
 };
 
 const markNearbyShops = (shops: any[]) => {
@@ -70,9 +76,6 @@ router.get("/search", async (req, res) => {
       }),
     ]);
 
-    console.log("donutResponse:", donutResponse.data.businesses.length);
-    console.log("doughnutResponse:", doughnutResponse.data.businesses.length);
-
     // Combine and deduplicate results
     const allBusinesses = [
       ...donutResponse.data.businesses,
@@ -83,49 +86,45 @@ router.get("/search", async (req, res) => {
         index === self.findIndex((b) => b.id === business.id),
     );
 
-    const filteredBusinesses = filterChainStores(uniqueBusinesses);
+    const { chainStores, nonChainStores } = filterChainStores(uniqueBusinesses);
 
-    const filteredAndCloseBusinesses = filteredBusinesses.filter(
-      (business) => business.distance <= 24140,
-    );
+    const formattedResults = (businesses: any[]) =>
+      businesses.map((business) => ({
+        id: business.id,
+        name: business.name,
+        rating: business.rating,
+        review_count: business.review_count,
+        address: business.location.display_address.join(", "),
+        coordinates: {
+          latitude: business.coordinates.latitude,
+          longitude: business.coordinates.longitude,
+        },
+        price: business.price,
+        image_url: business.image_url,
+        url: business.url,
+        phone: business.display_phone,
+        distance: business.distance,
+        categories: business.categories,
+        is_closed: business.is_closed,
+        photos: business.photos || [business.image_url],
+      }));
+
+    const nearbyShops = nonChainStores.slice(0, 10); //Take top 10
+    const markedShops = markNearbyShops(nearbyShops);
 
     // Create metrics object
     const searchMetrics = {
       donutResults: donutResponse.data.businesses.length,
       doughnutResults: doughnutResponse.data.businesses.length,
       totalUniqueShops: uniqueBusinesses.length,
-      filteredShops: filteredBusinesses.length,
-      nearbyShops: filteredAndCloseBusinesses.length,
-      chainStoresFiltered: uniqueBusinesses.length - filteredBusinesses.length,
+      filteredShops: nonChainStores.length,
+      nearbyShops: markedShops.length,
+      chainStoresFiltered: chainStores.length,
     };
-
-    console.log("Search metrics being sent:", searchMetrics);
-
-    const formattedResults = filteredBusinesses.map((business) => ({
-      id: business.id,
-      name: business.name,
-      rating: business.rating,
-      review_count: business.review_count,
-      address: business.location.display_address.join(", "),
-      coordinates: {
-        latitude: business.coordinates.latitude,
-        longitude: business.coordinates.longitude,
-      },
-      price: business.price,
-      image_url: business.image_url,
-      url: business.url,
-      phone: business.display_phone,
-      distance: business.distance, // Added distance field
-      categories: business.categories, // Added categories
-      is_closed: business.is_closed, // Added operating status
-      photos: business.photos || [business.image_url], // Added photos array
-    }));
-
-    const nearbyShops = filteredBusinesses.slice(0,10); //Take top 10
-    const markedShops = markNearbyShops(nearbyShops);
 
     res.json({
       shops: markedShops,
+      chainStores: formattedResults(chainStores),
       metrics: searchMetrics,
     });
   } catch (error: any) {
