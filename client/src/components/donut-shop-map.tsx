@@ -56,50 +56,55 @@ function MapController({
 
   // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
-    if (shouldFitBounds) {
-      // Only proceed if we have shops or city coordinates
-      if ((shops.length > 0) || (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon)) {
-        let bounds = null;
-        
-        // If we have shops, start with their bounds
-        if (shops.length > 0) {
-          const shopCoords = shops.map((shop) => [
-            shop.coordinates.latitude,
-            shop.coordinates.longitude,
-          ]);
-          bounds = L.latLngBounds(shopCoords);
-        }
-        
-        // If we have city coordinates
-        if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
-          const cityPoint = [cityCoordinates.lat, cityCoordinates.lon];
-          
-          if (bounds) {
-            // Add city to existing bounds
-            bounds.extend(cityPoint);
-          } else {
-            // Create bounds from city only - with a small area around it
-            bounds = L.latLngBounds([
-              [cityCoordinates.lat - 0.05, cityCoordinates.lon - 0.05],
-              [cityCoordinates.lat + 0.05, cityCoordinates.lon + 0.05]
-            ]);
+    // Function to fit map to bounds
+    const fitMapToBounds = () => {
+      // Check if we have valid data to proceed
+      if (!cityCoordinates && shops.length === 0) return;
+      
+      // Create a bounds object
+      const bounds = L.latLngBounds([]);
+      
+      // Add city coordinates to bounds first (make it the center)
+      if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
+        bounds.extend([cityCoordinates.lat, cityCoordinates.lon]);
+      }
+      
+      // Add all shop coordinates to the bounds
+      if (shops.length > 0) {
+        shops.forEach(shop => {
+          if (shop.coordinates && shop.coordinates.latitude && shop.coordinates.longitude) {
+            bounds.extend([shop.coordinates.latitude, shop.coordinates.longitude]);
           }
-        }
+        });
+      }
+      
+      // If we have valid bounds
+      if (bounds.isValid()) {
+        // Add padding for better visibility
+        const paddedBounds = bounds.pad(0.2);
         
-        if (bounds) {
-          // Add padding to the bounds for better view
-          const paddedBounds = bounds.pad(0.3);
-          
-          // Use a timeout to ensure the map is ready
-          setTimeout(() => {
-            map.invalidateSize();
-            map.fitBounds(paddedBounds);
-          }, 100);
-        }
+        // First invalidate size to ensure the map container is properly measured
+        map.invalidateSize();
+        
+        // Then fit to bounds with animation
+        map.fitBounds(paddedBounds, {
+          animate: true,
+          duration: 0.5
+        });
       } else if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
-        // If we only have city coordinates, center on city
+        // Fallback to city center with a default zoom if bounds aren't valid
         map.setView([cityCoordinates.lat, cityCoordinates.lon], 12);
       }
+    };
+    
+    // Only run the fitting logic when shouldFitBounds is true
+    if (shouldFitBounds) {
+      // Delay the execution slightly to ensure the map is fully loaded
+      const timer = setTimeout(() => {
+        fitMapToBounds();
+      }, 300);
+      
+      return () => clearTimeout(timer);
     }
   }, [shouldFitBounds, shops, map, cityCoordinates]);
 

@@ -209,10 +209,18 @@ export default function DonutShops() {
   useEffect(() => {
     if (shouldFitBounds) {
       // Give the map more time to properly set bounds
-      const timer = setTimeout(() => setShouldFitBounds(false), 500);
+      // Increased timeout to ensure map has time to load and calculate bounds
+      const timer = setTimeout(() => setShouldFitBounds(false), 1000);
       return () => clearTimeout(timer);
     }
   }, [shouldFitBounds]);
+  
+  // Force shouldFitBounds to true when shops data changes
+  useEffect(() => {
+    if (data?.shops && data.shops.length > 0) {
+      setShouldFitBounds(true);
+    }
+  }, [data?.shops]);
 
   useEffect(() => {
     if (params) {
