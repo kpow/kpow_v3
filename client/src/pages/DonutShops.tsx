@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
@@ -23,6 +24,9 @@ import {
 import { ChevronDown } from "lucide-react";
 import { YelpResponse } from "@/types/shop";
 
+/**
+ * Interface representing the state of the search criteria
+ */
 interface SearchState {
   city?: string;
   state?: string;
@@ -31,10 +35,19 @@ interface SearchState {
   longitude?: number;
 }
 
+/**
+ * DonutShops - Main component for the donut shop discovery page
+ * This page allows users to search for donut shops by city, zip code,
+ * or coordinates and displays results on a map and in a slider.
+ */
 export default function DonutShops() {
+  // =========================================================================
+  // STATE MANAGEMENT
+  // =========================================================================
   const [searchType, setSearchType] = useState<string>("city");
   const [, params] = useRoute("/donut-tour/:city/:state");
 
+  // Initialize with a city from URL params or random city
   const initialCity = params
     ? {
         city: decodeURIComponent(params.city),
@@ -53,7 +66,15 @@ export default function DonutShops() {
   const [shouldFitBounds, setShouldFitBounds] = useState(true);
   const [isLoadingShops, setIsLoadingShops] = useState(true);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
+  // =========================================================================
+  // DATA FETCHING WITH REACT QUERY
+  // =========================================================================
+  
+  /**
+   * Query for fetching donut shop data based on search criteria
+   */
   const { data, isLoading, refetch } = useQuery<YelpResponse>({
     queryKey: ["donutShops", searchState],
     queryFn: async () => {
@@ -83,16 +104,24 @@ export default function DonutShops() {
 
       return response.json();
     },
-    enabled: false,
-    staleTime: Infinity,
+    enabled: false, // Don't run automatically on mount
+    staleTime: Infinity, // Don't refetch automatically
   });
 
+  // Filter shops based on minimum rating
   const shops = (data?.shops || []).filter(
     (shop) => shop.rating >= minRating,
   );
 
   const chainStores = data?.chainStores || [];
 
+  // =========================================================================
+  // EVENT HANDLERS
+  // =========================================================================
+  
+  /**
+   * Validates search criteria and initiates search
+   */
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
     if (validationMessage) {
@@ -104,6 +133,7 @@ export default function DonutShops() {
       return;
     }
 
+    // Update URL if searching by city
     if (searchState.city && searchState.state) {
       setLocation(
         `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(
@@ -115,8 +145,9 @@ export default function DonutShops() {
     await refetch();
   };
 
-  const [, setLocation] = useLocation();
-
+  /**
+   * Selects a random city and initiates search
+   */
   const handleRandomCity = async () => {
     try {
       const newCity = getRandomCity();
@@ -140,6 +171,10 @@ export default function DonutShops() {
     }
   };
 
+  /**
+   * Validates search criteria based on search type
+   * @returns Error message or null if valid
+   */
   const getValidationMessage = () => {
     if (searchType === "city" && (!searchState.city || !searchState.state)) {
       return "Please enter both city and state";
@@ -156,6 +191,9 @@ export default function DonutShops() {
     return null;
   };
 
+  /**
+   * Updates search state when inputs change
+   */
   const handleInputChange = (
     value: string | number,
     field: keyof SearchState,
@@ -163,39 +201,24 @@ export default function DonutShops() {
     setSearchState((prev) => ({ ...prev, [field]: value }));
   };
 
+  /**
+   * Handles shop selection on map or slider
+   */
   const handleShopClick = (shop: Shop) => {
     setSelectedShopId(shop.id);
     setShouldFitBounds(false);
   };
 
+  /**
+   * Updates minimum rating filter
+   */
   const handleRatingChange = (value: number[]) => {
     setMinRating(value[0]);
   };
 
-  useEffect(() => {
-    if (shouldFitBounds) {
-      const timer = setTimeout(() => setShouldFitBounds(false), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldFitBounds]);
-
-  useEffect(() => {
-    if (data?.shops && data.shops.length > 0) {
-      setShouldFitBounds(true);
-    }
-  }, [data?.shops]);
-
-  useEffect(() => {
-    if (params) {
-      setSearchState({
-        city: decodeURIComponent(params.city),
-        state: decodeURIComponent(params.state),
-      });
-      setShouldFitBounds(true);
-      refetch();
-    }
-  }, [params?.city, params?.state]);
-
+  /**
+   * Handles selection of a favorite shop from the donut luv list
+   */
   const handleFavoriteShopSelect = (
     city: string,
     state: string,
@@ -217,18 +240,51 @@ export default function DonutShops() {
     }, 0);
   };
 
+  // =========================================================================
+  // SIDE EFFECTS
+  // =========================================================================
+  
+  // Reset map bounds after a delay
   useEffect(() => {
-    const handleFetchComplete = () => {
-      setIsLoadingShops(false);
-    };
-
-    if (data?.shops && data.shops.length > 0) {
-      handleFetchComplete();
+    if (shouldFitBounds) {
+      const timer = setTimeout(() => setShouldFitBounds(false), 1000);
+      return () => clearTimeout(timer);
     }
+  }, [shouldFitBounds]);
 
-    return () => {};
+  // Fit map bounds when shops data changes
+  useEffect(() => {
+    if (data?.shops && data.shops.length > 0) {
+      setShouldFitBounds(true);
+    }
   }, [data?.shops]);
 
+  // Handle URL parameter changes
+  useEffect(() => {
+    if (params) {
+      setSearchState({
+        city: decodeURIComponent(params.city),
+        state: decodeURIComponent(params.state),
+      });
+      setShouldFitBounds(true);
+      refetch();
+    }
+  }, [params?.city, params?.state]);
+
+  // Update loading state when data is fetched
+  useEffect(() => {
+    if (data?.shops && data.shops.length > 0) {
+      setIsLoadingShops(false);
+    }
+  }, [data?.shops]);
+
+  // =========================================================================
+  // HELPER FUNCTIONS FOR SEO AND DISPLAY
+  // =========================================================================
+  
+  /**
+   * Generates page title based on search criteria
+   */
   const getPageTitle = () => {
     if (searchType === "city" && searchState.city && searchState.state) {
       return `Donut Shops in ${searchState.city}, ${searchState.state}`;
@@ -239,6 +295,9 @@ export default function DonutShops() {
     return "Find Local Donut Shops";
   };
 
+  /**
+   * Generates page description for SEO
+   */
   const getPageDescription = () => {
     const shopCount = shops.length;
     const locationText =
@@ -251,19 +310,28 @@ export default function DonutShops() {
     return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
   };
 
+  /**
+   * Gets preview image for social sharing
+   */
   const getPreviewImage = () => {
     return shops[0]?.image_url ?? "/donut-placeholder.png";
   };
 
+  // =========================================================================
+  // RENDER COMPONENT
+  // =========================================================================
   return (
     <>
+      {/* SEO Metadata */}
       <SEO
         title={getPageTitle()}
         description={getPageDescription()}
         image={getPreviewImage()}
         type="website"
       />
+      
       <div className="container mx-auto max-w-[1800px] flex flex-col min-h-screen">
+        {/* Page Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-4">
           <PageTitle size="lg" className="text-2xl sm:text-3xl break-words">
             donut tour{" "}
@@ -282,6 +350,7 @@ export default function DonutShops() {
           </Button>
         </div>
 
+        {/* Shop Slider */}
         <div className="mb-4">
           <div className="h-full w-full rounded-lg overflow-hidden">
             {isLoadingShops ? (
@@ -296,9 +365,12 @@ export default function DonutShops() {
           </div>
         </div>
 
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto flex flex-col items-stretch">
+          {/* Left Content Area (Map and Collections) */}
           <div className="lg:col-span-2 lg:row-span-2 h-full flex flex-col">
             
+            {/* Map Component */}
             <Card>
               <CardContent className="p-0 h-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[780px] lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
                 {shops && shops.length > 0 && (
@@ -314,9 +386,11 @@ export default function DonutShops() {
               </CardContent>
             </Card>
 
+            {/* Collapsible Sections */}
             <Card className="mt-6">
               <CardContent className="p-4">
                 <div className="space-y-4">
+                  {/* Donut Luv Section */}
                   <Collapsible className="w-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[1000px]">
                     <CollapsibleTrigger className="flex items-center justify-between w-full">
                       <h2 className="text-lg font-slackey">donut luv</h2>
@@ -327,6 +401,7 @@ export default function DonutShops() {
                     </CollapsibleContent>
                   </Collapsible>
 
+                  {/* Recent Tours Section */}
                   <Collapsible className="w-full">
                     <CollapsibleTrigger className="flex items-center justify-between w-full">
                       <h2 className="text-lg font-slackey">recent tours</h2>
@@ -357,6 +432,7 @@ export default function DonutShops() {
             
           </div>
 
+          {/* Right Sidebar - Search Component */}
           <DonutShopSearch 
             searchState={searchState}
             onSearchStateChange={handleInputChange}
@@ -374,6 +450,9 @@ export default function DonutShops() {
   );
 }
 
+/**
+ * Returns a random city from the predefined cities list
+ */
 const getRandomCity = () => {
   const randomIndex = Math.floor(Math.random() * cities.length);
   return {
