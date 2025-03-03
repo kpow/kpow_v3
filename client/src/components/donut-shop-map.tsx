@@ -21,6 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import markerIcons, { MarkerColor } from "./markerIcons";
+
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -249,7 +251,7 @@ export function DonutShopMap({
             <Marker
               key={shop.id}
               position={[shop.coordinates.latitude, shop.coordinates.longitude]}
-              icon={ShopIcon}
+              icon={markerIcons['red']}
               ref={(el) => {
                 if (el) {
                   markersRef.current[shop.id] = el;
