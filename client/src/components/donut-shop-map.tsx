@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/select";
 
 import markerIcons, { MarkerColor } from "./markerIcons";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // Custom donut shop marker icon
 const ShopIcon = L.icon({
@@ -123,6 +125,7 @@ interface CityCoordinates {
 // Update DonutShopMapProps interface
 interface DonutShopMapProps {
   shops: Shop[];
+  chainStores?: Shop[];
   onShopClick?: (shop: Shop) => void;
   shouldFitBounds?: boolean;
   selectedShopId?: string;
@@ -132,6 +135,7 @@ interface DonutShopMapProps {
 
 export function DonutShopMap({
   shops = [],
+  chainStores = [],
   onShopClick,
   shouldFitBounds = false,
   selectedShopId,
@@ -140,6 +144,7 @@ export function DonutShopMap({
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [showChainStores, setShowChainStores] = useState(false);
   const [tileLayer, setTileLayer] = useState<string>("toner-lite");
   const [cityCoordinates, setCityCoordinates] =
     useState<CityCoordinates | null>(null);
@@ -304,6 +309,7 @@ export function DonutShopMap({
             </Marker>
           )}
 
+          {/* Regular shops */}
           {shops.map((shop) => (
             <Marker
               key={shop.id}
@@ -365,6 +371,49 @@ export function DonutShopMap({
               </Popup>
             </Marker>
           ))}
+
+          {/* Chain stores */}
+          {showChainStores &&
+            chainStores.map((shop) => (
+              <Marker
+                key={shop.id}
+                position={[shop.coordinates.latitude, shop.coordinates.longitude]}
+                icon={markerIcons.grey}
+                eventHandlers={{
+                  click: () => onShopClick?.(shop),
+                }}
+              >
+                <Popup>
+                  <div className="p-1">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-bold">{shop.name}</h3>
+                      </div>
+                      <p className="text-sm text-gray-600">{shop.address}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <span className="font-medium">Rating:</span>
+                          <span>{shop.rating} ⭐</span>
+                        </div>
+                        {shop.price && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">Price:</span>
+                            <span>{shop.price}</span>
+                          </div>
+                        )}
+                      </div>
+                      {shop.image_url && (
+                        <img
+                          src={shop.image_url}
+                          alt={shop.name}
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
         </MapContainer>
       </div>
 
@@ -389,6 +438,17 @@ export function DonutShopMap({
           </Select>
         </div>
       </div> */}
+       {/* Chain store toggle switch */}
+      <div className="absolute top-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="show-chains"
+            checked={showChainStores}
+            onCheckedChange={setShowChainStores}
+          />
+          <Label htmlFor="show-chains">Show Chain Stores</Label>
+        </div>
+      </div>
     </div>
   );
 }

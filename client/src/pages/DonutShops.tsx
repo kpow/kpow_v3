@@ -84,26 +84,12 @@ export default function DonutShops() {
       }
 
       const response = await fetch(`/api/yelp/search?${queryString}`);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to fetch shops");
       }
 
-      const data = await response.json();
-      console.log("Received API response:", data);
-
-      if (
-        data.shops.length > 0 &&
-        searchType === "city" &&
-        searchState.city &&
-        searchState.state
-      ) {
-        saveToVisitedCities(searchState.city, searchState.state);
-      }
-
-      setShouldFitBounds(true);
-      return data;
+      return response.json();
     },
     enabled: false,
     staleTime: Infinity,
