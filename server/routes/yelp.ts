@@ -20,11 +20,30 @@ const filterChainStores = (businesses: any[]) => {
   return { chainStores, nonChainStores };
 };
 
-const markNearbyShops = (shops: any[]) => {
-  return shops.map((shop) => ({
-    ...shop,
-    isNearby: shop.distance <= 24140,
-  }));
+const getCityCoordinates = async (location: string) => {
+  try {
+    const query = encodeURIComponent(location);
+    const response = await axios.get(
+      `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`,
+      {
+        headers: {
+          "User-Agent": "DonutTourApp/1.0",
+        },
+      },
+    );
+
+    if (response.data && response.data.length > 0) {
+      return {
+        latitude: parseFloat(response.data[0].lat),
+        longitude: parseFloat(response.data[0].lon),
+        display_name: response.data[0].display_name,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching city coordinates:", error);
+    return null;
+  }
 };
 
 // Search donut/doughnut shops
@@ -38,6 +57,12 @@ router.get("/search", async (req, res) => {
         error:
           "Either location or coordinates (latitude & longitude) are required",
       });
+    }
+
+    // Get city coordinates if location is provided
+    let cityCenter = null;
+    if (location) {
+      cityCenter = await getCityCoordinates(location as string);
     }
 
     // Base parameters
@@ -107,10 +132,9 @@ router.get("/search", async (req, res) => {
         categories: business.categories,
         is_closed: business.is_closed,
         photos: business.photos || [business.image_url],
+        // Calculate if shop is nearby (within 15 miles / 24140 meters)
+        isNearby: business.distance <= 24140,
       }));
-
-    const nearbyShops = nonChainStores.slice(0, 10); //Take top 10
-    const markedShops = markNearbyShops(nearbyShops);
 
     // Create metrics object
     const searchMetrics = {
@@ -118,13 +142,21 @@ router.get("/search", async (req, res) => {
       doughnutResults: doughnutResponse.data.businesses.length,
       totalUniqueShops: uniqueBusinesses.length,
       filteredShops: nonChainStores.length,
-      nearbyShops: markedShops.length,
+      nearbyShops: nonChainStores.filter((shop) => shop.distance <= 24140).length,
       chainStoresFiltered: chainStores.length,
     };
 
+    // Return all marker data including city center
     res.json({
-      shops: markedShops,
+      shops: formattedResults(nonChainStores),
       chainStores: formattedResults(chainStores),
+      cityCenter: cityCenter ? {
+        coordinates: {
+          latitude: cityCenter.latitude,
+          longitude: cityCenter.longitude,
+        },
+        display_name: cityCenter.display_name,
+      } : null,
       metrics: searchMetrics,
     });
   } catch (error: any) {

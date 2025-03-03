@@ -16,4 +16,27 @@ export interface Shop {
   categories?: any[];
   is_closed?: boolean;
   photos?: string[];
+  isNearby?: boolean;
+}
+
+export interface CityCenter {
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  display_name: string;
+}
+
+export interface YelpResponse {
+  shops: Shop[];
+  chainStores: Shop[];
+  cityCenter: CityCenter | null;
+  metrics: {
+    donutResults: number;
+    doughnutResults: number;
+    totalUniqueShops: number;
+    filteredShops: number;
+    nearbyShops: number;
+    chainStoresFiltered: number;
+  };
 }

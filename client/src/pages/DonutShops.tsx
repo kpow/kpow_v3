@@ -25,18 +25,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { YelpResponse } from "@/types/shop";
 
-interface YelpResponse {
-  shops: Shop[];
-  chainStores: Shop[];
-  metrics: {
-    donutResults: number;
-    doughnutResults: number;
-    totalUniqueShops: number;
-    filteredShops: number;
-    nearbyShops: number;
-    chainStoresFiltered: number;
-  };
+interface SearchState {
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export default function DonutShops() {
@@ -80,7 +76,7 @@ export default function DonutShops() {
         queryString.append("latitude", searchState.latitude.toString());
         queryString.append("longitude", searchState.longitude.toString());
       } else {
-        return { shops: [], chainStores: [], metrics: null };
+        return { shops: [], chainStores: [], cityCenter: null, metrics: null };
       }
 
       const response = await fetch(`/api/yelp/search?${queryString}`);
@@ -96,7 +92,7 @@ export default function DonutShops() {
   });
 
   const shops = (data?.shops || []).filter(
-    (shop: Shop) => shop.rating >= minRating,
+    (shop) => shop.rating >= minRating,
   );
 
   const chainStores = data?.chainStores || [];
@@ -180,42 +176,13 @@ export default function DonutShops() {
     setMinRating(value[0]);
   };
 
-  const getPageTitle = () => {
-    if (searchType === "city" && searchState.city && searchState.state) {
-      return `Donut Shops in ${searchState.city}, ${searchState.state}`;
-    }
-    if (searchType === "zipcode" && searchState.zipCode) {
-      return `Donut Shops near ${searchState.zipCode}`;
-    }
-    return "Find Local Donut Shops";
-  };
-
-  const getPageDescription = () => {
-    const shopCount = shops.length;
-    const locationText =
-      searchState.city && searchState.state
-        ? `${searchState.city}, ${searchState.state}`
-        : searchState.zipCode
-        ? `ZIP code ${searchState.zipCode}`
-        : "your area";
-
-    return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
-  };
-
-  const getPreviewImage = () => {
-    return shops[0]?.image_url ?? "/donut-placeholder.png";
-  };
-
   useEffect(() => {
     if (shouldFitBounds) {
-      // Give the map more time to properly set bounds
-      // Increased timeout to ensure map has time to load and calculate bounds
       const timer = setTimeout(() => setShouldFitBounds(false), 1000);
       return () => clearTimeout(timer);
     }
   }, [shouldFitBounds]);
 
-  // Force shouldFitBounds to true when shops data changes
   useEffect(() => {
     if (data?.shops && data.shops.length > 0) {
       setShouldFitBounds(true);
@@ -266,6 +233,32 @@ export default function DonutShops() {
     return () => {};
   }, [data?.shops]);
 
+  const getPageTitle = () => {
+    if (searchType === "city" && searchState.city && searchState.state) {
+      return `Donut Shops in ${searchState.city}, ${searchState.state}`;
+    }
+    if (searchType === "zipcode" && searchState.zipCode) {
+      return `Donut Shops near ${searchState.zipCode}`;
+    }
+    return "Find Local Donut Shops";
+  };
+
+  const getPageDescription = () => {
+    const shopCount = shops.length;
+    const locationText =
+      searchState.city && searchState.state
+        ? `${searchState.city}, ${searchState.state}`
+        : searchState.zipCode
+        ? `ZIP code ${searchState.zipCode}`
+        : "your area";
+
+    return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
+  };
+
+  const getPreviewImage = () => {
+    return shops[0]?.image_url ?? "/donut-placeholder.png";
+  };
+
   return (
     <>
       <SEO
@@ -311,24 +304,19 @@ export default function DonutShops() {
           <div className="lg:col-span-2 lg:row-span-2 h-full flex flex-col">
             <Card>
               <CardContent className="p-0 h-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[780px] lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
-                {shops &&
-                  shops.length > 0 &&
-                  shops.some(
-                    (shop: Shop) =>
-                      shop.coordinates?.latitude && shop.coordinates?.longitude,
-                  ) && (
-                    <DonutShopMap
-                      shops={shops}
-                      chainStores={chainStores}
-                      onShopClick={handleShopClick}
-                      shouldFitBounds={shouldFitBounds}
-                      selectedShopId={selectedShopId}
-                      currentCity={searchState.city}
-                      currentState={searchState.state}
-                    />
-                  )}
+                {shops && shops.length > 0 && (
+                  <DonutShopMap
+                    shops={shops}
+                    chainStores={chainStores}
+                    onShopClick={handleShopClick}
+                    shouldFitBounds={shouldFitBounds}
+                    selectedShopId={selectedShopId}
+                    cityCenter={data?.cityCenter || null}
+                  />
+                )}
               </CardContent>
             </Card>
+
             <Card className="mt-6">
               <CardContent className="p-4">
                 <div className="space-y-4">
@@ -506,33 +494,3 @@ const getRandomCity = () => {
     state: cities[randomIndex].state,
   };
 };
-
-const saveToVisitedCities = (city: string, state: string) => {
-  const newCity = {
-    city,
-    state,
-    timestamp: Date.now(),
-  };
-
-  const storedCities = localStorage.getItem("visitedCities");
-  const currentCities = storedCities ? JSON.parse(storedCities) : [];
-
-  const exists = currentCities.some(
-    (prevCity: any) => prevCity.city === city && prevCity.state === state,
-  );
-
-  if (!exists) {
-    const updated = [newCity, ...currentCities];
-    const trimmed = updated.slice(0, 55);
-    localStorage.setItem("visitedCities", JSON.stringify(trimmed));
-    window.dispatchEvent(new Event("visitedCitiesUpdated"));
-  }
-};
-
-interface SearchState {
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  latitude?: number;
-  longitude?: number;
-}

@@ -12,135 +12,72 @@ import { useEffect, useRef } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Shop } from "@/types/shop";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import markerIcons, { MarkerColor } from "./markerIcons";
+import { Shop, CityCenter } from "@/types/shop";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-
-// Custom donut shop marker icon
-const ShopIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-});
-
-// No replacement - removing unused function
+import markerIcons from "./markerIcons";
 
 interface MapControllerProps {
   shops: Shop[];
   shouldFitBounds: boolean;
   selectedShopId?: string;
   markersRef: React.MutableRefObject<{ [key: string]: L.Marker }>;
-  cityCoordinates?: { lat: number; lon: number; display_name: string } | null;
+  cityCenter: CityCenter | null;
 }
 
-// MapController component to handle map updates and marker control
 function MapController({
   shops,
   shouldFitBounds,
   selectedShopId,
   markersRef,
-  cityCoordinates,
+  cityCenter,
 }: MapControllerProps) {
   const map = useMap();
 
-  // Handle bounds fitting only on initial load or explicit request
   useEffect(() => {
-    // Function to fit map to bounds
-    const fitMapToBounds = () => {
-      // Check if we have valid data to proceed
-      if (!cityCoordinates && shops.length === 0) return;
-
-      // Create a bounds object
+    if (shouldFitBounds && (shops.length > 0 || cityCenter)) {
       const bounds = L.latLngBounds([]);
 
-      // Add city coordinates to bounds first (make it the center)
-      if (cityCoordinates && cityCoordinates.lat && cityCoordinates.lon) {
-        bounds.extend([cityCoordinates.lat, cityCoordinates.lon]);
+      // Add city center to bounds if available
+      if (cityCenter?.coordinates) {
+        bounds.extend([
+          cityCenter.coordinates.latitude,
+          cityCenter.coordinates.longitude,
+        ]);
       }
 
-      // Add all shop coordinates to the bounds
-      if (shops.length > 0) {
-        shops.forEach((shop) => {
-          if (
-            shop.coordinates &&
-            shop.coordinates.latitude &&
-            shop.coordinates.longitude
-          ) {
-            bounds.extend([
-              shop.coordinates.latitude,
-              shop.coordinates.longitude,
-            ]);
-          }
-        });
-      }
+      // Add all shop coordinates to bounds
+      shops.forEach((shop) => {
+        if (shop.coordinates) {
+          bounds.extend([
+            shop.coordinates.latitude,
+            shop.coordinates.longitude,
+          ]);
+        }
+      });
 
-      // If we have valid bounds
       if (bounds.isValid()) {
-        // Add padding for better visibility
         const paddedBounds = bounds.pad(0.2);
-
-        // First invalidate size to ensure the map container is properly measured
-        map.invalidateSize();
-
-        // Then fit to bounds with animation
         map.fitBounds(paddedBounds, {
           animate: true,
           duration: 0.5,
         });
-      } else if (
-        cityCoordinates &&
-        cityCoordinates.lat &&
-        cityCoordinates.lon
-      ) {
-        // Fallback to city center with a default zoom if bounds aren't valid
-        map.setView([cityCoordinates.lat, cityCoordinates.lon], 6);
       }
-    };
-
-    // Only run the fitting logic when shouldFitBounds is true
-    if (shouldFitBounds) {
-      // Delay the execution slightly to ensure the map is fully loaded
-      const timer = setTimeout(() => {
-        fitMapToBounds();
-      }, 300);
-
-      return () => clearTimeout(timer);
     }
-  }, [shouldFitBounds, shops, map, cityCoordinates]);
+  }, [shouldFitBounds, shops, cityCenter, map]);
 
   // Handle selected shop updates
   useEffect(() => {
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
       const shop = shops.find((s) => s.id === selectedShopId);
-      if (shop) {
-        const storedFavorites = JSON.parse(
-          localStorage.getItem("donutLuv") || "[]",
-        );
-        const isFromFavorites = storedFavorites.some(
-          (f: any) => f.id === shop.id,
-        );
 
-        // Center map on the selected shop with different zoom levels
+      if (shop?.coordinates) {
         map.setView(
           [shop.coordinates.latitude, shop.coordinates.longitude],
-          isFromFavorites ? 18 : map.getZoom(), // Zoom close only for favorites
+          map.getZoom() || 14
         );
-        // Open the marker popup after a short delay to ensure proper rendering
-        setTimeout(() => {
-          marker.openPopup();
-        }, 100);
+        marker.openPopup();
       }
     }
   }, [selectedShopId, shops, map, markersRef]);
@@ -148,22 +85,13 @@ function MapController({
   return null;
 }
 
-// Add type for city coordinates
-interface CityCoordinates {
-  lat: number;
-  lon: number;
-  display_name: string;
-}
-
-// Update DonutShopMapProps interface
 interface DonutShopMapProps {
   shops: Shop[];
   chainStores?: Shop[];
   onShopClick?: (shop: Shop) => void;
   shouldFitBounds?: boolean;
   selectedShopId?: string;
-  currentCity?: string;
-  currentState?: string;
+  cityCenter: CityCenter | null;
 }
 
 export function DonutShopMap({
@@ -172,77 +100,11 @@ export function DonutShopMap({
   onShopClick,
   shouldFitBounds = false,
   selectedShopId,
-  currentCity,
-  currentState,
+  cityCenter,
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [showChainStores, setShowChainStores] = useState(false);
-  const [cityCoordinates, setCityCoordinates] =
-    useState<CityCoordinates | null>(null);
-
-  // Function to fetch city coordinates from Nominatim
-  const fetchCityCoordinates = async (city: string, state: string) => {
-    try {
-      // First try with specific city and state
-      const query = `${city}, ${state}, USA`;
-      const encodedQuery = encodeURIComponent(query);
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&limit=1&addressdetails=1`,
-        {
-          headers: {
-            "User-Agent": "DonutTourApp/1.0",
-          },
-        },
-      );
-      const data = await response.json();
-
-      if (data && data.length > 0) {
-        setCityCoordinates({
-          lat: parseFloat(data[0].lat),
-          lon: parseFloat(data[0].lon),
-          display_name: data[0].display_name,
-        });
-        console.log("City coordinates found:", data[0].lat, data[0].lon);
-      } else {
-        // Try again with just the city name
-        const fallbackQuery = encodeURIComponent(city);
-        const fallbackResponse = await fetch(
-          `https://nominatim.openstreetmap.org/search?city=${fallbackQuery}&state=${encodeURIComponent(state)}&country=USA&format=json&limit=1`,
-          {
-            headers: {
-              "User-Agent": "DonutTourApp/1.0",
-            },
-          },
-        );
-        const fallbackData = await fallbackResponse.json();
-
-        if (fallbackData && fallbackData.length > 0) {
-          setCityCoordinates({
-            lat: parseFloat(fallbackData[0].lat),
-            lon: parseFloat(fallbackData[0].lon),
-            display_name: fallbackData[0].display_name,
-          });
-          console.log(
-            "Fallback city coordinates found:",
-            fallbackData[0].lat,
-            fallbackData[0].lon,
-          );
-        } else {
-          console.warn("Could not find coordinates for", city, state);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching city coordinates:", error);
-    }
-  };
-
-  // Update city coordinates when city/state changes
-  useEffect(() => {
-    if (currentCity && currentState) {
-      fetchCityCoordinates(currentCity, currentState);
-    }
-  }, [currentCity, currentState]);
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem("donutLuv");
@@ -277,7 +139,6 @@ export function DonutShopMap({
     }
 
     setFavorites(new Set(favorites));
-    // Dispatch custom event to notify the list component
     window.dispatchEvent(new Event("donutLuvUpdate"));
   };
 
@@ -285,74 +146,69 @@ export function DonutShopMap({
 
   return (
     <div className="relative h-full w-full">
-      {/* Map Container - Place it first in the DOM */}
       <div className="h-full w-full rounded-lg overflow-hidden">
         <MapContainer
           center={[39.8283, -98.5795]}
           zoom={4}
           style={{ height: "100%", width: "100%" }}
-          className="z-0" // Explicitly set base z-index
+          className="z-0"
         >
           <MapController
             shops={shops}
             shouldFitBounds={shouldFitBounds}
             selectedShopId={selectedShopId}
             markersRef={markersRef}
-            cityCoordinates={cityCoordinates}
+            cityCenter={cityCenter}
           />
+
           <LayersControl position="topright">
-            {/* Stamen Toner Basemap */}
             <BaseLayer checked name="Toner-lite">
               <TileLayer
                 url="https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>'
               />
             </BaseLayer>
-
-            {/* Default Basemap (Carto Light) */}
             <BaseLayer name="CartoLight">
               <TileLayer
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://carto.com/">Carto</a>, 
-                             &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+                attribution='&copy; <a href="https://carto.com/">Carto</a>'
               />
             </BaseLayer>
-
-            {/* OpenStreetMap Default Basemap */}
             <BaseLayer name="OpenStreetMap">
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
               />
             </BaseLayer>
-
-            {/* Stamen Toner Basemap */}
             <BaseLayer name="Watercolor">
               <TileLayer
                 url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
-                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>'
               />
             </BaseLayer>
           </LayersControl>
 
-          {/* Add city marker */}
-          {cityCoordinates && (
+          {/* City center marker */}
+          {cityCenter && (
             <Marker
-              position={[cityCoordinates.lat, cityCoordinates.lon]}
+              position={[
+                cityCenter.coordinates.latitude,
+                cityCenter.coordinates.longitude,
+              ]}
               icon={markerIcons.green}
             >
               <Popup>
                 <div className="p-1">
-                  <h3 className="text-lg font-bold">{currentCity}</h3>
+                  <h3 className="text-lg font-bold">City Center</h3>
                   <p className="text-sm text-gray-600">
-                    {cityCoordinates.display_name}
+                    {cityCenter.display_name}
                   </p>
                 </div>
               </Popup>
             </Marker>
           )}
 
-          {/* Regular shops */}
+          {/* Shop markers */}
           {shops.map((shop) => (
             <Marker
               key={shop.id}
@@ -415,7 +271,7 @@ export function DonutShopMap({
             </Marker>
           ))}
 
-          {/* Chain stores */}
+          {/* Chain store markers */}
           {showChainStores &&
             chainStores.map((shop) => (
               <Marker
@@ -463,8 +319,7 @@ export function DonutShopMap({
         </MapContainer>
       </div>
 
-      {/* Chain store toggle switch appears below */}
-      {/* Chain store toggle switch */}
+      {/* Chain store toggle */}
       <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg">
         <div className="flex items-center space-x-2">
           <Switch
