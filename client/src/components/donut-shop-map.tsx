@@ -5,6 +5,7 @@ import {
   Popup,
   useMap,
   LayersControl,
+  useMapEvents
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -35,18 +36,18 @@ const ShopIcon = L.icon({
 // Helper function to get map bounds from shops
 const getBoundsFromShops = (shops: Shop[]) => {
   if (!shops || shops.length === 0) return null;
-  
-  const validShops = shops.filter(shop => 
-    shop.coordinates && 
-    shop.coordinates.latitude && 
+
+  const validShops = shops.filter(shop =>
+    shop.coordinates &&
+    shop.coordinates.latitude &&
     shop.coordinates.longitude
   );
-  
+
   if (validShops.length === 0) return null;
 
   const lats = validShops.map(shop => shop.coordinates.latitude);
   const lngs = validShops.map(shop => shop.coordinates.longitude);
-  
+
   return L.latLngBounds(
     [Math.min(...lats), Math.min(...lngs)],
     [Math.max(...lats), Math.max(...lngs)]
@@ -117,6 +118,7 @@ interface DonutShopMapProps {
   onShopClick?: (shop: Shop) => void;
   shouldFitBounds?: boolean;
   selectedShopId?: string;
+  cityCenter?: { lat: number; lng: number; name: string };
 }
 
 export function DonutShopMap({
@@ -124,6 +126,7 @@ export function DonutShopMap({
   onShopClick,
   shouldFitBounds = false,
   selectedShopId,
+  cityCenter,
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -200,7 +203,7 @@ export function DonutShopMap({
           center={[39.8283, -98.5795]}
           zoom={4}
           style={{ height: "100%", width: "100%" }}
-          className="z-0" // Explicitly set base z-index
+          className="z-0"
         >
           <MapController
             shops={shops}
@@ -243,10 +246,21 @@ export function DonutShopMap({
             </BaseLayer>
           </LayersControl>
 
-          {/* <TileLayer
-            url={tileLayerOptions[tileLayer]}
-            attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> <a href="https://stamen.com/" target="_blank">&copy; Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-          /> */}
+          {/* Add city center marker */}
+          {cityCenter && (
+            <Marker
+              position={[cityCenter.lat, cityCenter.lng]}
+              icon={markerIcons['blue']}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-bold text-lg">{cityCenter.name}</h3>
+                  <p className="text-sm text-gray-600">City Center</p>
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
           {shops.map((shop) => (
             <Marker
               key={shop.id}
