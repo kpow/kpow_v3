@@ -298,6 +298,7 @@ export default function DonutShops() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:max-w-[1800px] mx-auto flex flex-col items-stretch">
           <div className="lg:col-span-2 lg:row-span-2 h-full flex flex-col">
+            
             <Card>
               <CardContent className="p-0 h-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[780px] lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
                 {shops && shops.length > 0 && (
@@ -353,6 +354,7 @@ export default function DonutShops() {
                 </div>
               </CardContent>
             </Card>
+            
           </div>
 
           <DonutShopSearch 
@@ -364,7 +366,9 @@ export default function DonutShops() {
             isLoading={isLoading}
             metricsData={data?.metrics}
           />
+          
         </div>
+        
       </div>
     </>
   );
