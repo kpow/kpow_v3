@@ -392,50 +392,6 @@ export default function DonutShops() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Collapsible Sections */}
-            <Card className="mt-6">
-              <CardContent className="p-4">
-                <div className="space-y-4">
-                  {/* Donut Luv Section */}
-                  <Collapsible className="w-full">
-                    <CollapsibleTrigger className="flex items-center justify-between w-full">
-                      <h2 className="text-lg font-slackey">donut luv</h2>
-                      <ChevronDown className="h-4 w-4" />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 transition-all duration-300">
-                      <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
-                    </CollapsibleContent>
-                  </Collapsible>
-
-                  {/* Recent Tours Section */}
-                  <Collapsible className="w-full">
-                    <CollapsibleTrigger className="flex items-center justify-between w-full">
-                      <h2 className="text-lg font-slackey">recent tours</h2>
-                      <ChevronDown className="h-4 w-4" />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 transition-all duration-300">
-                      <CityTagCloud
-                        onCitySelect={(city, state) => {
-                          setSearchState({ city, state });
-                          setTimeout(() => {
-                            refetch();
-                          }, 0);
-                        }}
-                        selectedCity={
-                          searchState.city && searchState.state
-                            ? {
-                                city: searchState.city,
-                                state: searchState.state,
-                              }
-                            : undefined
-                        }
-                      />
-                    </CollapsibleContent>
-                  </Collapsible>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Right Sidebar - Search Component */}
@@ -448,6 +404,53 @@ export default function DonutShops() {
             isLoading={isLoading}
             metricsData={data?.metrics}
           />
+        </div>
+        <div className="flex flex-col w-full items-center justify-center mt-4">
+       
+              {/* Collapsible Sections */}
+              <Card className="mt-0 w-full">
+                <CardContent className="p-4">
+                  <div className="space-y-4">
+                    {/* Donut Luv Section */}
+                    <Collapsible className="w-full">
+                      <CollapsibleTrigger className="flex items-center justify-between w-full">
+                        <h2 className="text-lg font-slackey">donut luv</h2>
+                        <ChevronDown className="h-4 w-4" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4 transition-all duration-300">
+                        <DonutLuvList onCitySelect={handleFavoriteShopSelect} />
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* Recent Tours Section */}
+                    <Collapsible className="w-full">
+                      <CollapsibleTrigger className="flex items-center justify-between w-full">
+                        <h2 className="text-lg font-slackey">recent tours</h2>
+                        <ChevronDown className="h-4 w-4" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4 transition-all duration-300">
+                        <CityTagCloud
+                          onCitySelect={(city, state) => {
+                            setSearchState({ city, state });
+                            setTimeout(() => {
+                              refetch();
+                            }, 0);
+                          }}
+                          selectedCity={
+                            searchState.city && searchState.state
+                              ? {
+                                  city: searchState.city,
+                                  state: searchState.state,
+                                }
+                              : undefined
+                          }
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                </CardContent>
+              </Card>
+       
         </div>
       </div>
     </>
