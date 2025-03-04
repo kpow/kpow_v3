@@ -5,6 +5,7 @@ import {
   Popup,
   useMap,
   LayersControl,
+  Circle,
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -190,22 +191,38 @@ export function DonutShopMap({
 
           {/* City center marker */}
           {cityCenter && (
-            <Marker
-              position={[
-                cityCenter.coordinates.latitude,
-                cityCenter.coordinates.longitude,
-              ]}
-              icon={markerIcons.green}
-            >
-              <Popup>
-                <div className="p-1">
-                  <h3 className="text-lg font-bold">City Center</h3>
-                  <p className="text-sm text-gray-600">
-                    {cityCenter.display_name}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
+            <>
+              <Marker
+                position={[
+                  cityCenter.coordinates.latitude,
+                  cityCenter.coordinates.longitude,
+                ]}
+                icon={markerIcons.green}
+              >
+                <Popup>
+                  <div className="p-1">
+                    <h3 className="text-lg font-bold">City Center</h3>
+                    <p className="text-sm text-gray-600">
+                      {cityCenter.display_name}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+              <Circle
+                center={[
+                  cityCenter.coordinates.latitude,
+                  cityCenter.coordinates.longitude,
+                ]}
+                radius={16093} /* 10 miles in meters (1 mile = 1609.3 meters) */
+                pathOptions={{
+                  fillColor: "#3388ff",
+                  fillOpacity: 0.2,
+                  weight: 1,
+                  color: "#3388ff",
+                  opacity: 0.5,
+                }}
+              />
+            </>
           )}
 
           {/* Shop markers */}
