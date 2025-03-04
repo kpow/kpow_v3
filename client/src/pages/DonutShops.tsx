@@ -398,7 +398,7 @@ export default function DonutShops() {
               <CardContent className="p-4">
                 <div className="space-y-4">
                   {/* Donut Luv Section */}
-                  <Collapsible className="w-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[1000px]">
+                  <Collapsible className="w-full">
                     <CollapsibleTrigger className="flex items-center justify-between w-full">
                       <h2 className="text-lg font-slackey">donut luv</h2>
                       <ChevronDown className="h-4 w-4" />
