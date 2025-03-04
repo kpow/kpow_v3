@@ -344,9 +344,9 @@ export function DonutShopMap({
             id="show-chains"
             checked={showChainStores}
             onCheckedChange={setShowChainStores}
-            className="switch data-[state=checked]:bg-purple-600"
+            className="switch data-[state=checked]:bg-blue-600"
           />
-          <Label htmlFor="show-chains" className="text-white">Show Chain Stores</Label>
+          <Label htmlFor="show-chains" className="text-black font-bold">Show Chain Stores</Label>
         </div>
       </div>
     </div>
