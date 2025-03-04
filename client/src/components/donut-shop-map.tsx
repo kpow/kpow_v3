@@ -213,7 +213,7 @@ export function DonutShopMap({
                   cityCenter.coordinates.latitude,
                   cityCenter.coordinates.longitude,
                 ]}
-                radius={16093} /* 10 miles in meters (1 mile = 1609.3 meters) */
+                radius={24150} /* 15 miles in meters (1 mile = 1609.3 meters) */
                 pathOptions={{
                   fillColor: "#3388ff",
                   fillOpacity: 0.2,
