@@ -48,24 +48,11 @@ export function DonutShopSearch({
   return (
     <Card className="lg:col-span-1 h-full">
       <CardContent className="pt-4 h-full flex flex-col">
-        <div className="mb-4">
-          <Label className="mb-2">Minimum Rating</Label>
-          <div className="flex items-center gap-4">
-            <Slider
-              value={[minRating]}
-              onValueChange={handleRatingChange}
-              max={5}
-              step={0.1}
-              className="flex-1"
-            />
-            <span className="min-w-[4rem] text-sm">{minRating} ⭐</span>
-          </div>
-        </div>
 
         <div className="flex-1 flex flex-col">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label>City Name</Label>
+              <h3 className="font-medium mb-0">City Name</h3>
               <Input
                 placeholder="Enter city name"
                 value={searchState.city || ""}
@@ -75,7 +62,7 @@ export function DonutShopSearch({
               />
             </div>
             <div className="grid gap-2">
-              <Label>State</Label>
+               <h3 className="font-medium mb-0">State</h3>
               <Input
                 placeholder="Enter state (e.g., CA)"
                 value={searchState.state || ""}
@@ -101,6 +88,19 @@ export function DonutShopSearch({
                 isLoading={isLoading}
               />
             </div>
+          </div>
+        </div>
+        <div className="mt-4">
+           <h3 className="text-lg font-medium mb-0">Minimum Rating</h3>
+          <div className="flex items-center gap-4">
+            <Slider
+              value={[minRating]}
+              onValueChange={handleRatingChange}
+              max={5}
+              step={0.1}
+              className="flex-1 mt-0"
+            />
+            <span className="min-w-[4rem] mt-0 text-lg text-bold">{minRating} ⭐</span>
           </div>
         </div>
       </CardContent>

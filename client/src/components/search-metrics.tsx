@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -17,10 +16,8 @@ interface SearchMetricsProps {
 }
 
 const MetricCard = ({ label, value }: { label: string; value: number }) => (
-  <div className="flex flex-col items-center justify-center p-2 text-center">
-    <span className="font-slackey text-3xl font-bold text-blue-600">
-      {value}
-    </span>
+  <div className="flex flex-col items-center justify-center p-1 text-center">
+    <span className="text-2xl font-bold text-blue-600">{value}</span>
     <span className="text-sm text-muted-foreground mt-1">{label}</span>
   </div>
 );
