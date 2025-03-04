@@ -9,6 +9,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "./map-styles.css"; // Import our custom map styles
 import { useEffect, useRef } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -337,14 +338,15 @@ export function DonutShopMap({
       </div>
 
       {/* Chain store toggle */}
-      <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg">
+      <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg switch-container">
         <div className="flex items-center space-x-2">
           <Switch
             id="show-chains"
             checked={showChainStores}
             onCheckedChange={setShowChainStores}
+            className="switch data-[state=checked]:bg-purple-600"
           />
-          <Label htmlFor="show-chains">Show Chain Stores</Label>
+          <Label htmlFor="show-chains" className="text-white">Show Chain Stores</Label>
         </div>
       </div>
     </div>

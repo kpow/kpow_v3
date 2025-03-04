@@ -1,0 +1,44 @@
+
+/* Custom Leaflet Controls with Purple Theme */
+.leaflet-control-layers,
+.leaflet-bar {
+  border: 2px solid rgba(128, 0, 128, 0.5) !important;
+  box-shadow: 0 1px 5px rgba(128, 0, 128, 0.4) !important;
+}
+
+.leaflet-control-layers-toggle,
+.leaflet-touch .leaflet-control-layers-toggle {
+  background-color: rgba(128, 0, 128, 0.8) !important;
+}
+
+.leaflet-control-layers-expanded {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(128, 0, 128, 0.5) !important;
+}
+
+.leaflet-bar a {
+  background-color: rgba(128, 0, 128, 0.8) !important;
+  color: white !important;
+  border-bottom: 1px solid rgba(128, 0, 128, 0.5) !important;
+}
+
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+  background-color: rgba(148, 0, 148, 0.9) !important;
+}
+
+.leaflet-bar a.leaflet-disabled {
+  background-color: rgba(128, 0, 128, 0.4) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Style for the chain store toggle switch container */
+.leaflet-container .bg-white\/90 {
+  background-color: rgba(128, 0, 128, 0.8) !important;
+  color: white;
+}
+
+/* Custom style for switch component when used in map */
+.leaflet-container .switch-container .switch {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
