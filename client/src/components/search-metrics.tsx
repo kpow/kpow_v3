@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SearchMetrics {
   donutResults: number;
@@ -24,10 +25,32 @@ const MetricCard = ({ label, value }: { label: string; value: number }) => (
   </div>
 );
 
+const MetricSkeleton = ({ label }: { label: string }) => (
+  <div className="flex flex-col items-center justify-center p-2 text-center">
+    <Skeleton className="h-10 w-12 mb-1" />
+    <span className="text-sm text-muted-foreground mt-1">{label}</span>
+  </div>
+);
+
 export function SearchMetrics({ metrics, isLoading }: SearchMetricsProps) {
   useEffect(() => {
     console.log("Received metrics in component:", metrics);
   }, [metrics]);
+
+  if (isLoading) {
+    return (
+      <div className="mt-6">
+        <h3 className="text-lg font-medium mb-2">search metrics</h3>
+        <div className="grid grid-cols-2 gap-2">
+          <MetricSkeleton label="Donut Shops" />
+          <MetricSkeleton label="Doughnut Shops" />
+          <MetricSkeleton label="Unique Shops" />
+          <MetricSkeleton label="Nearby Shops" />
+          <MetricSkeleton label="Chain Stores Filtered" />
+        </div>
+      </div>
+    );
+  }
 
   if (!metrics) return null;
 
