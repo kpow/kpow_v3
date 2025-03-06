@@ -30,8 +30,8 @@ async function fetchArtistImage(artist: string): Promise<string> {
 
 async function main() {
   // Updated input and output file names
-  const inputFile = "missingArtistImages.txt";
-  const outputFile = "missingArtistImages.json";
+  const inputFile = "missingArtistImages.json";
+  const outputFile = "ArtistImages.json";
 
   // Read the input file and create an array of artist names (one per line)
   const fileContent = fs.readFileSync(inputFile, "utf-8");
