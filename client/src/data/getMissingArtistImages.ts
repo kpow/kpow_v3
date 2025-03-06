@@ -1,6 +1,5 @@
 
 #!/usr/bin/env ts-node
-
 import fs from "fs";
 import axios from "axios";
 
