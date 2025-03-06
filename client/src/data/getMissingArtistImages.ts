@@ -8,6 +8,9 @@ interface ArtistImage {
   url: string;
 }
 
+// Add delay function
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 async function fetchArtistImage(artist: string): Promise<string> {
   // Construct the iTunes API URL
   const query = encodeURIComponent(artist);
@@ -39,11 +42,14 @@ async function main() {
 
   const results: ArtistImage[] = [];
 
-  // Process each artist sequentially (you could also run in parallel if needed)
+  // Process each artist sequentially with delay
   for (const artist of artists) {
     console.log(`Fetching image for artist: ${artist}`);
     const imageUrl = await fetchArtistImage(artist);
     results.push({ key: artist, url: imageUrl });
+
+    // Add 200ms delay between requests
+    await delay(200);
   }
 
   // Write the resulting JSON array to the output file
