@@ -1,3 +1,4 @@
+
 #!/usr/bin/env ts-node
 
 import fs from "fs";
@@ -29,9 +30,9 @@ async function fetchArtistImage(artist: string): Promise<string> {
 }
 
 async function main() {
-  // Hard-coded input and output file names.
+  // Updated input and output file names
   const inputFile = "missingArtistImages.txt";
-  const outputFile = "missingArtistImagesCache.json";
+  const outputFile = "missingArtistImages.json";
 
   // Read the input file and create an array of artist names (one per line)
   const fileContent = fs.readFileSync(inputFile, "utf-8");
