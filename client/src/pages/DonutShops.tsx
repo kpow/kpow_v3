@@ -361,21 +361,15 @@ export default function DonutShops() {
         {/* Shop Slider */}
         <div className="mb-4">
           <div className="h-full w-full rounded-lg overflow-hidden">
-            <div className="h-full w-full rounded-lg overflow-hidden">
-              {shops && shops.length > 0 ? (
-                <ShopSlider 
-                  shops={shops} 
-                  onShopClick={handleShopClick} 
-                  isLoading={isLoadingShops} 
-                />
-              ) : isLoadingShops ? (
-                <ShopSlider 
-                  shops={[]} 
-                  onShopClick={() => {}} 
-                  isLoading={true} 
-                />
-              ) : null}
-            </div>
+            {isLoadingShops ? (
+              <div className="w-full">
+                <Skeleton className="h-[200px] w-full" />
+              </div>
+            ) : shops && shops.length > 0 ? (
+              <div className="h-full w-full rounded-lg overflow-hidden">
+                <ShopSlider shops={shops} onShopClick={handleShopClick} />
+              </div>
+            ) : null}
           </div>
         </div>
 
