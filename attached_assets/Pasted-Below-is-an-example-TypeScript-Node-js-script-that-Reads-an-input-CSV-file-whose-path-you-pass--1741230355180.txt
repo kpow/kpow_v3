@@ -1,0 +1,149 @@
+Below is an example TypeScript Node.js script that:
+
+• Reads an input CSV file (whose path you pass as an argument)  
+• Uses a JavaScript file (ArtistImagesCache.js) containing an array of objects (each with a “key” and “url”) as the image cache  
+• For each CSV row, looks up the image URL for the “Artist Name” (case-insensitive) and appends it as a new column (“Artist Image”)  
+• Writes out an updated CSV file  
+• Prints a report listing any artists that did not have an image
+
+Make sure you have installed the required packages (for example, using npm):
+
+npm install csv-parser csv-stringify
+
+Also ensure that your tsconfig.json is set up with "esModuleInterop": true so you can import the JS cache file.
+
+Below is the complete script (e.g. save it as script.ts):
+
+---
+
+```typescript
+#!/usr/bin/env node
+
+import fs from 'fs';
+import path from 'path';
+import csvParser from 'csv-parser';
+import { stringify } from 'csv-stringify';
+
+// Import the artist images from the JavaScript file.
+// Make sure the file is in the same directory or adjust the path accordingly.
+import artistImages from './ArtistImagesCache.js';
+
+interface CSVRow {
+  "Song Name": string;
+  "Album Name": string;
+  "Container Album Name": string;
+  "Container Type": string;
+  "End Position In Milliseconds": string;
+  "End Reason Type": string;
+  "Event End Timestamp": string;
+  "Event Start Timestamp": string;
+  "Event Type": string;
+  "Feature Name": string;
+  "Media Duration In Milliseconds": string;
+  "Play Duration Milliseconds": string;
+  "Artist Name": string;
+  // New column to store the image URL.
+  "Artist Image"?: string;
+}
+
+function main() {
+  // The first command line argument is the input CSV file path.
+  const inputCsv = process.argv[2];
+  if (!inputCsv) {
+    console.error("Usage: node script.js <input_csv> [output_csv]");
+    process.exit(1);
+  }
+  
+  // The second argument is optional; default output file is 'output.csv'
+  const outputCsv = process.argv[3] || 'output.csv';
+  
+  // Build a lookup map for artist images.
+  // We use a case-insensitive key by converting the artist name to lowercase.
+  const imageMap: { [artist: string]: string } = {};
+  for (const entry of artistImages) {
+    imageMap[entry.key.toLowerCase()] = entry.url;
+  }
+  
+  // Set to collect names for which we could not find an image.
+  const missingArtists = new Set<string>();
+  const rows: CSVRow[] = [];
+  
+  // Read the CSV file.
+  fs.createReadStream(inputCsv)
+    .pipe(csvParser())
+    .on('data', (data: CSVRow) => {
+      // Get the artist name from the current row.
+      const artistName = data["Artist Name"];
+      if (artistName) {
+        // Lookup the image URL (using lowercase for case-insensitive matching).
+        const imageUrl = imageMap[artistName.toLowerCase()];
+        if (imageUrl) {
+          data["Artist Image"] = imageUrl;
+        } else {
+          data["Artist Image"] = "";
+          missingArtists.add(artistName);
+        }
+      }
+      rows.push(data);
+    })
+    .on('end', () => {
+      // Once all rows are processed, write them to a new CSV file.
+      stringify(rows, { header: true }, (err, output) => {
+        if (err) {
+          console.error("Error writing CSV:", err);
+          return;
+        }
+        fs.writeFileSync(outputCsv, output);
+        console.log(`CSV with artist images saved to ${outputCsv}`);
+        
+        // Output a report of artists missing images.
+        if (missingArtists.size > 0) {
+          console.log("\nArtists missing images:");
+          missingArtists.forEach(artist => console.log(artist));
+        } else {
+          console.log("\nAll artists have corresponding images.");
+        }
+      });
+    })
+    .on('error', (error) => {
+      console.error("Error processing CSV:", error);
+    });
+}
+
+main();
+```
+
+---
+
+### How It Works
+
+1. **Importing the cache:**  
+   The script imports the `artistImages` array from your provided JavaScript file. Adjust the path if necessary.
+
+2. **Mapping images:**  
+   It builds a lookup object (`imageMap`) where keys are artist names (in lowercase) and values are their image URLs.
+
+3. **Processing the CSV:**  
+   Using the `csv-parser` package, the script reads each row from the CSV. For each row it:
+   - Looks up the artist’s image URL by matching the “Artist Name” (converted to lowercase).
+   - If found, sets the new field `"Artist Image"` to the URL.
+   - If not, leaves `"Artist Image"` empty and adds the artist name to a set of missing images.
+
+4. **Output:**  
+   The script writes the modified data to a new CSV (defaulting to `output.csv`, or a name provided as a second argument) using `csv-stringify`. It also prints a report listing any artists missing an image.
+
+### Running the Script
+
+Compile the TypeScript (if needed) using `tsc script.ts` or run it directly with ts-node:
+
+```bash
+ts-node script.ts input.csv output.csv
+```
+
+Or, if you have compiled to JavaScript:
+
+```bash
+node script.js input.csv output.csv
+```
+
+This script should meet your requirements for appending artist images to your CSV and reporting missing images.
