@@ -167,6 +167,7 @@ export default function Home() {
             <div className="h-full w-full rounded-lg overflow-hidden">
               <ShopSlider
                 shops={shops}
+                isLoading={isLoadingShops}
                 onShopClick={(shop) => {
                   window.open(shop.url, "_blank");
                 }}
