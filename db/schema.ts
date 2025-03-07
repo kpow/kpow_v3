@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
@@ -18,6 +18,10 @@ export const songs = pgTable("songs", {
   containerType: text("container_type"),
   mediaDurationMs: integer("media_duration_ms"),
   artistId: integer("artist_id").references(() => artists.id),
+}, (table) => {
+  return {
+    uniqueSongPerArtist: unique("songs_name_artist_id_unique").on(table.name, table.artistId),
+  };
 });
 
 // Plays table to store individual play events
@@ -53,7 +57,7 @@ export const playsRelations = relations(plays, ({ one }) => ({
   }),
 }));
 
-// Export insert and select schemas for each table
+// Export schemas
 export const insertArtistSchema = createInsertSchema(artists);
 export const selectArtistSchema = createSelectSchema(artists);
 export type InsertArtist = typeof artists.$inferInsert;
