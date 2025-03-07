@@ -14,6 +14,8 @@ export function registerMusicRoutes(router: Router) {
           bio: artists.bio,
           imageUrl: artists.imageUrl,
           artistImageUrl: artists.artistImageUrl,
+          listeners: artists.listeners,
+          playcount: artists.playcount,
           playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
           lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played')
         })
@@ -22,7 +24,7 @@ export function registerMusicRoutes(router: Router) {
         .leftJoin(plays, eq(plays.songId, songs.id))
         .groupBy(artists.id)
         .orderBy(desc(sql`play_count`))
-        .limit(10);
+        .limit(500);
 
       res.json({ artists: topArtists });
     } catch (error) {
