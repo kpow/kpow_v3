@@ -6,7 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
-import { Shop } from '@/types/shop';
+import { Shop } from "@/types/shop";
 
 interface ShopSliderProps {
   shops: Shop[];
@@ -15,7 +15,7 @@ interface ShopSliderProps {
 
 export function ShopSlider({ shops, onShopClick }: ShopSliderProps) {
   return (
-    <div className="w-full px-2 py-0">
+    <div className="w-full px-2 py-0 min-h-[180px]">
       <Carousel
         opts={{
           align: "start",
