@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { artists } from "../db/schema";
-import { eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import axios from "axios";
 import fs from "fs/promises";
 import path from "path";
@@ -15,6 +15,11 @@ interface ItunesResponse {
     artistName: string;
     artworkUrl100?: string;
   }>;
+}
+
+interface Artist {
+  id: number;
+  name: string;
 }
 
 async function delay(ms: number) {
@@ -64,47 +69,58 @@ async function getArtistImage(artistName: string): Promise<string | null> {
   }
 }
 
-async function enrichArtistImages(batchSize: number = 10) {
+async function enrichArtistImages() {
   const lastProcessedId = await loadCheckpoint();
   console.log(`Starting from artist ID: ${lastProcessedId}`);
+  let processedCount = 0;
 
-  const artistsToUpdate = await db.query.artists.findMany({
-    where: isNull(artists.imageUrl),
-    limit: batchSize
-  });
+  try {
+    // Read the list of artists without images
+    const artistsData = await fs.readFile('artists_without_images.json', 'utf-8');
+    const artists_list: Artist[] = JSON.parse(artistsData);
 
-  for (const artist of artistsToUpdate) {
-    try {
-      console.log(`Processing artist: ${artist.name}`);
+    // Filter artists based on checkpoint
+    const remainingArtists = artists_list.filter(artist => artist.id > lastProcessedId);
 
-      const imageUrl = await getArtistImage(artist.name);
-      if (imageUrl) {
-        await db
-          .update(artists)
-          .set({ 
-            imageUrl: imageUrl,
-            lastUpdated: new Date()
-          })
-          .where(eq(artists.id, artist.id));
+    console.log(`Found ${remainingArtists.length} artists to process`);
 
-        console.log(`Updated image for: ${artist.name}`);
-      } else {
-        console.log(`No image found for: ${artist.name}`);
+    for (const artist of remainingArtists) {
+      try {
+        console.log(`Processing artist: ${artist.name}`);
+
+        const imageUrl = await getArtistImage(artist.name);
+        if (imageUrl) {
+          await db
+            .update(artists)
+            .set({ 
+              imageUrl: imageUrl,
+              lastUpdated: new Date()
+            })
+            .where(eq(artists.id, artist.id));
+
+          console.log(`Updated image for: ${artist.name}`);
+          processedCount++;
+        } else {
+          console.log(`No image found for: ${artist.name}`);
+        }
+
+        await saveCheckpoint(artist.id);
+        await delay(DELAY_MS);
+      } catch (error) {
+        await logError(artist.name, error);
+        console.error(`Error processing ${artist.name}:`, error);
       }
-
-      await saveCheckpoint(artist.id);
-      await delay(DELAY_MS);
-    } catch (error) {
-      await logError(artist.name, error);
-      console.error(`Error processing ${artist.name}:`, error);
     }
+  } catch (error) {
+    console.error("Failed to read artists list:", error);
+    return processedCount;
   }
 
-  return artistsToUpdate.length;
+  return processedCount;
 }
 
 // Run the script
-enrichArtistImages(5)
+enrichArtistImages()
   .then(count => {
     console.log(`Processed ${count} artists`);
     process.exit(0);
