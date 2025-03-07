@@ -1,9 +1,9 @@
 import { db } from "../db";
 import { artists, songs } from "../db/schema";
-import { isNull, and, desc, asc } from "drizzle-orm";
+import { isNull, asc } from "drizzle-orm";
 import fs from "fs/promises";
 
-const OUTPUT_FILE = "artists_without_images.json";
+const OUTPUT_FILE = "./artists_without_images.json";
 
 interface ArtistWithAlbum {
   id: number;
@@ -12,22 +12,21 @@ interface ArtistWithAlbum {
 }
 
 async function getArtistsWithoutImages() {
-  // Get artists without images and their most recent album
+  // Get artists without images and their first album
   const artistsToUpdate = await db.query.artists.findMany({
     where: isNull(artists.imageUrl),
     with: {
       songs: {
         limit: 1,
-        orderBy: [desc(songs.mediaDurationMs)]
-      }
+      },
     },
-    orderBy: [asc(artists.id)]
+    orderBy: [asc(artists.id)],
   });
 
-  const artistList: ArtistWithAlbum[] = artistsToUpdate.map(artist => ({
+  const artistList: ArtistWithAlbum[] = artistsToUpdate.map((artist) => ({
     id: artist.id,
     name: artist.name,
-    albumName: artist.songs?.[0]?.albumName || null
+    albumName: artist.songs?.[0]?.albumName || null,
   }));
 
   await fs.writeFile(OUTPUT_FILE, JSON.stringify(artistList, null, 2));
@@ -40,11 +39,11 @@ async function getArtistsWithoutImages() {
 
 // Run the script
 getArtistsWithoutImages()
-  .then(count => {
+  .then((count) => {
     console.log(`Successfully saved ${count} artists to file`);
     process.exit(0);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error("Script failed:", error);
     process.exit(1);
   });

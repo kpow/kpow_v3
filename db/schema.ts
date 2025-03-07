@@ -7,6 +7,7 @@ export const artists = pgTable("artists", {
   id: serial("id").primaryKey(),
   name: text("name").unique().notNull(),
   imageUrl: text("image_url"),
+  artistImageUrl: text("artist_image_url"), // New column for Last.fm artist images
   bio: text("bio"),
   listeners: integer("listeners"),
   playcount: integer("playcount"),

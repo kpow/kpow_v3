@@ -13,17 +13,10 @@ const BASE_DELAY_MS = 1000; // 1 second between requests
 const MAX_DELAY_MS = 60000; // Maximum backoff of 1 minute
 const JITTER_MS = 300; // Add random jitter to prevent synchronized requests
 
-interface ItunesResponse {
-  resultCount: number;
-  results: Array<{
-    artistName: string;
-    artworkUrl100?: string;
-  }>;
-}
-
 interface Artist {
   id: number;
   name: string;
+  albumName: string | null;
 }
 
 async function delay(ms: number): Promise<void> {
@@ -62,30 +55,43 @@ async function loadCheckpoint(): Promise<number> {
   }
 }
 
+// Clean search term
+const cleanSearchTerm = (term: string): string => {
+  return term.replace(/["\[\]{}]/g, '').trim();
+};
+
 async function getArtistImage(
-  artistName: string,
+  artist: Artist,
   retryCount = 0,
 ): Promise<string | null> {
   try {
+    // Only use album name for search if available
+    if (!artist.albumName) {
+      console.log(`No album name available for artist: "${artist.name}"`);
+      return null;
+    }
+
+    const searchTerm = cleanSearchTerm(artist.albumName);
+    console.log(`Searching for album: "${searchTerm}" by artist: "${artist.name}"`);
+
     // Create the URL for logging purposes
     const params = new URLSearchParams({
-      term: artistName,
+      term: searchTerm,
       entity: "album",
       limit: "5",
     });
     const fullUrl = `https://itunes.apple.com/search?${params.toString()}`;
     console.log(`Querying iTunes API with URL: ${fullUrl}`);
 
-    const response = await axios.get<ItunesResponse>(
+    const response = await axios.get(
       "https://itunes.apple.com/search",
       {
         params: {
-          term: artistName,
+          term: searchTerm,
           entity: "album",
           limit: 5,
         },
         headers: {
-          // Adding user agent to appear more like a browser
           "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         },
@@ -93,26 +99,42 @@ async function getArtistImage(
     );
 
     if (response.data.resultCount > 0) {
+      console.log(`Found ${response.data.resultCount} results for album: "${searchTerm}"`);
+
       // Find the first result that matches our artist name (case insensitive)
       const match = response.data.results.find(
-        (result) =>
-          result.artistName.toLowerCase() === artistName.toLowerCase(),
+        (result) => {
+          const matchFound = result.artistName.toLowerCase() === artist.name.toLowerCase();
+          if (matchFound) {
+            console.log(`Found matching artist: "${result.artistName}" for album: "${result.collectionName}"`);
+          }
+          return matchFound;
+        }
       );
-      return match?.artworkUrl100
-        ? match.artworkUrl100.replace("100x100bb", "300x300bb")
-        : null;
+
+      if (match?.artworkUrl100) {
+        const imageUrl = match.artworkUrl100.replace("100x100bb", "300x300bb");
+        console.log(`Found artwork URL: ${imageUrl}`);
+        return imageUrl;
+      }
+
+      console.log(`No matching artist found in results for: ${artist.name}`);
+      // Log all artists found to help debug
+      console.log('Artists found:', response.data.results.map(r => r.artistName).join(', '));
+      return null;
     }
+
+    console.log(`No results found for album: "${searchTerm}"`);
     return null;
   } catch (error: any) {
     // Handle rate limiting (403 or 429 status codes)
     if (error.response?.status === 403 || error.response?.status === 429) {
-      // If we've reached max retries, log and return null
       console.log(
-        "---------------------------Rate limit exceeded. Stopping.-----------------------------------",
+        "---------------------------Rate limit exceeded. Retrying...-----------------------------------",
       );
       if (retryCount >= 5) {
         await logError(
-          artistName,
+          artist.name,
           `Max retries reached. Status: ${error.response?.status}`,
         );
         return null;
@@ -121,16 +143,16 @@ async function getArtistImage(
       // Calculate backoff time
       const backoffDelay = getBackoffDelay(retryCount);
       console.log(
-        `Rate limit hit for "${artistName}". Waiting ${backoffDelay / 1000}s before retry ${retryCount + 1}/5`,
+        `Rate limit hit for "${artist.name}". Waiting ${backoffDelay / 1000}s before retry ${retryCount + 1}/5`,
       );
 
       // Wait and then retry
       await delay(backoffDelay);
-      return getArtistImage(artistName, retryCount + 1);
+      return getArtistImage(artist, retryCount + 1);
     }
 
     // Log other errors
-    await logError(artistName, error);
+    await logError(artist.name, error);
     return null;
   }
 }
@@ -169,9 +191,9 @@ async function enrichArtistImages(): Promise<number> {
       }
 
       try {
-        console.log(`Processing artist: ${artist.name}`);
+        console.log(`Processing artist: ${artist.name}${artist.albumName ? ` (Album: ${artist.albumName})` : ''}`);
 
-        const imageUrl = await getArtistImage(artist.name);
+        const imageUrl = await getArtistImage(artist);
         if (imageUrl) {
           await db
             .update(artists)
@@ -189,7 +211,7 @@ async function enrichArtistImages(): Promise<number> {
 
         await saveCheckpoint(artist.id);
 
-        // Add more delay between requests to avoid rate limiting
+        // Add delay between requests to avoid rate limiting
         const waitTime = BASE_DELAY_MS + Math.random() * JITTER_MS;
         console.log(
           `Waiting ${waitTime / 1000} seconds before next request...`,
