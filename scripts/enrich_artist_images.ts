@@ -62,6 +62,15 @@ async function loadCheckpoint(): Promise<number> {
 
 async function getArtistImage(artistName: string, retryCount = 0): Promise<string | null> {
   try {
+    // Create the URL for logging purposes
+    const params = new URLSearchParams({
+      term: artistName,
+      entity: 'album',
+      limit: '5'
+    });
+    const fullUrl = `https://itunes.apple.com/search?${params.toString()}`;
+    console.log(`Querying iTunes API with URL: ${fullUrl}`);
+    
     const response = await axios.get<ItunesResponse>('https://itunes.apple.com/search', {
       params: {
         term: artistName,
