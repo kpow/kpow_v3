@@ -25,6 +25,14 @@ interface LastFmImage {
   "#text": string;
 }
 
+interface ProcessingStats {
+  totalProcessed: number;
+  successCount: number;
+  errorCount: number;
+  startTime: number;
+  lastRateLimit: number;
+}
+
 // Helper functions for delay and backoff
 async function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -53,6 +61,25 @@ async function logProgress(message: string): Promise<void> {
   console.log(message); // Also log to console
 }
 
+async function logSessionSummary(stats: ProcessingStats): Promise<void> {
+  const endTime = Date.now();
+  const duration = (endTime - stats.startTime) / 1000 / 60; // in minutes
+  const successRate = ((stats.successCount / stats.totalProcessed) * 100).toFixed(1);
+
+  const summary = [
+    "\n=== Session Summary ===",
+    `Total Artists Processed: ${stats.totalProcessed}`,
+    `Successful Updates: ${stats.successCount}`,
+    `Failed Updates: ${stats.errorCount}`,
+    `Success Rate: ${successRate}%`,
+    `Total Duration: ${duration.toFixed(1)} minutes`,
+    `Rate Limits Hit: ${stats.lastRateLimit}`,
+    "===================\n"
+  ].join("\n");
+
+  await logProgress(summary);
+}
+
 // Checkpoint management
 async function saveCheckpoint(lastProcessedId: number): Promise<void> {
   await fs.writeFile(
@@ -79,20 +106,26 @@ async function getArtistImage(
   try {
     const artistName = encodeURIComponent(artist.name);
     const url = `https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${artistName}&api_key=${apiKey}&format=json`;
-    
+
     const response = await axios.get(url);
     const images: LastFmImage[] = response.data?.artist?.image || [];
-    
+
+    // Log rate limit info if available
+    const rateLimitRemaining = response.headers['x-ratelimit-remaining'];
+    if (rateLimitRemaining) {
+      await logProgress(`Rate limit remaining: ${rateLimitRemaining}`);
+    }
+
     // Get the largest image available (typically the last one)
     const largestImage = images
       .reverse()
       .find(img => img["#text"] && !img["#text"].includes("default"));
-    
+
     if (largestImage?.["#text"]) {
       await logProgress(`Found image for artist: ${artist.name}`);
       return largestImage["#text"];
     }
-    
+
     await logProgress(`No image found for artist: ${artist.name}`);
     return null;
   } catch (error: any) {
@@ -101,16 +134,16 @@ async function getArtistImage(
         await logError(artist.name, `Max retries reached. Status: 429`);
         return null;
       }
-      
+
       const backoffDelay = getBackoffDelay(retryCount);
       await logProgress(
         `Rate limit hit for "${artist.name}". Waiting ${backoffDelay/1000}s before retry ${retryCount + 1}/5`
       );
-      
+
       await delay(backoffDelay);
       return getArtistImage(artist, apiKey, retryCount + 1);
     }
-    
+
     await logError(artist.name, error);
     return null;
   }
@@ -126,9 +159,14 @@ async function enrichArtistImages(apiKey: string): Promise<number> {
 
   const lastProcessedId = await loadCheckpoint();
   await logProgress(`Starting from artist ID: ${lastProcessedId}`);
-  
-  let processedCount = 0;
-  let successCount = 0;
+
+  const stats: ProcessingStats = {
+    totalProcessed: 0,
+    successCount: 0,
+    errorCount: 0,
+    startTime: Date.now(),
+    lastRateLimit: 0
+  };
 
   try {
     // Get all artists without artist images
@@ -150,10 +188,21 @@ async function enrichArtistImages(apiKey: string): Promise<number> {
         continue;
       }
 
-      const progress = ((processedCount / totalArtists) * 100).toFixed(2);
-      await logProgress(
-        `Progress: ${progress}% (${processedCount}/${totalArtists}) - Processing: ${artist.name}`
-      );
+      const progress = ((stats.totalProcessed / totalArtists) * 100).toFixed(2);
+      const timeElapsed = (Date.now() - stats.startTime) / 1000;
+      const avgTimePerArtist = timeElapsed / (stats.totalProcessed || 1);
+      const estimatedTimeRemaining = ((totalArtists - stats.totalProcessed) * avgTimePerArtist) / 60;
+
+      const progressMessage = [
+        `Progress: ${progress}% (${stats.totalProcessed}/${totalArtists})`,
+        `Success rate: ${((stats.successCount/stats.totalProcessed)*100 || 0).toFixed(1)}%`,
+        `Time elapsed: ${(timeElapsed/60).toFixed(1)} minutes`,
+        `Estimated remaining: ${estimatedTimeRemaining.toFixed(1)} minutes`,
+        `Rate limits hit: ${stats.lastRateLimit}`,
+        `Processing: ${artist.name}`
+      ].join('\n');
+
+      await logProgress(progressMessage);
 
       try {
         const imageUrl = await getArtistImage(artist, apiKey);
@@ -165,30 +214,34 @@ async function enrichArtistImages(apiKey: string): Promise<number> {
               lastUpdated: new Date()
             })
             .where(eq(artists.id, artist.id));
-          
-          successCount++;
+
+          stats.successCount++;
+        } else {
+          stats.errorCount++;
         }
 
         await saveCheckpoint(artist.id);
-        processedCount++;
+        stats.totalProcessed++;
 
         // Add delay between requests
         const waitTime = BASE_DELAY_MS + Math.random() * JITTER_MS;
         await logProgress(`Waiting ${waitTime/1000} seconds before next request...`);
         await delay(waitTime);
       } catch (error) {
+        stats.errorCount++;
         await logError(artist.name, error);
         // Continue with next artist after error
       }
     }
 
+    await logSessionSummary(stats);
     await logProgress(
-      `Completed processing. Success: ${successCount}/${processedCount} artists`
+      `Completed processing. Success: ${stats.successCount}/${stats.totalProcessed} artists`
     );
-    return successCount;
+    return stats.successCount;
   } catch (error) {
     await logError("SCRIPT", error);
-    return processedCount;
+    return stats.totalProcessed;
   }
 }
 
