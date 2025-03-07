@@ -30,6 +30,21 @@ function isValidDate(dateStr: string): boolean {
   return !isNaN(timestamp) && timestamp > 0;
 }
 
+async function getConnection(pool: pkg.Pool): Promise<pkg.PoolClient> {
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      return await pool.connect();
+    } catch (error) {
+      retries--;
+      if (retries === 0) throw error;
+      console.log('Retrying database connection...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  throw new Error('Failed to connect to database after retries');
+}
+
 async function importPlays() {
   const csvPath = path.join(__dirname, '../client/src/data/kpow-apple-music-plays-with-images.csv');
   const progressFile = path.join(__dirname, 'import-progress.json');
@@ -64,6 +79,8 @@ async function importPlays() {
   // Connect to PostgreSQL
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    max: 1, // Limit to single connection for better stability
+    connectionTimeoutMillis: 10000,
   });
 
   try {
@@ -88,13 +105,14 @@ async function importPlays() {
     console.log('Importing play events...');
     let playCount = 0;
     let skippedCount = 0;
-    const playBatchSize = 5; // Even smaller batch size
+    const playBatchSize = 3; // Even smaller batch size
 
     for (let i = startIndex; i < records.length; i += playBatchSize) {
       const batch = records.slice(i, Math.min(i + playBatchSize, records.length));
-      const client = await pool.connect();
+      let client;
 
       try {
+        client = await getConnection(pool);
         await client.query('BEGIN');
 
         for (const record of batch) {
@@ -103,18 +121,21 @@ async function importPlays() {
 
           if (!songId) {
             skippedCount++;
+            totalSkippedCount++;
             continue;
           }
 
           if (!isValidDate(record["Event Start Timestamp"]) || 
               !isValidDate(record["Event End Timestamp"])) {
             skippedCount++;
+            totalSkippedCount++;
             continue;
           }
 
           const playDuration = parseInt(record["Play Duration Milliseconds"]);
           if (isNaN(playDuration) || playDuration <= 0) {
             skippedCount++;
+            totalSkippedCount++;
             continue;
           }
 
@@ -156,14 +177,28 @@ async function importPlays() {
 
         console.log(`Progress: ${((i + batch.length) / records.length * 100).toFixed(2)}% (${totalPlayCount} imported, ${totalSkippedCount} skipped)`);
       } catch (error) {
-        await client.query('ROLLBACK');
+        if (client) {
+          try {
+            await client.query('ROLLBACK');
+          } catch (rollbackError) {
+            console.error('Error rolling back transaction:', rollbackError);
+          }
+        }
         console.error(`Error processing batch starting at ${i}:`, error);
+
+        // If we hit a connection error, wait longer before retrying
+        if (error.code === '57P01') {
+          console.log('Database connection interrupted, waiting before retry...');
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
       } finally {
-        client.release();
+        if (client) {
+          client.release();
+        }
       }
 
-      // Add a slightly longer delay between batches
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Add a longer delay between batches
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     // Clean up progress file when complete
