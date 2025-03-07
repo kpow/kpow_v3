@@ -96,12 +96,11 @@ async function enrichArtist(artistName: string): Promise<void> {
       mega: ""
     });
 
-    // Update database
+    // Update database with more careful bio handling
     await db.update(artists)
       .set({
         imageUrl: images.large || images.extralarge || images.mega || "",
-        images,
-        bio: artist.bio.summary,
+        bio: artist.bio?.content || artist.bio?.summary || null,
         lastfmUrl: artist.url,
         mbid: artist.mbid,
         listeners: parseInt(artist.stats.listeners),
