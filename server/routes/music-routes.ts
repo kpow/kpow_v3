@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { db } from "@/db";
+import { db } from "../../db";
 import { eq, desc, sql } from "drizzle-orm";
-import { artists, plays } from "@db/schema";
+import { artists, plays, songs } from "../../db/schema";
 
 export function registerMusicRoutes(router: Router) {
   // Get top artists by play count
@@ -12,11 +12,14 @@ export function registerMusicRoutes(router: Router) {
           id: artists.id,
           name: artists.name,
           bio: artists.bio,
+          imageUrl: artists.imageUrl,
+          artistImageUrl: artists.artistImageUrl,
           playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
-          lastPlayed: sql<string>`MAX(${plays.timestamp})`.as('last_played')
+          lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played')
         })
         .from(artists)
-        .leftJoin(plays, eq(plays.artistId, artists.id))
+        .leftJoin(songs, eq(songs.artistId, artists.id))
+        .leftJoin(plays, eq(plays.songId, songs.id))
         .groupBy(artists.id)
         .orderBy(desc(sql`play_count`))
         .limit(10);
@@ -33,21 +36,39 @@ export function registerMusicRoutes(router: Router) {
   // Get single artist details with recent plays
   router.get("/api/music/artists/:id", async (req, res) => {
     try {
-      const artistId = req.params.id;
+      const artistId = parseInt(req.params.id);
 
-      const artist = await db.query.artists.findFirst({
+      const artistWithSongs = await db.query.artists.findFirst({
         where: eq(artists.id, artistId),
         with: {
-          plays: {
-            limit: 10,
-            orderBy: [desc(plays.timestamp)]
+          songs: {
+            with: {
+              plays: {
+                limit: 10,
+                orderBy: [desc(plays.startTimestamp)]
+              }
+            }
           }
         }
       });
 
-      if (!artist) {
+      if (!artistWithSongs) {
         return res.status(404).json({ message: "Artist not found" });
       }
+
+      // Transform the data to match the expected format
+      const artist = {
+        ...artistWithSongs,
+        plays: artistWithSongs.songs.flatMap(song => 
+          song.plays.map(play => ({
+            id: play.id,
+            startTimestamp: play.startTimestamp,
+            songName: song.name
+          }))
+        ).sort((a, b) => 
+          new Date(b.startTimestamp).getTime() - new Date(a.startTimestamp).getTime()
+        ).slice(0, 10)
+      };
 
       res.json({ artist });
     } catch (error) {

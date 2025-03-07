@@ -2,16 +2,17 @@ import { z } from "zod";
 
 // Define the schema for the Artist type
 export const artistSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   name: z.string(),
-  image: z.string().optional(),
+  imageUrl: z.string().optional(),
+  artistImageUrl: z.string().optional(),
   bio: z.string().optional(),
   playCount: z.number(),
   lastPlayed: z.string(),
   plays: z.array(z.object({
-    id: z.string(),
-    playedAt: z.string(),
-    trackName: z.string()
+    id: z.number(),
+    startTimestamp: z.string(),
+    songName: z.string()
   })).optional()
 });
 
