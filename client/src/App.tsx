@@ -14,6 +14,7 @@ import Videos from "@/pages/Videos";
 import NotFound from "@/pages/not-found";
 import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
+import ITunez from "@/pages/itunez";
 import { Route as WouterRoute } from "wouter";
 import { SEO } from "@/components/SEO";
 
@@ -37,7 +38,8 @@ function Router() {
         <Route path="/pmonk" component={PMonk} />
         <Route path="/battle" component={Battle} />
         <Route path="/donut-tour" component={DonutShops} />
-            <Route path="/donut-tour/:city/:state" component={DonutShops} />
+        <Route path="/donut-tour/:city/:state" component={DonutShops} />
+        <Route path="/itunez" component={ITunez} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

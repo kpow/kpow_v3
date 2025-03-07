@@ -6,6 +6,7 @@ import { registerLastFmRoutes } from "./routes/lastfm-routes";
 import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
 import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
+import { registerMusicRoutes } from "./routes/music-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
@@ -43,6 +44,7 @@ export function registerRoutes(app: Express): Server {
   registerGoodreadsRoutes(router);
   registerFeedbinRoutes(router);
   registerGithubRoutes(router);
+  registerMusicRoutes(router); // Add the new music routes
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
