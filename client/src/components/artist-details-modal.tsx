@@ -5,10 +5,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
-import { Music, Calendar, PlayCircle } from "lucide-react";
+import { Music, Calendar, PlayCircle, Headphones, User } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Artist } from "@/types/artist";
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
 
 interface ArtistDetailsModalProps {
   artist: Artist | null;
@@ -36,35 +38,68 @@ export function ArtistDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
         <DialogHeader>
-          <DialogTitle className="font-slackey text-2xl">
+          <DialogTitle className="font-slackey text-2xl text-center">
             {artist.name}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 pt-4">
-          {artist.image && (
-            <img
-              src={artist.image}
-              alt={artist.name}
-              className="w-full h-48 object-cover rounded-lg"
-            />
+
+        <motion.div 
+          className="space-y-4 pt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Artist Image */}
+          {(artist.imageUrl || artist.artistImageUrl) && (
+            <div className="relative overflow-hidden rounded-lg">
+              <motion.img
+                src={artist.imageUrl || artist.artistImageUrl}
+                alt={artist.name}
+                className="w-full h-48 object-cover rounded-lg"
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.4 }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            </div>
           )}
 
-          <div className="flex items-center text-muted-foreground">
-            <PlayCircle className="mr-2 h-4 w-4" />
-            <span>Total Plays: {artist.playCount}</span>
+          {/* Stats Section */}
+          <div className="grid grid-cols-2 gap-4">
+            {artist.playCount && (
+              <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
+                <PlayCircle className="h-4 w-4 text-primary" />
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground">Plays</span>
+                  <span className="font-medium">{artist.playCount}</span>
+                </div>
+              </div>
+            )}
+
+            {artist.listeners && (
+              <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
+                <User className="h-4 w-4 text-primary" />
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground">Listeners</span>
+                  <span className="font-medium">{artist.listeners}</span>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center text-muted-foreground">
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Last Played: {format(new Date(artist.lastPlayed), "PPP")}</span>
-          </div>
+          {artist.lastPlayed && (
+            <div className="flex items-center text-muted-foreground text-sm">
+              <Calendar className="mr-2 h-4 w-4" />
+              <span>Last Played: {format(new Date(artist.lastPlayed), "PPP")}</span>
+            </div>
+          )}
 
           {/* Bio Section */}
-          <div className="mt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Music className="h-4 w-4" />
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <Music className="h-4 w-4 text-primary" />
               <h3 className="text-lg font-semibold">About</h3>
             </div>
 
@@ -75,27 +110,46 @@ export function ArtistDetailsModal({
                 <Skeleton className="h-4 w-5/6" />
               </div>
             ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {artist.bio}
-                </p>
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                {artist.bio && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {artist.bio}
+                  </p>
+                )}
 
-                {artistDetails?.artist?.plays && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-semibold mb-2">Recent Plays:</h4>
-                    <ul className="space-y-2">
-                      {artistDetails.artist.plays.map((play) => (
-                        <li key={play.id} className="text-sm text-muted-foreground">
-                          {play.trackName} - {format(new Date(play.playedAt), "PP")}
-                        </li>
+                {artistDetails?.artist?.plays && artistDetails.artist.plays.length > 0 && (
+                  <div className="mt-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Headphones className="h-4 w-4 text-primary" />
+                      <h4 className="font-semibold">Recent Plays</h4>
+                    </div>
+                    <ul className="space-y-3">
+                      {artistDetails.artist.plays.map((play, index) => (
+                        <motion.li
+                          key={play.id}
+                          className="flex items-center justify-between text-sm bg-muted/30 p-2 rounded"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <span className="font-medium">{play.songName}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {format(new Date(play.startTimestamp), "PP")}
+                          </Badge>
+                        </motion.li>
                       ))}
                     </ul>
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
-        </div>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );

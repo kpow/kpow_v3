@@ -52,9 +52,9 @@ export function TopArtistsSlider() {
             onClick={() => handleArtistClick(artist)}
           >
             <CardContent className="p-0">
-              {artist.image ? (
+              {(artist.imageUrl || artist.artistImageUrl) ? (
                 <img
-                  src={artist.image}
+                  src={artist.imageUrl || artist.artistImageUrl}
                   alt={artist.name}
                   className="h-48 w-full object-cover"
                 />

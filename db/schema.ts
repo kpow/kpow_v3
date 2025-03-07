@@ -7,7 +7,7 @@ export const artists = pgTable("artists", {
   id: serial("id").primaryKey(),
   name: text("name").unique().notNull(),
   imageUrl: text("image_url"),
-  artistImageUrl: text("artist_image_url"), // New column for Last.fm artist images
+  artistImageUrl: text("artist_image_url"),
   bio: text("bio"),
   listeners: integer("listeners"),
   playcount: integer("playcount"),
@@ -77,14 +77,3 @@ export const insertPlaySchema = createInsertSchema(plays);
 export const selectPlaySchema = createSelectSchema(plays);
 export type InsertPlay = typeof plays.$inferInsert;
 export type SelectPlay = typeof plays.$inferSelect;
-
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").unique().notNull(),
-  password: text("password").notNull(),
-});
-
-export const insertUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
-export type InsertUser = typeof users.$inferInsert;
-export type SelectUser = typeof users.$inferSelect;

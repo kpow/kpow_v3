@@ -7,8 +7,11 @@ export const artistSchema = z.object({
   imageUrl: z.string().optional(),
   artistImageUrl: z.string().optional(),
   bio: z.string().optional(),
-  playCount: z.number(),
-  lastPlayed: z.string(),
+  listeners: z.number().optional(),
+  playcount: z.number().optional(),
+  lastUpdated: z.string().optional(),
+  playCount: z.number().optional(),
+  lastPlayed: z.string().optional(),
   plays: z.array(z.object({
     id: z.number(),
     startTimestamp: z.string(),
