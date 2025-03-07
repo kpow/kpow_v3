@@ -12,6 +12,7 @@ export const artistSchema = z.object({
   lastUpdated: z.string().optional(),
   playCount: z.number().optional(),
   lastPlayed: z.string().optional(),
+  rank: z.number().optional(),
   plays: z.array(z.object({
     id: z.number(),
     startTimestamp: z.string(),

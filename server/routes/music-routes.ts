@@ -16,6 +16,7 @@ export function registerMusicRoutes(router: Router) {
           artistImageUrl: artists.artistImageUrl,
           listeners: artists.listeners,
           playcount: artists.playcount,
+          lastUpdated: artists.lastUpdated,
           playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
           lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played')
         })
@@ -26,7 +27,13 @@ export function registerMusicRoutes(router: Router) {
         .orderBy(desc(sql`play_count`))
         .limit(500);
 
-      res.json({ artists: topArtists });
+      // Add ranking to each artist
+      const rankedArtists = topArtists.map((artist, index) => ({
+        ...artist,
+        rank: index + 1
+      }));
+
+      res.json({ artists: rankedArtists });
     } catch (error) {
       console.error("Error fetching top artists:", error);
       res.status(500).json({ 

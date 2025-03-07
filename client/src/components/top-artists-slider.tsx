@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { type Artist } from "@/types/artist";
 
 interface TopArtistsSliderProps {
@@ -59,26 +60,49 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
             className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/4"
           >
             <Card
-              className="overflow-hidden cursor-pointer transition-all hover:scale-105"
+              className="overflow-hidden cursor-pointer transition-all hover:scale-105 relative"
               onClick={() => onArtistClick?.(artist)}
             >
               <CardContent className="p-0">
+                {/* Rank Badge */}
+                {artist.rank && (
+                  <Badge 
+                    variant="default" 
+                    className="absolute top-2 left-2 z-10 bg-primary text-primary-foreground font-bold"
+                  >
+                    #{artist.rank}
+                  </Badge>
+                )}
+
+                {/* Artist Image */}
                 {(artist.imageUrl || artist.artistImageUrl) ? (
-                  <img
-                    src={artist.imageUrl || artist.artistImageUrl}
-                    alt={artist.name}
-                    className="h-48 w-full object-cover"
-                  />
+                  <div className="relative h-48">
+                    <img
+                      src={artist.imageUrl || artist.artistImageUrl}
+                      alt={artist.name}
+                      className="h-48 w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
                 ) : (
                   <div className="h-48 w-full bg-muted flex items-center justify-center">
                     <span className="text-4xl">🎵</span>
                   </div>
                 )}
+
+                {/* Artist Info */}
                 <div className="p-4">
                   <h3 className="font-bold truncate">{artist.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {artist.playCount} plays
-                  </p>
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-sm text-muted-foreground">
+                      {artist.playCount?.toLocaleString() || 0} plays
+                    </p>
+                    {artist.listeners && (
+                      <p className="text-sm text-muted-foreground">
+                        {artist.listeners.toLocaleString()} listeners
+                      </p>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
