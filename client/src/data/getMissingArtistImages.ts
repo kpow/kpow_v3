@@ -6,6 +6,12 @@ interface ArtistImage {
   url: string;
 }
 
+interface ArtistWithAlbum {
+  id: number;
+  name: string;
+  albumName: string | null;
+}
+
 // Exponential backoff delay
 const getBackoffDelay = (retryCount: number): number => {
   const baseDelay = 60000; // Start with 60 seconds
@@ -15,21 +21,25 @@ const getBackoffDelay = (retryCount: number): number => {
 // Add delay function
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Clean artist name
-const cleanArtistName = (name: string): string => {
-  return name.replace(/["\[\]{}]/g, '').trim();
+// Clean search term
+const cleanSearchTerm = (term: string): string => {
+  return term.replace(/["\[\]{}]/g, '').trim();
 };
 
-async function fetchArtistImage(artist: string, retryCount = 0): Promise<string | null> {
-  const cleanedArtist = cleanArtistName(artist);
-  if (!cleanedArtist) {
-    console.log(`Skipping invalid artist name: "${artist}"`);
+async function fetchArtistImage(artist: ArtistWithAlbum, retryCount = 0): Promise<string | null> {
+  // Use album name + artist name if available, otherwise just artist name
+  const searchTerm = artist.albumName 
+    ? `${cleanSearchTerm(artist.name)} ${cleanSearchTerm(artist.albumName)}`
+    : cleanSearchTerm(artist.name);
+
+  if (!searchTerm) {
+    console.log(`Skipping invalid search term for artist: "${artist.name}"`);
     return null;
   }
 
-  // Construct the iTunes API URL
-  const query = encodeURIComponent(cleanedArtist);
-  const apiUrl = `https://itunes.apple.com/search?term=${query}&entity=musicArtist&limit=1`;
+  // Construct the iTunes API URL - search for albums instead of artists
+  const query = encodeURIComponent(searchTerm);
+  const apiUrl = `https://itunes.apple.com/search?term=${query}&entity=album&limit=1`;
 
   try {
     const response = await axios.get(apiUrl);
@@ -44,15 +54,15 @@ async function fetchArtistImage(artist: string, retryCount = 0): Promise<string 
   } catch (error: any) {
     if (error.response?.status === 403) {
       if (retryCount >= 5) {
-        console.error(`Max retries reached for artist "${cleanedArtist}"`);
+        console.error(`Max retries reached for search term "${searchTerm}"`);
         return null;
       }
       const backoffDelay = getBackoffDelay(retryCount);
-      console.log(`Rate limit hit for "${cleanedArtist}". Waiting ${backoffDelay/1000}s before retry ${retryCount + 1}/5`);
+      console.log(`Rate limit hit for "${searchTerm}". Waiting ${backoffDelay/1000}s before retry ${retryCount + 1}/5`);
       await delay(backoffDelay);
       return fetchArtistImage(artist, retryCount + 1);
     }
-    console.error(`Error fetching image for artist "${cleanedArtist}":`, error.message);
+    console.error(`Error fetching image for search term "${searchTerm}":`, error.message);
     return null;
   }
 }
@@ -70,23 +80,16 @@ async function saveProgress(processed: Set<string>) {
   fs.writeFileSync('processed_artists.json', JSON.stringify(Array.from(processed)));
 }
 
-async function loadArtists(inputFile: string): Promise<string[]> {
+async function loadArtists(inputFile: string): Promise<ArtistWithAlbum[]> {
   try {
     const fileContent = fs.readFileSync(inputFile, 'utf-8');
-    try {
-      // Try parsing as JSON array
-      const parsed = JSON.parse(fileContent);
-      if (Array.isArray(parsed)) {
-        return parsed.filter(item => typeof item === 'string');
-      }
-      throw new Error('Input file must contain an array of strings');
-    } catch (jsonError) {
-      // If not JSON, treat as line-separated text
-      return fileContent
-        .split(/\r?\n/)
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
+    const artists = JSON.parse(fileContent);
+
+    if (!Array.isArray(artists)) {
+      throw new Error('Input file must contain an array of artists');
     }
+
+    return artists;
   } catch (error) {
     console.error('Error reading input file:', error);
     return [];
@@ -102,7 +105,7 @@ process.on('SIGINT', () => {
 
 async function main() {
   const isTestMode = process.argv.includes('--test');
-  const inputFile = isTestMode ? "client/src/data/test-artists.json" : "missingArtistImages.json";
+  const inputFile = isTestMode ? "client/src/data/test-artists.json" : "artists_without_images.json";
   const outputFile = isTestMode ? "test-artist-images.json" : "ArtistImages.json";
   const existingResults: ArtistImage[] = [];
 
@@ -136,25 +139,25 @@ async function main() {
       break;
     }
 
-    if (processed.has(artist)) {
-      console.log(`Skipping already processed artist: ${artist}`);
+    if (processed.has(artist.name)) {
+      console.log(`Skipping already processed artist: ${artist.name}`);
       processedCount++;
       continue;
     }
 
     const progress = ((processedCount / totalArtists) * 100).toFixed(2);
     console.log(`\nProgress: ${progress}% (${processedCount}/${totalArtists})`);
-    console.log(`Processing artist: ${artist}`);
+    console.log(`Processing artist: ${artist.name}${artist.albumName ? ` (Album: ${artist.albumName})` : ''}`);
 
     const imageUrl = await fetchArtistImage(artist);
 
     if (imageUrl) {
-      existingResults.push({ key: artist, url: imageUrl });
+      existingResults.push({ key: artist.name, url: imageUrl });
       fs.writeFileSync(outputFile, JSON.stringify(existingResults, null, 2));
-      console.log(`Saved image URL for ${artist}`);
+      console.log(`Saved image URL for ${artist.name}`);
     }
 
-    processed.add(artist);
+    processed.add(artist.name);
     await saveProgress(processed);
     processedCount++;
 
