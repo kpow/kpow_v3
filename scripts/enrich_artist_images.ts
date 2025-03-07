@@ -1,3 +1,4 @@
+
 import { db } from "../db";
 import { artists } from "../db/schema";
 import { eq } from "drizzle-orm";
@@ -6,8 +7,12 @@ import fs from "fs/promises";
 import path from "path";
 
 const CHECKPOINT_FILE = "artist_image_checkpoint.json";
-const DELAY_MS = 250;
 const ERROR_LOG_FILE = "artist_image_errors.log";
+
+// More conservative rate limiting settings
+const BASE_DELAY_MS = 1000; // 1 second between requests
+const MAX_DELAY_MS = 60000; // Maximum backoff of 1 minute
+const JITTER_MS = 300; // Add random jitter to prevent synchronized requests
 
 interface ItunesResponse {
   resultCount: number;
@@ -22,17 +27,27 @@ interface Artist {
   name: string;
 }
 
-async function delay(ms: number) {
+async function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function logError(artistName: string, error: any) {
+// Exponential backoff with jitter
+function getBackoffDelay(retryCount: number): number {
+  const exponentialDelay = Math.min(
+    MAX_DELAY_MS,
+    BASE_DELAY_MS * Math.pow(2, retryCount)
+  );
+  const jitter = Math.random() * JITTER_MS;
+  return exponentialDelay + jitter;
+}
+
+async function logError(artistName: string, error: any): Promise<void> {
   const timestamp = new Date().toISOString();
   const errorMessage = `${timestamp} - Artist: ${artistName} - Error: ${error}\n`;
   await fs.appendFile(ERROR_LOG_FILE, errorMessage);
 }
 
-async function saveCheckpoint(lastProcessedId: number) {
+async function saveCheckpoint(lastProcessedId: number): Promise<void> {
   await fs.writeFile(CHECKPOINT_FILE, JSON.stringify({ lastId: lastProcessedId }));
 }
 
@@ -45,13 +60,17 @@ async function loadCheckpoint(): Promise<number> {
   }
 }
 
-async function getArtistImage(artistName: string): Promise<string | null> {
+async function getArtistImage(artistName: string, retryCount = 0): Promise<string | null> {
   try {
     const response = await axios.get<ItunesResponse>('https://itunes.apple.com/search', {
       params: {
         term: artistName,
         entity: 'album',
         limit: 5
+      },
+      headers: {
+        // Adding user agent to appear more like a browser
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
     });
 
@@ -60,16 +79,41 @@ async function getArtistImage(artistName: string): Promise<string | null> {
       const match = response.data.results.find(
         result => result.artistName.toLowerCase() === artistName.toLowerCase()
       );
-      return match?.artworkUrl100 || null;
+      return match?.artworkUrl100 ? match.artworkUrl100.replace('100x100bb', '300x300bb') : null;
     }
     return null;
-  } catch (error) {
+  } catch (error: any) {
+    // Handle rate limiting (403 or 429 status codes)
+    if (error.response?.status === 403 || error.response?.status === 429) {
+      // If we've reached max retries, log and return null
+      if (retryCount >= 5) {
+        await logError(artistName, `Max retries reached. Status: ${error.response?.status}`);
+        return null;
+      }
+      
+      // Calculate backoff time
+      const backoffDelay = getBackoffDelay(retryCount);
+      console.log(`Rate limit hit for "${artistName}". Waiting ${backoffDelay/1000}s before retry ${retryCount + 1}/5`);
+      
+      // Wait and then retry
+      await delay(backoffDelay);
+      return getArtistImage(artistName, retryCount + 1);
+    }
+    
+    // Log other errors
     await logError(artistName, error);
     return null;
   }
 }
 
-async function enrichArtistImages() {
+async function enrichArtistImages(): Promise<number> {
+  // Track if we're in the process of shutting down
+  let isShuttingDown = false;
+  process.on('SIGINT', () => {
+    console.log('\nGraceful shutdown initiated...');
+    isShuttingDown = true;
+  });
+
   const lastProcessedId = await loadCheckpoint();
   console.log(`Starting from artist ID: ${lastProcessedId}`);
   let processedCount = 0;
@@ -85,6 +129,11 @@ async function enrichArtistImages() {
     console.log(`Found ${remainingArtists.length} artists to process`);
 
     for (const artist of remainingArtists) {
+      if (isShuttingDown) {
+        console.log('Shutting down gracefully...');
+        break;
+      }
+
       try {
         console.log(`Processing artist: ${artist.name}`);
 
@@ -105,10 +154,17 @@ async function enrichArtistImages() {
         }
 
         await saveCheckpoint(artist.id);
-        await delay(DELAY_MS);
+        
+        // Add more delay between requests to avoid rate limiting
+        const waitTime = BASE_DELAY_MS + Math.random() * JITTER_MS;
+        console.log(`Waiting ${waitTime/1000} seconds before next request...`);
+        await delay(waitTime);
       } catch (error) {
         await logError(artist.name, error);
         console.error(`Error processing ${artist.name}:`, error);
+        
+        // Wait longer after an error
+        await delay(BASE_DELAY_MS * 2);
       }
     }
   } catch (error) {
