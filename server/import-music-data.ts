@@ -30,8 +30,21 @@ function isValidDate(dateStr: string): boolean {
   return !isNaN(timestamp) && timestamp > 0;
 }
 
-async function importData() {
+async function importPlays() {
   const csvPath = path.join(__dirname, '../client/src/data/kpow-apple-music-plays-with-images.csv');
+  const progressFile = path.join(__dirname, 'import-progress.json');
+
+  // Read progress if exists
+  let startIndex = 0;
+  let totalPlayCount = 0;
+  let totalSkippedCount = 0;
+  if (fs.existsSync(progressFile)) {
+    const progress = JSON.parse(fs.readFileSync(progressFile, 'utf-8'));
+    startIndex = progress.lastProcessedIndex || 0;
+    totalPlayCount = progress.totalPlayCount || 0;
+    totalSkippedCount = progress.totalSkippedCount || 0;
+    console.log(`Resuming from index ${startIndex} (${totalPlayCount} imported, ${totalSkippedCount} skipped)`);
+  }
 
   console.log('Reading CSV file...');
   const records: MusicPlay[] = [];
@@ -48,122 +61,37 @@ async function importData() {
 
   console.log(`Read ${records.length} records from CSV`);
 
-  // Pre-process to get unique artists and songs
-  console.log('Pre-processing data...');
-  const uniqueArtistsMap = new Map<string, { name: string, image: string | null }>();
-  const uniqueSongsSet = new Set<string>();
-
-  for (const record of records) {
-    uniqueArtistsMap.set(record["Artist Name"], {
-      name: record["Artist Name"],
-      image: record["Artist Image"] || null
-    });
-    uniqueSongsSet.add(`${record["Song Name"]}-${record["Artist Name"]}`);
-  }
-
-  console.log(`Found ${uniqueArtistsMap.size} unique artists and ${uniqueSongsSet.size} unique songs`);
-
   // Connect to PostgreSQL
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
   });
 
   try {
-    // Import artists
-    console.log('Importing artists...');
-    const uniqueArtists = new Map<string, number>();
-    const artistBatchSize = 50;
-    const artists = Array.from(uniqueArtistsMap.values());
-
-    for (let i = 0; i < artists.length; i += artistBatchSize) {
-      const batch = artists.slice(i, i + artistBatchSize);
-      const client = await pool.connect();
-
-      try {
-        await client.query('BEGIN');
-
-        for (const artist of batch) {
-          const result = await client.query(
-            `INSERT INTO artists (name, image_url) 
-             VALUES ($1, $2) 
-             ON CONFLICT (name) DO UPDATE 
-             SET image_url = EXCLUDED.image_url
-             RETURNING id, name`,
-            [artist.name, artist.image]
-          );
-          uniqueArtists.set(result.rows[0].name, result.rows[0].id);
-        }
-
-        await client.query('COMMIT');
-        console.log(`Processed ${i + batch.length} artists of ${artists.length}`);
-      } catch (error) {
-        await client.query('ROLLBACK');
-        console.error(`Error processing artist batch starting at ${i}:`, error);
-      } finally {
-        client.release();
-      }
-    }
-
-    // Import songs
-    console.log('Importing songs...');
+    // Load existing song IDs first
+    console.log('Loading existing song references...');
     const uniqueSongs = new Map<string, number>();
-    const songBatchSize = 50;
 
-    for (let i = 0; i < records.length; i += songBatchSize) {
-      const batch = records.slice(i, i + songBatchSize);
-      const client = await pool.connect();
+    const songResults = await pool.query(
+      `SELECT s.id, s.name, a.name as artist_name 
+       FROM songs s 
+       JOIN artists a ON s.artist_id = a.id`
+    );
 
-      try {
-        await client.query('BEGIN');
-
-        for (const record of batch) {
-          const songKey = `${record["Song Name"]}-${record["Artist Name"]}`;
-          if (!uniqueSongs.has(songKey)) {
-            try {
-              const result = await client.query(
-                `INSERT INTO songs (name, album_name, container_album_name, container_type, media_duration_ms, artist_id)
-                 VALUES ($1, $2, $3, $4, $5, $6)
-                 ON CONFLICT ON CONSTRAINT songs_name_artist_id_unique 
-                 DO UPDATE SET
-                   album_name = EXCLUDED.album_name,
-                   container_album_name = EXCLUDED.container_album_name,
-                   container_type = EXCLUDED.container_type,
-                   media_duration_ms = EXCLUDED.media_duration_ms
-                 RETURNING id`,
-                [
-                  record["Song Name"],
-                  record["Album Name"],
-                  record["Container Album Name"],
-                  record["Container Type"],
-                  parseInt(record["Media Duration In Milliseconds"]) || null,
-                  uniqueArtists.get(record["Artist Name"])!,
-                ]
-              );
-              uniqueSongs.set(songKey, result.rows[0].id);
-            } catch (error) {
-              console.error(`Error importing song ${songKey}:`, error);
-            }
-          }
-        }
-
-        await client.query('COMMIT');
-        console.log(`Processed ${i + batch.length} songs of ${records.length}`);
-      } catch (error) {
-        await client.query('ROLLBACK');
-        console.error(`Error processing song batch starting at ${i}:`, error);
-      } finally {
-        client.release();
-      }
+    for (const row of songResults.rows) {
+      const songKey = `${row.name}-${row.artist_name}`;
+      uniqueSongs.set(songKey, row.id);
     }
 
-    // Import play events
+    console.log(`Loaded ${uniqueSongs.size} existing songs`);
+
+    // Import play events with smaller batches
     console.log('Importing play events...');
     let playCount = 0;
     let skippedCount = 0;
-    const playBatchSize = 50;
+    const playBatchSize = 5; // Even smaller batch size
 
-    for (let i = 0; i < records.length; i += playBatchSize) {
-      const batch = records.slice(i, i + playBatchSize);
+    for (let i = startIndex; i < records.length; i += playBatchSize) {
+      const batch = records.slice(i, Math.min(i + playBatchSize, records.length));
       const client = await pool.connect();
 
       try {
@@ -208,28 +136,45 @@ async function importData() {
               ]
             );
             playCount++;
+            totalPlayCount++;
           } catch (error) {
             console.error(`Error importing play for ${songKey}:`, error);
             skippedCount++;
+            totalSkippedCount++;
           }
         }
 
         await client.query('COMMIT');
-        console.log(`Processed ${i + batch.length} plays of ${records.length} (${playCount} imported, ${skippedCount} skipped)`);
+
+        // Save progress
+        fs.writeFileSync(progressFile, JSON.stringify({ 
+          lastProcessedIndex: i + batch.length,
+          totalPlayCount,
+          totalSkippedCount,
+          percentage: ((i + batch.length) / records.length * 100).toFixed(2)
+        }, null, 2));
+
+        console.log(`Progress: ${((i + batch.length) / records.length * 100).toFixed(2)}% (${totalPlayCount} imported, ${totalSkippedCount} skipped)`);
       } catch (error) {
         await client.query('ROLLBACK');
-        console.error(`Error processing plays batch starting at ${i}:`, error);
+        console.error(`Error processing batch starting at ${i}:`, error);
       } finally {
         client.release();
       }
+
+      // Add a slightly longer delay between batches
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+
+    // Clean up progress file when complete
+    if (fs.existsSync(progressFile)) {
+      fs.unlinkSync(progressFile);
     }
 
     console.log(`
 Import complete:
-- ${uniqueArtists.size} unique artists imported
-- ${uniqueSongs.size} unique songs imported
-- ${playCount} play events imported
-- ${skippedCount} play events skipped
+- ${totalPlayCount} play events imported
+- ${totalSkippedCount} play events skipped
     `);
 
   } catch (error) {
@@ -239,4 +184,4 @@ Import complete:
   }
 }
 
-importData().catch(console.error);
+importPlays().catch(console.error);
