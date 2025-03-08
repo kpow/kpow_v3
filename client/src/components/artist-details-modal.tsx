@@ -18,8 +18,13 @@ import { Badge } from "@/components/ui/badge";
 const BioSection = ({ bio }: { bio: string }) => {
   const [showFullBio, setShowFullBio] = React.useState(false);
   const bioLines = bio.split('\n');
-  const visibleBio = showFullBio ? bio : bioLines.slice(0, 7).join('\n');
-  const hasMoreContent = bioLines.length > 7;
+  
+  // Show only 2 lines initially (reduced by ~70%)
+  const visibleBio = showFullBio 
+    ? bio 
+    : bioLines.slice(0, 2).join('\n') + (bioLines.length > 2 ? '...' : '');
+  
+  const hasMoreContent = bioLines.length > 2;
   
   return (
     <div className="text-sm text-muted-foreground leading-relaxed">
