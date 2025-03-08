@@ -108,7 +108,7 @@ export function YearlyTopSongs() {
                     </div>
 
                     {/* Artist Image or Placeholder */}
-                    <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
+                    <div className="absolute bottom-0 right-0 w-56 h-56 overflow-hidden rounded-tl-lg">
                       {yearImage ? (
                         <>
                           <img
