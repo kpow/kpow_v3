@@ -4,13 +4,13 @@ import { Card } from "@/components/ui/card";
 import { SEO } from "@/components/SEO";
 import { PageTitle } from "@/components/ui/page-title";
 import { ArtistDetailsModal } from "@/components/artist-details-modal";
+import { YearlyTopSongs } from "@/components/yearly-top-songs";
 import { type Artist } from "@/types/artist";
 import { useQuery } from "@tanstack/react-query";
 
 export default function ITunezPage() {
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
 
-  // Fetch all artists for navigation
   const { data: topArtists } = useQuery({
     queryKey: ["/api/music/top-artists"],
     queryFn: async () => {
@@ -23,29 +23,26 @@ export default function ITunezPage() {
 
   const handleArtistNavigation = (direction: 'next' | 'prev') => {
     if (!topArtists?.artists || !selectedArtist) return;
-    
+
     const artists = topArtists.artists;
     const currentIndex = artists.findIndex(a => a.id === selectedArtist.id);
     if (currentIndex === -1) return;
-    
+
     let newIndex;
     if (direction === 'next') {
       newIndex = (currentIndex + 1) % artists.length;
     } else {
       newIndex = (currentIndex - 1 + artists.length) % artists.length;
     }
-    
-    // Preserve scroll position and modal height by saving current scroll position
+
     const modalContent = document.querySelector('.Dialog__content');
     const scrollPosition = modalContent?.scrollTop || 0;
-    
-    // Set the new artist - this will trigger a new query with loading state
+
     setSelectedArtist(artists[newIndex]);
-    
-    // Restore scroll position after state update
+
     setTimeout(() => {
       if (modalContent) {
-        modalContent.scrollTop = 0; // Reset to top for new content
+        modalContent.scrollTop = 0;
       }
     }, 10);
   };
@@ -64,6 +61,10 @@ export default function ITunezPage() {
 
         <Card className="p-6">
           <TopArtistsSlider onArtistClick={setSelectedArtist} />
+        </Card>
+
+        <Card className="p-6">
+          <YearlyTopSongs />
         </Card>
 
         <ArtistDetailsModal
