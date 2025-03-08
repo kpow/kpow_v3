@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { Music } from "lucide-react";
 
 interface Song {
   songId: number;
@@ -106,17 +107,23 @@ export function YearlyTopSongs() {
                       </div>
                     </div>
 
-                    {/* Artist Image */}
-                    {yearImage && (
-                      <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
-                        <img
-                          src={yearImage}
-                          alt={`Artist from ${year}`}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-background/20" />
-                      </div>
-                    )}
+                    {/* Artist Image or Placeholder */}
+                    <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
+                      {yearImage ? (
+                        <>
+                          <img
+                            src={yearImage}
+                            alt={`Artist from ${year}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-br from-transparent to-background/20" />
+                        </>
+                      ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <Music className="w-8 h-8 text-muted-foreground/50" />
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
