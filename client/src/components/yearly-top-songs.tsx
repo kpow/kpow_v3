@@ -79,50 +79,49 @@ export function YearlyTopSongs() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: idx * 0.1 }}
               >
-                <Card className="overflow-hidden relative">
+                <Card className="overflow-hidden">
                   <CardContent className="p-0">
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-bold">{year}</h3>
-                        <Badge variant="outline" className="text-xs">
-                          Top 5 Songs
-                        </Badge>
-                      </div>
-                      <div className="space-y-2">
-                        {songs.map((song, index) => (
-                          <div
-                            key={song.songId}
-                            className="flex items-center justify-between text-sm"
-                          >
-                            <div className="flex-1">
-                              <span className="font-medium truncate">
-                                {index + 1}. {song.songName}
-                              </span>
-                              <div className="text-muted-foreground text-xs">
-                                {song.artistName} • {song.playCount} plays
+                    <div className="grid grid-cols-1 md:grid-cols-3">
+                      <div className="col-span-2 p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-xl font-bold">{year}</h3>
+                          <Badge variant="outline" className="text-xs">
+                            Top 5 Songs
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          {songs.map((song, index) => (
+                            <div
+                              key={song.songId}
+                              className="flex items-center text-sm"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <span className="font-medium block truncate">
+                                  {index + 1}. {song.songName}
+                                </span>
+                                <div className="text-muted-foreground text-xs">
+                                  {song.artistName} • {song.playCount} plays
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Artist Image or Placeholder */}
-                    <div className="absolute bottom-0 right-0 w-56 h-56 overflow-hidden rounded-tl-lg">
-                      {yearImage ? (
-                        <>
+                      
+                      {/* Artist Image or Placeholder */}
+                      <div className="md:col-span-1 h-40 md:h-full border-t md:border-t-0 md:border-l border-border">
+                        {yearImage ? (
                           <img
                             src={yearImage}
                             alt={`Artist from ${year}`}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-br from-transparent to-background/20" />
-                        </>
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <Music className="w-8 h-8 text-muted-foreground/50" />
-                        </div>
-                      )}
+                        ) : (
+                          <div className="w-full h-full bg-muted flex items-center justify-center">
+                            <Music className="w-8 h-8 text-muted-foreground/50" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
