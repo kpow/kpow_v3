@@ -78,7 +78,7 @@ export default function Home() {
       link: "/battle",
     },
     {
-      title: "tunes",
+      title: "uTunes",
       subtitle: "LISTEN",
       imageSrc: "/tunes.jpg",
       type: "main" as const,
@@ -138,7 +138,11 @@ export default function Home() {
         <HorizontalDivider />
 
         {/* {recentPlays} */}
-        <SectionHeader title="Recently Played" />
+        <SectionHeader
+          title="Recently Played"
+          buttonText="more music"
+          linkHref="itunez"
+        />
         <RecentPlays />
         <HorizontalDivider />
 
