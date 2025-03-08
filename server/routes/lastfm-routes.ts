@@ -32,4 +32,44 @@ export function registerLastFmRoutes(router: Router) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
+
+  router.get("/api/lastfm/top-tracks", async (_req, res) => {
+    try {
+      const data = await fetchLastFmData("user.gettoptracks", {
+        user: "krakap",
+        limit: "20",
+        period: "overall",
+      });
+
+      if (!data.toptracks?.track) {
+        throw new Error("No top tracks found in Last.fm response");
+      }
+
+      const tracks = await Promise.all(
+        data.toptracks.track.map(async (track: any) => {
+          const trackInfo = await fetchLastFmData("track.getInfo", {
+            track: track.name,
+            artist: track.artist.name,
+            username: "krakap",
+          });
+
+          return {
+            name: track.name,
+            artist: track.artist.name,
+            playcount: parseInt(track.playcount),
+            rank: parseInt(track["@attr"].rank),
+            url: track.url,
+            firstPlayed: trackInfo.track?.userplaycount ? 
+              new Date(Number(trackInfo.track.userplaycount) * 1000).toISOString() : 
+              null,
+          };
+        })
+      );
+
+      res.json({ tracks });
+    } catch (error) {
+      console.error("Error in /api/lastfm/top-tracks:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
 }
