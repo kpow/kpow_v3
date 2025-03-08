@@ -346,6 +346,8 @@ export function registerPhishRoutes(router: Router) {
 
       // Filter shows by username
       const usernameArtist = username || "koolyp";
+      console.log(`Looking for shows with artist: "${usernameArtist}"`);
+      
       const shows = allShows.filter(
         (show: any) => show.artist === usernameArtist,
       );
@@ -363,9 +365,10 @@ export function registerPhishRoutes(router: Router) {
         .map(([venue, count]) => ({ venue, count: Number(count) }))
         .sort((a, b) => b.count - a.count);
 
-      console.log(`Returning ${sortedVenues.length} venues`);
+      console.log(`Returning ${sortedVenues.length} venues - FULL LIST WITHOUT PAGINATION`);
+      console.log('First 5 venues:', sortedVenues.slice(0, 5));
       
-      // Return all venues
+      // Return all venues - no pagination
       res.json({
         venues: sortedVenues,
         total: sortedVenues.length
