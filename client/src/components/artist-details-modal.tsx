@@ -66,6 +66,13 @@ export function ArtistDetailsModal({
     },
     enabled: !!artist?.id && isOpen,
     staleTime: 0, // Ensure fresh data is fetched when modal opens
+    retry: 2,
+  });
+
+  // Log for debugging
+  console.log("Artist modal data:", { 
+    providedArtist: artist, 
+    fetchedDetails: artistDetails?.artist 
   });
 
   if (!artist) return null;
