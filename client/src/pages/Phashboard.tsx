@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getAttendedShows,
   getShowStats,
-  getPaginatedVenues,
+  getAllVenues,
   getSetlistStats,
   getShowsByVenue,
 } from "@/lib/phish-api";
@@ -45,7 +45,7 @@ export default function ShowStats() {
 
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues/stats", username],
-    queryFn: () => getPaginatedVenues(username),
+    queryFn: () => getAllVenues(username),
     staleTime: 0, // Don't cache to ensure fresh data
     refetchOnWindowFocus: true,
   });
@@ -94,7 +94,7 @@ export default function ShowStats() {
           <Card>
             <CardContent className="pt-6">
               <h2 className="text-lg font-slackey mb-4">venues</h2>
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 venue-scrollbar">
                 {/* Debug info */}
                 {console.log('Venues data:', venuesData)}
                 {venuesLoading ? (

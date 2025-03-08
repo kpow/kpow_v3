@@ -24,6 +24,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom scrollbar for the venues list */
+.venue-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #0097fb rgba(255, 255, 255, 0.1);
+}
+
+.venue-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.venue-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.venue-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #0097fb;
+  border-radius: 4px;
+}
+
 @layer base {
   * {
     @apply border-border;

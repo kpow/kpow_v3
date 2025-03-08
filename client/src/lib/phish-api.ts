@@ -77,11 +77,11 @@ export async function getShowStats(username: string): Promise<{
   };
 }
 
-export async function getPaginatedVenues(
+export async function getAllVenues(
   username: string
 ): Promise<{ venues: VenueStat[]; total: number }> {
   // Add a cache-busting query parameter to ensure fresh data
-  console.log('Fetching venues data for:', username);
+  console.log('Fetching ALL venues data for:', username);
   const url = `${API_BASE}/venues/stats?username=${username}&t=${new Date().getTime()}`;
   console.log('Fetch URL:', url);
   
