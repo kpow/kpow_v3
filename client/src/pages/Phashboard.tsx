@@ -46,6 +46,7 @@ export default function ShowStats() {
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues/stats", username],
     queryFn: () => getPaginatedVenues(username),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { data: venueShows } = useQuery({

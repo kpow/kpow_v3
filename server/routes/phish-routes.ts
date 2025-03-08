@@ -329,7 +329,7 @@ export function registerPhishRoutes(router: Router) {
   // Endpoint to get all venue statistics
   router.get("/api/venues/stats", async (req, res) => {
     try {
-      const { username } = req.query;
+      const { username, limit } = req.query;
       
       const allShowsFilePath = path.join(
         process.cwd(),
@@ -360,6 +360,7 @@ export function registerPhishRoutes(router: Router) {
         .map(([venue, count]) => ({ venue, count: Number(count) }))
         .sort((a, b) => b.count - a.count);
 
+      // Return all venues
       res.json({
         venues: sortedVenues,
         total: sortedVenues.length

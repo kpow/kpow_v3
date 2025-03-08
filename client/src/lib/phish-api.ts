@@ -80,7 +80,7 @@ export async function getShowStats(username: string): Promise<{
 export async function getPaginatedVenues(
   username: string
 ): Promise<{ venues: VenueStat[]; total: number }> {
-  const response = await fetch(`${API_BASE}/venues/stats?limit=0`); // Limit=0 means fetch all venues
+  const response = await fetch(`${API_BASE}/venues/stats`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch venue statistics');
