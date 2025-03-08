@@ -107,24 +107,15 @@ export function YearlyTopSongs({ onArtistClick }: YearlyTopSongsProps = {}) {
                                 <div className="text-muted-foreground text-xs">
                                   <span 
                                     className="hover:text-primary hover:underline cursor-pointer"
-                                    onClick={async (e) => {
+                                    onClick={(e) => {
                                       e.stopPropagation();
                                       if (onArtistClick) {
-                                        try {
-                                          // Fetch complete artist data before passing to modal
-                                          const response = await fetch(`/api/music/artists/${song.artistId}`);
-                                          if (!response.ok) throw new Error('Failed to fetch artist details');
-                                          const data = await response.json();
-                                          onArtistClick(data.artist);
-                                        } catch (error) {
-                                          console.error("Error fetching artist data:", error);
-                                          // Fallback to basic data if fetch fails
-                                          const artist: Artist = {
-                                            id: song.artistId,
-                                            name: song.artistName,
-                                          };
-                                          onArtistClick(artist);
-                                        }
+                                        // Pass basic artist info and let the modal fetch details
+                                        const artist: Artist = {
+                                          id: song.artistId,
+                                          name: song.artistName,
+                                        };
+                                        onArtistClick(artist);
                                       }
                                     }}
                                   >
