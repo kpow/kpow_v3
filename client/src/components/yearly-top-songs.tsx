@@ -140,16 +140,16 @@ export function YearlyTopSongs({
   );
 
   const ListingSection = (
-    <div className="md:col-span-8 grid grid-cols-2 gap-6">
-      {/* First Column (1-5) */}
-      <div className="space-y-0">
+    <div className="md:col-span-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
+        {/* Songs 1-5 */}
         {songsData?.songs.slice(0, 5).map((song, index) => (
           <motion.div
             key={song.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() =>
               onArtistClick?.({
                 id: song.artistId,
@@ -157,33 +157,31 @@ export function YearlyTopSongs({
               })
             }
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Badge
                 variant="default"
-                className="font-slackey bg-primary text-primary-foreground"
+                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
               >
                 #{index + 1}
               </Badge>
-              <div>
-                <h3 className="font-medium">{song.name}</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="overflow-hidden">
+                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">
                   {song.artistName} • {song.playCount.toLocaleString()} plays
                 </p>
               </div>
             </div>
           </motion.div>
         ))}
-      </div>
 
-      {/* Second Column (6-10) */}
-      <div className="space-y-0">
+        {/* Songs 6-10 */}
         {songsData?.songs.slice(5, 10).map((song, index) => (
           <motion.div
             key={song.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: (index + 5) * 0.1 }}
-            className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() =>
               onArtistClick?.({
                 id: song.artistId,
@@ -191,16 +189,16 @@ export function YearlyTopSongs({
               })
             }
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Badge
                 variant="default"
-                className="font-slackey bg-primary text-primary-foreground"
+                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
               >
                 #{index + 6}
               </Badge>
-              <div>
-                <h3 className="font-medium">{song.name}</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="overflow-hidden">
+                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">
                   {song.artistName} • {song.playCount.toLocaleString()} plays
                 </p>
               </div>
