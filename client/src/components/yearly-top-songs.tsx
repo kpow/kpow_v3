@@ -141,70 +141,79 @@ export function YearlyTopSongs({
 
   const ListingSection = (
     <div className="md:col-span-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
-        {/* Songs 1-5 */}
-        {songsData?.songs.slice(0, 5).map((song, index) => (
-          <motion.div
-            key={song.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() =>
-              onArtistClick?.({
-                id: song.artistId,
-                name: song.artistName,
-              })
-            }
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Badge
-                variant="default"
-                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-              >
-                #{index + 1}
-              </Badge>
-              <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {song.artistName} • {song.playCount.toLocaleString()} plays
-                </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
+        <div>
+          {/* Songs 1-5 */}
+          {songsData?.songs.slice(0, 5).map((song, index) => (
+            <motion.div
+              key={song.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors mb-2"
+              onClick={() =>
+                onArtistClick?.({
+                  id: song.artistId,
+                  name: song.artistName,
+                })
+              }
+            >
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Badge
+                  variant="default"
+                  className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
+                >
+                  #{index + 1}
+                </Badge>
+                <div className="overflow-hidden">
+                  <h3 className="font-medium text-sm sm:text-base truncate">
+                    {song.name}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                    {song.artistName} •{" "}
+                    {song.playCount.toLocaleString()} plays
+                  </p>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
-
-        {/* Songs 6-10 */}
-        {songsData?.songs.slice(5, 10).map((song, index) => (
-          <motion.div
-            key={song.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: (index + 5) * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() =>
-              onArtistClick?.({
-                id: song.artistId,
-                name: song.artistName,
-              })
-            }
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Badge
-                variant="default"
-                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-              >
-                #{index + 6}
-              </Badge>
-              <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {song.artistName} • {song.playCount.toLocaleString()} plays
-                </p>
+            </motion.div>
+          ))}
+        </div>
+        <div>
+          {/* Songs 6-10 */}
+          {songsData?.songs.slice(5, 10).map((song, index) => (
+            <motion.div
+              key={song.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: (index + 5) * 0.1 }}
+              className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors mb-2"
+              onClick={() =>
+                onArtistClick?.({
+                  id: song.artistId,
+                  name: song.artistName,
+                })
+              }
+            >
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Badge
+                  variant="default"
+                  className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
+                >
+                  #{index + 6}
+                </Badge>
+                <div className="overflow-hidden">
+                  <h3 className="font-medium text-sm sm:text-base truncate">
+                    {song.name}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                    {song.artistName} •{" "}
+                    {song.playCount.toLocaleString()} plays
+                  </p>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );
