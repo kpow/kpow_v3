@@ -35,6 +35,7 @@ export default function ITunezPage() {
       newIndex = (currentIndex - 1 + artists.length) % artists.length;
     }
     
+    // Set the new artist - this will trigger a new query with loading state
     setSelectedArtist(artists[newIndex]);
   };
 
