@@ -104,22 +104,50 @@ export function registerMusicRoutes(router: Router) {
         .from(plays)
         .innerJoin(songs, eq(plays.songId, songs.id))
         .innerJoin(artists, eq(songs.artistId, artists.id))
-        .groupBy(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})`, songs.id, artists.id)
-        .orderBy(
+        .where(
+          sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`
+        )
+        .groupBy(
           sql`EXTRACT(YEAR FROM ${plays.startTimestamp})`,
-          desc(sql`play_count`),
+          songs.id,
+          songs.name,
+          artists.id,
+          artists.name,
+          artists.artistImageUrl
+        )
+        .orderBy(
+          sql`year`,
+          desc(sql`play_count`)
         );
 
       // Group by year and take top 5 for each
-      const topSongsByYear = songsByYear.reduce((acc, song) => {
-        if (!acc[song.year]) {
-          acc[song.year] = [];
+      const topSongsByYear: Record<number, (typeof songsByYear[number][] & { yearImage?: string })> = {};
+
+      // First, group songs by year and ensure proper sorting by play count
+      songsByYear.forEach((song) => {
+        if (!topSongsByYear[song.year]) {
+          topSongsByYear[song.year] = [];
         }
-        if (acc[song.year].length < 5) {
-          acc[song.year].push(song);
+        // Only add if we don't have 5 songs yet for this year
+        if (topSongsByYear[song.year].length < 5) {
+          topSongsByYear[song.year].push(song);
         }
-        return acc;
-      }, {} as Record<number, typeof songsByYear>);
+      });
+
+      // Then, find representative images for each year
+      Object.entries(topSongsByYear).forEach(([year, songs]) => {
+        // First try to find image from the top song's artist
+        const topSongArtistImage = songs[0]?.artistImageUrl;
+        if (topSongArtistImage) {
+          (topSongsByYear[Number(year)] as any).yearImage = topSongArtistImage;
+        } else {
+          // If top artist doesn't have image, find first artist with an image
+          const artistWithImage = songs.find(song => song.artistImageUrl);
+          if (artistWithImage) {
+            (topSongsByYear[Number(year)] as any).yearImage = artistWithImage.artistImageUrl;
+          }
+        }
+      });
 
       res.json({ songsByYear: topSongsByYear });
     } catch (error) {
@@ -129,4 +157,5 @@ export function registerMusicRoutes(router: Router) {
       });
     }
   });
+
 }

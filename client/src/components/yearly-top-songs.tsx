@@ -14,7 +14,7 @@ interface Song {
 }
 
 interface YearData {
-  [key: string]: Song[];
+  [key: string]: (Song[] & { yearImage?: string });
 }
 
 export function YearlyTopSongs() {
@@ -67,11 +67,11 @@ export function YearlyTopSongs() {
             >
               <Card className="overflow-hidden">
                 <CardContent className="p-0">
-                  {/* Find first artist with an image */}
-                  {songs.some(song => song.artistImageUrl) && (
+                  {/* Use the year's representative image if available */}
+                  {songs.yearImage && (
                     <div className="relative h-48">
                       <img
-                        src={songs.find(song => song.artistImageUrl)?.artistImageUrl}
+                        src={songs.yearImage}
                         alt={`Top artist of ${year}`}
                         className="w-full h-full object-cover"
                       />
@@ -91,12 +91,14 @@ export function YearlyTopSongs() {
                           key={song.songId}
                           className="flex items-center justify-between text-sm"
                         >
-                          <span className="font-medium truncate">
-                            {index + 1}. {song.songName}
-                          </span>
-                          <span className="text-muted-foreground text-xs">
-                            {song.artistName}
-                          </span>
+                          <div className="flex-1">
+                            <span className="font-medium truncate">
+                              {index + 1}. {song.songName}
+                            </span>
+                            <div className="text-muted-foreground text-xs">
+                              {song.artistName} • {song.playCount} plays
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
