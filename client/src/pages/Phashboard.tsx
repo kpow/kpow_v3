@@ -46,7 +46,8 @@ export default function ShowStats() {
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
     queryKey: ["/api/venues/stats", username],
     queryFn: () => getPaginatedVenues(username),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // Don't cache to ensure fresh data
+    refetchOnWindowFocus: true,
   });
 
   const { data: venueShows } = useQuery({
@@ -101,8 +102,8 @@ export default function ShowStats() {
                       <Skeleton className="h-5 w-16" />
                     </div>
                   ))
-                ) : (
-                  venuesData?.venues.map((venue) => (
+                ) : venuesData && venuesData.venues && venuesData.venues.length > 0 ? (
+                  venuesData.venues.map((venue) => (
                     <div
                       key={venue.venue}
                       className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
@@ -117,6 +118,8 @@ export default function ShowStats() {
                       </span>
                     </div>
                   ))
+                ) : (
+                  <div className="p-3 text-center">No venues found</div>
                 )}
               </div>
             </CardContent>

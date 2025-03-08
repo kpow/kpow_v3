@@ -80,7 +80,8 @@ export async function getShowStats(username: string): Promise<{
 export async function getPaginatedVenues(
   username: string
 ): Promise<{ venues: VenueStat[]; total: number }> {
-  const response = await fetch(`${API_BASE}/venues/stats`);
+  // Add a cache-busting query parameter to ensure fresh data
+  const response = await fetch(`${API_BASE}/venues/stats?username=${username}&t=${new Date().getTime()}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch venue statistics');

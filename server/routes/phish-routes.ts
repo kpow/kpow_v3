@@ -330,6 +330,7 @@ export function registerPhishRoutes(router: Router) {
   router.get("/api/venues/stats", async (req, res) => {
     try {
       const { username, limit } = req.query;
+      console.log(`Venues stats request for username: ${username}`);
       
       const allShowsFilePath = path.join(
         process.cwd(),
@@ -341,12 +342,14 @@ export function registerPhishRoutes(router: Router) {
       const allShows = JSON.parse(
         fs.readFileSync(allShowsFilePath, "utf-8"),
       ).data;
+      console.log(`Total shows in database: ${allShows.length}`);
 
       // Filter shows by username
       const usernameArtist = username || "koolyp";
       const shows = allShows.filter(
         (show: any) => show.artist === usernameArtist,
       );
+      console.log(`Filtered shows for ${usernameArtist}: ${shows.length}`);
 
       const venueStats = shows.reduce(
         (acc: { [key: string]: number }, show: any) => {
@@ -360,6 +363,8 @@ export function registerPhishRoutes(router: Router) {
         .map(([venue, count]) => ({ venue, count: Number(count) }))
         .sort((a, b) => b.count - a.count);
 
+      console.log(`Returning ${sortedVenues.length} venues`);
+      
       // Return all venues
       res.json({
         venues: sortedVenues,
