@@ -101,20 +101,12 @@ export function registerPhishRoutes(router: Router) {
         .map(([venue, count]) => ({ venue, count: Number(count) }))
         .sort((a, b) => b.count - a.count);
 
-      const start = (page - 1) * limit;
-      const end = start + limit;
-      const paginatedVenues = sortedVenues.slice(start, end);
-
-      const total = sortedVenues.length;
-      const totalPages = Math.ceil(total / limit);
-
+      // Always return all venues without pagination
+      console.log(`Returning all ${sortedVenues.length} venues`);
+      
       res.json({
-        venues: paginatedVenues,
-        pagination: {
-          current: page,
-          total: totalPages,
-          hasMore: page < totalPages,
-        },
+        venues: sortedVenues,
+        total: sortedVenues.length
       });
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });

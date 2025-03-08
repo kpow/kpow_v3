@@ -97,6 +97,7 @@ export default function ShowStats() {
               <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 venue-scrollbar">
                 {/* Debug info */}
                 {console.log('Venues data:', venuesData)}
+                {console.log('Rendering venues section, data:', venuesData)}
                 {venuesLoading ? (
                   Array.from({ length: 10 }).map((_, index) => (
                     <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
