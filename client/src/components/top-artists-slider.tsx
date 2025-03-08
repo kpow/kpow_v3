@@ -138,8 +138,8 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
 
             {/* Tick marks for each 100 */}
             {Array.from({ length: Math.floor(count / 100) + 1 }).map((_, index) => {
-              // Only create tick marks if there are at least 100 items
-              if (count < 100 || (index * 100 >= count)) return null;
+              // Only create tick marks if there are at least 100 items and skip the 0 tick
+              if (count < 100 || (index * 100 >= count) || index === 0) return null;
 
               const position = (index * 100) / (count - 1) * 100;
               return (
