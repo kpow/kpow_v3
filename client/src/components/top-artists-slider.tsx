@@ -65,17 +65,16 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
     if (!isDragging || !progressRef.current || !api || count === 0) return;
     
     const rect = progressRef.current.getBoundingClientRect();
-    const dragDelta = e.clientX - dragStartX;
-    const dragPercentage = dragDelta / rect.width;
     
-    // Calculate the new position based on drag delta
-    const newPosition = Math.max(0, Math.min(1, slidePosition + dragPercentage));
-    const targetIndex = Math.round(newPosition * (count - 1));
+    // Calculate position directly from current mouse position
+    const position = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const targetIndex = Math.round(position * (count - 1));
     
-    // Use scrollToIdx instead of scrollTo for smoother animation
-    if (targetIndex !== current) {
-      api.scrollTo(targetIndex, { animation: true });
-    }
+    // Update current index for visual feedback
+    setCurrent(targetIndex);
+    
+    // Don't animate during drag for smoother experience
+    api.scrollTo(targetIndex, { animation: false });
   };
 
   const handleDragEnd = () => {
@@ -128,6 +127,9 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
               const position = (e.clientX - rect.left) / rect.width;
               const clampedPosition = Math.max(0, Math.min(1, position));
               const targetIndex = Math.round(clampedPosition * (count - 1));
+              
+              // Update current position immediately for visual feedback
+              setCurrent(targetIndex);
               api.scrollTo(targetIndex, { animation: true });
             }}
           >
@@ -139,7 +141,7 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
               className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 bg-indigo-600 rounded-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
               style={{ 
                 left: `calc(${count > 1 ? (current / (count - 1)) * 100 : 0}% - 8px)`,
-                transition: isDragging ? 'none' : 'left 0.3s ease-out'
+                transition: isDragging ? 'none' : 'left 0.2s ease-out'
               }}
               onMouseDown={handleDragStart}
             ></div>
