@@ -141,7 +141,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
                 #{index + 1}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base break-words overflow-wrap-anywhere">{artist.name}</h3>
+                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   {artist.playCount?.toLocaleString() || 0} plays
                 </p>
@@ -168,7 +168,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
                 #{index + 6}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base break-words overflow-wrap-anywhere">{artist.name}</h3>
+                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   {artist.playCount?.toLocaleString() || 0} plays
                 </p>
