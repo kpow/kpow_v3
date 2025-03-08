@@ -1,22 +1,33 @@
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { Music } from "lucide-react";
 import { type Artist } from "@/types/artist";
 
 interface Song {
-  songId: number;
-  songName: string;
+  id: number;
+  name: string;
   artistId: number;
   artistName: string;
   imageUrl: string | null;
+  artistImageUrl: string | null;
   playCount: number;
-}
-
-interface YearData {
-  [key: string]: Song[];
 }
 
 interface YearlyTopSongsProps {
@@ -24,130 +35,194 @@ interface YearlyTopSongsProps {
 }
 
 export function YearlyTopSongs({ onArtistClick }: YearlyTopSongsProps = {}) {
-  const { data: songsByYear, isLoading } = useQuery({
-    queryKey: ["/api/music/top-songs-by-year"],
+  const [selectedYear, setSelectedYear] = useState<string>("2024");
+  const [api, setApi] = useState<CarouselApi>();
+
+  const { data: yearsData, isLoading: isLoadingYears } = useQuery({
+    queryKey: ["/api/music/available-years"],
     queryFn: async () => {
-      const response = await fetch("/api/music/top-songs-by-year");
-      if (!response.ok) throw new Error("Failed to fetch top songs by year");
+      const response = await fetch("/api/music/available-years");
+      if (!response.ok) throw new Error("Failed to fetch available years");
       const data = await response.json();
-      return data.songsByYear as YearData;
+      return data as { years: string[] };
     },
   });
 
-  // Helper function to find the first available image URL from the songs list
-  const findFirstAvailableImage = (songs: Song[]): string | null => {
-    for (const song of songs) {
-      if (song.imageUrl) {
-        return song.imageUrl;
-      }
-    }
-    return null;
-  };
+  const { data: songsData, isLoading: isLoadingSongs } = useQuery({
+    queryKey: ["/api/music/top-songs-by-year", selectedYear],
+    queryFn: async () => {
+      const response = await fetch(`/api/music/top-songs-by-year/${selectedYear}`);
+      if (!response.ok) throw new Error("Failed to fetch top songs");
+      const data = await response.json();
+      return data as { songs: Song[] };
+    },
+  });
 
-  if (isLoading) {
+  // Filter songs with images for the carousel
+  const songsWithImages = songsData?.songs.filter(
+    (song) => song.imageUrl || song.artistImageUrl
+  ) || [];
+
+  // Auto-advance carousel every 3 seconds
+  useEffect(() => {
+    if (!api || !songsWithImages.length) return;
+
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [api, songsWithImages]);
+
+  if (isLoadingYears || isLoadingSongs) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i} className="overflow-hidden">
-            <CardContent className="p-0">
-              <Skeleton className="h-48 w-full" />
-              <div className="p-4 space-y-2">
-                <Skeleton className="h-6 w-24" />
-                <div className="space-y-1">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Skeleton key={j} className="h-4 w-full" />
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-48" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Skeleton className="h-64" />
+          <Skeleton className="h-64" />
+        </div>
       </div>
     );
   }
 
-  if (!songsByYear) return null;
-
   return (
-    <div className="space-y-8">
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {Object.entries(songsByYear)
-          .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-          .map(([year, songs], idx) => {
-            const yearImage = findFirstAvailableImage(songs);
-
-            return (
-              <motion.div
+    <div className="space-y-6">
+      {/* Header with Title and Year Selector */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold font-slackey">yearly top songs</h2>
+        <Select
+          value={selectedYear}
+          onValueChange={setSelectedYear}
+        >
+          <SelectTrigger className="w-48 font-slackey">
+            <SelectValue placeholder="Select year" />
+          </SelectTrigger>
+          <SelectContent>
+            {yearsData?.years.map((year) => (
+              <SelectItem
                 key={year}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: idx * 0.1 }}
+                value={year}
+                className="font-slackey"
               >
-                <Card className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="grid grid-cols-1 md:grid-cols-3">
-                      <div className="col-span-2 p-4">
-                        <div className="flex items-center mb-4">
-                          <h3 className="text-xl font-bold mr-4">{year}</h3>
-                          <Badge variant="outline" className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2">
-                            Top 5 Songs
-                          </Badge>
-                        </div>
-                        <div className="space-y-2">
-                          {songs.map((song, index) => (
-                            <div
-                              key={song.songId}
-                              className="flex items-center text-sm"
-                            >
-                              <div className="flex-1 min-w-0">
-                                <span className="font-medium block truncate">
-                                  {index + 1}. {song.songName}
-                                </span>
-                                <div className="text-muted-foreground text-xs">
-                                  <span 
-                                    className="hover:text-primary hover:underline cursor-pointer"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (onArtistClick) {
-                                        // Pass basic artist info and let the modal fetch details
-                                        const artist: Artist = {
-                                          id: song.artistId,
-                                          name: song.artistName,
-                                        };
-                                        onArtistClick(artist);
-                                      }
-                                    }}
-                                  >
-                                    {song.artistName}
-                                  </span> • {song.playCount} plays
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      {/* Artist Image or Placeholder */}
-                      <div className="md:col-span-1 h-40 md:h-full border-t md:border-t-0 md:border-l border-border">
-                        {yearImage ? (
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Image Carousel - Left Side */}
+        <div className="md:col-span-4 relative min-h-[300px]">
+          {songsWithImages.length > 0 ? (
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              setApi={setApi}
+              className="w-full h-full"
+            >
+              <CarouselContent>
+                {songsWithImages.map((song) => (
+                  <CarouselItem key={song.id}>
+                    <Card className="overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="relative h-[300px]">
                           <img
-                            src={yearImage}
-                            alt={`Artist from ${year}`}
+                            src={song.imageUrl || song.artistImageUrl}
+                            alt={`${song.name} by ${song.artistName}`}
                             className="w-full h-full object-cover"
                           />
-                        ) : (
-                          <div className="w-full h-full bg-muted flex items-center justify-center">
-                            <Music className="w-8 h-8 text-muted-foreground/50" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 className="text-white font-bold">{song.name}</h3>
+                            <p className="text-white/80 text-sm">{song.artistName}</p>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
+              <Music className="w-8 h-8 text-muted-foreground/50" />
+            </div>
+          )}
+        </div>
+
+        {/* Songs List - Right Side */}
+        <div className="md:col-span-8 grid grid-cols-2 gap-6">
+          {/* First Column (1-5) */}
+          <div className="space-y-3">
+            {songsData?.songs.slice(0, 5).map((song, index) => (
+              <motion.div
+                key={song.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => onArtistClick?.({
+                  id: song.artistId,
+                  name: song.artistName,
+                })}
+              >
+                <div className="flex items-center gap-3">
+                  <Badge
+                    variant="default"
+                    className="font-slackey bg-primary text-primary-foreground"
+                  >
+                    #{index + 1}
+                  </Badge>
+                  <div>
+                    <h3 className="font-medium">{song.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {song.artistName} • {song.playCount.toLocaleString()} plays
+                    </p>
+                  </div>
+                </div>
               </motion.div>
-            );
-          })}
+            ))}
+          </div>
+
+          {/* Second Column (6-10) */}
+          <div className="space-y-3">
+            {songsData?.songs.slice(5, 10).map((song, index) => (
+              <motion.div
+                key={song.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: (index + 5) * 0.1 }}
+                className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => onArtistClick?.({
+                  id: song.artistId,
+                  name: song.artistName,
+                })}
+              >
+                <div className="flex items-center gap-3">
+                  <Badge
+                    variant="default"
+                    className="font-slackey bg-primary text-primary-foreground"
+                  >
+                    #{index + 6}
+                  </Badge>
+                  <div>
+                    <h3 className="font-medium">{song.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {song.artistName} • {song.playCount.toLocaleString()} plays
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

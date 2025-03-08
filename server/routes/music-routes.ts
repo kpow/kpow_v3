@@ -214,4 +214,47 @@ export function registerMusicRoutes(router: Router) {
       });
     }
   });
+    // Get top songs by year
+  router.get("/api/music/top-songs-by-year/:year", async (req, res) => {
+    try {
+      const year = parseInt(req.params.year);
+
+      const topSongs = await db
+        .select({
+          id: songs.id,
+          name: songs.name,
+          artistId: artists.id,
+          artistName: artists.name,
+          imageUrl: artists.imageUrl,
+          artistImageUrl: artists.artistImageUrl,
+          playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
+        })
+        .from(songs)
+        .innerJoin(plays, eq(plays.songId, songs.id))
+        .innerJoin(artists, eq(songs.artistId, artists.id))
+        .where(
+          and(
+            sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer = ${year}`,
+            sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`
+          )
+        )
+        .groupBy(
+          songs.id,
+          songs.name,
+          artists.id,
+          artists.name,
+          artists.imageUrl,
+          artists.artistImageUrl
+        )
+        .orderBy(desc(sql`play_count`))
+        .limit(10);
+
+      res.json({ songs: topSongs });
+    } catch (error) {
+      console.error("Error fetching top songs by year:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch top songs by year" 
+      });
+    }
+  });
 }

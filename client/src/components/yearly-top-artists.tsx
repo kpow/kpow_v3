@@ -49,7 +49,7 @@ export function YearlyTopArtists({ onArtistClick }: YearlyTopArtistsProps) {
       const response = await fetch(`/api/music/top-artists-by-year/${selectedYear}`);
       if (!response.ok) throw new Error("Failed to fetch top artists");
       const data = await response.json();
-      return data as TopArtistsByYear;
+      return data as { artists: Artist[] };
     },
   });
 
@@ -111,7 +111,47 @@ export function YearlyTopArtists({ onArtistClick }: YearlyTopArtistsProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Artists List - Left Side */}
+        {/* Image Carousel - Left Side */}
+        <div className="md:col-span-4 relative min-h-[300px]">
+          {artistsWithImages.length > 0 ? (
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              setApi={setApi}
+              className="w-full h-full"
+            >
+              <CarouselContent>
+                {artistsWithImages.map((artist) => (
+                  <CarouselItem key={artist.id}>
+                    <Card className="overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="relative h-[300px]">
+                          <img
+                            src={artist.imageUrl || artist.artistImageUrl}
+                            alt={artist.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 className="text-white font-bold">{artist.name}</h3>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
+              <span className="text-4xl">🎵</span>
+            </div>
+          )}
+        </div>
+
+        {/* Artists List - Right Side */}
         <div className="md:col-span-8 grid grid-cols-2 gap-6">
           {/* First Column (1-5) */}
           <div className="space-y-3">
@@ -170,46 +210,6 @@ export function YearlyTopArtists({ onArtistClick }: YearlyTopArtistsProps) {
               </motion.div>
             ))}
           </div>
-        </div>
-
-        {/* Image Carousel - Right Side */}
-        <div className="md:col-span-4 relative min-h-[300px]">
-          {artistsWithImages.length > 0 ? (
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              setApi={setApi}
-              className="w-full h-full"
-            >
-              <CarouselContent>
-                {artistsWithImages.map((artist) => (
-                  <CarouselItem key={artist.id}>
-                    <Card className="overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="relative h-[300px]">
-                          <img
-                            src={artist.imageUrl || artist.artistImageUrl}
-                            alt={artist.name}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <h3 className="text-white font-bold">{artist.name}</h3>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
-              <span className="text-4xl">🎵</span>
-            </div>
-          )}
         </div>
       </div>
     </div>
