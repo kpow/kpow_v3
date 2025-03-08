@@ -123,60 +123,59 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
   const ListingSection = (
     <div className="md:col-span-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-2 md:gap-0">
-        <div className="w-full md:w-1/2"> {/* Left Column */}
-          {artistsData?.artists.slice(0, 5).map((artist, index) => (
-            <motion.div
-              key={artist.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors mb-2"
-              onClick={() => onArtistClick?.(artist)}
-            >
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Badge
-                  variant="default"
-                  className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-                >
-                  #{index + 1}
-                </Badge>
-                <div className="overflow-hidden">
-                  <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {artist.playCount?.toLocaleString() || 0} plays
-                  </p>
-                </div>
+        {/* Artists 1-5 */}
+        {artistsData?.artists.slice(0, 5).map((artist, index) => (
+          <motion.div
+            key={artist.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => onArtistClick?.(artist)}
+          >
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Badge
+                variant="default"
+                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
+              >
+                #{index + 1}
+              </Badge>
+              <div className="overflow-hidden">
+                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  {artist.playCount?.toLocaleString() || 0} plays
+                </p>
               </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="w-full md:w-1/2"> {/* Right Column */}
-          {artistsData?.artists.slice(5, 10).map((artist, index) => (
-            <motion.div
-              key={artist.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: (index + 5) * 0.1 }}
-              className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors mb-2"
-              onClick={() => onArtistClick?.(artist)}
-            >
-              <div className="flex items-center gap-2 sm:gap-3">
-                <Badge
-                  variant="default"
-                  className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-                >
-                  #{index + 6}
-                </Badge>
-                <div className="overflow-hidden">
-                  <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {artist.playCount?.toLocaleString() || 0} plays
-                  </p>
-                </div>
+            </div>
+          </motion.div>
+        ))}
+
+        {/* Artists 6-10 */}
+        {artistsData?.artists.slice(5, 10).map((artist, index) => (
+          <motion.div
+            key={artist.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: (index + 5) * 0.1 }}
+            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => onArtistClick?.(artist)}
+          >
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Badge
+                variant="default"
+                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
+              >
+                #{index + 6}
+              </Badge>
+              <div className="overflow-hidden">
+                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  {artist.playCount?.toLocaleString() || 0} plays
+                </p>
               </div>
-            </motion.div>
-          ))}
-        </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
