@@ -165,9 +165,9 @@ export function YearlyTopSongs({
                 #{index + 1}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base">
+                <div className="font-bold text-sm sm:text-base">
                   {song.name}
-                </h3>
+                </div>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   {song.artistName}
                   {/* • {song.playCount.toLocaleString()} plays */}
@@ -200,9 +200,9 @@ export function YearlyTopSongs({
                 #{index + 6}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base">
+                <div className="font-bold text-sm sm:text-base">
                   {song.name}
-                </h3>
+                </div>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   {song.artistName}
                   {/* • {song.playCount.toLocaleString()} plays */}

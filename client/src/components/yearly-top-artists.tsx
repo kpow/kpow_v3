@@ -24,7 +24,10 @@ interface YearlyTopArtistsProps {
   carouselPosition?: "left" | "right";
 }
 
-export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: YearlyTopArtistsProps) {
+export function YearlyTopArtists({
+  onArtistClick,
+  carouselPosition = "left",
+}: YearlyTopArtistsProps) {
   const [selectedYear, setSelectedYear] = useState<string>("2024");
   const [api, setApi] = useState<CarouselApi>();
 
@@ -41,7 +44,9 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
   const { data: artistsData, isLoading: isLoadingArtists } = useQuery({
     queryKey: ["/api/music/top-artists-by-year", selectedYear],
     queryFn: async () => {
-      const response = await fetch(`/api/music/top-artists-by-year/${selectedYear}`);
+      const response = await fetch(
+        `/api/music/top-artists-by-year/${selectedYear}`,
+      );
       if (!response.ok) throw new Error("Failed to fetch top artists");
       const data = await response.json();
       return data as { artists: Artist[] };
@@ -49,9 +54,10 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
   });
 
   // Filter artists with images for the carousel
-  const artistsWithImages = artistsData?.artists.filter(
-    (artist) => artist.imageUrl || artist.artistImageUrl
-  ) || [];
+  const artistsWithImages =
+    artistsData?.artists.filter(
+      (artist) => artist.imageUrl || artist.artistImageUrl,
+    ) || [];
 
   // Auto-advance carousel every 3 seconds
   useEffect(() => {
@@ -141,7 +147,9 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
                 #{index + 1}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base">{artist.name}</h3>
+                <div className="font-bold text-sm sm:text-base">
+                  {artist.name}
+                </div>
                 {/* <p className="text-xs sm:text-sm text-muted-foreground">
                   {artist.playCount?.toLocaleString() || 0} plays
                 </p> */}
@@ -168,7 +176,9 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
                 #{index + 6}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base">{artist.name}</h3>
+                <div className="font-bold text-sm sm:text-base">
+                  {artist.name}
+                </div>
                 {/* <p className="text-xs sm:text-sm text-muted-foreground">
                   {artist.playCount?.toLocaleString() || 0} plays
                 </p> */}
@@ -185,20 +195,13 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
       {/* Header with Title and Year Selector */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold font-slackey">yearly top artists</h2>
-        <Select
-          value={selectedYear}
-          onValueChange={setSelectedYear}
-        >
+        <Select value={selectedYear} onValueChange={setSelectedYear}>
           <SelectTrigger className="w-48 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent>
             {yearsData?.years.map((year) => (
-              <SelectItem
-                key={year}
-                value={year}
-                className="font-slackey"
-              >
+              <SelectItem key={year} value={year} className="font-slackey">
                 {year}
               </SelectItem>
             ))}
