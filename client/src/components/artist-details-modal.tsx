@@ -155,8 +155,9 @@ export function ArtistDetailsModal({
           {isLoading ? (
             <ArtistDetailsSkeleton />
           ) : (
-          {/* Stats and Image Section - Side by Side */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <>
+            {/* Stats and Image Section - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Stats Section - Left 1/2 */}
             <div className="flex flex-col space-y-3">
               {artist.rank && (
@@ -270,6 +271,7 @@ export function ArtistDetailsModal({
               </motion.div>
             )}
           </div>
+            </>
           )}
         </motion.div>
       </DialogContent>
