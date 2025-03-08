@@ -21,6 +21,8 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [slidePosition, setSlidePosition] = useState(0);
   const progressRef = useRef<HTMLDivElement>(null);
 
   const { data: topArtists, isLoading } = useQuery({
@@ -47,6 +49,14 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
   const handleDragStart = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
+    setDragStartX(e.clientX);
+    
+    // Remember the starting slide position
+    if (progressRef.current && count > 0) {
+      const position = current / (count - 1);
+      setSlidePosition(position);
+    }
+    
     document.addEventListener("mousemove", handleDrag);
     document.addEventListener("mouseup", handleDragEnd);
   };
@@ -55,11 +65,17 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
     if (!isDragging || !progressRef.current || !api || count === 0) return;
     
     const rect = progressRef.current.getBoundingClientRect();
-    const position = (e.clientX - rect.left) / rect.width;
-    const clampedPosition = Math.max(0, Math.min(1, position));
-    const targetIndex = Math.floor(clampedPosition * count);
+    const dragDelta = e.clientX - dragStartX;
+    const dragPercentage = dragDelta / rect.width;
     
-    api.scrollTo(targetIndex);
+    // Calculate the new position based on drag delta
+    const newPosition = Math.max(0, Math.min(1, slidePosition + dragPercentage));
+    const targetIndex = Math.round(newPosition * (count - 1));
+    
+    // Use scrollToIdx instead of scrollTo for smoother animation
+    if (targetIndex !== current) {
+      api.scrollTo(targetIndex, { animation: true });
+    }
   };
 
   const handleDragEnd = () => {
@@ -88,13 +104,64 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
 
   return (
     <div className="w-full">
+      {/* Header with Title and Navigation */}
+      <div className="flex items-center justify-between mb-4 px-4">
+        <h2 className="text-xl font-bold">Top Artists</h2>
+        
+        {/* Custom Navigation */}
+        <div className="flex items-center gap-4">
+          {/* Previous Button */}
+          <button 
+            onClick={() => api?.scrollPrev()}
+            className="border rounded-md px-3 py-1 bg-white hover:bg-gray-100 transition-colors"
+          >
+            PREV
+          </button>
+
+          {/* Progress Bar */}
+          <div 
+            ref={progressRef}
+            className="relative w-32 h-2 bg-gray-200 rounded-full cursor-pointer"
+            onClick={(e) => {
+              if (!progressRef.current || !api || count === 0) return;
+              const rect = progressRef.current.getBoundingClientRect();
+              const position = (e.clientX - rect.left) / rect.width;
+              const clampedPosition = Math.max(0, Math.min(1, position));
+              const targetIndex = Math.round(clampedPosition * (count - 1));
+              api.scrollTo(targetIndex, { animation: true });
+            }}
+          >
+            {/* Track Line */}
+            <div className="absolute inset-0 bg-indigo-100 rounded-full"></div>
+            
+            {/* Draggable Handle */}
+            <div 
+              className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 bg-indigo-600 rounded-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+              style={{ 
+                left: `calc(${count > 1 ? (current / (count - 1)) * 100 : 0}% - 8px)`,
+                transition: isDragging ? 'none' : 'left 0.3s ease-out'
+              }}
+              onMouseDown={handleDragStart}
+            ></div>
+          </div>
+
+          {/* Next Button */}
+          <button 
+            onClick={() => api?.scrollNext()}
+            className="border rounded-md px-3 py-1 bg-white hover:bg-gray-100 transition-colors"
+          >
+            NEXT
+          </button>
+        </div>
+      </div>
+
       <Carousel
         opts={{
           align: "start",
           loop: true,
         }}
         setApi={setApi}
-        className="w-full mb-6"
+        className="w-full"
       >
         <CarouselContent className="-ml-2 md:-ml-4">
           {topArtists?.artists.map((artist) => (
@@ -153,51 +220,6 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
           ))}
         </CarouselContent>
       </Carousel>
-
-      {/* Custom Navigation */}
-      <div className="flex items-center justify-between w-full gap-4 px-4">
-        {/* Previous Button */}
-        <button 
-          onClick={() => api?.scrollPrev()}
-          className="border rounded-md px-4 py-2 bg-white hover:bg-gray-100 transition-colors"
-        >
-          PREV
-        </button>
-
-        {/* Progress Bar */}
-        <div 
-          ref={progressRef}
-          className="relative flex-1 h-1 bg-gray-200 rounded-full cursor-pointer"
-          onClick={(e) => {
-            if (!progressRef.current || !api || count === 0) return;
-            const rect = progressRef.current.getBoundingClientRect();
-            const position = (e.clientX - rect.left) / rect.width;
-            const targetIndex = Math.floor(position * count);
-            api.scrollTo(targetIndex);
-          }}
-        >
-          {/* Track Line */}
-          <div className="absolute inset-0 bg-indigo-100 rounded-full"></div>
-          
-          {/* Draggable Handle */}
-          <div 
-            className="absolute top-1/2 transform -translate-y-1/2 w-4 h-4 bg-indigo-600 rounded-full cursor-grab"
-            style={{ 
-              left: `calc(${count ? (current / (count - 1)) * 100 : 0}% - 8px)`,
-              transition: isDragging ? 'none' : 'left 0.3s ease-out'
-            }}
-            onMouseDown={handleDragStart}
-          ></div>
-        </div>
-
-        {/* Next Button */}
-        <button 
-          onClick={() => api?.scrollNext()}
-          className="border rounded-md px-4 py-2 bg-white hover:bg-gray-100 transition-colors"
-        >
-          NEXT
-        </button>
-      </div>
     </div>
   );
 }
