@@ -69,7 +69,7 @@ export function ArtistDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[780px] max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+      <DialogContent className="sm:max-w-[1020px] max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
         <DialogHeader>
           <DialogTitle className="font-slackey text-2xl text-center">
             {artist.name}
@@ -83,8 +83,8 @@ export function ArtistDetailsModal({
           transition={{ duration: 0.3 }}
         >
           {/* Stats and Image Section - Side by Side */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Stats Section - Left 1/3 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Stats Section - Left 1/2 */}
             <div className="flex flex-col space-y-3">
               {artist.playCount && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
@@ -117,8 +117,8 @@ export function ArtistDetailsModal({
               )}
             </div>
 
-            {/* Artist Image - Right 2/3 */}
-            <div className="md:col-span-2">
+            {/* Artist Image - Right 1/2 */}
+            <div className="md:col-span-1">
               {(artist.imageUrl || artist.artistImageUrl) && (
                 <div className="relative overflow-hidden rounded-lg h-full">
                   <motion.img
