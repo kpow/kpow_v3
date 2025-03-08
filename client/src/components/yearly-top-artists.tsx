@@ -122,7 +122,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
 
   const ListingSection = (
     <div className="md:col-span-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-2 md:gap-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
         {/* Artists 1-5 */}
         {artistsData?.artists.slice(0, 5).map((artist, index) => (
           <motion.div
