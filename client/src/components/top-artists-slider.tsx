@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -50,28 +49,28 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
     e.preventDefault();
     setIsDragging(true);
     setDragStartX(e.clientX);
-    
+
     // Remember the starting slide position
     if (progressRef.current && count > 0) {
       const position = current / (count - 1);
       setSlidePosition(position);
     }
-    
+
     document.addEventListener("mousemove", handleDrag);
     document.addEventListener("mouseup", handleDragEnd);
   };
 
   const handleDrag = (e: MouseEvent) => {
     if (!isDragging || !progressRef.current || !api || count === 0) return;
-    
+
     const rect = progressRef.current.getBoundingClientRect();
     const dragDelta = e.clientX - dragStartX;
     const dragPercentage = dragDelta / rect.width;
-    
+
     // Calculate the new position based on drag delta
     const newPosition = Math.max(0, Math.min(1, slidePosition + dragPercentage));
     const targetIndex = Math.round(newPosition * (count - 1));
-    
+
     // Use scrollToIdx instead of scrollTo for smoother animation
     if (targetIndex !== current) {
       api.scrollTo(targetIndex, { animation: true });
@@ -107,7 +106,7 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
       {/* Header with Title and Navigation */}
       <div className="flex items-center justify-between mb-4 px-4">
         <h2 className="text-xl font-bold">Top Artists</h2>
-        
+
         {/* Custom Navigation */}
         <div className="flex items-center gap-4">
           {/* Previous Button */}
@@ -128,18 +127,43 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
               const position = (e.clientX - rect.left) / rect.width;
               const clampedPosition = Math.max(0, Math.min(1, position));
               const targetIndex = Math.round(clampedPosition * (count - 1));
+
+              // Update current position immediately for visual feedback
+              setCurrent(targetIndex);
               api.scrollTo(targetIndex, { animation: true });
             }}
           >
             {/* Track Line */}
             <div className="absolute inset-0 bg-indigo-100 rounded-full"></div>
-            
+
+            {/* Tick marks for each 100 */}
+            {Array.from({ length: Math.floor(count / 100) + 1 }).map((_, index) => {
+              // Only create tick marks if there are at least 100 items
+              if (count < 100 || (index * 100 >= count)) return null;
+
+              const position = (index * 100) / (count - 1) * 100;
+              return (
+                <div 
+                  key={index}
+                  className="absolute top-[-3px] w-[1px] h-[8px] bg-gray-400"
+                  style={{ 
+                    left: `${position}%`,
+                    transform: 'translateX(-50%)'
+                  }}
+                >
+                  <span className="absolute top-[-18px] left-1/2 transform -translate-x-1/2 text-[10px] text-gray-500">
+                    {index * 100}
+                  </span>
+                </div>
+              );
+            })}
+
             {/* Draggable Handle */}
             <div 
-              className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 bg-indigo-600 rounded-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+              className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 bg-indigo-600 rounded-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} z-10`}
               style={{ 
                 left: `calc(${count > 1 ? (current / (count - 1)) * 100 : 0}% - 8px)`,
-                transition: isDragging ? 'none' : 'left 0.3s ease-out'
+                transition: isDragging ? 'none' : 'left 0.2s ease-out'
               }}
               onMouseDown={handleDragStart}
             ></div>
