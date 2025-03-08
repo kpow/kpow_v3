@@ -65,19 +65,8 @@ export function YearlyTopSongs() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.1 }}
             >
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden relative">
                 <CardContent className="p-0">
-                  {/* Use the year's representative image if available */}
-                  {songs.yearImage && (
-                    <div className="relative h-48">
-                      <img
-                        src={songs.yearImage}
-                        alt={`Top artist of ${year}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    </div>
-                  )}
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-xl font-bold">{year}</h3>
@@ -103,6 +92,18 @@ export function YearlyTopSongs() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Artist Image */}
+                  {songs.yearImage && (
+                    <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
+                      <img
+                        src={songs.yearImage}
+                        alt={`Artist from ${year}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-background/20" />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
