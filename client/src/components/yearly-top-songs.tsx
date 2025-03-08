@@ -28,6 +28,16 @@ export function YearlyTopSongs() {
     },
   });
 
+  // Helper function to find the first available image URL from the songs list
+  const findFirstAvailableImage = (songs: Song[]): string | null => {
+    for (const song of songs) {
+      if (song.imageUrl) {
+        return song.imageUrl;
+      }
+    }
+    return null;
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -58,56 +68,60 @@ export function YearlyTopSongs() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {Object.entries(songsByYear)
           .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-          .map(([year, songs], idx) => (
-            <motion.div
-              key={year}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: idx * 0.1 }}
-            >
-              <Card className="overflow-hidden relative">
-                <CardContent className="p-0">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-bold">{year}</h3>
-                      <Badge variant="outline" className="text-xs">
-                        Top 5 Songs
-                      </Badge>
-                    </div>
-                    <div className="space-y-2">
-                      {songs.map((song, index) => (
-                        <div
-                          key={song.songId}
-                          className="flex items-center justify-between text-sm"
-                        >
-                          <div className="flex-1">
-                            <span className="font-medium truncate">
-                              {index + 1}. {song.songName}
-                            </span>
-                            <div className="text-muted-foreground text-xs">
-                              {song.artistName} • {song.playCount} plays
+          .map(([year, songs], idx) => {
+            const yearImage = findFirstAvailableImage(songs);
+
+            return (
+              <motion.div
+                key={year}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.1 }}
+              >
+                <Card className="overflow-hidden relative">
+                  <CardContent className="p-0">
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-bold">{year}</h3>
+                        <Badge variant="outline" className="text-xs">
+                          Top 5 Songs
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        {songs.map((song, index) => (
+                          <div
+                            key={song.songId}
+                            className="flex items-center justify-between text-sm"
+                          >
+                            <div className="flex-1">
+                              <span className="font-medium truncate">
+                                {index + 1}. {song.songName}
+                              </span>
+                              <div className="text-muted-foreground text-xs">
+                                {song.artistName} • {song.playCount} plays
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Artist Image */}
-                  {songs[0]?.imageUrl && (
-                    <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
-                      <img
-                        src={songs[0].imageUrl}
-                        alt={`Artist from ${year}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-background/20" />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                    {/* Artist Image */}
+                    {yearImage && (
+                      <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
+                        <img
+                          src={yearImage}
+                          alt={`Artist from ${year}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-background/20" />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
       </div>
     </div>
   );
