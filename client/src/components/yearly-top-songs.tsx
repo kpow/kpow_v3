@@ -9,12 +9,12 @@ interface Song {
   songName: string;
   artistId: number;
   artistName: string;
-  artistImageUrl: string | null;
+  imageUrl: string | null;
   playCount: number;
 }
 
 interface YearData {
-  [key: string]: (Song[] & { imageUrl?: string });
+  [key: string]: Song[];
 }
 
 export function YearlyTopSongs() {
@@ -94,10 +94,10 @@ export function YearlyTopSongs() {
                   </div>
 
                   {/* Artist Image */}
-                  {songs.imageUrl && (
+                  {songs[0]?.imageUrl && (
                     <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
                       <img
-                        src={songs.imageUrl}
+                        src={songs[0].imageUrl}
                         alt={`Artist from ${year}`}
                         className="w-full h-full object-cover"
                       />
