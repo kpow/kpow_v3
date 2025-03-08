@@ -78,13 +78,9 @@ export async function getShowStats(username: string): Promise<{
 }
 
 export async function getPaginatedVenues(
-  username: string,
-  page = 1,
-  limit = 10
+  username: string
 ): Promise<{ venues: VenueStat[]; total: number }> {
-  const response = await fetch(
-    `${API_BASE}/venues/stats?page=${page}&limit=${limit}`
-  );
+  const response = await fetch(`${API_BASE}/venues/stats`); //Removed pagination parameters
 
   if (!response.ok) {
     throw new Error('Failed to fetch venue statistics');
@@ -93,7 +89,7 @@ export async function getPaginatedVenues(
   const data = await response.json();
   return {
     venues: data.venues,
-    total: data.pagination.total * limit // Convert pages to total items
+    total: data.venues.length // Total is now the length of the venues array
   };
 }
 

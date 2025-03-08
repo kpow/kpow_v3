@@ -359,6 +359,65 @@ export function registerPhishRoutes(router: Router) {
       });
     }
   });
+
+  router.get("/api/venues/paginated", async (req, res) => {
+    try {
+      const { username, page = 1, limit = 5 } = req.query;
+      const parsedPage = parseInt(page as string);
+      const parsedLimit = parseInt(limit as string);
+
+      const allShowsFilePath = path.join(
+        process.cwd(),
+        "client",
+        "src",
+        "data",
+        "allshows.json",
+      );
+      const allShows = JSON.parse(
+        fs.readFileSync(allShowsFilePath, "utf-8"),
+      ).data;
+
+      // Filter shows by username
+      const usernameArtist = username || "koolyp";
+      const shows = allShows.filter(
+        (show: any) => show.artist === usernameArtist,
+      );
+
+      const venueStats = shows.reduce(
+        (acc: { [key: string]: number }, show: any) => {
+          acc[show.venue] = (acc[show.venue] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
+
+      const sortedVenues = Object.entries(venueStats)
+        .map(([venue, count]) => ({ venue, count: Number(count) }))
+        .sort((a, b) => b.count - a.count);
+
+      // If limit is 0, return all venues, otherwise paginate
+      const paginatedVenues = parsedLimit === 0
+        ? sortedVenues
+        : sortedVenues.slice(
+            (parsedPage - 1) * parsedLimit,
+            parsedPage * parsedLimit,
+          );
+
+      const total = sortedVenues.length;
+      const totalPages = parsedLimit === 0 ? 1 : Math.ceil(total / parsedLimit);
+
+      res.json({
+        venues: paginatedVenues,
+        pagination: {
+          current: parsedPage,
+          total: totalPages,
+          hasMore: parsedPage < totalPages,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
 }
 
 function formatSongUrl(songName: string): string {
