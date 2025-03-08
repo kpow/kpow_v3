@@ -1,6 +1,10 @@
 import type { Express } from "express";
 import { Router } from "express";
 import { createServer, type Server } from "http";
+import session from "express-session";
+import passport from "./config/passport";
+import { sessionConfig } from "./config/session";
+import authRoutes from "./routes/auth-routes";
 import { registerPhishRoutes } from "./routes/phish-routes";
 import { registerLastFmRoutes } from "./routes/lastfm-routes";
 import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
@@ -36,7 +40,15 @@ if (!process.env.YELP_API_KEY) {
 }
 
 export function registerRoutes(app: Express): Server {
+  // Setup session and passport
+  app.use(session(sessionConfig));
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   const router = Router();
+
+  // Register auth routes first
+  router.use(authRoutes);
 
   // Register all route modules
   registerPhishRoutes(router);
