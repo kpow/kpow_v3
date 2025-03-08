@@ -112,12 +112,28 @@ export function ArtistDetailsModal({
           <Skeleton className="h-4 w-5/6" />
         </div>
       </div>
+      
+      {/* Recent Plays Skeleton */}
+      <div className="mt-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Skeleton className="h-4 w-4 rounded-full" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-center justify-between text-sm bg-muted/30 p-2 rounded">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[820px] max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+      <DialogContent className="sm:max-w-[820px] max-h-[80vh] min-h-[600px] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
         <DialogHeader className="flex flex-col space-y-2">
           <div className="flex items-center justify-between w-full">
             <button 

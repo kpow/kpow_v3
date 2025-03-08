@@ -35,8 +35,19 @@ export default function ITunezPage() {
       newIndex = (currentIndex - 1 + artists.length) % artists.length;
     }
     
+    // Preserve scroll position and modal height by saving current scroll position
+    const modalContent = document.querySelector('.Dialog__content');
+    const scrollPosition = modalContent?.scrollTop || 0;
+    
     // Set the new artist - this will trigger a new query with loading state
     setSelectedArtist(artists[newIndex]);
+    
+    // Restore scroll position after state update
+    setTimeout(() => {
+      if (modalContent) {
+        modalContent.scrollTop = 0; // Reset to top for new content
+      }
+    }, 10);
   };
 
   return (
