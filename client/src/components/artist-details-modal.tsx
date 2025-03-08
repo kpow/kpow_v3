@@ -14,6 +14,30 @@ import { type Artist } from "@/types/artist";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 
+// Bio section component with proper hook usage
+const BioSection = ({ bio }: { bio: string }) => {
+  const [showFullBio, setShowFullBio] = React.useState(false);
+  const bioLines = bio.split('\n');
+  const visibleBio = showFullBio ? bio : bioLines.slice(0, 7).join('\n');
+  const hasMoreContent = bioLines.length > 7;
+  
+  return (
+    <div className="text-sm text-muted-foreground leading-relaxed">
+      <p>{visibleBio}</p>
+      {hasMoreContent && (
+        <Button 
+          variant="link" 
+          size="sm" 
+          className="px-0 mt-2" 
+          onClick={() => setShowFullBio(!showFullBio)}
+        >
+          {showFullBio ? "Show Less" : "Show More"}
+        </Button>
+      )}
+    </div>
+  );
+};
+
 interface ArtistDetailsModalProps {
   artist: Artist | null;
   isOpen: boolean;
@@ -120,30 +144,7 @@ export function ArtistDetailsModal({
               >
                 {artist.bio && (
                   <>
-                    <div className="text-sm text-muted-foreground leading-relaxed">
-                      {(() => {
-                        const [showFullBio, setShowFullBio] = React.useState(false);
-                        const bioLines = artist.bio.split('\n');
-                        const visibleBio = showFullBio ? artist.bio : bioLines.slice(0, 7).join('\n');
-                        const hasMoreContent = bioLines.length > 7;
-                        
-                        return (
-                          <>
-                            <p>{visibleBio}</p>
-                            {hasMoreContent && (
-                              <Button 
-                                variant="link" 
-                                size="sm" 
-                                className="px-0 mt-2" 
-                                onClick={() => setShowFullBio(!showFullBio)}
-                              >
-                                {showFullBio ? "Show Less" : "Show More"}
-                              </Button>
-                            )}
-                          </>
-                        );
-                      })()}
-                    </div>
+                    <BioSection bio={artist.bio} />
                   </>
                 )}
 
