@@ -165,14 +165,13 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
                   <div className="p-2">
                     <h3 className="font-bold truncate">{artist.name}</h3>
                     <div className="flex justify-between items-center mt-1">
-                      <p className="text-sm text-muted-foreground">
+                      {/* <p className="text-sm text-muted-foreground">
                         {artist.playCount?.toLocaleString() || 0} <br />
                         plays
-                      </p>
+                      </p> */}
                       {artist.listeners && (
                         <p className="text-sm text-muted-foreground text-right">
-                          {artist.listeners.toLocaleString()} <br />
-                          listeners
+                          {artist.listeners.toLocaleString()} listeners
                         </p>
                       )}
                     </div>

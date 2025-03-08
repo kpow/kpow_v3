@@ -141,7 +141,7 @@ export function YearlyTopSongs({
 
   const ListingSection = (
     <div className="md:col-span-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-2 md:gap-2">
         {/* Songs 1-5 */}
         {songsData?.songs.slice(0, 5).map((song, index) => (
           <motion.div
@@ -149,7 +149,7 @@ export function YearlyTopSongs({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            className="bg-muted/100 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() =>
               onArtistClick?.({
                 id: song.artistId,
@@ -165,9 +165,12 @@ export function YearlyTopSongs({
                 #{index + 1}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {song.artistName} • {song.playCount.toLocaleString()} plays
+                <h3 className="font-medium text-sm sm:text-base">
+                  {song.name}
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  {song.artistName}
+                  {/* • {song.playCount.toLocaleString()} plays */}
                 </p>
               </div>
             </div>
@@ -181,7 +184,7 @@ export function YearlyTopSongs({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: (index + 5) * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            className="bg-muted/100 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() =>
               onArtistClick?.({
                 id: song.artistId,
@@ -197,9 +200,12 @@ export function YearlyTopSongs({
                 #{index + 6}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {song.artistName} • {song.playCount.toLocaleString()} plays
+                <h3 className="font-medium text-sm sm:text-base">
+                  {song.name}
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  {song.artistName}
+                  {/* • {song.playCount.toLocaleString()} plays */}
                 </p>
               </div>
             </div>

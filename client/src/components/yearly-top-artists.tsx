@@ -122,7 +122,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
 
   const ListingSection = (
     <div className="md:col-span-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-2 md:gap-2">
         {/* Artists 1-5 */}
         {artistsData?.artists.slice(0, 5).map((artist, index) => (
           <motion.div
@@ -130,7 +130,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            className="bg-muted/100 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() => onArtistClick?.(artist)}
           >
             <div className="flex items-center gap-2 sm:gap-3">
@@ -141,10 +141,10 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
                 #{index + 1}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">
+                <h3 className="font-medium text-sm sm:text-base">{artist.name}</h3>
+                {/* <p className="text-xs sm:text-sm text-muted-foreground">
                   {artist.playCount?.toLocaleString() || 0} plays
-                </p>
+                </p> */}
               </div>
             </div>
           </motion.div>
@@ -157,7 +157,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: (index + 5) * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            className="bg-muted/100 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() => onArtistClick?.(artist)}
           >
             <div className="flex items-center gap-2 sm:gap-3">
@@ -168,10 +168,10 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
                 #{index + 6}
               </Badge>
               <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">
+                <h3 className="font-medium text-sm sm:text-base">{artist.name}</h3>
+                {/* <p className="text-xs sm:text-sm text-muted-foreground">
                   {artist.playCount?.toLocaleString() || 0} plays
-                </p>
+                </p> */}
               </div>
             </div>
           </motion.div>

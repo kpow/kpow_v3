@@ -122,7 +122,7 @@ export function ArtistDetailsModal({
       </div>
       
       {/* Recent Plays Skeleton */}
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <div className="flex items-center gap-2 mb-4">
           <Skeleton className="h-4 w-4 rounded-full" />
           <Skeleton className="h-4 w-32" />
@@ -135,7 +135,7 @@ export function ArtistDetailsModal({
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </>
   );
 
@@ -193,7 +193,7 @@ export function ArtistDetailsModal({
                   </div>
                 </div>
               )}
-              {(artistDetails?.artist.playCount || artist.playCount) && (
+              {/* {(artistDetails?.artist.playCount || artist.playCount) && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
                   <PlayCircle className="h-4 w-4 text-primary" />
                   <div className="flex flex-col">
@@ -201,7 +201,7 @@ export function ArtistDetailsModal({
                     <span className="font-slackey text-l">{artistDetails?.artist.playCount || artist.playCount}</span>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {(artistDetails?.artist.listeners || artist.listeners) && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
