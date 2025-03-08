@@ -28,20 +28,24 @@
 .venue-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #0097fb rgba(255, 255, 255, 0.1);
+  overflow-y: scroll !important; /* Force scrollbar to always show */
 }
 
 .venue-scrollbar::-webkit-scrollbar {
   width: 8px;
+  display: block !important; /* Ensure scrollbar is always displayed */
 }
 
 .venue-scrollbar::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
+  visibility: visible !important;
 }
 
 .venue-scrollbar::-webkit-scrollbar-thumb {
   background-color: #0097fb;
   border-radius: 4px;
+  visibility: visible !important;
 }
 
 @layer base {
