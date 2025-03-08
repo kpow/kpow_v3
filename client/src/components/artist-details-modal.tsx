@@ -47,12 +47,14 @@ interface ArtistDetailsModalProps {
   artist: Artist | null;
   isOpen: boolean;
   onClose: () => void;
+  onNavigate?: (direction: 'next' | 'prev') => void;
 }
 
 export function ArtistDetailsModal({
   artist,
   isOpen,
   onClose,
+  onNavigate,
 }: ArtistDetailsModalProps) {
   const { data: artistDetails, isLoading } = useQuery({
     queryKey: ["/api/music/artists", artist?.id],
@@ -70,10 +72,32 @@ export function ArtistDetailsModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[820px] max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-        <DialogHeader>
-          <DialogTitle className="font-slackey text-2xl text-center">
-            {artist.name}
-          </DialogTitle>
+        <DialogHeader className="flex flex-col space-y-2">
+          <div className="flex items-center justify-between w-full">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onNavigate) onNavigate('prev');
+              }}
+              className="p-2 rounded-full hover:bg-muted/50 transition-colors"
+              aria-label="Previous artist"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <DialogTitle className="font-slackey text-2xl text-center">
+              {artist.name}
+            </DialogTitle>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onNavigate) onNavigate('next');
+              }}
+              className="p-2 rounded-full hover:bg-muted/50 transition-colors"
+              aria-label="Next artist"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
         </DialogHeader>
 
         <motion.div 
@@ -86,6 +110,15 @@ export function ArtistDetailsModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Stats Section - Left 1/2 */}
             <div className="flex flex-col space-y-3">
+              {artist.rank && (
+                <div className="flex items-center space-x-2 bg-primary/10 p-3 rounded-lg border border-primary/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-muted-foreground">Ranking</span>
+                    <span className="font-medium">#{artist.rank}</span>
+                  </div>
+                </div>
+              )}
               {artist.playCount && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
                   <PlayCircle className="h-4 w-4 text-primary" />
