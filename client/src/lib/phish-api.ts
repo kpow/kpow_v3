@@ -1,35 +1,7 @@
 // Constants - no need for API key anymore as we're using backend routes
+import { ShowAttendance, VenueStat, Setlist, SetlistResponse, SetlistStats } from '@types/api';
+
 const API_BASE = '/api';
-
-export interface ShowAttendance {
-  showid: string;
-  showdate: string;
-  venue: string;
-  city: string;
-  state: string;
-  country: string;
-  notes?: string;
-}
-
-export interface VenueStat {
-  venue: string;
-  count: number;
-}
-
-export interface Setlist {
-  showid: string;
-  set: string;
-  song: string;
-  position: number;
-}
-
-export interface SetlistResponse {
-  showdate: string;
-  venue: string;
-  location: string;
-  setlistdata: string;
-  setlistnotes: string;
-}
 
 // API Functions
 export async function getAttendedShows(
@@ -84,9 +56,9 @@ export async function getAllVenues(
   console.log('Fetching ALL venues data for:', username);
   const url = `${API_BASE}/venues/stats?username=${username}&t=${new Date().getTime()}`;
   console.log('Fetch URL:', url);
-  
+
   const response = await fetch(url);
-  
+
   if (!response.ok) {
     console.error('Venue API error:', response.status, response.statusText);
     throw new Error('Failed to fetch venue statistics');
@@ -107,11 +79,6 @@ export async function getSetlist(showId: string): Promise<SetlistResponse> {
   }
 
   return response.json();
-}
-
-export interface SetlistStats {
-  uniqueSongs: number;
-  songCounts: Record<string, number>;
 }
 
 export async function getSetlistStats(username: string): Promise<SetlistStats> {

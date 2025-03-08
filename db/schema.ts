@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, boolean, timestamp, varchar, unique, jsonb } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
+import { Artist, ArtistInsert, Song, SongInsert, Play, PlayInsert } from '@types/database';
+import { artistSchema } from '@types/artist';
 
 // Artists table to store unique artists and their images
 export const artists = pgTable("artists", {
@@ -62,18 +63,12 @@ export const playsRelations = relations(plays, ({ one }) => ({
   }),
 }));
 
-// Export schemas
-export const insertArtistSchema = createInsertSchema(artists);
-export const selectArtistSchema = createSelectSchema(artists);
-export type InsertArtist = typeof artists.$inferInsert;
-export type SelectArtist = typeof artists.$inferSelect;
-
-export const insertSongSchema = createInsertSchema(songs);
-export const selectSongSchema = createSelectSchema(songs);
-export type InsertSong = typeof songs.$inferInsert;
-export type SelectSong = typeof songs.$inferSelect;
-
-export const insertPlaySchema = createInsertSchema(plays);
-export const selectPlaySchema = createSelectSchema(plays);
-export type InsertPlay = typeof plays.$inferInsert;
-export type SelectPlay = typeof plays.$inferSelect;
+// Export types from the shared types directory
+export type {
+  Artist,
+  ArtistInsert,
+  Song,
+  SongInsert,
+  Play,
+  PlayInsert
+};
