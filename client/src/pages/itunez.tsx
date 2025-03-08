@@ -64,7 +64,7 @@ export default function ITunezPage() {
         </Card>
 
         <Card className="p-6">
-          <YearlyTopSongs />
+          <YearlyTopSongs onArtistClick={setSelectedArtist} />
         </Card>
 
         <ArtistDetailsModal

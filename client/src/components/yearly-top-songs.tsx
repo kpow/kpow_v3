@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { Music } from "lucide-react";
+import { type Artist } from "@/types/artist";
 
 interface Song {
   songId: number;
@@ -18,7 +19,11 @@ interface YearData {
   [key: string]: Song[];
 }
 
-export function YearlyTopSongs() {
+interface YearlyTopSongsProps {
+  onArtistClick?: (artist: Artist) => void;
+}
+
+export function YearlyTopSongs({ onArtistClick }: YearlyTopSongsProps = {}) {
   const { data: songsByYear, isLoading } = useQuery({
     queryKey: ["/api/music/top-songs-by-year"],
     queryFn: async () => {
@@ -100,7 +105,23 @@ export function YearlyTopSongs() {
                                   {index + 1}. {song.songName}
                                 </span>
                                 <div className="text-muted-foreground text-xs">
-                                  {song.artistName} • {song.playCount} plays
+                                  <span 
+                                    className="hover:text-primary hover:underline cursor-pointer"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (onArtistClick) {
+                                        // Create minimal artist object with available data
+                                        const artist: Artist = {
+                                          id: song.artistId,
+                                          name: song.artistName,
+                                          imageUrl: song.imageUrl,
+                                        };
+                                        onArtistClick(artist);
+                                      }
+                                    }}
+                                  >
+                                    {song.artistName}
+                                  </span> • {song.playCount} plays
                                 </div>
                               </div>
                             </div>
