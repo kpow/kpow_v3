@@ -23,7 +23,7 @@ export function registerMusicRoutes(router: Router) {
         .from(artists)
         .leftJoin(songs, eq(songs.artistId, artists.id))
         .leftJoin(plays, eq(plays.songId, songs.id))
-        .groupBy(artists.id)
+        .groupBy(artists.id, artists.name, artists.bio, artists.imageUrl, artists.artistImageUrl, artists.listeners, artists.playcount, artists.lastUpdated)
         .orderBy(desc(sql`play_count`))
         .limit(500);
 
@@ -96,7 +96,7 @@ export function registerMusicRoutes(router: Router) {
           year: sql<number>`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`,
           songId: songs.id,
           songName: songs.name,
-          artistId: songs.artistId,
+          artistId: artists.id,
           artistName: artists.name,
           artistImageUrl: artists.artistImageUrl,
           playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
@@ -108,7 +108,7 @@ export function registerMusicRoutes(router: Router) {
           sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`
         )
         .groupBy(
-          sql`EXTRACT(YEAR FROM ${plays.startTimestamp})`,
+          sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`,
           songs.id,
           songs.name,
           artists.id,
@@ -116,14 +116,14 @@ export function registerMusicRoutes(router: Router) {
           artists.artistImageUrl
         )
         .orderBy(
-          sql`year`,
-          desc(sql`play_count`)
+          desc(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`),
+          desc(sql`COUNT(${plays.id})`)
         );
 
       // Group by year and take top 5 for each
       const topSongsByYear: Record<number, (typeof songsByYear[number][] & { yearImage?: string })> = {};
 
-      // First, group songs by year and ensure proper sorting by play count
+      // First, group songs by year and ensure proper sorting
       songsByYear.forEach((song) => {
         if (!topSongsByYear[song.year]) {
           topSongsByYear[song.year] = [];
@@ -157,5 +157,4 @@ export function registerMusicRoutes(router: Router) {
       });
     }
   });
-
 }
