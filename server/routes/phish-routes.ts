@@ -326,6 +326,49 @@ export function registerPhishRoutes(router: Router) {
     }
   });
 
+  // Endpoint to get all venue statistics
+  router.get("/api/venues/stats", async (req, res) => {
+    try {
+      const { username } = req.query;
+      
+      const allShowsFilePath = path.join(
+        process.cwd(),
+        "client",
+        "src",
+        "data",
+        "allshows.json",
+      );
+      const allShows = JSON.parse(
+        fs.readFileSync(allShowsFilePath, "utf-8"),
+      ).data;
+
+      // Filter shows by username
+      const usernameArtist = username || "koolyp";
+      const shows = allShows.filter(
+        (show: any) => show.artist === usernameArtist,
+      );
+
+      const venueStats = shows.reduce(
+        (acc: { [key: string]: number }, show: any) => {
+          acc[show.venue] = (acc[show.venue] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
+
+      const sortedVenues = Object.entries(venueStats)
+        .map(([venue, count]) => ({ venue, count: Number(count) }))
+        .sort((a, b) => b.count - a.count);
+
+      res.json({
+        venues: sortedVenues,
+        total: sortedVenues.length
+      });
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
+
   // The main endpoint for all shows
   router.get("/api/shows/all", async (_req, res) => {
     try {
@@ -408,11 +451,7 @@ export function registerPhishRoutes(router: Router) {
 
       res.json({
         venues: paginatedVenues,
-        pagination: {
-          current: parsedPage,
-          total: totalPages,
-          hasMore: parsedPage < totalPages,
-        },
+        total: total
       });
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });

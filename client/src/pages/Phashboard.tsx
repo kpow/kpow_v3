@@ -44,9 +44,8 @@ export default function ShowStats() {
   });
 
   const { data: venuesData, isLoading: venuesLoading } = useQuery({
-    queryKey: ["/api/venues/paginated", username, venuesPage],
-    queryFn: () => getPaginatedVenues(username, venuesPage, VENUES_PER_PAGE),
-    placeholderData: (previousData) => previousData,
+    queryKey: ["/api/venues/stats", username],
+    queryFn: () => getPaginatedVenues(username),
   });
 
   const { data: venueShows } = useQuery({
@@ -93,49 +92,32 @@ export default function ShowStats() {
           <Card>
             <CardContent className="pt-6">
               <h2 className="text-lg font-slackey mb-4">venues</h2>
-              <div className="space-y-3">
-                {venuesData?.venues.map((venue) => (
-                  <div
-                    key={venue.venue}
-                    className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-                    onClick={() => {
-                      setSelectedVenue(venue.venue);
-                      setIsVenueModalOpen(true);
-                    }}
-                  >
-                    <span className="font-medium">{venue.venue}</span>
-                    <span className="text-muted-foreground">
-                      {venue.count} shows
-                    </span>
-                  </div>
-                ))}
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {venuesLoading ? (
+                  Array.from({ length: 10 }).map((_, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
+                      <Skeleton className="h-5 w-40" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                  ))
+                ) : (
+                  venuesData?.venues.map((venue) => (
+                    <div
+                      key={venue.venue}
+                      className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
+                      onClick={() => {
+                        setSelectedVenue(venue.venue);
+                        setIsVenueModalOpen(true);
+                      }}
+                    >
+                      <span className="font-medium">{venue.venue}</span>
+                      <span className="text-muted-foreground">
+                        {venue.count} shows
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
-              {venuesData && venuesData.total > VENUES_PER_PAGE && (
-                <div className="mt-4 flex justify-between items-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setVenuesPage((p) => Math.max(1, p - 1))}
-                    disabled={venuesPage === 1 || venuesLoading}
-                    className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                  >
-                    Previous
-                  </Button>
-                  <span className="text-sm">Page {venuesPage}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                    onClick={() => setVenuesPage((p) => p + 1)}
-                    disabled={
-                      venuesPage * VENUES_PER_PAGE >= (venuesData?.total || 0) ||
-                      venuesLoading
-                    }
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
 
