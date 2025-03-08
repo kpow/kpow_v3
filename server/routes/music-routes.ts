@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "../../db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and } from "drizzle-orm";
 import { artists, plays, songs } from "../../db/schema";
 
 export function registerMusicRoutes(router: Router) {
@@ -98,7 +98,7 @@ export function registerMusicRoutes(router: Router) {
           songName: songs.name,
           artistId: artists.id,
           artistName: artists.name,
-          imageUrl: artists.imageUrl,  // Changed from artistImageUrl to imageUrl to match schema
+          imageUrl: artists.imageUrl,  
           playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
         })
         .from(plays)
@@ -113,7 +113,7 @@ export function registerMusicRoutes(router: Router) {
           songs.name,
           artists.id,
           artists.name,
-          artists.imageUrl  // Changed from artistImageUrl to imageUrl to match schema
+          artists.imageUrl  
         )
         .orderBy(
           desc(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`),
@@ -154,6 +154,63 @@ export function registerMusicRoutes(router: Router) {
       console.error("Error fetching top songs by year:", error);
       res.status(500).json({
         message: error instanceof Error ? error.message : "Failed to fetch top songs by year"
+      });
+    }
+  });
+
+  // Get available years from plays
+  router.get("/api/music/available-years", async (_req, res) => {
+    try {
+      const yearsData = await db
+        .select({
+          year: sql<number>`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`,
+        })
+        .from(plays)
+        .groupBy(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`)
+        .orderBy(desc(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`));
+
+      const years = yearsData.map(y => y.year.toString());
+
+      res.json({ years });
+    } catch (error) {
+      console.error("Error fetching available years:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch available years" 
+      });
+    }
+  });
+
+  // Get top artists by year
+  router.get("/api/music/top-artists-by-year/:year", async (req, res) => {
+    try {
+      const year = parseInt(req.params.year);
+
+      const topArtists = await db
+        .select({
+          id: artists.id,
+          name: artists.name,
+          imageUrl: artists.imageUrl,
+          artistImageUrl: artists.artistImageUrl,
+          playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
+        })
+        .from(artists)
+        .leftJoin(songs, eq(songs.artistId, artists.id))
+        .leftJoin(plays, eq(plays.songId, songs.id))
+        .where(
+          and(
+            sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer = ${year}`,
+            sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`
+          )
+        )
+        .groupBy(artists.id, artists.name, artists.imageUrl, artists.artistImageUrl)
+        .orderBy(desc(sql`play_count`))
+        .limit(10);
+
+      res.json({ artists: topArtists });
+    } catch (error) {
+      console.error("Error fetching top artists by year:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch top artists by year" 
       });
     }
   });
