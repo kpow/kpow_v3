@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -6,29 +7,30 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { type Artist } from "@/types/artist";
-import { motion } from "framer-motion";
+import { SectionHeader } from "./SectionHeader";
+import { CarouselProgressNav } from "./CarouselProgressNav";
 
 interface YearlyTopArtistsProps {
   onArtistClick?: (artist: Artist) => void;
   carouselPosition?: "left" | "right";
 }
 
-export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: YearlyTopArtistsProps) {
-  const [selectedYear, setSelectedYear] = useState<string>("2024");
+export function YearlyTopArtists({
+  onArtistClick,
+  carouselPosition = "left",
+}: YearlyTopArtistsProps) {
   const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [slidePosition, setSlidePosition] = useState(0);
 
-  const { data: yearsData, isLoading: isLoadingYears } = useQuery({
+  const { data: years } = useQuery({
     queryKey: ["/api/music/available-years"],
     queryFn: async () => {
       const response = await fetch("/api/music/available-years");
@@ -38,187 +40,172 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
     },
   });
 
-  const { data: artistsData, isLoading: isLoadingArtists } = useQuery({
+  const selectedYear = years?.years[current] || "2024";
+
+  const { data: topArtistsByYear, isLoading } = useQuery({
     queryKey: ["/api/music/top-artists-by-year", selectedYear],
     queryFn: async () => {
-      const response = await fetch(`/api/music/top-artists-by-year/${selectedYear}`);
-      if (!response.ok) throw new Error("Failed to fetch top artists");
+      const response = await fetch(
+        `/api/music/top-artists-by-year/${selectedYear}`,
+      );
+      if (!response.ok) throw new Error("Failed to fetch top artists by year");
       const data = await response.json();
       return data as { artists: Artist[] };
     },
+    enabled: !!selectedYear,
   });
 
-  // Filter artists with images for the carousel
-  const artistsWithImages = artistsData?.artists.filter(
-    (artist) => artist.imageUrl || artist.artistImageUrl
-  ) || [];
-
-  // Auto-advance carousel every 3 seconds
   useEffect(() => {
-    if (!api || !artistsWithImages.length) return;
+    if (!api) return;
 
-    const interval = setInterval(() => {
-      api.scrollNext();
-    }, 3000);
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
 
-    return () => clearInterval(interval);
-  }, [api, artistsWithImages]);
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
-  if (isLoadingYears || isLoadingArtists) {
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragStartX(e.clientX);
+
+    // Remember the starting slide position
+    if (count > 0) {
+      const position = current / (count - 1);
+      setSlidePosition(position);
+    }
+
+    document.addEventListener("mousemove", handleDrag);
+    document.addEventListener("mouseup", handleDragEnd);
+  };
+
+  const handleDrag = (e: MouseEvent) => {
+    if (!isDragging || !api || count === 0) return;
+
+    const dragDelta = e.clientX - dragStartX;
+    const dragPercentage = dragDelta / window.innerWidth;
+
+    // Calculate the new position based on drag delta
+    const newPosition = Math.max(
+      0,
+      Math.min(1, slidePosition + dragPercentage),
+    );
+    const targetIndex = Math.round(newPosition * (count - 1));
+
+    if (targetIndex !== current) {
+      api.scrollTo(targetIndex);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    document.removeEventListener("mousemove", handleDrag);
+    document.removeEventListener("mouseup", handleDragEnd);
+  };
+
+  if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-10 w-48" />
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-4 w-32" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Skeleton className="h-64" />
-          <Skeleton className="h-64" />
+
+        <div className="grid grid-cols-2 gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
         </div>
       </div>
     );
   }
 
-  const CarouselSection = (
-    <div className="md:col-span-4 relative min-h-[300px]">
-      {artistsWithImages.length > 0 ? (
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          setApi={setApi}
-          className="w-full h-full"
-        >
-          <CarouselContent>
-            {artistsWithImages.map((artist) => (
-              <CarouselItem key={artist.id}>
-                <Card className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="relative h-[300px]">
-                      <img
-                        src={artist.imageUrl || artist.artistImageUrl}
-                        alt={artist.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 className="text-white font-bold">{artist.name}</h3>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
-          <span className="text-4xl">🎵</span>
-        </div>
-      )}
-    </div>
-  );
-
-  const ListingSection = (
-    <div className="md:col-span-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
-        {/* Artists 1-5 */}
-        {artistsData?.artists.slice(0, 5).map((artist, index) => (
-          <motion.div
-            key={artist.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() => onArtistClick?.(artist)}
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Badge
-                variant="default"
-                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-              >
-                #{index + 1}
-              </Badge>
-              <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  {artist.playCount?.toLocaleString() || 0} plays
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-
-        {/* Artists 6-10 */}
-        {artistsData?.artists.slice(5, 10).map((artist, index) => (
-          <motion.div
-            key={artist.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: (index + 5) * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() => onArtistClick?.(artist)}
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Badge
-                variant="default"
-                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-              >
-                #{index + 6}
-              </Badge>
-              <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{artist.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  {artist.playCount?.toLocaleString() || 0} plays
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
+  const top10Artists = topArtistsByYear?.artists.slice(0, 10) || [];
+  
+  // Split into left and right columns (1-5 in left, 6-10 in right)
+  const leftColumnArtists = top10Artists.slice(0, 5);
+  const rightColumnArtists = top10Artists.slice(5, 10);
 
   return (
-    <div className="space-y-6">
-      {/* Header with Title and Year Selector */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-slackey">yearly top artists</h2>
-        <Select
-          value={selectedYear}
-          onValueChange={setSelectedYear}
-        >
-          <SelectTrigger className="w-48 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
-            <SelectValue placeholder="Select year" />
-          </SelectTrigger>
-          <SelectContent>
-            {yearsData?.years.map((year) => (
-              <SelectItem
-                key={year}
-                value={year}
-                className="font-slackey"
-              >
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="w-full">
+      <div
+        className={`flex flex-col ${carouselPosition === "right" ? "md:flex-row-reverse" : "md:flex-row"} justify-between mb-6 px-2`}
+      >
+        <SectionHeader title={`top 10 artists in ${selectedYear}`} />
+        <div className="flex items-center mb-4 md:mb-0">
+          <CarouselProgressNav
+            api={api ?? null}
+            current={current}
+            count={count}
+            isDragging={isDragging}
+            onDragStart={handleDragStart}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {carouselPosition === "left" ? (
-          <>
-            {CarouselSection}
-            {ListingSection}
-          </>
-        ) : (
-          <>
-            {ListingSection}
-            {CarouselSection}
-          </>
-        )}
-      </div>
+      <Carousel className="w-full" setApi={setApi}>
+        <CarouselContent>
+          {years?.years.map((year) => (
+            <CarouselItem key={year}>
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Left column - Artists 1-5 */}
+                <div className="space-y-3">
+                  {leftColumnArtists.map((artist, index) => (
+                    <div
+                      key={`${artist.id}-${index}`}
+                      className="flex items-center cursor-pointer group"
+                      onClick={() => onArtistClick?.(artist)}
+                    >
+                      <Badge
+                        variant="outline"
+                        className="mr-2 w-6 h-6 rounded-full flex items-center justify-center bg-primary text-primary-foreground"
+                      >
+                        {index + 1}
+                      </Badge>
+                      <div className="flex-1 truncate">
+                        <div className="font-bold group-hover:text-primary truncate">
+                          {artist.name}
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {artist.playCount?.toLocaleString() || 0} plays
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Right column - Artists 6-10 */}
+                <div className="space-y-3">
+                  {rightColumnArtists.map((artist, index) => (
+                    <div
+                      key={`${artist.id}-${index}`}
+                      className="flex items-center cursor-pointer group"
+                      onClick={() => onArtistClick?.(artist)}
+                    >
+                      <Badge
+                        variant="outline"
+                        className="mr-2 w-6 h-6 rounded-full flex items-center justify-center bg-primary text-primary-foreground"
+                      >
+                        {index + 6}
+                      </Badge>
+                      <div className="flex-1 truncate">
+                        <div className="font-bold group-hover:text-primary truncate">
+                          {artist.name}
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {artist.playCount?.toLocaleString() || 0} plays
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
     </div>
   );
 }

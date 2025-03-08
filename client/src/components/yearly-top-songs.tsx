@@ -6,29 +6,12 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
-import { Music } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { type Artist } from "@/types/artist";
-
-interface Song {
-  id: number;
-  name: string;
-  artistId: number;
-  artistName: string;
-  imageUrl: string | null;
-  artistImageUrl: string | null;
-  playCount: number;
-}
+import { type Song } from "@/types/song";
+import { SectionHeader } from "./SectionHeader";
+import { CarouselProgressNav } from "./CarouselProgressNav";
 
 interface YearlyTopSongsProps {
   onArtistClick?: (artist: Artist) => void;
@@ -38,11 +21,15 @@ interface YearlyTopSongsProps {
 export function YearlyTopSongs({
   onArtistClick,
   carouselPosition = "left",
-}: YearlyTopSongsProps = {}) {
-  const [selectedYear, setSelectedYear] = useState<string>("2024");
+}: YearlyTopSongsProps) {
   const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [slidePosition, setSlidePosition] = useState(0);
 
-  const { data: yearsData, isLoading: isLoadingYears } = useQuery({
+  const { data: years } = useQuery({
     queryKey: ["/api/music/available-years"],
     queryFn: async () => {
       const response = await fetch("/api/music/available-years");
@@ -52,195 +39,178 @@ export function YearlyTopSongs({
     },
   });
 
-  const { data: songsData, isLoading: isLoadingSongs } = useQuery({
+  const selectedYear = years?.years[current] || "2024";
+
+  const { data: topSongsByYear, isLoading } = useQuery({
     queryKey: ["/api/music/top-songs-by-year", selectedYear],
     queryFn: async () => {
       const response = await fetch(
         `/api/music/top-songs-by-year/${selectedYear}`,
       );
-      if (!response.ok) throw new Error("Failed to fetch top songs");
+      if (!response.ok) throw new Error("Failed to fetch top songs by year");
       const data = await response.json();
       return data as { songs: Song[] };
     },
+    enabled: !!selectedYear,
   });
 
-  // Filter songs with images for the carousel
-  const songsWithImages =
-    songsData?.songs.filter((song) => song.imageUrl || song.artistImageUrl) ||
-    [];
-
-  // Auto-advance carousel every 3 seconds
   useEffect(() => {
-    if (!api || !songsWithImages.length) return;
+    if (!api) return;
 
-    const interval = setInterval(() => {
-      api.scrollNext();
-    }, 3000);
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
 
-    return () => clearInterval(interval);
-  }, [api, songsWithImages]);
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
-  if (isLoadingYears || isLoadingSongs) {
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragStartX(e.clientX);
+
+    // Remember the starting slide position
+    if (count > 0) {
+      const position = current / (count - 1);
+      setSlidePosition(position);
+    }
+
+    document.addEventListener("mousemove", handleDrag);
+    document.addEventListener("mouseup", handleDragEnd);
+  };
+
+  const handleDrag = (e: MouseEvent) => {
+    if (!isDragging || !api || count === 0) return;
+
+    const dragDelta = e.clientX - dragStartX;
+    const dragPercentage = dragDelta / window.innerWidth;
+
+    // Calculate the new position based on drag delta
+    const newPosition = Math.max(
+      0,
+      Math.min(1, slidePosition + dragPercentage),
+    );
+    const targetIndex = Math.round(newPosition * (count - 1));
+
+    if (targetIndex !== current) {
+      api.scrollTo(targetIndex);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    document.removeEventListener("mousemove", handleDrag);
+    document.removeEventListener("mouseup", handleDragEnd);
+  };
+
+  if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-10 w-48" />
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-4 w-32" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Skeleton className="h-64" />
-          <Skeleton className="h-64" />
+
+        <div className="grid grid-cols-2 gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
         </div>
       </div>
     );
   }
 
-  const CarouselSection = (
-    <div className="md:col-span-4 relative min-h-[300px]">
-      {songsWithImages.length > 0 ? (
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          setApi={setApi}
-          className="w-full h-full"
-        >
-          <CarouselContent>
-            {songsWithImages.map((song) => (
-              <CarouselItem key={song.id}>
-                <Card className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="relative h-[300px]">
-                      <img
-                        src={song.imageUrl || song.artistImageUrl}
-                        alt={`${song.name} by ${song.artistName}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 className="text-white font-bold">{song.name}</h3>
-                        <p className="text-white/80 text-sm">
-                          {song.artistName}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
-          <Music className="w-8 h-8 text-muted-foreground/50" />
-        </div>
-      )}
-    </div>
-  );
+  const top10Songs = topSongsByYear?.songs.slice(0, 10) || [];
 
-  const ListingSection = (
-    <div className="md:col-span-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
-        {/* Songs 1-5 */}
-        {songsData?.songs.slice(0, 5).map((song, index) => (
-          <motion.div
-            key={song.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() =>
-              onArtistClick?.({
-                id: song.artistId,
-                name: song.artistName,
-              })
-            }
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Badge
-                variant="default"
-                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-              >
-                #{index + 1}
-              </Badge>
-              <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {song.artistName} • {song.playCount.toLocaleString()} plays
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-
-        {/* Songs 6-10 */}
-        {songsData?.songs.slice(5, 10).map((song, index) => (
-          <motion.div
-            key={song.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: (index + 5) * 0.1 }}
-            className="bg-muted/30 p-2 sm:p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() =>
-              onArtistClick?.({
-                id: song.artistId,
-                name: song.artistName,
-              })
-            }
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Badge
-                variant="default"
-                className="font-slackey bg-primary text-primary-foreground text-xs sm:text-sm"
-              >
-                #{index + 6}
-              </Badge>
-              <div className="overflow-hidden">
-                <h3 className="font-medium text-sm sm:text-base truncate">{song.name}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {song.artistName} • {song.playCount.toLocaleString()} plays
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
+  // Split into left and right columns (1-5 in left, 6-10 in right)
+  const leftColumnSongs = top10Songs.slice(0, 5);
+  const rightColumnSongs = top10Songs.slice(5, 10);
 
   return (
-    <div className="space-y-6">
-      {/* Header with Title and Year Selector */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-slackey">yearly top songs</h2>
-        <Select value={selectedYear} onValueChange={setSelectedYear}>
-          <SelectTrigger className="w-48 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
-            <SelectValue placeholder="Select year" />
-          </SelectTrigger>
-          <SelectContent>
-            {yearsData?.years.map((year) => (
-              <SelectItem key={year} value={year} className="font-slackey">
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="w-full">
+      <div
+        className={`flex flex-col ${carouselPosition === "right" ? "md:flex-row-reverse" : "md:flex-row"} justify-between mb-6 px-2`}
+      >
+        <SectionHeader title={`top 10 songs in ${selectedYear}`} />
+        <div className="flex items-center mb-4 md:mb-0">
+          <CarouselProgressNav
+            api={api ?? null}
+            current={current}
+            count={count}
+            isDragging={isDragging}
+            onDragStart={handleDragStart}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {carouselPosition === "left" ? (
-          <>
-            {CarouselSection}
-            {ListingSection}
-          </>
-        ) : (
-          <>
-            {ListingSection}
-            {CarouselSection}
-          </>
-        )}
-      </div>
+      <Carousel className="w-full" setApi={setApi}>
+        <CarouselContent>
+          {years?.years.map((year) => (
+            <CarouselItem key={year}>
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Left column - Songs 1-5 */}
+                <div className="space-y-3">
+                  {leftColumnSongs.map((song, index) => (
+                    <div
+                      key={`${song.id}-${index}`}
+                      className="flex items-center cursor-pointer group"
+                      onClick={() => song.artistId && onArtistClick?.({ id: song.artistId, name: song.artistName || "" })}
+                    >
+                      <Badge
+                        variant="outline"
+                        className="mr-2 w-6 h-6 rounded-full flex items-center justify-center bg-primary text-primary-foreground"
+                      >
+                        {index + 1}
+                      </Badge>
+                      <div className="flex-1 overflow-hidden">
+                        <div className="font-bold group-hover:text-primary truncate">
+                          {song.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {song.artistName}
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {song.playCount?.toLocaleString() || 0} plays
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Right column - Songs 6-10 */}
+                <div className="space-y-3">
+                  {rightColumnSongs.map((song, index) => (
+                    <div
+                      key={`${song.id}-${index}`}
+                      className="flex items-center cursor-pointer group"
+                      onClick={() => song.artistId && onArtistClick?.({ id: song.artistId, name: song.artistName || "" })}
+                    >
+                      <Badge
+                        variant="outline"
+                        className="mr-2 w-6 h-6 rounded-full flex items-center justify-center bg-primary text-primary-foreground"
+                      >
+                        {index + 6}
+                      </Badge>
+                      <div className="flex-1 overflow-hidden">
+                        <div className="font-bold group-hover:text-primary truncate">
+                          {song.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {song.artistName}
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {song.playCount?.toLocaleString() || 0} plays
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
     </div>
   );
 }
