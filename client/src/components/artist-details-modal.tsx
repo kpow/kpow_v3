@@ -65,6 +65,7 @@ export function ArtistDetailsModal({
       return data as { artist: Artist };
     },
     enabled: !!artist?.id && isOpen,
+    staleTime: 0, // Ensure fresh data is fetched when modal opens
   });
 
   if (!artist) return null;
@@ -176,41 +177,41 @@ export function ArtistDetailsModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Stats Section - Left 1/2 */}
             <div className="flex flex-col space-y-3">
-              {artist.rank && (
+              {(artistDetails?.artist.rank || artist.rank) && (
                 <div className="flex items-center space-x-2 bg-primary/10 p-3 rounded-lg border border-primary/20">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   <div className="flex flex-col">
                     <span className="text-xs">Ranking</span>
-                    <span className="font-slackey text-2xl">#{artist.rank}</span>
+                    <span className="font-slackey text-2xl">#{artistDetails?.artist.rank || artist.rank}</span>
                   </div>
                 </div>
               )}
-              {artist.playCount && (
+              {(artistDetails?.artist.playCount || artist.playCount) && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
                   <PlayCircle className="h-4 w-4 text-primary" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground">Plays</span>
-                    <span className="font-slackey text-l">{artist.playCount}</span>
+                    <span className="font-slackey text-l">{artistDetails?.artist.playCount || artist.playCount}</span>
                   </div>
                 </div>
               )}
 
-              {artist.listeners && (
+              {(artistDetails?.artist.listeners || artist.listeners) && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
                   <User className="h-4 w-4 text-primary" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground">Listeners</span>
-                    <span className="font-slackey text-l">{artist.listeners}</span>
+                    <span className="font-slackey text-l">{artistDetails?.artist.listeners || artist.listeners}</span>
                   </div>
                 </div>
               )}
 
-              {artist.lastPlayed && (
+              {(artistDetails?.artist.lastPlayed || artist.lastPlayed) && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
                   <Calendar className="h-4 w-4 text-primary" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground">Last Played</span>
-                    <span className="font-slackey text-l">{format(new Date(artist.lastPlayed), "PPP")}</span>
+                    <span className="font-slackey text-l">{format(new Date(artistDetails?.artist.lastPlayed || artist.lastPlayed), "PPP")}</span>
                   </div>
                 </div>
               )}
@@ -218,11 +219,11 @@ export function ArtistDetailsModal({
 
             {/* Artist Image - Right 1/2 */}
             <div className="md:col-span-1">
-              {(artist.imageUrl || artist.artistImageUrl) && (
+              {(artistDetails?.artist.imageUrl || artistDetails?.artist.artistImageUrl || artist.imageUrl || artist.artistImageUrl) && (
                 <div className="relative overflow-hidden rounded-lg max-h-[300px]">
                   <motion.img
-                    src={artist.imageUrl || artist.artistImageUrl}
-                    alt={artist.name}
+                    src={artistDetails?.artist.imageUrl || artistDetails?.artist.artistImageUrl || artist.imageUrl || artist.artistImageUrl}
+                    alt={artistDetails?.artist.name || artist.name}
                     className="w-full h-full object-cover rounded-lg"
                     initial={{ scale: 1.1 }}
                     animate={{ scale: 1 }}
@@ -254,9 +255,9 @@ export function ArtistDetailsModal({
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                {artist.bio && (
+                {(artistDetails?.artist.bio || artist.bio) && (
                   <>
-                    <BioSection bio={artist.bio} />
+                    <BioSection bio={artistDetails?.artist.bio || artist.bio} />
                   </>
                 )}
 

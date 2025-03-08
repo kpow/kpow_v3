@@ -110,11 +110,10 @@ export function YearlyTopSongs({ onArtistClick }: YearlyTopSongsProps = {}) {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (onArtistClick) {
-                                        // Create minimal artist object with available data
+                                        // Only pass the necessary id to trigger data fetching
                                         const artist: Artist = {
                                           id: song.artistId,
                                           name: song.artistName,
-                                          imageUrl: song.imageUrl,
                                         };
                                         onArtistClick(artist);
                                       }
