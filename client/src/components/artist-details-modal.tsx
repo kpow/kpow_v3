@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 // Bio section component with proper hook usage
 const BioSection = ({ bio }: { bio: string }) => {
   const [showFullBio, setShowFullBio] = React.useState(false);
-  const MAX_VISIBLE_CHARACTERS = 100; // Show first 100 characters initially
+  const MAX_VISIBLE_CHARACTERS = 720; // Show first 100 characters initially
   
   // Truncate by character count instead of lines
   const visibleBio = showFullBio 
