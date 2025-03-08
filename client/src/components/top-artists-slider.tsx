@@ -131,7 +131,7 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
               className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/4"
             >
               <Card
-                className="overflow-hidden cursor-pointer transition-all hover:scale-105 relative"
+                className="overflow-hidden cursor-pointer transition-all relative"
                 onClick={() => onArtistClick?.(artist)}
               >
                 <CardContent className="p-0">
@@ -139,7 +139,7 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
                   {artist.rank && (
                     <Badge
                       variant="default"
-                      className="absolute top-2 left-2 z-10 bg-primary text-primary-foreground font-bold"
+                      className="font-slackey absolute top-2 left-2 z-10 bg-primary text-primary-foreground font-bold"
                     >
                       #{artist.rank}
                     </Badge>
