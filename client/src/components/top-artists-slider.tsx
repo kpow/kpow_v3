@@ -50,6 +50,8 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
       opts={{
         align: "start",
         loop: true,
+        pagination: true,
+        numVisibleItems: 4,
       }}
       className="w-full"
     >
@@ -91,15 +93,15 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
                 )}
 
                 {/* Artist Info */}
-                <div className="p-4">
+                <div className="p-2">
                   <h3 className="font-bold truncate">{artist.name}</h3>
                   <div className="flex justify-between items-center mt-1">
                     <p className="text-sm text-muted-foreground">
-                      {artist.playCount?.toLocaleString() || 0} plays
+                      {artist.playCount?.toLocaleString() || 0} <br/>plays
                     </p>
                     {artist.listeners && (
-                      <p className="text-sm text-muted-foreground">
-                        {artist.listeners.toLocaleString()} listeners
+                      <p className="text-sm text-muted-foreground text-right">
+                        {artist.listeners.toLocaleString()} <br />listeners
                       </p>
                     )}
                   </div>

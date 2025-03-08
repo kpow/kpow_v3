@@ -66,6 +66,11 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       href: "/donut-tour",
     },
     {
+      icon: <Music className="w-4 h-4" />,
+      label: "itunez",
+      href: "/itunez",
+    },
+    {
       icon: <Code className="w-4 h-4" />,
       label: "gatsby version",
       href: "https://gatsby.kpow-wow.com/",
