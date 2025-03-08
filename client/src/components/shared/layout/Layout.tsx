@@ -1,7 +1,7 @@
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { SlideMenu } from "../../SlideMenu";
-import { ScrollToTop } from "../../ScrollToTop";
+import { SlideMenu } from "./SlideMenu";
+import { ScrollToTop } from "./ScrollToTop";
 
 interface LayoutProps {
   children: React.ReactNode;

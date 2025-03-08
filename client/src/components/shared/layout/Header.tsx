@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { Logo } from "@/components/Logo";
-import { SlideMenu } from "@/components/SlideMenu";
+// import { Logo } from "./Logo";
+import { SlideMenu } from "./SlideMenu";
 import { Link } from "wouter";
-import { ContactDialog } from "@/components/ContactDialog";
+import { ContactDialog } from "./ContactDialog";
 import MetallicPaint, {
   parseLogoImage,
-} from "@/reactbits/MetallicPaint/MetallicPaint";
+} from "../../../reactbits/MetallicPaint/MetallicPaint";
 import { Wand2 } from "lucide-react";
 
-import logo from "@/reactbits/skull-white.svg";
-import Magnet from "@/reactbits/Magnet/Magnet";
-import SplashCursor from "@/reactbits/SplashCursor/SplashCursor";
+import logo from "../../../reactbits/skull-white.svg";
+import Magnet from "../../../reactbits/Magnet/Magnet";
+import SplashCursor from "../../../reactbits/SplashCursor/SplashCursor";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,15 +33,17 @@ export function Header() {
     loadDefaultImage();
   }, []);
 
+  // Auto-disable SplashCursor after 10 seconds
   useEffect(() => {
     let timerId: NodeJS.Timeout | null = null;
 
     if (showCursor) {
       timerId = setTimeout(() => {
         setShowCursor(false);
-      }, 10000);
+      }, 10000); // 10 seconds in milliseconds
     }
 
+    // Cleanup function to clear the timer if component unmounts or showCursor changes
     return () => {
       if (timerId) {
         clearTimeout(timerId);
@@ -72,6 +74,7 @@ export function Header() {
                     />
                   )}
                 </div>
+                {/* <Logo /> */}
                 <div className="flex items-center gap-2">
                   <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
                   <button
@@ -88,6 +91,7 @@ export function Header() {
             </Magnet>
           </Link>
           <nav className="flex items-center gap-4">
+            {/* Hide ContactDialog on mobile using Tailwind's responsive classes */}
             <div className="hidden md:block">
               <ContactDialog />
             </div>
