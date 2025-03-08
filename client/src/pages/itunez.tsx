@@ -65,11 +65,11 @@ export default function ITunezPage() {
         </Card>
 
         <Card className="p-6">
-          <YearlyTopArtists onArtistClick={setSelectedArtist} />
+          <YearlyTopArtists onArtistClick={setSelectedArtist} carouselPosition="right" />
         </Card>
 
         <Card className="p-6">
-          <YearlyTopSongs onArtistClick={setSelectedArtist} />
+          <YearlyTopSongs onArtistClick={setSelectedArtist} carouselPosition="left" />
         </Card>
 
         <ArtistDetailsModal

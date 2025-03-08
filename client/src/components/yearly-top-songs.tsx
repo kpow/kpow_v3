@@ -32,9 +32,10 @@ interface Song {
 
 interface YearlyTopSongsProps {
   onArtistClick?: (artist: Artist) => void;
+  carouselPosition?: "left" | "right";
 }
 
-export function YearlyTopSongs({ onArtistClick }: YearlyTopSongsProps = {}) {
+export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: YearlyTopSongsProps = {}) {
   const [selectedYear, setSelectedYear] = useState<string>("2024");
   const [api, setApi] = useState<CarouselApi>();
 
@@ -89,6 +90,116 @@ export function YearlyTopSongs({ onArtistClick }: YearlyTopSongsProps = {}) {
     );
   }
 
+  const CarouselSection = (
+    <div className="md:col-span-4 relative min-h-[300px]">
+      {songsWithImages.length > 0 ? (
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          setApi={setApi}
+          className="w-full h-full"
+        >
+          <CarouselContent>
+            {songsWithImages.map((song) => (
+              <CarouselItem key={song.id}>
+                <Card className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="relative h-[300px]">
+                      <img
+                        src={song.imageUrl || song.artistImageUrl}
+                        alt={`${song.name} by ${song.artistName}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <h3 className="text-white font-bold">{song.name}</h3>
+                        <p className="text-white/80 text-sm">{song.artistName}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      ) : (
+        <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
+          <Music className="w-8 h-8 text-muted-foreground/50" />
+        </div>
+      )}
+    </div>
+  );
+
+  const ListingSection = (
+    <div className="md:col-span-8 grid grid-cols-2 gap-6">
+      {/* First Column (1-5) */}
+      <div className="space-y-3">
+        {songsData?.songs.slice(0, 5).map((song, index) => (
+          <motion.div
+            key={song.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => onArtistClick?.({
+              id: song.artistId,
+              name: song.artistName,
+            })}
+          >
+            <div className="flex items-center gap-3">
+              <Badge
+                variant="default"
+                className="font-slackey bg-primary text-primary-foreground"
+              >
+                #{index + 1}
+              </Badge>
+              <div>
+                <h3 className="font-medium">{song.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {song.artistName} • {song.playCount.toLocaleString()} plays
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Second Column (6-10) */}
+      <div className="space-y-3">
+        {songsData?.songs.slice(5, 10).map((song, index) => (
+          <motion.div
+            key={song.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: (index + 5) * 0.1 }}
+            className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => onArtistClick?.({
+              id: song.artistId,
+              name: song.artistName,
+            })}
+          >
+            <div className="flex items-center gap-3">
+              <Badge
+                variant="default"
+                className="font-slackey bg-primary text-primary-foreground"
+              >
+                #{index + 6}
+              </Badge>
+              <div>
+                <h3 className="font-medium">{song.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {song.artistName} • {song.playCount.toLocaleString()} plays
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Header with Title and Year Selector */}
@@ -116,113 +227,17 @@ export function YearlyTopSongs({ onArtistClick }: YearlyTopSongsProps = {}) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Image Carousel - Left Side */}
-        <div className="md:col-span-4 relative min-h-[300px]">
-          {songsWithImages.length > 0 ? (
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              setApi={setApi}
-              className="w-full h-full"
-            >
-              <CarouselContent>
-                {songsWithImages.map((song) => (
-                  <CarouselItem key={song.id}>
-                    <Card className="overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="relative h-[300px]">
-                          <img
-                            src={song.imageUrl || song.artistImageUrl}
-                            alt={`${song.name} by ${song.artistName}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <h3 className="text-white font-bold">{song.name}</h3>
-                            <p className="text-white/80 text-sm">{song.artistName}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
-              <Music className="w-8 h-8 text-muted-foreground/50" />
-            </div>
-          )}
-        </div>
-
-        {/* Songs List - Right Side */}
-        <div className="md:col-span-8 grid grid-cols-2 gap-6">
-          {/* First Column (1-5) */}
-          <div className="space-y-3">
-            {songsData?.songs.slice(0, 5).map((song, index) => (
-              <motion.div
-                key={song.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => onArtistClick?.({
-                  id: song.artistId,
-                  name: song.artistName,
-                })}
-              >
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="default"
-                    className="font-slackey bg-primary text-primary-foreground"
-                  >
-                    #{index + 1}
-                  </Badge>
-                  <div>
-                    <h3 className="font-medium">{song.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {song.artistName} • {song.playCount.toLocaleString()} plays
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Second Column (6-10) */}
-          <div className="space-y-3">
-            {songsData?.songs.slice(5, 10).map((song, index) => (
-              <motion.div
-                key={song.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: (index + 5) * 0.1 }}
-                className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => onArtistClick?.({
-                  id: song.artistId,
-                  name: song.artistName,
-                })}
-              >
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="default"
-                    className="font-slackey bg-primary text-primary-foreground"
-                  >
-                    #{index + 6}
-                  </Badge>
-                  <div>
-                    <h3 className="font-medium">{song.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {song.artistName} • {song.playCount.toLocaleString()} plays
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        {carouselPosition === "left" ? (
+          <>
+            {CarouselSection}
+            {ListingSection}
+          </>
+        ) : (
+          <>
+            {ListingSection}
+            {CarouselSection}
+          </>
+        )}
       </div>
     </div>
   );

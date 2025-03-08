@@ -19,20 +19,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { type Artist } from "@/types/artist";
 import { motion } from "framer-motion";
 
-interface TopArtistsByYear {
-  year: string;
-  artists: Artist[];
-}
-
 interface YearlyTopArtistsProps {
   onArtistClick?: (artist: Artist) => void;
+  carouselPosition?: "left" | "right";
 }
 
-export function YearlyTopArtists({ onArtistClick }: YearlyTopArtistsProps) {
+export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: YearlyTopArtistsProps) {
   const [selectedYear, setSelectedYear] = useState<string>("2024");
   const [api, setApi] = useState<CarouselApi>();
 
-  // Fetch available years and artists data
   const { data: yearsData, isLoading: isLoadingYears } = useQuery({
     queryKey: ["/api/music/available-years"],
     queryFn: async () => {
@@ -84,6 +79,109 @@ export function YearlyTopArtists({ onArtistClick }: YearlyTopArtistsProps) {
     );
   }
 
+  const CarouselSection = (
+    <div className="md:col-span-4 relative min-h-[300px]">
+      {artistsWithImages.length > 0 ? (
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          setApi={setApi}
+          className="w-full h-full"
+        >
+          <CarouselContent>
+            {artistsWithImages.map((artist) => (
+              <CarouselItem key={artist.id}>
+                <Card className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="relative h-[300px]">
+                      <img
+                        src={artist.imageUrl || artist.artistImageUrl}
+                        alt={artist.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <h3 className="text-white font-bold">{artist.name}</h3>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      ) : (
+        <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
+          <span className="text-4xl">🎵</span>
+        </div>
+      )}
+    </div>
+  );
+
+  const ListingSection = (
+    <div className="md:col-span-8 grid grid-cols-2 gap-6">
+      {/* First Column (1-5) */}
+      <div className="space-y-3">
+        {artistsData?.artists.slice(0, 5).map((artist, index) => (
+          <motion.div
+            key={artist.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => onArtistClick?.(artist)}
+          >
+            <div className="flex items-center gap-3">
+              <Badge
+                variant="default"
+                className="font-slackey bg-primary text-primary-foreground"
+              >
+                #{index + 1}
+              </Badge>
+              <div>
+                <h3 className="font-medium">{artist.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {artist.playCount?.toLocaleString() || 0} plays
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Second Column (6-10) */}
+      <div className="space-y-3">
+        {artistsData?.artists.slice(5, 10).map((artist, index) => (
+          <motion.div
+            key={artist.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: (index + 5) * 0.1 }}
+            className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => onArtistClick?.(artist)}
+          >
+            <div className="flex items-center gap-3">
+              <Badge
+                variant="default"
+                className="font-slackey bg-primary text-primary-foreground"
+              >
+                #{index + 6}
+              </Badge>
+              <div>
+                <h3 className="font-medium">{artist.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {artist.playCount?.toLocaleString() || 0} plays
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Header with Title and Year Selector */}
@@ -111,106 +209,17 @@ export function YearlyTopArtists({ onArtistClick }: YearlyTopArtistsProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Image Carousel - Left Side */}
-        <div className="md:col-span-4 relative min-h-[300px]">
-          {artistsWithImages.length > 0 ? (
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              setApi={setApi}
-              className="w-full h-full"
-            >
-              <CarouselContent>
-                {artistsWithImages.map((artist) => (
-                  <CarouselItem key={artist.id}>
-                    <Card className="overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="relative h-[300px]">
-                          <img
-                            src={artist.imageUrl || artist.artistImageUrl}
-                            alt={artist.name}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <h3 className="text-white font-bold">{artist.name}</h3>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
-              <span className="text-4xl">🎵</span>
-            </div>
-          )}
-        </div>
-
-        {/* Artists List - Right Side */}
-        <div className="md:col-span-8 grid grid-cols-2 gap-6">
-          {/* First Column (1-5) */}
-          <div className="space-y-3">
-            {artistsData?.artists.slice(0, 5).map((artist, index) => (
-              <motion.div
-                key={artist.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => onArtistClick?.(artist)}
-              >
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="default"
-                    className="font-slackey bg-primary text-primary-foreground"
-                  >
-                    #{index + 1}
-                  </Badge>
-                  <div>
-                    <h3 className="font-medium">{artist.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {artist.playCount?.toLocaleString() || 0} plays
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Second Column (6-10) */}
-          <div className="space-y-3">
-            {artistsData?.artists.slice(5, 10).map((artist, index) => (
-              <motion.div
-                key={artist.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: (index + 5) * 0.1 }}
-                className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => onArtistClick?.(artist)}
-              >
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="default"
-                    className="font-slackey bg-primary text-primary-foreground"
-                  >
-                    #{index + 6}
-                  </Badge>
-                  <div>
-                    <h3 className="font-medium">{artist.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {artist.playCount?.toLocaleString() || 0} plays
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        {carouselPosition === "left" ? (
+          <>
+            {CarouselSection}
+            {ListingSection}
+          </>
+        ) : (
+          <>
+            {ListingSection}
+            {CarouselSection}
+          </>
+        )}
       </div>
     </div>
   );
