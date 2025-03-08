@@ -17,14 +17,14 @@ import { Badge } from "@/components/ui/badge";
 // Bio section component with proper hook usage
 const BioSection = ({ bio }: { bio: string }) => {
   const [showFullBio, setShowFullBio] = React.useState(false);
-  const bioLines = bio.split('\n');
-
-  // Show only 2 lines initially (reduced by ~70%)
+  const MAX_VISIBLE_CHARACTERS = 100; // Show first 100 characters initially
+  
+  // Truncate by character count instead of lines
   const visibleBio = showFullBio 
     ? bio 
-    : bioLines.slice(0, 1).join('\n') + (bioLines.length > 2 ? '...' : '');
+    : bio.substring(0, MAX_VISIBLE_CHARACTERS) + (bio.length > MAX_VISIBLE_CHARACTERS ? '...' : '');
   
-  const hasMoreContent = bioLines.length > 2;
+  const hasMoreContent = bio.length > MAX_VISIBLE_CHARACTERS;
   
   return (
     <div className="text-sm leading-relaxed">
