@@ -106,7 +106,7 @@ export function TopArtistsSlider({ onArtistClick }: TopArtistsSliderProps) {
     <div className="w-full">
       {/* Header with Title and Navigation */}
       <div className="flex items-center flex-col md:flex-row justify-between mb-4 px-4">
-        <h2 className="text-2xl font-bold mb-4 md:mb-0">top artists</h2>
+        <h2 className="text-2xl font-bold mb-4 md:mb-0">top 500 artists</h2>
         <CarouselProgressNav
           api={api ?? null}
           current={current}

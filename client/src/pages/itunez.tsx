@@ -55,7 +55,7 @@ export default function ITunezPage() {
         description="Explore my music listening habits and favorite artists."
         image="/tunes.jpg"
       />
-      <div className="container mx-auto py-8 space-y-8">
+      <div className="container mx-auto py-0 space-y-8">
         <div className="flex items-center justify-between mb-8">
           <PageTitle size="lg">my itunez data</PageTitle>
         </div>

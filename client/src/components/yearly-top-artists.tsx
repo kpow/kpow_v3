@@ -123,7 +123,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
   const ListingSection = (
     <div className="md:col-span-8 grid grid-cols-2 gap-6">
       {/* First Column (1-5) */}
-      <div className="space-y-3">
+      <div className="space-y-0">
         {artistsData?.artists.slice(0, 5).map((artist, index) => (
           <motion.div
             key={artist.id}
@@ -152,7 +152,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
       </div>
 
       {/* Second Column (6-10) */}
-      <div className="space-y-3">
+      <div className="space-y-0">
         {artistsData?.artists.slice(5, 10).map((artist, index) => (
           <motion.div
             key={artist.id}
@@ -191,7 +191,7 @@ export function YearlyTopArtists({ onArtistClick, carouselPosition = "left" }: Y
           value={selectedYear}
           onValueChange={setSelectedYear}
         >
-          <SelectTrigger className="w-48 font-slackey">
+          <SelectTrigger className="w-48 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent>

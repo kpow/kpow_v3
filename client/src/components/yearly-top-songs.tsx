@@ -35,7 +35,10 @@ interface YearlyTopSongsProps {
   carouselPosition?: "left" | "right";
 }
 
-export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: YearlyTopSongsProps = {}) {
+export function YearlyTopSongs({
+  onArtistClick,
+  carouselPosition = "left",
+}: YearlyTopSongsProps = {}) {
   const [selectedYear, setSelectedYear] = useState<string>("2024");
   const [api, setApi] = useState<CarouselApi>();
 
@@ -52,7 +55,9 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
   const { data: songsData, isLoading: isLoadingSongs } = useQuery({
     queryKey: ["/api/music/top-songs-by-year", selectedYear],
     queryFn: async () => {
-      const response = await fetch(`/api/music/top-songs-by-year/${selectedYear}`);
+      const response = await fetch(
+        `/api/music/top-songs-by-year/${selectedYear}`,
+      );
       if (!response.ok) throw new Error("Failed to fetch top songs");
       const data = await response.json();
       return data as { songs: Song[] };
@@ -60,9 +65,9 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
   });
 
   // Filter songs with images for the carousel
-  const songsWithImages = songsData?.songs.filter(
-    (song) => song.imageUrl || song.artistImageUrl
-  ) || [];
+  const songsWithImages =
+    songsData?.songs.filter((song) => song.imageUrl || song.artistImageUrl) ||
+    [];
 
   // Auto-advance carousel every 3 seconds
   useEffect(() => {
@@ -115,7 +120,9 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-4">
                         <h3 className="text-white font-bold">{song.name}</h3>
-                        <p className="text-white/80 text-sm">{song.artistName}</p>
+                        <p className="text-white/80 text-sm">
+                          {song.artistName}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -135,7 +142,7 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
   const ListingSection = (
     <div className="md:col-span-8 grid grid-cols-2 gap-6">
       {/* First Column (1-5) */}
-      <div className="space-y-3">
+      <div className="space-y-0">
         {songsData?.songs.slice(0, 5).map((song, index) => (
           <motion.div
             key={song.id}
@@ -143,10 +150,12 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
             className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() => onArtistClick?.({
-              id: song.artistId,
-              name: song.artistName,
-            })}
+            onClick={() =>
+              onArtistClick?.({
+                id: song.artistId,
+                name: song.artistName,
+              })
+            }
           >
             <div className="flex items-center gap-3">
               <Badge
@@ -167,7 +176,7 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
       </div>
 
       {/* Second Column (6-10) */}
-      <div className="space-y-3">
+      <div className="space-y-0">
         {songsData?.songs.slice(5, 10).map((song, index) => (
           <motion.div
             key={song.id}
@@ -175,10 +184,12 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: (index + 5) * 0.1 }}
             className="bg-muted/30 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-            onClick={() => onArtistClick?.({
-              id: song.artistId,
-              name: song.artistName,
-            })}
+            onClick={() =>
+              onArtistClick?.({
+                id: song.artistId,
+                name: song.artistName,
+              })
+            }
           >
             <div className="flex items-center gap-3">
               <Badge
@@ -205,20 +216,13 @@ export function YearlyTopSongs({ onArtistClick, carouselPosition = "left" }: Yea
       {/* Header with Title and Year Selector */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold font-slackey">yearly top songs</h2>
-        <Select
-          value={selectedYear}
-          onValueChange={setSelectedYear}
-        >
-          <SelectTrigger className="w-48 font-slackey">
+        <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <SelectTrigger className="w-48 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent>
             {yearsData?.years.map((year) => (
-              <SelectItem
-                key={year}
-                value={year}
-                className="font-slackey"
-              >
+              <SelectItem key={year} value={year} className="font-slackey">
                 {year}
               </SelectItem>
             ))}
