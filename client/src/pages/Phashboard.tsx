@@ -7,16 +7,16 @@ import {
   getShowsByVenue,
 } from "@/lib/phish-api";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShowCard, ShowCardSkeleton } from "@/components/show-card";
+import { ShowCard, ShowCardSkeleton } from "@/components/phashboard/show-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
-import { OnThisDayShows } from "@/components/OnThisDay";
-import { VenueShowsModal } from "@/components/venue-shows-modal";
-import { SongStats } from "@/components/song-stats";
+import { OnThisDayShows } from "@/components/phashboard/OnThisDay";
+import { VenueShowsModal } from "@/components/phashboard/venue-shows-modal";
+import { SongStats } from "@/components/phashboard/song-stats";
 import { PageTitle } from "@/components/ui/page-title";
-import { VenueMap } from "@/components/venue-map";
-import { SEO } from "@/components/SEO";
+import { VenueMap } from "@/components/phashboard/venue-map";
+import { SEO } from "@/components/global/SEO";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -52,10 +52,12 @@ export default function ShowStats() {
 
   const { data: venueShows } = useQuery({
     queryKey: ["/api/venues/shows", username, selectedVenue],
-    queryFn: () => selectedVenue ? getShowsByVenue(username, selectedVenue) : Promise.resolve([]),
+    queryFn: () =>
+      selectedVenue
+        ? getShowsByVenue(username, selectedVenue)
+        : Promise.resolve([]),
     enabled: !!selectedVenue,
   });
-
 
   const renderShowsContent = () => {
     if (showsLoading) {
@@ -81,14 +83,16 @@ export default function ShowStats() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title={getPageTitle()}
         description={getPageDescription()}
         image="/phash-stats.jpg"
         type="website"
       />
       <div className="container mx-auto p-2">
-        <PageTitle size="lg" className="mb-8">phashboard</PageTitle>
+        <PageTitle size="lg" className="mb-8">
+          phashboard
+        </PageTitle>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <Card>
@@ -96,16 +100,21 @@ export default function ShowStats() {
               <h2 className="text-lg font-slackey mb-4">venues</h2>
               <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 venue-scrollbar">
                 {/* Debug info */}
-                {console.log('Venues data:', venuesData)}
-                {console.log('Rendering venues section, data:', venuesData)}
+                {console.log("Venues data:", venuesData)}
+                {console.log("Rendering venues section, data:", venuesData)}
                 {venuesLoading ? (
                   Array.from({ length: 10 }).map((_, index) => (
-                    <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
+                    >
                       <Skeleton className="h-5 w-40" />
                       <Skeleton className="h-5 w-16" />
                     </div>
                   ))
-                ) : venuesData && venuesData.venues && venuesData.venues.length > 0 ? (
+                ) : venuesData &&
+                  venuesData.venues &&
+                  venuesData.venues.length > 0 ? (
                   venuesData.venues.map((venue) => (
                     <div
                       key={venue.venue}
@@ -133,7 +142,6 @@ export default function ShowStats() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 m-0 mb-8">
-         
           <div className="md:col-span-2 mr-8">
             <Card className="h-full">
               <CardContent className="p-0 m-0">
@@ -141,10 +149,8 @@ export default function ShowStats() {
               </CardContent>
             </Card>
           </div>
-       
 
           <div className="space-y-4">
-
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total venues</h2>
@@ -157,7 +163,7 @@ export default function ShowStats() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="pt-6">
                 <h2 className="text-lg font-slackey mb-2">total shows</h2>
@@ -170,8 +176,6 @@ export default function ShowStats() {
                 </div>
               </CardContent>
             </Card>
-
-          
 
             <Card>
               <CardContent className="pt-6">

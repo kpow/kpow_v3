@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -12,9 +17,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getSetlistStats } from "@/lib/phish-api";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { format } from "date-fns";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SONGS_PER_PAGE = 10;
 
@@ -53,7 +65,9 @@ export function SongStats() {
   const { data: songOccurrences, isLoading: occurrencesLoading } = useQuery({
     queryKey: ["/api/setlist/occurrences", selectedSong],
     queryFn: async () => {
-      const response = await fetch(`/api/setlist/occurrences/${encodeURIComponent(selectedSong!)}`);
+      const response = await fetch(
+        `/api/setlist/occurrences/${encodeURIComponent(selectedSong!)}`,
+      );
       if (!response.ok) throw new Error("Failed to fetch song occurrences");
       return response.json();
     },
@@ -73,13 +87,17 @@ export function SongStats() {
 
   // Calculate pagination
   const sortedSongs = songStats
-    ? Object.entries(songStats.songCounts)
-        .sort(([, a], [, b]) => (b as number) - (a as number))
+    ? Object.entries(songStats.songCounts).sort(
+        ([, a], [, b]) => (b as number) - (a as number),
+      )
     : [];
 
   const totalPages = Math.ceil(sortedSongs.length / SONGS_PER_PAGE);
   const startIndex = (currentPage - 1) * SONGS_PER_PAGE;
-  const paginatedSongs = sortedSongs.slice(startIndex, startIndex + SONGS_PER_PAGE);
+  const paginatedSongs = sortedSongs.slice(
+    startIndex,
+    startIndex + SONGS_PER_PAGE,
+  );
 
   return (
     <Card>
@@ -131,7 +149,7 @@ export function SongStats() {
             <div className="flex justify-between items-center mt-4">
               <Button
                 variant="outline"
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               >
@@ -142,7 +160,9 @@ export function SongStats() {
               </span>
               <Button
                 variant="outline"
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               >
@@ -152,7 +172,10 @@ export function SongStats() {
           </div>
         )}
 
-        <Dialog open={!!selectedSong} onOpenChange={() => setSelectedSong(null)}>
+        <Dialog
+          open={!!selectedSong}
+          onOpenChange={() => setSelectedSong(null)}
+        >
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl font-slackey">

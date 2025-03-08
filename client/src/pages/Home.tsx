@@ -1,18 +1,18 @@
-import { ContentSection } from "@/components/ContentSection";
-import { RecentPlays } from "@/components/RecentPlays";
-import { SetlistGame } from "@/components/setlist-game-static";
-import { CubeFrame } from "@/components/cube-frame";
+import { ContentSection } from "@/components/home/ContentSection";
+import { RecentPlays } from "@/components/home/RecentPlays";
+import { SetlistGame } from "@/components/home/setlist-game-static";
+import { CubeFrame } from "@/components/home/cube-frame";
 import { BookFeed } from "@/components/BookFeed";
-import { GitHubSection } from "@/components/GitHubSection";
-import { InstagramCarousel } from "@/components/InstagramCarousel";
+import { GitHubSection } from "@/components/home/GitHubSection";
+import { InstagramCarousel } from "@/components/instagram/InstagramCarousel";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
-import { ShopSlider } from "@/components/shop-slider";
+import { ShopSlider } from "@/components/donuts/shop-slider";
 import { cities } from "@/data/cities";
-import SectionHeader from "@/components/SectionHeader";
-import HorizontalDivider from "@/components/HorizontalDivider";
-import { SEO } from "@/components/SEO";
+import SectionHeader from "@/components/global/SectionHeader";
+import HorizontalDivider from "@/components/global/HorizontalDivider";
+import { SEO } from "@/components/global/SEO";
 import { StarFeed } from "@/components/StarFeed";
 import { Shop } from "@/types/shop";
 

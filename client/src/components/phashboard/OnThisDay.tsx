@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { useState } from "react";
 import { ShowDetailsModal } from "./show-details-modal";
@@ -10,10 +10,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { Button } from "./ui/button";
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 async function getShowsOnDate(month: number, day: number) {
   const response = await fetch(`/api/shows/on-date?month=${month}&day=${day}`);

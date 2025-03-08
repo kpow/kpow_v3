@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 // import { Logo } from "./Logo";
 import { SlideMenu } from "./SlideMenu";
 import { Link } from "wouter";
-import { ContactDialog } from "./ContactDialog";
+import { ContactDialog } from "@/components/ContactDialog";
 import MetallicPaint, {
   parseLogoImage,
-} from "../reactbits/MetallicPaint/MetallicPaint";
+} from "@/reactbits/MetallicPaint/MetallicPaint";
 import { Wand2 } from "lucide-react";
 
-import logo from "../reactbits/skull-white.svg";
-import Magnet from "../reactbits/Magnet/Magnet";
-import SplashCursor from "../reactbits/SplashCursor/SplashCursor";
+import logo from "@/reactbits/skull-white.svg";
+import Magnet from "@/reactbits/Magnet/Magnet";
+import SplashCursor from "@/reactbits/SplashCursor/SplashCursor";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

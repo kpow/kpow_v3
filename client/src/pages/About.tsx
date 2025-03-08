@@ -1,5 +1,5 @@
 import { Briefcase, Users2, Code2, Coffee, Download, Link } from "lucide-react";
-import { SEO } from "@/components/SEO";
+import { SEO } from "@/components/global/SEO";
 
 export default function About() {
   const pageTitle = "About Kevin - Digital Architect & Developer";

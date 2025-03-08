@@ -1,1 +1,0 @@
-// This file is being removed as we no longer need the modal functionality

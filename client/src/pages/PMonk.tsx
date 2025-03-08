@@ -5,7 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { PageTitle } from "@/components/ui/page-title";
-import { SEO } from "@/components/SEO"; // Added SEO import
+import { SEO } from "@/components/global/SEO";
 
 interface ImageData {
   src: string;

@@ -1,4 +1,4 @@
-import Aurora from "../reactbits/Aurora/Aurora";
+import Aurora from "@/reactbits/Aurora/Aurora";
 
 export function Footer() {
   return (

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import {
   Carousel,

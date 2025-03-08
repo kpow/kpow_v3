@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { TopArtistsSlider } from "@/components/top-artists-slider";
+import { TopArtistsSlider } from "@/components/itunes/top-artists-slider";
 import { Card } from "@/components/ui/card";
-import { SEO } from "@/components/SEO";
+import { SEO } from "@/components/global/SEO";
 import { PageTitle } from "@/components/ui/page-title";
-import { ArtistDetailsModal } from "@/components/artist-details-modal";
-import { YearlyTopSongs } from "@/components/yearly-top-songs";
-import { YearlyTopArtists } from "@/components/yearly-top-artists";
+import { ArtistDetailsModal } from "@/components/itunes/artist-details-modal";
+import { YearlyTopSongs } from "@/components/itunes/yearly-top-songs";
+import { YearlyTopArtists } from "@/components/itunes/yearly-top-artists";
 import { type Artist } from "@/types/artist";
 import { useQuery } from "@tanstack/react-query";
 
@@ -22,21 +22,21 @@ export default function ITunezPage() {
     },
   });
 
-  const handleArtistNavigation = (direction: 'next' | 'prev') => {
+  const handleArtistNavigation = (direction: "next" | "prev") => {
     if (!topArtists?.artists || !selectedArtist) return;
 
     const artists = topArtists.artists;
-    const currentIndex = artists.findIndex(a => a.id === selectedArtist.id);
+    const currentIndex = artists.findIndex((a) => a.id === selectedArtist.id);
     if (currentIndex === -1) return;
 
     let newIndex;
-    if (direction === 'next') {
+    if (direction === "next") {
       newIndex = (currentIndex + 1) % artists.length;
     } else {
       newIndex = (currentIndex - 1 + artists.length) % artists.length;
     }
 
-    const modalContent = document.querySelector('.Dialog__content');
+    const modalContent = document.querySelector(".Dialog__content");
     const scrollPosition = modalContent?.scrollTop || 0;
 
     setSelectedArtist(artists[newIndex]);
@@ -65,11 +65,17 @@ export default function ITunezPage() {
         </Card>
 
         <Card className="p-6">
-          <YearlyTopArtists onArtistClick={setSelectedArtist} carouselPosition="right" />
+          <YearlyTopArtists
+            onArtistClick={setSelectedArtist}
+            carouselPosition="right"
+          />
         </Card>
 
         <Card className="p-6">
-          <YearlyTopSongs onArtistClick={setSelectedArtist} carouselPosition="left" />
+          <YearlyTopSongs
+            onArtistClick={setSelectedArtist}
+            carouselPosition="left"
+          />
         </Card>
 
         <ArtistDetailsModal

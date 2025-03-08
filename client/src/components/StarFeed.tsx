@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ContentSection } from "@/components/ContentSection";
+import { ContentSection } from "@/components/home/ContentSection";
 import { StarredArticle } from "@/lib/hooks/use-starred-articles";
 import { Skeleton } from "@/components/ui/skeleton";
 

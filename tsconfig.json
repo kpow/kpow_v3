@@ -20,7 +20,8 @@
       "@db/*": ["./db/*"],
       "@/*": ["./client/src/*"],
       "@types": ["./types"],
-      "@types/*": ["./types/*"]
+      "@types/*": ["./types/*"],
+      "@data/*": ["./client/src/data/*"]
     }
   }
 }

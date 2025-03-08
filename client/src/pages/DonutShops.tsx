@@ -4,17 +4,17 @@ import { useRoute, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageTitle } from "@/components/ui/page-title";
-import { DonutShopMap } from "@/components/donut-shop-map";
-import { ShopSlider } from "@/components/shop-slider";
+import { DonutShopMap } from "@/components/donuts/donut-shop-map";
+import { ShopSlider } from "@/components/donuts/shop-slider";
 import { useToast } from "@/hooks/use-toast";
 import { cities } from "@/data/cities";
 import { Shuffle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SEO } from "@/components/SEO";
-import { CityTagCloud } from "@/components/CityTagCloud";
-import { DonutLuvList } from "@/components/donut-luv-list";
+import { SEO } from "@/components/global/SEO";
+import { CityTagCloud } from "@/components/donuts/CityTagCloud";
+import { DonutLuvList } from "@/components/donuts/donut-luv-list";
 import { Shop } from "@/types/shop";
-import { DonutShopSearch } from "@/components/DonutShopSearch";
+import { DonutShopSearch } from "@/components/donuts/DonutShopSearch";
 import {
   Collapsible,
   CollapsibleContent,

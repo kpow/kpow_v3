@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { SearchMetrics } from "@/components/search-metrics";
+import { SearchMetrics } from "@/components/donuts/search-metrics";
 import { YelpResponse } from "@/types/shop";
 
 interface SearchState {

@@ -1,5 +1,5 @@
 import { HeroBattle } from "@/components/HeroBattle";
-import { SEO } from "@/components/SEO";
+import { SEO } from "@/components/global/SEO";
 
 export default function Battle() {
   const pageTitle = "Battle - Choose Your Champion";

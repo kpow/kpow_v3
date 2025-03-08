@@ -15,7 +15,7 @@ import {
   Circle,
   Mail,
 } from "lucide-react";
-import { ContactDialog } from "./ContactDialog";
+import { ContactDialog } from "@/components/ContactDialog";
 
 interface SlideMenuProps {
   isOpen: boolean;

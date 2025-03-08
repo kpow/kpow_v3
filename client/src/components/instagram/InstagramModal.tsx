@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface InstagramMediaChild {

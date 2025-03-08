@@ -9,15 +9,14 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./map-styles.css"; // Import our custom map styles
-import { useEffect, useRef } from "react";
+import "@/components/map-styles.css"; // Import our custom map styles
+import { useEffect, useRef, useState } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Shop, CityCenter } from "@/types/shop";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import markerIcons from "./markerIcons";
+import markerIcons from "@/components/donuts/markerIcons";
 
 interface MapControllerProps {
   shops: Shop[];

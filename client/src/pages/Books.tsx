@@ -6,7 +6,7 @@ import { useLocation } from "wouter";
 import { BookCard } from "@/components/BookCard";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
-import { SEO } from "@/components/SEO";
+import { SEO } from "@/components/global/SEO";
 
 interface Book {
   book: {

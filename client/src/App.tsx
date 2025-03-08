@@ -16,7 +16,7 @@ import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
 import ITunez from "@/pages/itunez";
 import { Route as WouterRoute } from "wouter";
-import { SEO } from "@/components/SEO";
+import { SEO } from "@/components/global/SEO";
 
 function Router() {
   return (

@@ -3,12 +3,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
-import { ContentSection } from "@/components/ContentSection";
+import { ContentSection } from "@/components/home/ContentSection";
 import { StarredArticle } from "@/lib/hooks/use-starred-articles";
 import { useToast } from "@/hooks/use-toast";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
-import { SEO } from "@/components/SEO";
+import { SEO } from "@/components/global/SEO";
 
 interface PaginationData {
   current_page: number;
@@ -76,7 +76,7 @@ export default function StarredArticles({
       date: new Date(article.published).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
-        year: "numeric"
+        year: "numeric",
       }),
       imageSrc: article.lead_image_url ?? "/placeholder-star.png",
       type: "star" as const,
@@ -86,8 +86,11 @@ export default function StarredArticles({
 
   // Get the first article's image for the SEO preview, if available
   const previewImage = articles[0]?.imageSrc ?? "/placeholder-star.png";
-  const pageTitle = `Star Feed ${currentPage > 1 ? `- Page ${currentPage}` : ''}`;
-  const pageDescription = `Curated collection of starred articles. ${articles.slice(0, 3).map(a => a.title).join(', ')}`;
+  const pageTitle = `Star Feed ${currentPage > 1 ? `- Page ${currentPage}` : ""}`;
+  const pageDescription = `Curated collection of starred articles. ${articles
+    .slice(0, 3)
+    .map((a) => a.title)
+    .join(", ")}`;
 
   function PaginationLoader() {
     return (
@@ -142,7 +145,7 @@ export default function StarredArticles({
 
   return (
     <>
-      <SEO 
+      <SEO
         title={pageTitle}
         description={pageDescription}
         image={previewImage}

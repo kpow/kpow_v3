@@ -8,7 +8,7 @@ import { VideoModal } from "@/components/VideoModal";
 import { useState } from "react";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
-import { SEO } from "@/components/SEO";
+import { SEO } from "@/components/global/SEO";
 
 const ITEMS_PER_PAGE = 9;
 const PLAYLIST_ID = "PLLnMxi7_aEL7eyC1HiZ2d1d4ce5irHaTQ";

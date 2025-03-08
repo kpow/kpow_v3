@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { ShowDetailsModal } from "@/components/show-details-modal";
+import { ShowDetailsModal } from "@/components/phashboard/show-details-modal";
 import {
   Form,
   FormField,
@@ -22,9 +22,9 @@ import {
 import { getSetlist } from "@/lib/phish-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Info } from "lucide-react";
-import SplitText from "../reactbits/SplitText/SplitText";
-import BlurText from "../reactbits/BlurText/BlurText";
-import GradientText from '../reactbits/GradientText/GradientText'
+import SplitText from "@/reactbits/SplitText/SplitText";
+import BlurText from "@/reactbits/BlurText/BlurText";
+import GradientText from '@/reactbits/GradientText/GradientText'
 
 <GradientText
   colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}

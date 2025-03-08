@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { ShowDetailsModal } from "@/components/show-details-modal";
+import { ShowDetailsModal } from "@/components/phashboard/show-details-modal";
 import {
   Form,
   FormField,
