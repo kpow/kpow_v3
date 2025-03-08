@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Music, Calendar, PlayCircle, Headphones, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Artist } from "@/types/artist";
@@ -117,9 +118,32 @@ export function ArtistDetailsModal({
                 transition={{ delay: 0.2 }}
               >
                 {artist.bio && (
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {artist.bio}
-                  </p>
+                  <>
+                    <div className="text-sm text-muted-foreground leading-relaxed">
+                      {(() => {
+                        const [showFullBio, setShowFullBio] = React.useState(false);
+                        const bioLines = artist.bio.split('\n');
+                        const visibleBio = showFullBio ? artist.bio : bioLines.slice(0, 7).join('\n');
+                        const hasMoreContent = bioLines.length > 7;
+                        
+                        return (
+                          <>
+                            <p>{visibleBio}</p>
+                            {hasMoreContent && (
+                              <Button 
+                                variant="link" 
+                                size="sm" 
+                                className="px-0 mt-2" 
+                                onClick={() => setShowFullBio(!showFullBio)}
+                              >
+                                {showFullBio ? "Show Less" : "Show More"}
+                              </Button>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </>
                 )}
 
                 {artistDetails?.artist?.plays && artistDetails.artist.plays.length > 0 && (
