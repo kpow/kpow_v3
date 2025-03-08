@@ -14,7 +14,7 @@ interface Song {
 }
 
 interface YearData {
-  [key: string]: (Song[] & { yearImage?: string });
+  [key: string]: (Song[] & { imageUrl?: string });
 }
 
 export function YearlyTopSongs() {
@@ -94,10 +94,10 @@ export function YearlyTopSongs() {
                   </div>
 
                   {/* Artist Image */}
-                  {songs.yearImage && (
+                  {songs.imageUrl && (
                     <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden rounded-tl-lg">
                       <img
-                        src={songs.yearImage}
+                        src={songs.imageUrl}
                         alt={`Artist from ${year}`}
                         className="w-full h-full object-cover"
                       />

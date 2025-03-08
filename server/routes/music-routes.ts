@@ -98,7 +98,7 @@ export function registerMusicRoutes(router: Router) {
           songName: songs.name,
           artistId: artists.id,
           artistName: artists.name,
-          artistImageUrl: artists.artistImageUrl,
+          imageUrl: artists.imageUrl,  // Changed from artistImageUrl to imageUrl to match schema
           playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
         })
         .from(plays)
@@ -113,7 +113,7 @@ export function registerMusicRoutes(router: Router) {
           songs.name,
           artists.id,
           artists.name,
-          artists.artistImageUrl
+          artists.imageUrl  // Changed from artistImageUrl to imageUrl to match schema
         )
         .orderBy(
           desc(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`),
@@ -121,7 +121,7 @@ export function registerMusicRoutes(router: Router) {
         );
 
       // Group by year and take top 5 for each
-      const topSongsByYear: Record<number, (typeof songsByYear[number][] & { yearImage?: string })> = {};
+      const topSongsByYear: Record<number, (typeof songsByYear[number][] & { imageUrl?: string })> = {};
 
       // First, group songs by year and ensure proper sorting
       songsByYear.forEach((song) => {
@@ -137,14 +137,14 @@ export function registerMusicRoutes(router: Router) {
       // Then, find representative images for each year
       Object.entries(topSongsByYear).forEach(([year, songs]) => {
         // First try to find image from the top song's artist
-        const topSongArtistImage = songs[0]?.artistImageUrl;
-        if (topSongArtistImage) {
-          (topSongsByYear[Number(year)] as any).yearImage = topSongArtistImage;
+        const topSongImage = songs[0]?.imageUrl;
+        if (topSongImage) {
+          (topSongsByYear[Number(year)] as any).imageUrl = topSongImage;
         } else {
           // If top artist doesn't have image, find first artist with an image
-          const artistWithImage = songs.find(song => song.artistImageUrl);
+          const artistWithImage = songs.find(song => song.imageUrl);
           if (artistWithImage) {
-            (topSongsByYear[Number(year)] as any).yearImage = artistWithImage.artistImageUrl;
+            (topSongsByYear[Number(year)] as any).imageUrl = artistWithImage.imageUrl;
           }
         }
       });
