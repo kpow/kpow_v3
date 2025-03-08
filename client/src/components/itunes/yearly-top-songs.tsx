@@ -218,10 +218,12 @@ export function YearlyTopSongs({
   return (
     <div className="space-y-6">
       {/* Header with Title and Year Selector */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-slackey">yearly top songs</h2>
+      <div className="flex items-center">
+        <h2 className="text-2xl font-bold font-slackey mr-4">
+          yearly top songs
+        </h2>
         <Select value={selectedYear} onValueChange={setSelectedYear}>
-          <SelectTrigger className="w-48 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
+          <SelectTrigger className="w-36 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent>

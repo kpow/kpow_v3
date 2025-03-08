@@ -22,18 +22,7 @@ import {
 import { getSetlist } from "@/lib/phish-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Info } from "lucide-react";
-import SplitText from "@/reactbits/SplitText/SplitText";
 import BlurText from "@/reactbits/BlurText/BlurText";
-import GradientText from '@/reactbits/GradientText/GradientText'
-
-<GradientText
-  colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
-  animationSpeed={3}
-  showBorder={false}
-  className="custom-class"
->
-  Add a splash of color!
-</GradientText>
 
 const handleAnimationComplete = () => {
   console.log("Animation completed!");
@@ -227,7 +216,7 @@ export function SetlistGame() {
   };
 
   return (
-    <Card className="w-full h-full min-h-[400px]">
+    <Card className="w-full h-full min-h-[400px] overflow-hidden">
       <CardContent className="p-2 flex flex-col h-full">
         <div className="justify-center flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-sm p-1 pl-4 m-0 mb-4">
           <div className="text-2xl font-slackey mr-4">guess the setlist</div>
@@ -255,7 +244,7 @@ export function SetlistGame() {
                     onAnimationComplete={handleAnimationComplete}
                     className="text-center flex justify-center font-slackey text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold"
                   />
-                  
+
                   {/* <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
                     Ready to test your Phish knowledge?
                   </h2> */}
@@ -465,7 +454,9 @@ export function SetlistGame() {
             <div className="flex gap-4 items-center">
               <div className="text-sm font-bold">Games: {gamesPlayed}</div>
               <div className="text-sm font-bold">High Score: {highScore}</div>
-              <div className="text-sm font-bold">Total Score: {cumulativeScore}</div>
+              <div className="text-sm font-bold">
+                Total Score: {cumulativeScore}
+              </div>
               {gameState !== "idle" && (
                 <div className="text-sm font-bold">Current: {score}</div>
               )}

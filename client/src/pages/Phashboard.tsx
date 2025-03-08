@@ -98,10 +98,7 @@ export default function ShowStats() {
           <Card>
             <CardContent className="pt-6">
               <h2 className="text-lg font-slackey mb-4">venues</h2>
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 venue-scrollbar">
-                {/* Debug info */}
-                {console.log("Venues data:", venuesData)}
-                {console.log("Rendering venues section, data:", venuesData)}
+              <div className="space-y-3 max-h-[450px] overflow-y-auto pr-2 venue-scrollbar">
                 {venuesLoading ? (
                   Array.from({ length: 10 }).map((_, index) => (
                     <div
