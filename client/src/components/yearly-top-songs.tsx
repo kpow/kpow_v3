@@ -65,7 +65,7 @@ export function YearlyTopSongs() {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-center mb-6">Top Songs By Year</h2>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {Object.entries(songsByYear)
           .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
@@ -83,9 +83,9 @@ export function YearlyTopSongs() {
                   <CardContent className="p-0">
                     <div className="grid grid-cols-1 md:grid-cols-3">
                       <div className="col-span-2 p-4">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-bold">{year}</h3>
-                          <Badge variant="outline" className="text-xs">
+                        <div className="flex items-center mb-4">
+                          <h3 className="text-xl font-bold mr-4">{year}</h3>
+                          <Badge variant="outline" className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2">
                             Top 5 Songs
                           </Badge>
                         </div>

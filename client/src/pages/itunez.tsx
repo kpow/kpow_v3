@@ -56,7 +56,7 @@ export default function ITunezPage() {
       />
       <div className="container mx-auto py-8 space-y-8">
         <div className="flex items-center justify-between mb-8">
-          <PageTitle size="lg">tunes</PageTitle>
+          <PageTitle size="lg">my itunez data</PageTitle>
         </div>
 
         <Card className="p-6">

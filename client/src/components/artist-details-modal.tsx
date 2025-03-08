@@ -33,10 +33,10 @@ const BioSection = ({ bio }: { bio: string }) => {
         <Button 
           variant="link" 
           size="sm" 
-          className="px-0 mt-2" 
+          className="px-0 mt-2 font-bold" 
           onClick={() => setShowFullBio(!showFullBio)}
         >
-          {showFullBio ? "Show Less" : "Show More"}
+          {showFullBio ? "Show Less -" : "Show More +"}
         </Button>
       )}
     </div>
@@ -180,8 +180,8 @@ export function ArtistDetailsModal({
                 <div className="flex items-center space-x-2 bg-primary/10 p-3 rounded-lg border border-primary/20">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground">Ranking</span>
-                    <span className="font-medium">#{artist.rank}</span>
+                    <span className="text-xs">Ranking</span>
+                    <span className="font-slackey text-2xl">#{artist.rank}</span>
                   </div>
                 </div>
               )}
@@ -190,7 +190,7 @@ export function ArtistDetailsModal({
                   <PlayCircle className="h-4 w-4 text-primary" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground">Plays</span>
-                    <span className="font-medium">{artist.playCount}</span>
+                    <span className="font-slackey text-l">{artist.playCount}</span>
                   </div>
                 </div>
               )}
@@ -200,7 +200,7 @@ export function ArtistDetailsModal({
                   <User className="h-4 w-4 text-primary" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground">Listeners</span>
-                    <span className="font-medium">{artist.listeners}</span>
+                    <span className="font-slackey text-l">{artist.listeners}</span>
                   </div>
                 </div>
               )}
@@ -210,7 +210,7 @@ export function ArtistDetailsModal({
                   <Calendar className="h-4 w-4 text-primary" />
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground">Last Played</span>
-                    <span className="font-medium">{format(new Date(artist.lastPlayed), "PPP")}</span>
+                    <span className="font-slackey text-l">{format(new Date(artist.lastPlayed), "PPP")}</span>
                   </div>
                 </div>
               )}
@@ -264,7 +264,7 @@ export function ArtistDetailsModal({
                   <div className="mt-6">
                     <div className="flex items-center gap-2 mb-4">
                       <Headphones className="h-4 w-4 text-primary" />
-                      <h4 className="font-semibold">Recent Plays</h4>
+                      <h4 className="font-slackey text-xl">Recent Plays</h4>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {artistDetails.artist.plays.map((play, index) => (
