@@ -33,11 +33,18 @@ interface TopTracksResponse {
   tracks: Track[];
 }
 
+// Vibrant, distinct colors that work well together
 const COLORS = [
-  "#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#a4de6c",
-  "#d0ed57", "#83a6ed", "#8dd1e1", "#82ca9d", "#a4de6c",
-  "#d0ed57", "#ffc658", "#ff7300", "#8884d8", "#83a6ed",
-  "#8dd1e1", "#82ca9d", "#a4de6c", "#d0ed57", "#ffc658"
+  "#FF6B6B", // Coral Red
+  "#4ECDC4", // Turquoise
+  "#45B7D1", // Sky Blue
+  "#96CEB4", // Sage Green
+  "#FFEEAD", // Cream Yellow
+  "#D4A5A5", // Dusty Rose
+  "#9A67EA", // Purple
+  "#F9D423", // Yellow
+  "#FF9F1C", // Orange
+  "#2AB7CA", // Teal
 ];
 
 export function TopTracksChart() {
@@ -49,7 +56,7 @@ export function TopTracksChart() {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Top 20 Tracks Over Time</CardTitle>
+          <CardTitle>Top 10 Tracks Over Time</CardTitle>
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[600px] w-full" />
@@ -68,23 +75,52 @@ export function TopTracksChart() {
 
   if (!data?.tracks) return null;
 
+  // Get top 10 tracks only
+  const top10Tracks = data.tracks.slice(0, 10);
+
   // Process data for the chart
-  const chartData = data.tracks[0].playHistory.map((_, weekIndex) => {
+  const chartData = top10Tracks[0].playHistory.map((_, weekIndex) => {
     const weekData: any = {
-      date: format(new Date(data.tracks[0].playHistory[weekIndex].from), 'MMM d, yyyy'),
+      date: format(new Date(top10Tracks[0].playHistory[weekIndex].from), 'MMM d, yyyy'),
     };
 
-    data.tracks.forEach((track, trackIndex) => {
+    top10Tracks.forEach((track) => {
       weekData[`${track.artist} - ${track.name}`] = track.playHistory[weekIndex].playcount;
+      // Add a cumulative total for each track
+      weekData[`${track.artist} - ${track.name} (Total)`] = track.totalPlaycount;
     });
 
     return weekData;
   });
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-black/90 p-4 rounded-lg shadow-lg border border-white/10">
+          <p className="text-white font-semibold mb-2">{label}</p>
+          <div className="space-y-1">
+            {payload.map((entry: any, index: number) => (
+              <div key={index} className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: entry.color }}
+                />
+                <p className="text-white text-sm">
+                  {entry.name.split(" (Total)")[0]}: {entry.value} plays
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Top 20 Tracks Over Time</CardTitle>
+        <CardTitle>Top 10 Tracks Over Time</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[600px] w-full">
@@ -98,25 +134,32 @@ export function TopTracksChart() {
                 bottom: 60,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <defs>
+                {COLORS.map((color, index) => (
+                  <linearGradient
+                    key={`gradient-${index}`}
+                    id={`gradient-${index}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={color} stopOpacity={0.2} />
+                  </linearGradient>
+                ))}
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis
                 dataKey="date"
                 angle={-45}
                 textAnchor="end"
                 height={60}
                 interval={Math.floor(chartData.length / 8)}
+                tick={{ fill: '#666' }}
               />
-              <YAxis />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "rgba(0, 0, 0, 0.8)",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "8px",
-                }}
-                labelStyle={{ color: "white" }}
-                itemStyle={{ color: "white" }}
-              />
+              <YAxis tick={{ fill: '#666' }} />
+              <Tooltip content={<CustomTooltip />} />
               <Legend
                 verticalAlign="top"
                 height={36}
@@ -124,15 +167,15 @@ export function TopTracksChart() {
                   paddingBottom: "20px",
                 }}
               />
-              {data.tracks.map((track, index) => (
+              {top10Tracks.map((track, index) => (
                 <Area
                   key={`${track.artist} - ${track.name}`}
                   type="monotone"
                   dataKey={`${track.artist} - ${track.name}`}
                   stackId="1"
-                  stroke={COLORS[index % COLORS.length]}
-                  fill={COLORS[index % COLORS.length]}
-                  fillOpacity={0.6}
+                  stroke={COLORS[index]}
+                  fill={`url(#gradient-${index})`}
+                  fillOpacity={1}
                 />
               ))}
             </AreaChart>
