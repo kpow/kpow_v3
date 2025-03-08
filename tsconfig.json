@@ -19,14 +19,6 @@
       "@db": ["./db/index.ts"],
       "@db/*": ["./db/*"],
       "@/*": ["./client/src/*"],
-      "@/components/shared/*": ["./client/src/components/shared/*"],
-      "@/components/shared/ui/*": ["./client/src/components/shared/ui/*"],
-      "@/components/shared/layout/*": ["./client/src/components/shared/layout/*"],
-      "@/components/home/*": ["./client/src/components/home/*"],
-      "@/components/battle/*": ["./client/src/components/battle/*"],
-      "@/components/phashboard/*": ["./client/src/components/phashboard/*"],
-      "@/components/donut-tour/*": ["./client/src/components/donut-tour/*"],
-      "@/components/media/*": ["./client/src/components/media/*"],
       "@types": ["./types"],
       "@types/*": ["./types/*"]
     }
