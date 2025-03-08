@@ -18,16 +18,16 @@ import { Badge } from "@/components/ui/badge";
 const BioSection = ({ bio }: { bio: string }) => {
   const [showFullBio, setShowFullBio] = React.useState(false);
   const bioLines = bio.split('\n');
-  
+
   // Show only 2 lines initially (reduced by ~70%)
   const visibleBio = showFullBio 
     ? bio 
-    : bioLines.slice(0, 2).join('\n') + (bioLines.length > 2 ? '...' : '');
+    : bioLines.slice(0, 1).join('\n') + (bioLines.length > 2 ? '...' : '');
   
   const hasMoreContent = bioLines.length > 2;
   
   return (
-    <div className="text-sm text-muted-foreground leading-relaxed">
+    <div className="text-sm leading-relaxed">
       <p>{visibleBio}</p>
       {hasMoreContent && (
         <Button 
@@ -69,7 +69,7 @@ export function ArtistDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[1020px] max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+      <DialogContent className="sm:max-w-[820px] max-h-[80vh] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
         <DialogHeader>
           <DialogTitle className="font-slackey text-2xl text-center">
             {artist.name}
@@ -120,7 +120,7 @@ export function ArtistDetailsModal({
             {/* Artist Image - Right 1/2 */}
             <div className="md:col-span-1">
               {(artist.imageUrl || artist.artistImageUrl) && (
-                <div className="relative overflow-hidden rounded-lg h-full">
+                <div className="relative overflow-hidden rounded-lg max-h-[300px]">
                   <motion.img
                     src={artist.imageUrl || artist.artistImageUrl}
                     alt={artist.name}
