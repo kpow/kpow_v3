@@ -5,6 +5,7 @@ import { SEO } from "@/components/SEO";
 import { PageTitle } from "@/components/ui/page-title";
 import { ArtistDetailsModal } from "@/components/artist-details-modal";
 import { YearlyTopSongs } from "@/components/yearly-top-songs";
+import { YearlyTopArtists } from "@/components/yearly-top-artists";
 import { type Artist } from "@/types/artist";
 import { useQuery } from "@tanstack/react-query";
 
@@ -61,6 +62,10 @@ export default function ITunezPage() {
 
         <Card className="p-6">
           <TopArtistsSlider onArtistClick={setSelectedArtist} />
+        </Card>
+
+        <Card className="p-6">
+          <YearlyTopArtists onArtistClick={setSelectedArtist} />
         </Card>
 
         <Card className="p-6">
