@@ -17,7 +17,8 @@ import { SongStats } from "@/components/phashboard/song-stats";
 import { PageTitle } from "@/components/ui/page-title";
 import { VenueMap } from "@/components/phashboard/venue-map";
 import { SEO } from "@/components/global/SEO";
-import { ScrollArea, ScrollList, ScrollListItem } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollList, ScrollListItem } from "@/components/ui/scroll-area";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
