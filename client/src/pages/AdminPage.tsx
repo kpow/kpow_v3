@@ -103,15 +103,26 @@ export default function AdminPage() {
 
   async function onSearchArtist(values: z.infer<typeof searchFormSchema>) {
     try {
-      const response = await fetch(
-        `/api/lastfm/artist-albums/${encodeURIComponent(values.artistName)}`
-      );
-      if (!response.ok) throw new Error("Artist search failed");
+      // Log the search attempt
+      console.log("Searching for artist:", values.artistName);
+
+      // Encode the artist name for the URL
+      const encodedArtist = encodeURIComponent(values.artistName);
+      const response = await fetch(`/api/lastfm/artist-albums/${encodedArtist}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Artist search failed");
+      }
+
       const data = await response.json();
+      console.log("Last.fm search results:", data);
+
       setLastFmAlbums(data);
       // Clear previous iTunes results
       setSearchResults(null);
     } catch (error) {
+      console.error("Search error:", error);
       toast({
         title: "Artist search failed",
         description: error instanceof Error ? error.message : "Failed to search artist",

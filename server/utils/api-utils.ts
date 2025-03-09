@@ -29,12 +29,14 @@ export async function fetchLastFmData(method: string, params: Record<string, str
     });
 
     const url = `${LASTFM_API_BASE}?${queryParams.toString()}`;
+    console.log("Making Last.fm API request to:", url);
     const response = await axios.get(url);
 
     if (response.status !== 200) {
       throw new Error(response.data.message || "Failed to fetch data from Last.fm API");
     }
 
+    console.log("Last.fm API response:", JSON.stringify(response.data, null, 2));
     return response.data;
   } catch (error) {
     console.error("Error fetching from Last.fm:", error);
