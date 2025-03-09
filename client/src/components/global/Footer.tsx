@@ -1,15 +1,15 @@
-import Aurora from "@/reactbits/Aurora/Aurora";
+// import Aurora from "@/reactbits/Aurora/Aurora";
 
 export function Footer() {
   return (
     <footer className="bg-black text-white pb-12">
-      <Aurora
+      {/* <Aurora
         colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
         blend={0.5}
         amplitude={1.0}
         speed={0.5}
-      />
-      <div className="container max-w-6xl mx-auto px-4 flex gap-8 justify-between flex-col sm:flex-row -mt-[100px]">
+      /> */}
+      <div className="container max-w-6xl mx-auto px-4 flex gap-8 justify-between flex-col sm:flex-row mt-[40px]">
         {/* About Section */}
         <div className="flex items-start gap-4 max-w-sm">
           <div>
@@ -32,7 +32,6 @@ export function Footer() {
           </p>
         </div>
       </div>
-      
     </footer>
   );
 }
