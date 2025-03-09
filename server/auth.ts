@@ -40,16 +40,8 @@ export function setupAuth(app: Express) {
   const store = new PostgresSessionStore({
     pool,
     createTableIfMissing: true,
-    // Add robust session store options
-    schemaName: 'public',
     tableName: 'session',
-    pruneSessionInterval: 60, // Prune expired sessions every minute
-    // Connection error handling
-    errorLog: console.error,
-    // Retry logic for connection issues
-    retries: 3,
-    initialDelay: 100,
-    maxDelay: 1000
+    pruneSessionInterval: 1800 // Prune expired sessions every 30 minutes
   });
 
   const sessionSettings: session.SessionOptions = {
@@ -61,11 +53,7 @@ export function setupAuth(app: Express) {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-    },
-    // Add rolling sessions
-    rolling: true,
-    // Set name for the session ID cookie
-    name: 'sid'
+    }
   };
 
   app.set("trust proxy", 1);

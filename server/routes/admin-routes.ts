@@ -11,9 +11,8 @@ export function registerAdminRoutes(router: Router) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const userId = req.user?.id;
-    if (userId !== 1) {
-      return res.status(403).json({ error: "Not authorized" });
+    if (!req.user?.approved) {
+      return res.status(403).json({ error: "Account not approved" });
     }
 
     const term = req.query.term as string;
@@ -46,9 +45,8 @@ export function registerAdminRoutes(router: Router) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const userId = req.user?.id;
-    if (userId !== 1) {
-      return res.status(403).json({ error: "Not authorized" });
+    if (!req.user?.approved) {
+      return res.status(403).json({ error: "Account not approved" });
     }
 
     const { artistName, imageUrl } = req.body;
