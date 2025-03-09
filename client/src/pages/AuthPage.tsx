@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -14,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   username: z.string().min(3).max(50),
@@ -23,7 +25,8 @@ const formSchema = z.object({
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
-  
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,11 +41,28 @@ export default function AuthPage() {
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     if (isLogin) {
-      loginMutation.mutate(data);
+      loginMutation.mutate(data, {
+        onSuccess: () => {
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully logged in.",
+          });
+        }
+      });
     } else {
-      registerMutation.mutate(data);
+      registerMutation.mutate(data, {
+        onSuccess: () => {
+          toast({
+            title: "Registration successful!",
+            description: "Your account has been created. Welcome!",
+          });
+          form.reset();
+        }
+      });
     }
   }
+
+  const isLoading = loginMutation.isPending || registerMutation.isPending;
 
   return (
     <div className="min-h-screen flex">
@@ -91,9 +111,16 @@ export default function AuthPage() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={loginMutation.isPending || registerMutation.isPending}
+                disabled={isLoading}
               >
-                {isLogin ? "Sign In" : "Sign Up"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {isLogin ? "Signing in..." : "Creating account..."}
+                  </>
+                ) : (
+                  <>{isLogin ? "Sign In" : "Sign Up"}</>
+                )}
               </Button>
             </form>
           </Form>
@@ -102,6 +129,8 @@ export default function AuthPage() {
             <button
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm text-primary hover:underline"
+              type="button"
+              disabled={isLoading}
             >
               {isLogin
                 ? "Don't have an account? Sign up"
