@@ -1,33 +1,8 @@
 [
   {
-    "id": 5,
-    "name": "The Muppets",
-    "albumName": "Muppets Most Wanted (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 6,
-    "name": "Miss Piggy",
-    "albumName": "Frozen (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 8,
-    "name": "Mudvayne",
-    "albumName": "Blurryface"
-  },
-  {
     "id": 9,
     "name": "Tortoise",
     "albumName": "Con Todo El Mundo"
-  },
-  {
-    "id": 10,
-    "name": "Audioslave",
-    "albumName": "American Beauty"
-  },
-  {
-    "id": 13,
-    "name": "Childish Gambino",
-    "albumName": "First Two Seven Inches"
   },
   {
     "id": 17,
@@ -35,19 +10,9 @@
     "albumName": "Danzig"
   },
   {
-    "id": 18,
-    "name": "Phoebe Bridgers",
-    "albumName": "Movements"
-  },
-  {
     "id": 19,
     "name": "Vangelis",
     "albumName": "Sgt. Pepper's Lonely Hearts Club Band (Deluxe Edition)"
-  },
-  {
-    "id": 20,
-    "name": "Misfits",
-    "albumName": "Several Shades of Why"
   },
   {
     "id": 24,
@@ -70,11 +35,6 @@
     "albumName": "I Don't Run"
   },
   {
-    "id": 30,
-    "name": "Billie Eilish",
-    "albumName": "Evil (From \"Descendants: Wicked World\") - Single"
-  },
-  {
     "id": 36,
     "name": "Rare Essence Feat. Wale",
     "albumName": "Mixtape, Vol. 2 (Hosted by DJ Dirty Rico)"
@@ -90,24 +50,9 @@
     "albumName": "Paul's Boutique"
   },
   {
-    "id": 40,
-    "name": "One Direction",
-    "albumName": "The Stone Roses"
-  },
-  {
     "id": 43,
     "name": "The Four Tops",
     "albumName": "World In Motion... - Single"
-  },
-  {
-    "id": 45,
-    "name": "Melanie Martinez",
-    "albumName": "Gala"
-  },
-  {
-    "id": 49,
-    "name": "Bebe Rexha",
-    "albumName": "La Belle et La Bête (Bande Originale française du Film)"
   },
   {
     "id": 50,
@@ -120,11 +65,6 @@
     "albumName": "Hairway to Steven"
   },
   {
-    "id": 56,
-    "name": "Leah Kate",
-    "albumName": "Make It Big"
-  },
-  {
     "id": 59,
     "name": "¥$",
     "albumName": "K-Town Showdown"
@@ -133,11 +73,6 @@
     "id": 64,
     "name": "Sleep Token",
     "albumName": "Mass Manipulation"
-  },
-  {
-    "id": 66,
-    "name": "2 Live Crew",
-    "albumName": "I'm the Man (Bonus Track Version)"
   },
   {
     "id": 71,
@@ -150,24 +85,9 @@
     "albumName": "Hamilton: An American Musical (Original Broadway Cast Recording)"
   },
   {
-    "id": 73,
-    "name": "Juice WRLD",
-    "albumName": "Hamilton: An American Musical (Original Broadway Cast Recording)"
-  },
-  {
-    "id": 74,
-    "name": "Mdou Moctar",
-    "albumName": "Hamilton: An American Musical (Original Broadway Cast Recording)"
-  },
-  {
     "id": 77,
     "name": "TLC",
     "albumName": "The Stone Roses (20th Anniversary Edition) [Remastered]"
-  },
-  {
-    "id": 78,
-    "name": "Coolio",
-    "albumName": "I Just Can't Stop It"
   },
   {
     "id": 82,
@@ -180,34 +100,9 @@
     "albumName": "Day of the Dead"
   },
   {
-    "id": 87,
-    "name": "Joe Strummer and the Mescaleros",
-    "albumName": "Operation Ivy (2007 Remaster)"
-  },
-  {
     "id": 90,
     "name": "Unknown",
     "albumName": "Live in Atlanta '24"
-  },
-  {
-    "id": 92,
-    "name": "Lost Frequencies",
-    "albumName": "The Velvet Underground & Nico (45th Anniversary Edition)"
-  },
-  {
-    "id": 93,
-    "name": "Run-D.M.C.",
-    "albumName": "Blood, Guts & Pussy"
-  },
-  {
-    "id": 100,
-    "name": "Andrew Underberg",
-    "albumName": "The Muppet Movie (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 118,
-    "name": "Bladee",
-    "albumName": "The Sound of a New World Being Born"
   },
   {
     "id": 134,
@@ -230,21 +125,6 @@
     "albumName": "Rather Be With You (From \"Descendants: Wicked World\") - Single"
   },
   {
-    "id": 147,
-    "name": "Leslie Odom Jr.",
-    "albumName": "Pretenders II (Deluxe Edition)"
-  },
-  {
-    "id": 156,
-    "name": "Nat King Cole",
-    "albumName": "London Calling"
-  },
-  {
-    "id": 161,
-    "name": "Siouxsie and the Banshees",
-    "albumName": "Superstition (Remastered and Expanded)"
-  },
-  {
     "id": 162,
     "name": "Original Broadway Cast of Suffs",
     "albumName": "American Beauty"
@@ -260,21 +140,6 @@
     "albumName": "The Muppet Movie (Original Motion Picture Soundtrack)"
   },
   {
-    "id": 194,
-    "name": "Auli'i Cravalho",
-    "albumName": "The Grand Pecking Order"
-  },
-  {
-    "id": 199,
-    "name": "Cast - Descendants",
-    "albumName": "Bizarre Ride II the Pharcyde"
-  },
-  {
-    "id": 200,
-    "name": "Justin Timberlake",
-    "albumName": "US Rock"
-  },
-  {
     "id": 224,
     "name": "V",
     "albumName": "Earth Crisis"
@@ -283,21 +148,6 @@
     "id": 233,
     "name": "Gonzo",
     "albumName": "The Muppet Movie (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 238,
-    "name": "Gucci Mane",
-    "albumName": "Sandinista! (Remastered)"
-  },
-  {
-    "id": 241,
-    "name": "The Beat",
-    "albumName": "Workingman's Dead"
-  },
-  {
-    "id": 242,
-    "name": "Smokey Robinson and The Miracles",
-    "albumName": "Our Beloved Revolutionary Sweetheart"
   },
   {
     "id": 250,
@@ -310,29 +160,14 @@
     "albumName": "The Great Gatsby - A New Musical (Original Broadway Cast Recording)"
   },
   {
-    "id": 259,
-    "name": "Ive",
-    "albumName": "TROLLS (Original Motion Picture Soundtrack)"
-  },
-  {
     "id": 260,
     "name": "Chillin like a Villain",
     "albumName": "Harry Potter and the Goblet of Fire"
   },
   {
-    "id": 267,
-    "name": "Denzel Curry",
-    "albumName": "Hairway To Steven"
-  },
-  {
     "id": 269,
     "name": "Larry Ellis & the Black Hammer",
     "albumName": "Long Live The Kane"
-  },
-  {
-    "id": 272,
-    "name": "Kermit",
-    "albumName": "Timeless: The All-Time Greatest Hits"
   },
   {
     "id": 274,
@@ -343,11 +178,6 @@
     "id": 279,
     "name": "Hiko",
     "albumName": "Our Beloved Revolutionary Sweetheart"
-  },
-  {
-    "id": 284,
-    "name": "Austyn Johnson",
-    "albumName": "The Greatest Showman (Original Motion Picture Soundtrack)"
   },
   {
     "id": 290,
@@ -368,11 +198,6 @@
     "id": 299,
     "name": "The Ify Jerry Krusade",
     "albumName": "Ole' Headz"
-  },
-  {
-    "id": 303,
-    "name": "Anna Kendrick",
-    "albumName": "Morrison Hotel (50th Anniversary Deluxe Edition)"
   },
   {
     "id": 311,
@@ -405,11 +230,6 @@
     "albumName": "Walk Among Us"
   },
   {
-    "id": 322,
-    "name": "Charlie Puth",
-    "albumName": "Welcome Oblivion (Bonus Track Version)"
-  },
-  {
     "id": 323,
     "name": "Shirley Walker",
     "albumName": "The Music of DC Comics: Vol. 2"
@@ -418,11 +238,6 @@
     "id": 327,
     "name": "ermhoi",
     "albumName": "Belle (Original Motion Picture Soundtrack) [English Edition]"
-  },
-  {
-    "id": 329,
-    "name": "TOMORROW X TOGETHER",
-    "albumName": "The Nightmare Before Christmas (Special Edition)"
   },
   {
     "id": 331,
@@ -438,16 +253,6 @@
     "id": 334,
     "name": "Hailu Mergia",
     "albumName": "Tche Belew"
-  },
-  {
-    "id": 336,
-    "name": "A$AP Rocky",
-    "albumName": "Hairway to Steven"
-  },
-  {
-    "id": 342,
-    "name": "Patti LuPone",
-    "albumName": "Company (Original Broadway Cast)"
   },
   {
     "id": 344,
@@ -473,11 +278,6 @@
     "id": 352,
     "name": "Chrystal",
     "albumName": "Ocean Rain (Deluxe Version)"
-  },
-  {
-    "id": 360,
-    "name": "Jin",
-    "albumName": "Business As Usual"
   },
   {
     "id": 363,
@@ -508,21 +308,6 @@
     "id": 387,
     "name": "The Nation of Ulysses",
     "albumName": "Totally Wired - The Rough Trade Anthology"
-  },
-  {
-    "id": 389,
-    "name": "Triggerfinger",
-    "albumName": "Off the Wall"
-  },
-  {
-    "id": 396,
-    "name": "Original Broadway Cast of Hamilton",
-    "albumName": "Hamilton: An American Musical (Original Broadway Cast Recording)"
-  },
-  {
-    "id": 407,
-    "name": "Althea And Donna",
-    "albumName": "Eat To the Beat"
   },
   {
     "id": 408,
@@ -558,11 +343,6 @@
     "id": 431,
     "name": "Charlie Hodson-Prior",
     "albumName": "Encanto (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 440,
-    "name": "Run–D.M.C.",
-    "albumName": "Dirty (Deluxe Edition) [Remastered]"
   },
   {
     "id": 441,
@@ -605,21 +385,6 @@
     "albumName": "The Sound of Music (Original Motion Picture Soundtrack)"
   },
   {
-    "id": 456,
-    "name": "Måneskin",
-    "albumName": "Mass Manipulation"
-  },
-  {
-    "id": 458,
-    "name": "Jung Kook",
-    "albumName": "Stay (Bonus Track Version)"
-  },
-  {
-    "id": 463,
-    "name": "Joshua's Troop",
-    "albumName": "Mighty Joshua"
-  },
-  {
     "id": 465,
     "name": "Susan Egan",
     "albumName": "Hercules (Original Motion Picture Soundtrack)"
@@ -645,16 +410,6 @@
     "albumName": "Descendants 3 (Original TV Movie Soundtrack)"
   },
   {
-    "id": 476,
-    "name": "I Killed the Prom Queen",
-    "albumName": "The Muppets (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 478,
-    "name": "The Black Crowes",
-    "albumName": "Goodnight Unknown"
-  },
-  {
     "id": 481,
     "name": "Luiz Bonfá",
     "albumName": "Moana (Original Motion Picture Soundtrack)"
@@ -675,11 +430,6 @@
     "albumName": "Infected"
   },
   {
-    "id": 488,
-    "name": "The Collapsable Hearts Club",
-    "albumName": "Like a Ship (Without a Sail)"
-  },
-  {
     "id": 489,
     "name": "Roddy Ricch",
     "albumName": "Like a Ship (Without a Sail)"
@@ -695,11 +445,6 @@
     "albumName": "California Funk"
   },
   {
-    "id": 493,
-    "name": "Type O Negative",
-    "albumName": "Our Beloved Revolutionary Sweetheart"
-  },
-  {
     "id": 500,
     "name": "Royal Republic",
     "albumName": "Willy Wonka & the Chocolate Factory (Music From the Original Soundtrack of the Paramount Picture)"
@@ -710,11 +455,6 @@
     "albumName": "Guero"
   },
   {
-    "id": 504,
-    "name": "Interpol",
-    "albumName": "California Funk"
-  },
-  {
     "id": 509,
     "name": "Endor",
     "albumName": "Some Friendly"
@@ -723,11 +463,6 @@
     "id": 510,
     "name": "Kodak Black",
     "albumName": "Isn't Anything"
-  },
-  {
-    "id": 511,
-    "name": "Sabrina Carpenter",
-    "albumName": "Green Mind"
   },
   {
     "id": 515,
@@ -745,11 +480,6 @@
     "albumName": "Arista Heritage Series: Ray Parker Jr."
   },
   {
-    "id": 519,
-    "name": "The Jackson 5",
-    "albumName": "Welcome Oblivion (Bonus Track Version)"
-  },
-  {
     "id": 520,
     "name": "VACATIONS",
     "albumName": "Mass Manipulation"
@@ -765,19 +495,9 @@
     "albumName": "On the Mouth (Remastered)"
   },
   {
-    "id": 530,
-    "name": "Escape the Fate",
-    "albumName": "Duty Now for the Future (Deluxe Edition)"
-  },
-  {
     "id": 531,
     "name": "Vansire",
     "albumName": "Deltron 3030"
-  },
-  {
-    "id": 533,
-    "name": "Artemas",
-    "albumName": "From the Mars Hotel"
   },
   {
     "id": 535,
@@ -845,34 +565,9 @@
     "albumName": "Texas Thunder Soul (1968-1974)"
   },
   {
-    "id": 557,
-    "name": "Khalid",
-    "albumName": "Descendants 3 (Original TV Movie Soundtrack)"
-  },
-  {
     "id": 559,
     "name": "Darude",
     "albumName": "Paradise and Lunch"
-  },
-  {
-    "id": 564,
-    "name": "George McCrae",
-    "albumName": "Liveage!"
-  },
-  {
-    "id": 572,
-    "name": "Peggy Lee",
-    "albumName": "Moana (Original Motion Picture Soundtrack) [Deluxe Edition]"
-  },
-  {
-    "id": 575,
-    "name": "Twenty One Pilots",
-    "albumName": "Tired of Being Alone"
-  },
-  {
-    "id": 577,
-    "name": "Dream Theater",
-    "albumName": "Disney's Greatest, Vol. 2"
   },
   {
     "id": 578,
@@ -883,11 +578,6 @@
     "id": 580,
     "name": "The Greatest Showman Ensemble",
     "albumName": "Masana Temples"
-  },
-  {
-    "id": 581,
-    "name": "Rihanna",
-    "albumName": "Ultimate Pitch Perfect (Original Motion Picture Soundtrack)"
   },
   {
     "id": 582,
@@ -905,16 +595,6 @@
     "albumName": "Ghostbusters (Original Motion Picture Soundtrack)"
   },
   {
-    "id": 587,
-    "name": "Beyoncé",
-    "albumName": "Squirrel and G-Man Twenty Four Hour Party People Plastic Face Carnt Smile (White Out)"
-  },
-  {
-    "id": 588,
-    "name": "Harry Styles",
-    "albumName": "Like a Ship...(Without a Sail)"
-  },
-  {
     "id": 590,
     "name": "Snow Patrol",
     "albumName": "Long in the Tooth"
@@ -923,21 +603,6 @@
     "id": 591,
     "name": "Prophets Of Rage",
     "albumName": "Some Friendly"
-  },
-  {
-    "id": 593,
-    "name": "Duster",
-    "albumName": "Start Today"
-  },
-  {
-    "id": 594,
-    "name": "Phillipa Soo",
-    "albumName": "Milo Goes to College"
-  },
-  {
-    "id": 597,
-    "name": "Ramin Djawadi",
-    "albumName": "I Just Can't Stop It"
   },
   {
     "id": 609,
@@ -955,19 +620,9 @@
     "albumName": "Day of Judgement"
   },
   {
-    "id": 615,
-    "name": "OneRepublic",
-    "albumName": "Little Shop of Horrors (Original Motion Picture Soundtrack)"
-  },
-  {
     "id": 616,
     "name": "Stan Van Outen",
     "albumName": "The Click (Deluxe Edition)"
-  },
-  {
-    "id": 617,
-    "name": "Halsey",
-    "albumName": "Black Pumas"
   },
   {
     "id": 618,
@@ -975,19 +630,9 @@
     "albumName": "Rift"
   },
   {
-    "id": 622,
-    "name": "Alex G",
-    "albumName": "History of the Future (Deluxe Edition)"
-  },
-  {
     "id": 623,
     "name": "Carl Dawkins Feat. The Wailers",
     "albumName": "Mr Satisfaction (1966-1976)"
-  },
-  {
-    "id": 627,
-    "name": "Sade",
-    "albumName": "American Beauty"
   },
   {
     "id": 628,
@@ -995,19 +640,9 @@
     "albumName": "Follow the Leader"
   },
   {
-    "id": 630,
-    "name": "Sabrina Claudio",
-    "albumName": "The Best of Blondie"
-  },
-  {
     "id": 631,
     "name": "Glass Animals",
     "albumName": "Jamaican Independence Celebration (feat. Bob Marley)"
-  },
-  {
-    "id": 635,
-    "name": "$uicideboy$",
-    "albumName": "Boss Hog"
   },
   {
     "id": 636,
@@ -1025,34 +660,14 @@
     "albumName": "The Little Mermaid (An Original Walt Disney Records Soundtrack) [Special Edition]"
   },
   {
-    "id": 640,
-    "name": "Miley Cyrus",
-    "albumName": "The Sound of Music (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 641,
-    "name": "Master KG",
-    "albumName": "Antics In the Forbidden Zone"
-  },
-  {
     "id": 643,
     "name": "Poets of Rhythm",
     "albumName": "Dance the Cool Jerk"
   },
   {
-    "id": 645,
-    "name": "Emeli Sandé",
-    "albumName": null
-  },
-  {
     "id": 646,
     "name": "Blackbear",
     "albumName": "La Sexorcisto: Devil Music, Vol. 1"
-  },
-  {
-    "id": 647,
-    "name": "American Football",
-    "albumName": "Entertainment!"
   },
   {
     "id": 649,
@@ -1063,11 +678,6 @@
     "id": 652,
     "name": "Pulp",
     "albumName": "Yo Gabba Gabba! Hey!"
-  },
-  {
-    "id": 653,
-    "name": "Polo G",
-    "albumName": "Magical Mystery Tour"
   },
   {
     "id": 654,
@@ -1090,24 +700,9 @@
     "albumName": "Living In Darkness"
   },
   {
-    "id": 659,
-    "name": "Chase Atlantic",
-    "albumName": "Out of Step"
-  },
-  {
     "id": 660,
     "name": "Jenifer Lewis",
     "albumName": "Descendants 3 (Original TV Movie Soundtrack)"
-  },
-  {
-    "id": 664,
-    "name": "The Wombats",
-    "albumName": "Long Live The Kane"
-  },
-  {
-    "id": 665,
-    "name": "Ariana Grande",
-    "albumName": "Funeral At the Movies & Ten Spot"
   },
   {
     "id": 666,
@@ -1118,11 +713,6 @@
     "id": 667,
     "name": "Leonard Cohen",
     "albumName": "Dave and Ansel Collins - Essentials (Re-Recorded Versions)"
-  },
-  {
-    "id": 668,
-    "name": "Alanis Morissette",
-    "albumName": "Clean Hands - Single"
   },
   {
     "id": 669,
@@ -1138,16 +728,6 @@
     "id": 672,
     "name": "Emmelie de Forest",
     "albumName": "Talkin' Blues (Live) [Remastered]"
-  },
-  {
-    "id": 675,
-    "name": "Placebo",
-    "albumName": "Z"
-  },
-  {
-    "id": 678,
-    "name": "Kenshi Yonezu",
-    "albumName": "Daydream Nation (Deluxe Edition)"
   },
   {
     "id": 679,
@@ -1175,11 +755,6 @@
     "albumName": "Just a Friend - EP"
   },
   {
-    "id": 686,
-    "name": "Lady Gaga",
-    "albumName": "The Complete Stax / Volt Soul Singles, Vol. 3: 1972-1975"
-  },
-  {
     "id": 689,
     "name": "Ravyn Lenae",
     "albumName": "In the Red Zone: The Essential Collection of Classic Dub"
@@ -1205,11 +780,6 @@
     "albumName": "Rips"
   },
   {
-    "id": 704,
-    "name": "Chappell Roan",
-    "albumName": "Creative Musicians, Vol. 2"
-  },
-  {
     "id": 705,
     "name": "Quevedo",
     "albumName": "Definitely Maybe (Deluxe Edition Remastered)"
@@ -1220,19 +790,9 @@
     "albumName": "History of the Future (Deluxe Edition)"
   },
   {
-    "id": 711,
-    "name": "Gorillaz",
-    "albumName": "One for All (30th Anniversary) [Remastered]"
-  },
-  {
     "id": 712,
     "name": "John Mayer",
     "albumName": "Mickey Mouse Disco"
-  },
-  {
-    "id": 713,
-    "name": "Big Gigantic",
-    "albumName": "Descendants 2 (Original TV Movie Soundtrack)"
   },
   {
     "id": 721,
@@ -1245,11 +805,6 @@
     "albumName": "Hispanic Causing Panic"
   },
   {
-    "id": 724,
-    "name": "Allister",
-    "albumName": "More Fun In the New World"
-  },
-  {
     "id": 725,
     "name": "Holly Humberstone",
     "albumName": "Gala"
@@ -1260,29 +815,9 @@
     "albumName": "The Heptones 22 Golden Hits"
   },
   {
-    "id": 728,
-    "name": "Death Cab for Cutie",
-    "albumName": "The Muppets (Original Motion Picture Soundtrack)"
-  },
-  {
-    "id": 729,
-    "name": "Metro Boomin",
-    "albumName": "The Best of Blondie"
-  },
-  {
-    "id": 730,
-    "name": "Honey G",
-    "albumName": "TROLLS (Original Motion Picture Soundtrack)"
-  },
-  {
     "id": 731,
     "name": "KC & The Sunshine Band",
     "albumName": "Number 1's: James Brown"
-  },
-  {
-    "id": 733,
-    "name": "xxxtentacion",
-    "albumName": "Coco (Original Motion Picture Soundtrack)"
   },
   {
     "id": 734,
@@ -1293,11 +828,6 @@
     "id": 735,
     "name": "Yazoo",
     "albumName": "Upstairs at Eric's"
-  },
-  {
-    "id": 736,
-    "name": "Don Toliver",
-    "albumName": "Bazerk Bazerk Bazerk (feat. No Self Control and the Band)"
   },
   {
     "id": 738,
@@ -1325,19 +855,9 @@
     "albumName": "Not Alone (From “American Song Contest”) - Single"
   },
   {
-    "id": 745,
-    "name": "Block B",
-    "albumName": "METZ"
-  },
-  {
     "id": 746,
     "name": "Hans Zimmer",
     "albumName": "Drink the Sea"
-  },
-  {
-    "id": 747,
-    "name": "Tyler, the Creator",
-    "albumName": "Quality Control"
   },
   {
     "id": 749,
@@ -1348,11 +868,6 @@
     "id": 750,
     "name": "The Pussycat Dolls",
     "albumName": "The Tennessee Fire"
-  },
-  {
-    "id": 751,
-    "name": "I Monster",
-    "albumName": "The Very Best of Daryl Hall & John Oates"
   },
   {
     "id": 752,
@@ -1370,11 +885,6 @@
     "albumName": "Roald Dahl's Matilda The Musical (Soundtrack from the Netflix Film)"
   },
   {
-    "id": 759,
-    "name": "La Roux",
-    "albumName": "Hunky Dory (2015 Remaster)"
-  },
-  {
     "id": 760,
     "name": "He Is We",
     "albumName": "Danzig"
@@ -1388,11 +898,6 @@
     "id": 763,
     "name": "Malcolm Yelvington",
     "albumName": "Check Your Head (Deluxe Edition) [Remastered 2009]"
-  },
-  {
-    "id": 764,
-    "name": "Archie Bell & The Drells",
-    "albumName": "Because I'm Awesome"
   },
   {
     "id": 766,
@@ -1420,34 +925,14 @@
     "albumName": "Magical Mystery Tour"
   },
   {
-    "id": 776,
-    "name": "alt-J",
-    "albumName": "Gala"
-  },
-  {
     "id": 780,
     "name": "Tyla",
     "albumName": "The Head On the Door (Remastered) [Bonus Version]"
   },
   {
-    "id": 782,
-    "name": "brakence",
-    "albumName": "Some Friendly"
-  },
-  {
-    "id": 785,
-    "name": "Sean Paul",
-    "albumName": "The Greatest Showman (Original Motion Picture Soundtrack)"
-  },
-  {
     "id": 786,
     "name": "Skindred",
     "albumName": "Entertainment!"
-  },
-  {
-    "id": 788,
-    "name": "John Denver",
-    "albumName": "Disney Holiday Favorites"
   },
   {
     "id": 790,
@@ -1485,16 +970,6 @@
     "albumName": "PinUps (2015 Remaster)"
   },
   {
-    "id": 805,
-    "name": "Oracle Sisters",
-    "albumName": "Texas Thunder Soul (1968-1974)"
-  },
-  {
-    "id": 806,
-    "name": "Nina Simone",
-    "albumName": "The Best of Trojan Reggae, Vol. 1"
-  },
-  {
     "id": 808,
     "name": "JiSoo",
     "albumName": "No Home Record"
@@ -1503,16 +978,6 @@
     "id": 811,
     "name": "Joji",
     "albumName": "Gimme Christmas - EP"
-  },
-  {
-    "id": 813,
-    "name": "DNCE",
-    "albumName": "Houses of the Holy (Deluxe Edition)"
-  },
-  {
-    "id": 815,
-    "name": "Daft Punk",
-    "albumName": "The Muppet Christmas Carol (Special Anniversary Edition)"
   },
   {
     "id": 818,
@@ -1573,11 +1038,6 @@
     "id": 832,
     "name": "Sum 41",
     "albumName": "Out of Step"
-  },
-  {
-    "id": 833,
-    "name": "Laura Marling",
-    "albumName": "10,9,8,7,6,5,4,3,2,1"
   },
   {
     "id": 835,
@@ -1690,11 +1150,6 @@
     "albumName": "Happy Pills - Single"
   },
   {
-    "id": 870,
-    "name": "Beach Weather",
-    "albumName": "Mass Manipulation"
-  },
-  {
     "id": 874,
     "name": "Timothée Chalamet",
     "albumName": "The Greatest Showman (Original Motion Picture Soundtrack)"
@@ -1718,11 +1173,6 @@
     "id": 879,
     "name": "Bread",
     "albumName": "Aoxomoxoa"
-  },
-  {
-    "id": 880,
-    "name": "Slipknot",
-    "albumName": "Primitive - EP"
   },
   {
     "id": 884,
@@ -1770,11 +1220,6 @@
     "albumName": "Introduction and In The Past"
   },
   {
-    "id": 907,
-    "name": "Quality Control",
-    "albumName": "The Specials (Deluxe Version)"
-  },
-  {
     "id": 912,
     "name": "Lera Lynn",
     "albumName": "Day of the Dead"
@@ -1810,11 +1255,6 @@
     "albumName": "Grateful Dead"
   },
   {
-    "id": 923,
-    "name": "Tegan and Sara",
-    "albumName": "I Against I"
-  },
-  {
     "id": 924,
     "name": "Glassjaw",
     "albumName": "Guilt Regret Embarrassment"
@@ -1848,16 +1288,6 @@
     "id": 937,
     "name": "d3r",
     "albumName": "Crocodiles"
-  },
-  {
-    "id": 939,
-    "name": "Bryson Tiller",
-    "albumName": "The Great Adventures of Slick Rick (Deluxe Edition)"
-  },
-  {
-    "id": 943,
-    "name": "Rex Orange County",
-    "albumName": "Wicked (Original Broadway Cast Recording)"
   },
   {
     "id": 944,
@@ -1910,11 +1340,6 @@
     "albumName": "Mighty Joshua"
   },
   {
-    "id": 958,
-    "name": "Rosa Walton",
-    "albumName": "Start Today"
-  },
-  {
     "id": 959,
     "name": "GZA/Genius",
     "albumName": null
@@ -1955,21 +1380,6 @@
     "albumName": "The Freed Man"
   },
   {
-    "id": 971,
-    "name": "CLAVVS",
-    "albumName": "Earth, Wind & Fire"
-  },
-  {
-    "id": 973,
-    "name": "Five Finger Death Punch",
-    "albumName": "Sleepwalking - Single"
-  },
-  {
-    "id": 974,
-    "name": "Waterparks",
-    "albumName": "Out of Step"
-  },
-  {
     "id": 977,
     "name": "Machine Girl",
     "albumName": "Porno for Pyros"
@@ -1995,29 +1405,14 @@
     "albumName": "More Fun In the New World (Remastered)"
   },
   {
-    "id": 983,
-    "name": "Kid Bloom",
-    "albumName": "No Doy"
-  },
-  {
     "id": 987,
     "name": "Celso Piña",
     "albumName": "Europe '72 (Live)"
   },
   {
-    "id": 988,
-    "name": "Jack Harlow",
-    "albumName": "Like a Ship (Without a Sail)"
-  },
-  {
     "id": 989,
     "name": "Ashley Singh",
     "albumName": "Eric Donaldson Sings 20 Jamaica Classics"
-  },
-  {
-    "id": 991,
-    "name": "aespa",
-    "albumName": "The Click"
   },
   {
     "id": 993,
@@ -2038,11 +1433,6 @@
     "id": 997,
     "name": "Muzz",
     "albumName": "Introduction and In The Past"
-  },
-  {
-    "id": 998,
-    "name": "Fabio Asher",
-    "albumName": "Grateful Dead (Skull & Roses) [Remastered]"
   },
   {
     "id": 1000,
@@ -2068,11 +1458,6 @@
     "id": 1008,
     "name": "ATB",
     "albumName": "Power, Corruption & Lies"
-  },
-  {
-    "id": 1010,
-    "name": "Glaive",
-    "albumName": "I Against I"
   },
   {
     "id": 1015,
@@ -2102,11 +1487,6 @@
   {
     "id": 1021,
     "name": "Illenium",
-    "albumName": "Smash Your Head on the Punk Rock"
-  },
-  {
-    "id": 1022,
-    "name": "The Byrds",
     "albumName": "Smash Your Head on the Punk Rock"
   },
   {
@@ -2198,11 +1578,6 @@
     "id": 1051,
     "name": "AJ Tracey",
     "albumName": "More Petrol"
-  },
-  {
-    "id": 1053,
-    "name": "Lil Xan",
-    "albumName": "Out of Step"
   },
   {
     "id": 1054,
@@ -2305,29 +1680,14 @@
     "albumName": "Muppets Most Wanted (Original Motion Picture Soundtrack)"
   },
   {
-    "id": 1083,
-    "name": "Hollywood Undead",
-    "albumName": "From Here to Eternity (Live)"
-  },
-  {
     "id": 1085,
     "name": "Girl In Red",
     "albumName": "Topolino"
   },
   {
-    "id": 1086,
-    "name": "Beast in Black",
-    "albumName": "Welcome to Zamrock! How Zambia's Liberation Led to a Rock Revolution, Vol. 1 (1972-1977)"
-  },
-  {
     "id": 1087,
     "name": "Camera Obscura",
     "albumName": "Some Friendly"
-  },
-  {
-    "id": 1089,
-    "name": "Kendrick Lamar",
-    "albumName": "I Just Can't Stop It (Remastered)"
   },
   {
     "id": 1093,
@@ -2355,19 +1715,9 @@
     "albumName": "Firewater"
   },
   {
-    "id": 1099,
-    "name": "Lindsey Stirling",
-    "albumName": "Lose You Now - Single"
-  },
-  {
     "id": 1103,
     "name": "Disturbed",
     "albumName": "Substance"
-  },
-  {
-    "id": 1105,
-    "name": "Red Velvet",
-    "albumName": "Watch Out!"
   },
   {
     "id": 1106,
@@ -2515,11 +1865,6 @@
     "albumName": "Encanto (Original Motion Picture Soundtrack)"
   },
   {
-    "id": 1158,
-    "name": "Death Grips",
-    "albumName": "Smash Your Head on the Punk Rock"
-  },
-  {
     "id": 1161,
     "name": "Mother Mother",
     "albumName": "Damned Damned Damned"
@@ -2565,11 +1910,6 @@
     "albumName": "California Funk"
   },
   {
-    "id": 1179,
-    "name": "Cardi B",
-    "albumName": "So I Can Love You / Untouched"
-  },
-  {
     "id": 1180,
     "name": "Beach House",
     "albumName": "The Real Thing"
@@ -2613,11 +1953,6 @@
     "id": 1194,
     "name": "Dane Cook",
     "albumName": "Retaliation"
-  },
-  {
-    "id": 1196,
-    "name": "Carolina Gaitán - La Gaita",
-    "albumName": "Encanto (Original Motion Picture Soundtrack)"
   },
   {
     "id": 1197,
@@ -2815,11 +2150,6 @@
     "albumName": "The Silver Collection: The Astrud Gilberto Album"
   },
   {
-    "id": 1256,
-    "name": "Playboi Carti",
-    "albumName": "sweetener"
-  },
-  {
     "id": 1258,
     "name": "Emmit Fenn",
     "albumName": "Authorized Greatest Hits"
@@ -2860,11 +2190,6 @@
     "albumName": "This Is Me (Dave Audé Remix) [From \"The Greatest Showman\"] - Single"
   },
   {
-    "id": 1270,
-    "name": "The Kooks",
-    "albumName": "Don't You Want Me Baby - Single"
-  },
-  {
     "id": 1271,
     "name": "Subhumans",
     "albumName": "Towako's Diary (“My Dear Exes” Original Soundtrack)"
@@ -2888,11 +2213,6 @@
     "id": 1276,
     "name": "Arrested Development & Speech",
     "albumName": "On the Cutting Room Floor (Mixtape)"
-  },
-  {
-    "id": 1277,
-    "name": "Daniel Caesar",
-    "albumName": "Heathers: The Musical (World Premiere Cast Recording)"
   },
   {
     "id": 1278,
@@ -3035,11 +2355,6 @@
     "albumName": "The Wall"
   },
   {
-    "id": 1337,
-    "name": "My Chemical Romance",
-    "albumName": "Descendants 2 (Original TV Movie Soundtrack)"
-  },
-  {
     "id": 1338,
     "name": "Reeve Carney",
     "albumName": "Hadestown (Original Broadway Cast Recording)"
@@ -3110,11 +2425,6 @@
     "albumName": "Yeah Yeah Yeahs - EP"
   },
   {
-    "id": 1358,
-    "name": "Bad Omens",
-    "albumName": "Catch a Fire (Deluxe Edition)"
-  },
-  {
     "id": 1359,
     "name": "The Gagliano Strings",
     "albumName": "Boss Hog"
@@ -3168,11 +2478,6 @@
     "id": 1373,
     "name": "Tapes 'n Tapes",
     "albumName": "The Spaghetti Incident?"
-  },
-  {
-    "id": 1377,
-    "name": "Mazzy Star",
-    "albumName": "Fade Into You - Single"
   },
   {
     "id": 1379,
@@ -3375,11 +2680,6 @@
     "albumName": "Black Pumas (Deluxe)"
   },
   {
-    "id": 1440,
-    "name": "Nick Drake",
-    "albumName": "Start Today"
-  },
-  {
     "id": 1441,
     "name": "Zombie Nation",
     "albumName": "Second Edition"
@@ -3448,11 +2748,6 @@
     "id": 1463,
     "name": "The Suffers",
     "albumName": "The Assassin"
-  },
-  {
-    "id": 1464,
-    "name": "The 1975",
-    "albumName": "California Funk"
   },
   {
     "id": 1465,
@@ -3698,11 +2993,6 @@
     "id": 1540,
     "name": "The Blues Brothers",
     "albumName": "So-Lo"
-  },
-  {
-    "id": 1541,
-    "name": "Doja Cat",
-    "albumName": "Pod"
   },
   {
     "id": 1543,
@@ -4108,11 +3398,6 @@
     "id": 1664,
     "name": "Danger Mouse & Jemini",
     "albumName": "Ghetto Pop Life"
-  },
-  {
-    "id": 1666,
-    "name": "Sugar Ray",
-    "albumName": "Chairs Missing"
   },
   {
     "id": 1667,
@@ -9680,11 +8965,6 @@
     "albumName": "The Wonderful and Frightening World of the Fall"
   },
   {
-    "id": 3294,
-    "name": "J Dilla",
-    "albumName": "Holy Fire"
-  },
-  {
     "id": 3297,
     "name": "Billie Holiday",
     "albumName": "Grease (The Original Soundtrack from the Motion Picture)"
@@ -11718,11 +10998,6 @@
     "id": 3881,
     "name": "The Verve",
     "albumName": "In Control Volume 1"
-  },
-  {
-    "id": 3883,
-    "name": "Smokey Robinson & The Miracles",
-    "albumName": "Recorded Live Motortown Revue In Paris"
   },
   {
     "id": 3884,

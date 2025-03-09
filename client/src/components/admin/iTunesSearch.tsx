@@ -117,6 +117,7 @@ export function ITunesSearch() {
               />
               <Button
                 type="submit"
+                className="w-full"
                 disabled={searchForm.formState.isSubmitting}
               >
                 {searchForm.formState.isSubmitting ? (

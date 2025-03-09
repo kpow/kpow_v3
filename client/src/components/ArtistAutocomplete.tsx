@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
-import artistsData from '../../../artists_without_images.json'
+import artistsData from '@/data/artists_without_images.json'
 
 interface Artist {
   id: number
