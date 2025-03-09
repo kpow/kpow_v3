@@ -29,14 +29,13 @@ export async function fetchLastFmData(method: string, params: Record<string, str
     });
 
     const url = `${LASTFM_API_BASE}?${queryParams.toString()}`;
-    const response = await fetch(url);
-    const data = await response.json();
+    const response = await axios.get(url);
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch data from Last.fm API");
+    if (response.status !== 200) {
+      throw new Error(response.data.message || "Failed to fetch data from Last.fm API");
     }
 
-    return data;
+    return response.data;
   } catch (error) {
     console.error("Error fetching from Last.fm:", error);
     throw error;
@@ -47,18 +46,17 @@ export async function fetchLastFmData(method: string, params: Record<string, str
 export async function fetchPhishData(endpoint: string) {
   try {
     const apiKey = process.env.PHISH_API_KEY;
-    const response = await fetch(
+    const response = await axios.get(
       `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
     );
-    const data = await response.json();
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(
-        data.message || "Failed to fetch data from Phish.net API",
+        response.data.message || "Failed to fetch data from Phish.net API",
       );
     }
 
-    return data.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error fetching from Phish.net:", error);
     throw error;
