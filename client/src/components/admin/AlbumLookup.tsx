@@ -65,11 +65,8 @@ export function AlbumLookup() {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Last.fm Album Lookup</CardTitle>
-      </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
+        <form onSubmit={handleSubmit} className="flex gap-2 mb-4 mt-10">
           <Input
             type="text"
             value={artist}
