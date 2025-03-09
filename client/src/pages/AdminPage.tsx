@@ -74,7 +74,13 @@ export default function AdminPage() {
   });
 
   const updateArtistImage = useMutation({
-    mutationFn: async ({ artistName, imageUrl }: { artistName: string; imageUrl: string }) => {
+    mutationFn: async ({
+      artistName,
+      imageUrl,
+    }: {
+      artistName: string;
+      imageUrl: string;
+    }) => {
       const res = await fetch("/api/admin/update-artist-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,7 +107,7 @@ export default function AdminPage() {
   async function onSearchSubmit(values: z.infer<typeof searchFormSchema>) {
     try {
       const response = await fetch(
-        `/api/admin/search-itunes?term=${encodeURIComponent(values.albumName)}`
+        `/api/admin/search-itunes?term=${encodeURIComponent(values.albumName)}`,
       );
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
@@ -109,7 +115,8 @@ export default function AdminPage() {
     } catch (error) {
       toast({
         title: "Search failed",
-        description: error instanceof Error ? error.message : "Failed to search iTunes",
+        description:
+          error instanceof Error ? error.message : "Failed to search iTunes",
         variant: "destructive",
       });
     }
@@ -140,7 +147,8 @@ export default function AdminPage() {
                   <div>
                     <p className="font-medium">{user.username}</p>
                     <p className="text-sm text-muted-foreground">
-                      Registered on: {new Date(user.createdAt).toLocaleDateString()}
+                      Registered on:{" "}
+                      {new Date(user.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <Button
@@ -169,7 +177,10 @@ export default function AdminPage() {
         <Card>
           <CardContent className="p-4">
             <Form {...searchForm}>
-              <form onSubmit={searchForm.handleSubmit(onSearchSubmit)} className="space-y-4">
+              <form
+                onSubmit={searchForm.handleSubmit(onSearchSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={searchForm.control}
                   name="albumName"
@@ -182,7 +193,10 @@ export default function AdminPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={searchForm.formState.isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={searchForm.formState.isSubmitting}
+                >
                   {searchForm.formState.isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -200,34 +214,49 @@ export default function AdminPage() {
                 <div>
                   <h3 className="text-lg font-medium mb-2">Search Results</h3>
                   <div className="grid gap-4">
-                    {searchResults.results?.map((result: any, index: number) => (
-                      <Card key={index}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-4">
-                            <img 
-                              src={result.artworkUrl100} 
-                              alt={result.collectionName}
-                              className="w-20 h-20 object-cover rounded"
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium">{result.artistName}</p>
-                              <p className="text-sm text-muted-foreground">{result.collectionName}</p>
+                    {searchResults.results?.map(
+                      (result: any, index: number) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-4">
+                              <img
+                                src={result.artworkUrl100}
+                                alt={result.collectionName}
+                                className="w-20 h-20 object-cover rounded"
+                              />
+                              <div className="flex-1">
+                                <p className="font-medium">
+                                  {result.artistName}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {result.collectionName}
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    searchForm.setValue(
+                                      "artistName",
+                                      result.artistName,
+                                    );
+                                    searchForm.setValue(
+                                      "imageUrl",
+                                      result.artworkUrl100.replace(
+                                        "100x100",
+                                        "600x600",
+                                      ),
+                                    );
+                                  }}
+                                >
+                                  Use This Artist
+                                </Button>
+                              </div>
                             </div>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                onClick={() => {
-                                  searchForm.setValue("artistName", result.artistName);
-                                  searchForm.setValue("imageUrl", result.artworkUrl100.replace('100x100', '600x600'));
-                                }}
-                              >
-                                Use This Artist
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      ),
+                    )}
                   </div>
                 </div>
 
@@ -235,14 +264,11 @@ export default function AdminPage() {
                   <h3 className="text-lg font-medium">Update Artist Image</h3>
                   <div className="flex gap-4">
                     <Input
-                      placeholder="Artist name..."
-                      className="flex-1"
-                      onChange={(e) => searchForm.setValue("artistName", e.target.value)}
-                    />
-                    <Input
                       placeholder="Image URL..."
-                      className="flex-2"
-                      onChange={(e) => searchForm.setValue("imageUrl", e.target.value)}
+                      className=""
+                      onChange={(e) =>
+                        searchForm.setValue("imageUrl", e.target.value)
+                      }
                     />
                     <Button
                       onClick={() =>
