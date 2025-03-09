@@ -5,14 +5,19 @@ import { cn } from "@/lib/utils"
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
+    maxHeight?: string;
+  }
+>(({ className, maxHeight, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+    <ScrollAreaPrimitive.Viewport 
+      className="h-full w-full rounded-[inherit]" 
+      style={maxHeight ? { maxHeight } : undefined}
+    >
       {children}
     </ScrollAreaPrimitive.Viewport>
     <ScrollBar />
@@ -33,7 +38,7 @@ const ScrollBar = React.forwardRef<
       orientation === "vertical" &&
         "h-full w-2.5 border-l border-l-transparent p-[1px]",
       orientation === "horizontal" &&
-        "h-2.5 flex-col border-t border-t-transparent p-[1px]",
+        "h-2.5 border-t border-t-transparent p-[1px]",
       className
     )}
     {...props}
@@ -44,56 +49,23 @@ const ScrollBar = React.forwardRef<
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
 export { ScrollArea, ScrollBar }
-import React from "react";
-import { cn } from "@/lib/utils";
 
-interface ScrollAreaProps {
+interface ScrollListProps {
   children: React.ReactNode;
   className?: string;
-  maxHeight?: string;
 }
 
-export function ScrollArea({ 
-  children, 
-  className, 
-  maxHeight = "450px" 
-}: ScrollAreaProps) {
-  return (
-    <div 
-      className={cn(
-        "border rounded-md overflow-y-auto", 
-        className
-      )}
-      style={{ maxHeight }}
-    >
-      {children}
-    </div>
-  );
+export function ScrollList({ children, className }: ScrollListProps) {
+  return <ul className={cn("divide-y", className)}>{children}</ul>;
 }
 
-export function ScrollList({ 
-  children, 
-  className 
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <ul className={cn("divide-y", className)}>
-      {children}
-    </ul>
-  );
-}
-
-export function ScrollListItem({
-  children,
-  className,
-  onClick
-}: {
+interface ScrollListItemProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
-}) {
+}
+
+export function ScrollListItem({ children, className, onClick }: ScrollListItemProps) {
   return (
     <li
       className={cn(
