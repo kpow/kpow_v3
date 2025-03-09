@@ -67,7 +67,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex">
       {/* Form Column */}
-      <div className="w-1/2 flex items-center justify-center bg-background p-8">
+      <div className="w-full flex justify-center bg-background p-8">
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-2">
@@ -137,17 +137,6 @@ export default function AuthPage() {
                 : "Already have an account? Sign in"}
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Hero Column */}
-      <div className="w-1/2 bg-primary/5 flex items-center justify-center p-8">
-        <div className="max-w-md text-center">
-          <h2 className="text-3xl font-bold mb-4">Cross-Domain Analytics Platform</h2>
-          <p className="text-muted-foreground">
-            Explore local culinary experiences and music discovery through interactive 
-            data visualization with secure authentication.
-          </p>
         </div>
       </div>
     </div>
