@@ -92,24 +92,37 @@ export function AlbumLookup() {
             ))}
           </div>
         ) : data?.topalbums?.album ? (
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {data.topalbums.album.map((album) => (
-              <Card key={album.url}>
-                <CardContent className="pt-4">
-                  <div className="aspect-square mb-2">
+          <div className="border rounded-md max-h-[500px] overflow-y-auto">
+            <ul className="divide-y">
+              {data.topalbums.album.map((album) => (
+                <li 
+                  key={album.url} 
+                  className="p-3 flex items-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                  onClick={() => {
+                    navigator.clipboard.writeText(album.name);
+                    toast({
+                      title: "Copied to clipboard",
+                      description: `Album: ${album.name}`,
+                      duration: 2000,
+                    });
+                  }}
+                >
+                  <div className="h-[60px] w-[60px] mr-3 flex-shrink-0">
                     <img
-                      src={album.image.find((img) => img.size === "large")?.["#text"]}
+                      src={album.image.find((img) => img.size === "medium")?.["#text"] || ""}
                       alt={album.name}
                       className="w-full h-full object-cover rounded"
                     />
                   </div>
-                  <h3 className="font-bold truncate">{album.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Playcount: {album.playcount}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm truncate">{album.name}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Playcount: {album.playcount}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         ) : null}
       </CardContent>
