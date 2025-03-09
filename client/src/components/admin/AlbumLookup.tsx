@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea, ScrollList, ScrollListItem } from "@/components/ui/scroll-area";
+import { ArtistAutocomplete } from "@/components/ArtistAutocomplete";
 
 interface Album {
   name: string;
@@ -54,7 +54,7 @@ export function AlbumLookup() {
     if (!artist) {
       toast({
         title: "Error",
-        description: "Please enter an artist name",
+        description: "Please select an artist",
         variant: "destructive",
       });
       return;
@@ -66,31 +66,29 @@ export function AlbumLookup() {
   return (
     <Card className="w-full">
       <CardContent>
-        <form onSubmit={handleSubmit} className="flex gap-2 mb-4 mt-10">
-          <Input
-            type="text"
-            value={artist}
-            onChange={(e) => setArtist(e.target.value)}
-            placeholder="Enter artist name"
-            className="flex-1"
+        <form onSubmit={handleSubmit} className="space-y-4 mt-10">
+          <ArtistAutocomplete 
+            onArtistSelect={(selectedArtist) => {
+              setArtist(selectedArtist.name);
+            }} 
           />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Loading..." : "Search"}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Loading..." : "Search Albums"}
           </Button>
         </form>
 
         {error ? (
-          <div className="text-red-500">
+          <div className="text-red-500 mt-4">
             {error instanceof Error ? error.message : "Error fetching albums"}
           </div>
         ) : isLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-2 mt-4">
             {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="h-12 w-full" />
             ))}
           </div>
         ) : data?.topalbums?.album ? (
-          <ScrollArea maxHeight="500px">
+          <ScrollArea className="h-[500px] mt-4">
             <ScrollList>
               {data.topalbums.album.map((album) => (
                 <ScrollListItem 
