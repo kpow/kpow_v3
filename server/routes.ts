@@ -1,10 +1,6 @@
 import type { Express } from "express";
 import { Router } from "express";
 import { createServer, type Server } from "http";
-import session from "express-session";
-import passport from "./config/passport";
-import { sessionConfig } from "./config/session";
-import authRoutes from "./routes/auth-routes";
 import { registerPhishRoutes } from "./routes/phish-routes";
 import { registerLastFmRoutes } from "./routes/lastfm-routes";
 import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
@@ -40,29 +36,7 @@ if (!process.env.YELP_API_KEY) {
 }
 
 export function registerRoutes(app: Express): Server {
-  // Initialize session middleware first
-  app.use(session({
-    ...sessionConfig,
-    resave: true, // Changed to true to ensure session is saved
-    saveUninitialized: true // Changed to true to create session for all requests
-  }));
-
-  // Then initialize passport
-  app.use(passport.initialize());
-  app.use(passport.session());
-
   const router = Router();
-
-  // Add health check endpoint
-  router.get("/api/health", (req, res) => {
-    res.json({ 
-      status: "OK",
-      timestamp: new Date().toISOString()
-    });
-  });
-
-  // Register auth routes first
-  router.use(authRoutes);
 
   // Register all route modules
   registerPhishRoutes(router);
@@ -70,7 +44,7 @@ export function registerRoutes(app: Express): Server {
   registerGoodreadsRoutes(router);
   registerFeedbinRoutes(router);
   registerGithubRoutes(router);
-  registerMusicRoutes(router);
+  registerMusicRoutes(router); // Add the new music routes
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
@@ -90,20 +64,6 @@ export function registerRoutes(app: Express): Server {
   // Serve the cube index.html
   router.get('/cube', (req, res) => {
     res.sendFile(path.join(process.cwd(), 'client', 'public', 'cube', 'index.html'));
-  });
-
-  // Add a test endpoint to verify session
-  router.get('/api/test-session', (req, res) => {
-    console.log('Session test:', {
-      sessionID: req.sessionID,
-      user: req.user,
-      isAuthenticated: req.isAuthenticated()
-    });
-    res.json({
-      sessionID: req.sessionID,
-      authenticated: req.isAuthenticated(),
-      user: req.user
-    });
   });
 
   // Use the router
