@@ -1,6 +1,7 @@
 
 import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
+
 import { cn } from "@/lib/utils"
 
 const ScrollArea = React.forwardRef<
@@ -15,7 +16,7 @@ const ScrollArea = React.forwardRef<
     {...props}
   >
     <ScrollAreaPrimitive.Viewport 
-      className={cn("h-full w-full rounded-[inherit]", maxHeight && `max-h-[${maxHeight}]`)}
+      className="h-full w-full rounded-[inherit]" 
       style={maxHeight ? { maxHeight } : undefined}
     >
       {children}
@@ -48,34 +49,34 @@ const ScrollBar = React.forwardRef<
 ))
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
-// List components for scrollable lists
-interface ScrollListProps {
-  children: React.ReactNode;
-  className?: string;
-}
+// ScrollList and ScrollListItem components
+const ScrollList = React.forwardRef<
+  HTMLUListElement,
+  React.HTMLAttributes<HTMLUListElement>
+>(({ className, ...props }, ref) => (
+  <ul
+    ref={ref}
+    className={cn("divide-y", className)}
+    {...props}
+  />
+));
+ScrollList.displayName = "ScrollList";
 
-function ScrollList({ children, className }: ScrollListProps) {
-  return <ul className={cn("divide-y", className)}>{children}</ul>;
-}
-
-interface ScrollListItemProps {
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}
-
-function ScrollListItem({ children, className, onClick }: ScrollListItemProps) {
-  return (
-    <li
-      className={cn(
-        "flex justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer",
-        className
-      )}
-      onClick={onClick}
-    >
-      {children}
-    </li>
-  );
-}
+const ScrollListItem = React.forwardRef<
+  HTMLLIElement,
+  React.LiHTMLAttributes<HTMLLIElement> & {
+    className?: string;
+  }
+>(({ className, ...props }, ref) => (
+  <li
+    ref={ref}
+    className={cn(
+      "flex py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer",
+      className
+    )}
+    {...props}
+  />
+));
+ScrollListItem.displayName = "ScrollListItem";
 
 export { ScrollArea, ScrollBar, ScrollList, ScrollListItem }
