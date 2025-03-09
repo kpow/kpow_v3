@@ -12,6 +12,7 @@ import Home from "@/pages/Home";
 import About from "@/pages/About";
 import NotFound from "@/pages/not-found";
 import Itunez from "@/pages/itunez";
+import Phashboard from "@/pages/Phashboard";
 import { SEO } from "@/components/global/SEO";
 
 function Router() {
@@ -23,6 +24,7 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/itunez" component={Itunez} />
+        <Route path="/phashboard" component={Phashboard} />
         <ProtectedRoute path="/admin" component={AdminPage} />
         <Route component={NotFound} />
       </Switch>
