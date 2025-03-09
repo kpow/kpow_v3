@@ -15,6 +15,7 @@ import NotFound from "@/pages/not-found";
 import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
 import ITunez from "@/pages/itunez";
+import Admin from "@/pages/Admin"; // Added import
 import { Route as WouterRoute } from "wouter";
 import { SEO } from "@/components/global/SEO";
 
@@ -28,6 +29,7 @@ function Router() {
         <Route path="/phashboard" component={ShowStats} />
         <Route path="/books/page/:page" component={Books} />
         <Route path="/books" component={Books} />
+        <Route path="/admin" component={Admin} /> {/* Added admin route */}
         <Route
           path="/starred-articles/page/:page"
           component={StarredArticles}
