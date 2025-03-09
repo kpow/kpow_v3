@@ -23,20 +23,17 @@ interface PendingUser {
 }
 
 const searchFormSchema = z.object({
-  artistName: z.string().min(1, "Artist name is required"),
-  albumName: z.string().min(1, "Album name is required").optional(),
+  albumName: z.string().min(1, "Album name is required"),
 });
 
 export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchResults, setSearchResults] = useState<any>(null);
-  const [lastFmAlbums, setLastFmAlbums] = useState<any>(null);
 
   const searchForm = useForm<z.infer<typeof searchFormSchema>>({
     resolver: zodResolver(searchFormSchema),
     defaultValues: {
-      artistName: "",
       albumName: "",
     },
   });
@@ -101,42 +98,12 @@ export default function AdminPage() {
     },
   });
 
-  async function onSearchArtist(values: z.infer<typeof searchFormSchema>) {
-    try {
-      // Log the search attempt
-      console.log("Searching for artist:", values.artistName);
-
-      // Encode the artist name for the URL
-      const encodedArtist = encodeURIComponent(values.artistName);
-      const response = await fetch(`/api/lastfm/artist-albums/${encodedArtist}`);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Artist search failed");
-      }
-
-      const data = await response.json();
-      console.log("Last.fm search results:", data);
-
-      setLastFmAlbums(data);
-      // Clear previous iTunes results
-      setSearchResults(null);
-    } catch (error) {
-      console.error("Search error:", error);
-      toast({
-        title: "Artist search failed",
-        description: error instanceof Error ? error.message : "Failed to search artist",
-        variant: "destructive",
-      });
-    }
-  }
-
-  async function onSearchItunes(albumName: string) {
+  async function onSearchSubmit(values: z.infer<typeof searchFormSchema>) {
     try {
       const response = await fetch(
-        `/api/admin/search-itunes?term=${encodeURIComponent(albumName)}`
+        `/api/admin/search-itunes?term=${encodeURIComponent(values.albumName)}`
       );
-      if (!response.ok) throw new Error("iTunes search failed");
+      if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
       setSearchResults(data);
     } catch (error) {
@@ -196,21 +163,21 @@ export default function AdminPage() {
         )}
       </div>
 
-      {/* Artist Search and Image Update Section */}
+      {/* iTunes Search Section */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Artist Image Update</h2>
         <Card>
           <CardContent className="p-4">
             <Form {...searchForm}>
-              <form onSubmit={searchForm.handleSubmit(onSearchArtist)} className="space-y-4">
+              <form onSubmit={searchForm.handleSubmit(onSearchSubmit)} className="space-y-4">
                 <FormField
                   control={searchForm.control}
-                  name="artistName"
+                  name="albumName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Search Artist</FormLabel>
+                      <FormLabel>Search Album</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter artist name..." {...field} />
+                        <Input placeholder="Enter album name..." {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -219,65 +186,34 @@ export default function AdminPage() {
                   {searchForm.formState.isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Searching Artist...
+                      Searching...
                     </>
                   ) : (
-                    "Search Last.fm"
+                    "Search iTunes"
                   )}
                 </Button>
               </form>
             </Form>
 
-            {lastFmAlbums && (
-              <div className="mt-6 space-y-6">
+            {searchResults && (
+              <div className="mt-4 space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Artist Albums from Last.fm</h3>
+                  <h3 className="text-lg font-medium mb-2">Search Results</h3>
                   <div className="grid gap-4">
-                    {lastFmAlbums.albums?.map((album: any, index: number) => (
+                    {searchResults.results?.map((result: any, index: number) => (
                       <Card key={index}>
                         <CardContent className="p-4">
                           <div className="flex items-center gap-4">
-                            <img
-                              src={album.image}
-                              alt={album.name}
+                            <img 
+                              src={result.artworkUrl100} 
+                              alt={result.collectionName}
                               className="w-20 h-20 object-cover rounded"
                             />
                             <div className="flex-1">
-                              <p className="font-medium">{album.name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Playcount: {album.playcount}
-                              </p>
+                              <p className="font-medium">{result.artistName}</p>
+                              <p className="text-sm text-muted-foreground">{result.collectionName}</p>
                             </div>
-                            <Button
-                              variant="outline"
-                              onClick={() => onSearchItunes(`${album.artist} ${album.name}`)}
-                            >
-                              Search on iTunes
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-
-                {searchResults && (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-medium mb-2">iTunes Results</h3>
-                    <div className="grid gap-4">
-                      {searchResults.results?.map((result: any, index: number) => (
-                        <Card key={index}>
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-4">
-                              <img
-                                src={result.artworkUrl100}
-                                alt={result.collectionName}
-                                className="w-20 h-20 object-cover rounded"
-                              />
-                              <div className="flex-1">
-                                <p className="font-medium">{result.artistName}</p>
-                                <p className="text-sm text-muted-foreground">{result.collectionName}</p>
-                              </div>
+                            <div className="flex gap-2">
                               <Button
                                 variant="outline"
                                 onClick={() => {
@@ -288,53 +224,53 @@ export default function AdminPage() {
                                 Use This Artist
                               </Button>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 space-y-4">
-                      <h3 className="text-lg font-medium">Update Artist Image</h3>
-                      <div className="flex gap-4">
-                        <Input
-                          placeholder="Artist name..."
-                          className="flex-1"
-                          onChange={(e) => searchForm.setValue("artistName", e.target.value)}
-                        />
-                        <Input
-                          placeholder="Image URL..."
-                          className="flex-2"
-                          onChange={(e) => searchForm.setValue("imageUrl", e.target.value)}
-                        />
-                        <Button
-                          onClick={() =>
-                            updateArtistImage.mutate({
-                              artistName: searchForm.getValues("artistName"),
-                              imageUrl: searchForm.getValues("imageUrl"),
-                            })
-                          }
-                          disabled={updateArtistImage.isPending}
-                        >
-                          {updateArtistImage.isPending ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Updating...
-                            </>
-                          ) : (
-                            "Update Artist"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="mt-6">
-                      <h3 className="text-lg font-medium mb-2">Raw Response</h3>
-                      <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto">
-                        {JSON.stringify(searchResults, null, 2)}
-                      </pre>
-                    </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                )}
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <h3 className="text-lg font-medium">Update Artist Image</h3>
+                  <div className="flex gap-4">
+                    <Input
+                      placeholder="Artist name..."
+                      className="flex-1"
+                      onChange={(e) => searchForm.setValue("artistName", e.target.value)}
+                    />
+                    <Input
+                      placeholder="Image URL..."
+                      className="flex-2"
+                      onChange={(e) => searchForm.setValue("imageUrl", e.target.value)}
+                    />
+                    <Button
+                      onClick={() =>
+                        updateArtistImage.mutate({
+                          artistName: searchForm.getValues("artistName"),
+                          imageUrl: searchForm.getValues("imageUrl"),
+                        })
+                      }
+                      disabled={updateArtistImage.isPending}
+                    >
+                      {updateArtistImage.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        "Update Artist"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Raw Response</h3>
+                  <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto">
+                    {JSON.stringify(searchResults, null, 2)}
+                  </pre>
+                </div>
               </div>
             )}
           </CardContent>

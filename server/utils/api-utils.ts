@@ -29,15 +29,14 @@ export async function fetchLastFmData(method: string, params: Record<string, str
     });
 
     const url = `${LASTFM_API_BASE}?${queryParams.toString()}`;
-    console.log("Making Last.fm API request to:", url);
-    const response = await axios.get(url);
+    const response = await fetch(url);
+    const data = await response.json();
 
-    if (response.status !== 200) {
-      throw new Error(response.data.message || "Failed to fetch data from Last.fm API");
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch data from Last.fm API");
     }
 
-    console.log("Last.fm API response:", JSON.stringify(response.data, null, 2));
-    return response.data;
+    return data;
   } catch (error) {
     console.error("Error fetching from Last.fm:", error);
     throw error;
@@ -48,17 +47,18 @@ export async function fetchLastFmData(method: string, params: Record<string, str
 export async function fetchPhishData(endpoint: string) {
   try {
     const apiKey = process.env.PHISH_API_KEY;
-    const response = await axios.get(
+    const response = await fetch(
       `${PHISH_API_BASE}${endpoint}.json?apikey=${apiKey}`,
     );
+    const data = await response.json();
 
-    if (response.status !== 200) {
+    if (!response.ok) {
       throw new Error(
-        response.data.message || "Failed to fetch data from Phish.net API",
+        data.message || "Failed to fetch data from Phish.net API",
       );
     }
 
-    return response.data.data;
+    return data.data;
   } catch (error) {
     console.error("Error fetching from Phish.net:", error);
     throw error;

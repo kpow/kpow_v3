@@ -37,23 +37,7 @@ async function getUserByUsername(username: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Configure the session store with robust error handling and connection settings
-  const store = new PostgresSessionStore({
-    pool,
-    createTableIfMissing: true,
-    // Add robust pool settings
-    pruneSessionInterval: 60,
-    // Error handling for the session store
-    errorLog: (err) => {
-      console.error("[Session Store Error]:", err);
-    }
-  });
-
-  // Handle store errors
-  store.on('error', function(error) {
-    console.error('[Session Store Error]:', error);
-  });
-
+  const store = new PostgresSessionStore({ pool, createTableIfMissing: true });
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET!,
     resave: false,
@@ -63,24 +47,11 @@ export function setupAuth(app: Express) {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-    },
-    // Add rolling sessions to help prevent timeouts
-    rolling: true
+    }
   };
 
   app.set("trust proxy", 1);
-
-  // Wrap session middleware in error handling
-  app.use((req, res, next) => {
-    session(sessionSettings)(req, res, (err) => {
-      if (err) {
-        console.error("[Session Middleware Error]:", err);
-        return res.status(500).json({ error: "Internal server error" });
-      }
-      next();
-    });
-  });
-
+  app.use(session(sessionSettings));
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -96,14 +67,12 @@ export function setupAuth(app: Express) {
         }
         return done(null, user);
       } catch (err) {
-        console.error("[Authentication Error]:", err);
         return done(err);
       }
     }),
   );
 
   passport.serializeUser((user, done) => done(null, user.id));
-
   passport.deserializeUser(async (id: number, done) => {
     try {
       const [user] = await db
@@ -113,7 +82,6 @@ export function setupAuth(app: Express) {
         .limit(1);
       done(null, user);
     } catch (err) {
-      console.error("[Deserialization Error]:", err);
       done(err);
     }
   });
@@ -136,7 +104,7 @@ export function setupAuth(app: Express) {
         .values({
           ...result.data,
           password: await hashPassword(result.data.password),
-          approved: false
+          approved: false // added approved: false to new users
         })
         .returning();
 
@@ -145,17 +113,13 @@ export function setupAuth(app: Express) {
         res.status(201).json(user);
       });
     } catch (err) {
-      console.error("[Registration Error]:", err);
       next(err);
     }
   });
 
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
-      if (err) {
-        console.error("[Login Error]:", err);
-        return next(err);
-      }
+      if (err) return next(err);
       if (!user) {
         return res.status(401).json({ error: info?.message || "Authentication failed" });
       }
@@ -168,10 +132,7 @@ export function setupAuth(app: Express) {
 
   app.post("/api/logout", (req, res, next) => {
     req.logout((err) => {
-      if (err) {
-        console.error("[Logout Error]:", err);
-        return next(err);
-      }
+      if (err) return next(err);
       res.sendStatus(200);
     });
   });
