@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-// import { Logo } from "./Logo";
 import { SlideMenu } from "./SlideMenu";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { ContactDialog } from "@/components/ContactDialog";
-import MetallicPaint, {
-  parseLogoImage,
-} from "@/reactbits/MetallicPaint/MetallicPaint";
-import { Wand2 } from "lucide-react";
+import MetallicPaint, { parseLogoImage } from "@/reactbits/MetallicPaint/MetallicPaint";
+import { Wand2, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 import logo from "@/reactbits/skull-white.svg";
 import Magnet from "@/reactbits/Magnet/Magnet";
@@ -16,6 +16,9 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showCursor, setShowCursor] = useState(false);
   const [imageData, setImageData] = useState<ImageData | null>(null);
+  const { user, logoutMutation } = useAuth();
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     async function loadDefaultImage() {
@@ -43,13 +46,24 @@ export function Header() {
       }, 10000); // 10 seconds in milliseconds
     }
 
-    // Cleanup function to clear the timer if component unmounts or showCursor changes
     return () => {
       if (timerId) {
         clearTimeout(timerId);
       }
     };
   }, [showCursor]);
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast({
+          title: "Logged out",
+          description: "You have been successfully logged out.",
+        });
+        setLocation("/auth");
+      },
+    });
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-95 text-white">
@@ -74,7 +88,6 @@ export function Header() {
                     />
                   )}
                 </div>
-                {/* <Logo /> */}
                 <div className="flex items-center gap-2">
                   <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
                   <button
@@ -91,7 +104,18 @@ export function Header() {
             </Magnet>
           </Link>
           <nav className="flex items-center gap-4">
-            {/* Hide ContactDialog on mobile using Tailwind's responsive classes */}
+            {user && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                disabled={logoutMutation.isPending}
+                className="text-white hover:text-white hover:bg-white/10"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                {logoutMutation.isPending ? "Logging out..." : "Logout"}
+              </Button>
+            )}
             <div className="hidden md:block">
               <ContactDialog />
             </div>
