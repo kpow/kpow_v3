@@ -1,7 +1,25 @@
 import { pgTable, text, serial, integer, boolean, timestamp, varchar, unique, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { z } from "zod";
 import { Artist, ArtistInsert, Song, SongInsert, Play, PlayInsert } from '@types/database';
 import { artistSchema } from '@types/artist';
+
+// Users table for authentication
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 256 }).notNull().unique(),
+  password: varchar("password", { length: 256 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Schema for user insertion with validation
+export const insertUserSchema = z.object({
+  username: z.string().min(3).max(50),
+  password: z.string().min(6).max(100),
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type SelectUser = typeof users.$inferSelect;
 
 // Artists table to store unique artists and their images
 export const artists = pgTable("artists", {
@@ -70,5 +88,7 @@ export type {
   Song,
   SongInsert,
   Play,
-  PlayInsert
+  PlayInsert,
+  InsertUser,
+  SelectUser
 };

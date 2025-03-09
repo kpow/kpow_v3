@@ -1,6 +1,9 @@
 import type { Express } from "express";
 import { Router } from "express";
 import { createServer, type Server } from "http";
+import { setupAuth } from "./auth";
+import express from "express";
+import path from "path";
 import { registerPhishRoutes } from "./routes/phish-routes";
 import { registerLastFmRoutes } from "./routes/lastfm-routes";
 import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
@@ -11,32 +14,21 @@ import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
 import yelpRoutes from "./routes/yelp";
-import path from "path";
-import express from "express";
 
-// Verify required environment variables
-if (!process.env.PHISH_API_KEY) {
-  throw new Error("PHISH_API_KEY environment variable is required");
-}
-
-if (!process.env.LASTFM_API_KEY) {
-  throw new Error("LASTFM_API_KEY environment variable is required");
-}
-
-if (!process.env.YOUTUBE_API_KEY) {
-  throw new Error("YOUTUBE_API_KEY environment variable is required");
-}
-
-if (!process.env.INSTAGRAM_ACCESS_TOKEN) {
-  throw new Error("INSTAGRAM_ACCESS_TOKEN environment variable is required");
-}
-
-if (!process.env.YELP_API_KEY) {
-  throw new Error("YELP_API_KEY environment variable is required");
-}
 
 export function registerRoutes(app: Express): Server {
   const router = Router();
+
+  // Set up authentication routes and middleware
+  setupAuth(app);
+
+  // Protected admin route
+  router.get("/api/admin", (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    res.json({ message: "Welcome to the admin area" });
+  });
 
   // Register all route modules
   registerPhishRoutes(router);

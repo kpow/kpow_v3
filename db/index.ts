@@ -1,4 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-serverless";
+import pkg from 'pg';
+const { Pool } = pkg;
 import ws from "ws";
 import * as schema from "@db/schema";
 
@@ -8,6 +10,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
+// Create PostgreSQL pool for session management
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+// Create Drizzle client
 export const db = drizzle({
   connection: process.env.DATABASE_URL,
   schema,
