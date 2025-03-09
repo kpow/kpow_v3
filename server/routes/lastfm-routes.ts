@@ -32,4 +32,30 @@ export function registerLastFmRoutes(router: Router) {
       res.status(500).json({ message: (error as Error).message });
     }
   });
+
+  // New endpoint for artist album lookup
+  router.get("/api/lastfm/artist-albums", async (req, res) => {
+    try {
+      const artist = req.query.artist as string;
+      if (!artist) {
+        return res.status(400).json({ error: "Artist parameter is required" });
+      }
+
+      const data = await fetchLastFmData("artist.gettopalbums", {
+        artist: artist,
+        limit: "50"
+      });
+
+      console.log("Last.fm API Response:", data);
+
+      if (data.error) {
+        throw new Error(data.message);
+      }
+
+      res.json(data);
+    } catch (error) {
+      console.error("Error in /api/lastfm/artist-albums:", error);
+      res.status(500).json({ message: (error as Error).message });
+    }
+  });
 }

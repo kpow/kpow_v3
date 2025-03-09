@@ -31,24 +31,16 @@ export function AlbumLookup() {
     queryFn: async () => {
       if (!artist) return null;
 
-      const apiUrl = `https://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${encodeURIComponent(
-        artist
-      )}&api_key=${import.meta.env.VITE_LASTFM_API_KEY}&format=json`;
-
-      console.log("Fetching from Last.fm:", apiUrl.replace(import.meta.env.VITE_LASTFM_API_KEY, 'API_KEY'));
-
-      const response = await fetch(apiUrl);
+      const response = await fetch(`/api/lastfm/artist-albums?artist=${encodeURIComponent(artist)}`);
       if (!response.ok) {
         const errorData = await response.text();
-        console.error("Last.fm API Error:", errorData);
+        console.error("API Error:", errorData);
         throw new Error(`Failed to fetch albums: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("Last.fm API Response:", data);
-
       if (data.error) {
-        throw new Error(`Last.fm API Error: ${data.message}`);
+        throw new Error(`API Error: ${data.message}`);
       }
 
       return data;
@@ -62,16 +54,6 @@ export function AlbumLookup() {
       toast({
         title: "Error",
         description: "Please enter an artist name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!import.meta.env.VITE_LASTFM_API_KEY) {
-      console.error("Last.fm API key is missing");
-      toast({
-        title: "Configuration Error",
-        description: "Last.fm API key is not configured",
         variant: "destructive",
       });
       return;
