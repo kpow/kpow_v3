@@ -4,6 +4,12 @@ import { isAuthenticated, isAdmin } from "../middleware/auth";
 
 const router = Router();
 
+// Log authentication attempts
+router.use((req, res, next) => {
+  console.log('Auth request path:', req.path);
+  next();
+});
+
 router.get("/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
@@ -11,6 +17,7 @@ router.get("/auth/google",
 router.get("/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
+    console.log('Google auth callback successful');
     res.redirect("/admin");
   }
 );

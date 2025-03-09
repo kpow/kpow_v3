@@ -12,8 +12,10 @@ passport.deserializeUser((user: any, done) => {
 // Get the Replit domain from environment variables
 const REPLIT_DOMAIN = process.env.REPLIT_DOMAINS ? process.env.REPLIT_DOMAINS.split(',')[0] : null;
 const CALLBACK_URL = REPLIT_DOMAIN
-  ? `https://${REPLIT_DOMAIN}/auth/google/callback`
+  ? `https://kpowcom-kpowz.replit.app/auth/google/callback`
   : "http://localhost:5000/auth/google/callback";
+
+console.log('OAuth Callback URL:', CALLBACK_URL);
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID!,
