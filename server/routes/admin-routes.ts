@@ -22,12 +22,14 @@ export function registerAdminRoutes(router: Router) {
     }
 
     try {
+      console.log(`[iTunes Search] Searching for term: ${term}`);
       const response = await axios.get(
         `https://itunes.apple.com/search?term=${encodeURIComponent(
           term
         )}&entity=album&limit=5`
       );
 
+      console.log(`[iTunes Search] Found ${response.data.resultCount} results`);
       res.json(response.data);
     } catch (error) {
       console.error("iTunes API Error:", error);
@@ -55,6 +57,7 @@ export function registerAdminRoutes(router: Router) {
     }
 
     try {
+      console.log(`[Artist Update] Updating image for artist: ${artistName}`);
       const result = await db
         .update(artists)
         .set({ imageUrl })
@@ -65,6 +68,7 @@ export function registerAdminRoutes(router: Router) {
         return res.status(404).json({ error: "Artist not found" });
       }
 
+      console.log(`[Artist Update] Successfully updated image for artist: ${artistName}`);
       res.json({ message: "Artist image updated successfully", artist: result[0] });
     } catch (error) {
       console.error("Database Error:", error);
