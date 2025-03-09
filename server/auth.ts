@@ -40,8 +40,7 @@ export function setupAuth(app: Express) {
   const store = new PostgresSessionStore({
     pool,
     createTableIfMissing: true,
-    tableName: 'session',
-    pruneSessionInterval: 1800 // Prune expired sessions every 30 minutes
+    tableName: 'session'
   });
 
   const sessionSettings: session.SessionOptions = {
@@ -110,7 +109,7 @@ export function setupAuth(app: Express) {
         .values({
           ...result.data,
           password: await hashPassword(result.data.password),
-          approved: false // added approved: false to new users
+          approved: false 
         })
         .returning();
 

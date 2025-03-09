@@ -13,8 +13,6 @@ if (!process.env.DATABASE_URL) {
 // Create PostgreSQL pool for session management
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  connectionTimeoutMillis: 120000, // 120 seconds
-  idleTimeoutMillis: 120000, // 120 seconds
   max: 20 // Maximum number of clients in the pool
 });
 

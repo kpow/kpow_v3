@@ -39,7 +39,7 @@ export function registerAdminRoutes(router: Router) {
     }
   });
 
-  // Update artist image endpoint (modified with better error handling)
+  // Update artist image endpoint
   router.post("/api/admin/update-artist-image", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });
@@ -75,12 +75,10 @@ export function registerAdminRoutes(router: Router) {
       // Process the image URL to ensure it's properly formatted
       const processedImageUrl = imageUrl.replace(/\d+x\d+/, '600x600');
 
+      // Update only the imageUrl field
       const result = await db
         .update(artists)
-        .set({ 
-          imageUrl: processedImageUrl,
-          lastUpdated: new Date().toISOString()
-        })
+        .set({ imageUrl: processedImageUrl })
         .where(eq(artists.name, artistName))
         .returning();
 
