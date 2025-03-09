@@ -13,6 +13,10 @@ if (!process.env.DATABASE_URL) {
 // Create PostgreSQL pool for session management
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  connectionTimeoutMillis: 10000, // 10 seconds
+  max: 20, // Maximum number of clients in the pool
+  idleTimeoutMillis: 30000, // 30 seconds
+  statement_timeout: 10000, // 10 seconds
 });
 
 // Create Drizzle client

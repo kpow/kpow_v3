@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: varchar("username", { length: 256 }).notNull().unique(),
   password: varchar("password", { length: 256 }).notNull(),
+  approved: boolean("approved").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

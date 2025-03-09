@@ -62,6 +62,9 @@ export function setupAuth(app: Express) {
         if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false, { message: "Invalid username or password" });
         }
+        if (!user.approved) {
+          return done(null, false, { message: "Account pending approval" });
+        }
         return done(null, user);
       } catch (err) {
         return done(err);
@@ -101,6 +104,7 @@ export function setupAuth(app: Express) {
         .values({
           ...result.data,
           password: await hashPassword(result.data.password),
+          approved: false // added approved: false to new users
         })
         .returning();
 
@@ -136,5 +140,60 @@ export function setupAuth(app: Express) {
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ error: "Not authenticated" });
     res.json(req.user);
+  });
+
+  app.post("/api/admin/approve-user", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const userId = req.user?.id;
+    if (userId !== 1) { 
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    const targetUserId = req.body.userId;
+    if (!targetUserId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    try {
+      await db
+        .update(users)
+        .set({ approved: true })
+        .where(eq(users.id, targetUserId));
+
+      res.json({ message: "User approved successfully" });
+    } catch (error) {
+      console.error("Error approving user:", error);
+      res.status(500).json({ error: "Failed to approve user" });
+    }
+  });
+
+  app.get("/api/admin/pending-users", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const userId = req.user?.id;
+    if (userId !== 1) { 
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    try {
+      const pendingUsers = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .where(eq(users.approved, false));
+
+      res.json(pendingUsers);
+    } catch (error) {
+      console.error("Error fetching pending users:", error);
+      res.status(500).json({ error: "Failed to fetch pending users" });
+    }
   });
 }
