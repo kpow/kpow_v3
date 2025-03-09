@@ -25,20 +25,33 @@ interface LastFmResponse {
 export function AlbumLookup() {
   const [artist, setArtist] = useState("");
   const { toast } = useToast();
-  
+
   const { data, isLoading, error, refetch } = useQuery<LastFmResponse>({
     queryKey: ["albums", artist],
     queryFn: async () => {
       if (!artist) return null;
-      const response = await fetch(
-        `https://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${encodeURIComponent(
-          artist
-        )}&api_key=${import.meta.env.VITE_LASTFM_API_KEY}&format=json`
-      );
+
+      const apiUrl = `https://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${encodeURIComponent(
+        artist
+      )}&api_key=${import.meta.env.VITE_LASTFM_API_KEY}&format=json`;
+
+      console.log("Fetching from Last.fm:", apiUrl.replace(import.meta.env.VITE_LASTFM_API_KEY, 'API_KEY'));
+
+      const response = await fetch(apiUrl);
       if (!response.ok) {
-        throw new Error("Failed to fetch albums");
+        const errorData = await response.text();
+        console.error("Last.fm API Error:", errorData);
+        throw new Error(`Failed to fetch albums: ${response.statusText}`);
       }
-      return response.json();
+
+      const data = await response.json();
+      console.log("Last.fm API Response:", data);
+
+      if (data.error) {
+        throw new Error(`Last.fm API Error: ${data.message}`);
+      }
+
+      return data;
     },
     enabled: false,
   });
@@ -53,6 +66,17 @@ export function AlbumLookup() {
       });
       return;
     }
+
+    if (!import.meta.env.VITE_LASTFM_API_KEY) {
+      console.error("Last.fm API key is missing");
+      toast({
+        title: "Configuration Error",
+        description: "Last.fm API key is not configured",
+        variant: "destructive",
+      });
+      return;
+    }
+
     refetch();
   };
 
@@ -76,7 +100,9 @@ export function AlbumLookup() {
         </form>
 
         {error ? (
-          <div className="text-red-500">Error fetching albums</div>
+          <div className="text-red-500">
+            {error instanceof Error ? error.message : "Error fetching albums"}
+          </div>
         ) : isLoading ? (
           <div className="space-y-2">
             {[...Array(5)].map((_, i) => (
