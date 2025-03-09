@@ -10,11 +10,11 @@ import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
 import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
 import { registerMusicRoutes } from "./routes/music-routes";
+import { registerAdminRoutes } from "./routes/admin-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
 import yelpRoutes from "./routes/yelp";
-
 
 export function registerRoutes(app: Express): Server {
   const router = Router();
@@ -22,21 +22,14 @@ export function registerRoutes(app: Express): Server {
   // Set up authentication routes and middleware
   setupAuth(app);
 
-  // Protected admin route
-  router.get("/api/admin", (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
-    res.json({ message: "Welcome to the admin area" });
-  });
-
   // Register all route modules
   registerPhishRoutes(router);
   registerLastFmRoutes(router);
   registerGoodreadsRoutes(router);
   registerFeedbinRoutes(router);
   registerGithubRoutes(router);
-  registerMusicRoutes(router); // Add the new music routes
+  registerMusicRoutes(router);
+  registerAdminRoutes(router); // Add the new admin routes
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);

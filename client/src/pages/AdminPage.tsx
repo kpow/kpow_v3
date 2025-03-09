@@ -3,6 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 interface PendingUser {
   id: number;
@@ -10,9 +22,21 @@ interface PendingUser {
   createdAt: string;
 }
 
+const searchFormSchema = z.object({
+  albumName: z.string().min(1, "Album name is required"),
+});
+
 export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [searchResults, setSearchResults] = useState<any>(null);
+
+  const searchForm = useForm<z.infer<typeof searchFormSchema>>({
+    resolver: zodResolver(searchFormSchema),
+    defaultValues: {
+      albumName: "",
+    },
+  });
 
   const { data: pendingUsers, isLoading } = useQuery<PendingUser[]>({
     queryKey: ["/api/admin/pending-users"],
@@ -49,6 +73,48 @@ export default function AdminPage() {
     },
   });
 
+  const updateArtistImage = useMutation({
+    mutationFn: async ({ artistName, imageUrl }: { artistName: string; imageUrl: string }) => {
+      const res = await fetch("/api/admin/update-artist-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artistName, imageUrl }),
+      });
+      if (!res.ok) throw new Error("Failed to update artist image");
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Artist updated",
+        description: "The artist's image URL has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  async function onSearchSubmit(values: z.infer<typeof searchFormSchema>) {
+    try {
+      const response = await fetch(
+        `/api/admin/search-itunes?term=${encodeURIComponent(values.albumName)}`
+      );
+      if (!response.ok) throw new Error("Search failed");
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      toast({
+        title: "Search failed",
+        description: error instanceof Error ? error.message : "Failed to search iTunes",
+        variant: "destructive",
+      });
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -58,8 +124,10 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 space-y-8">
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+
+      {/* User Approval Section */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Pending Users</h2>
         {pendingUsers?.length === 0 ? (
@@ -93,6 +161,84 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* iTunes Search Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Artist Image Update</h2>
+        <Card>
+          <CardContent className="p-4">
+            <Form {...searchForm}>
+              <form onSubmit={searchForm.handleSubmit(onSearchSubmit)} className="space-y-4">
+                <FormField
+                  control={searchForm.control}
+                  name="albumName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Search Album</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter album name..." {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={searchForm.formState.isSubmitting}>
+                  {searchForm.formState.isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Searching...
+                    </>
+                  ) : (
+                    "Search iTunes"
+                  )}
+                </Button>
+              </form>
+            </Form>
+
+            {searchResults && (
+              <div className="mt-4">
+                <h3 className="text-lg font-medium mb-2">Search Results</h3>
+                <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto">
+                  {JSON.stringify(searchResults, null, 2)}
+                </pre>
+
+                <div className="mt-4 space-y-4">
+                  <h3 className="text-lg font-medium">Update Artist Image</h3>
+                  <div className="flex gap-4">
+                    <Input
+                      placeholder="Artist name..."
+                      className="flex-1"
+                      onChange={(e) => searchForm.setValue("artistName", e.target.value)}
+                    />
+                    <Input
+                      placeholder="Image URL..."
+                      className="flex-2"
+                      onChange={(e) => searchForm.setValue("imageUrl", e.target.value)}
+                    />
+                    <Button
+                      onClick={() =>
+                        updateArtistImage.mutate({
+                          artistName: searchForm.getValues("artistName"),
+                          imageUrl: searchForm.getValues("imageUrl"),
+                        })
+                      }
+                      disabled={updateArtistImage.isPending}
+                    >
+                      {updateArtistImage.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        "Update Artist"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
