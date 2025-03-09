@@ -86,6 +86,13 @@ export function ITunesSearch() {
     }
   };
 
+  const handleUseArtwork = (result: any) => {
+    // Extract the largest available artwork URL
+    const artworkUrl = result.artworkUrl100.replace('100x100', '600x600');
+    searchForm.setValue("artistName", result.artistName);
+    searchForm.setValue("imageUrl", artworkUrl);
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Artist Image Update</h2>
@@ -135,6 +142,13 @@ export function ITunesSearch() {
                       searchForm.setValue("imageUrl", e.target.value)
                     }
                   />
+                  <Input
+                    placeholder="Artist name..."
+                    value={searchForm.watch("artistName")}
+                    onChange={(e) =>
+                      searchForm.setValue("artistName", e.target.value)
+                    }
+                  />
                   <Button
                     onClick={() =>
                       updateArtistImage.mutate({
@@ -173,6 +187,12 @@ export function ITunesSearch() {
                               {result.collectionName}
                             </p>
                           </div>
+                          <Button
+                            variant="outline"
+                            onClick={() => handleUseArtwork(result)}
+                          >
+                            Use Artwork
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
