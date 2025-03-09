@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { AlbumLookup } from "@/components/admin/AlbumLookup";
 
 interface PendingUser {
   id: number;
@@ -24,17 +25,23 @@ interface PendingUser {
 
 const searchFormSchema = z.object({
   albumName: z.string().min(1, "Album name is required"),
+  artistName: z.string().optional(),
+  imageUrl: z.string().optional(),
 });
+
+type SearchFormValues = z.infer<typeof searchFormSchema>;
 
 export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchResults, setSearchResults] = useState<any>(null);
 
-  const searchForm = useForm<z.infer<typeof searchFormSchema>>({
+  const searchForm = useForm<SearchFormValues>({
     resolver: zodResolver(searchFormSchema),
     defaultValues: {
       albumName: "",
+      artistName: "",
+      imageUrl: "",
     },
   });
 
@@ -74,13 +81,7 @@ export default function AdminPage() {
   });
 
   const updateArtistImage = useMutation({
-    mutationFn: async ({
-      artistName,
-      imageUrl,
-    }: {
-      artistName: string;
-      imageUrl: string;
-    }) => {
+    mutationFn: async ({ artistName, imageUrl }: { artistName: string; imageUrl: string }) => {
       const res = await fetch("/api/admin/update-artist-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,7 +105,7 @@ export default function AdminPage() {
     },
   });
 
-  async function onSearchSubmit(values: z.infer<typeof searchFormSchema>) {
+  const onSearchSubmit = async (values: SearchFormValues) => {
     try {
       const response = await fetch(
         `/api/admin/search-itunes?term=${encodeURIComponent(values.albumName)}`,
@@ -120,7 +121,7 @@ export default function AdminPage() {
         variant: "destructive",
       });
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -147,8 +148,7 @@ export default function AdminPage() {
                   <div>
                     <p className="font-medium">{user.username}</p>
                     <p className="text-sm text-muted-foreground">
-                      Registered on:{" "}
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      Registered on: {new Date(user.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <Button
@@ -169,6 +169,12 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Last.fm Album Lookup Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Last.fm Album Lookup</h2>
+        <AlbumLookup />
       </div>
 
       {/* iTunes Search Section */}
@@ -236,10 +242,7 @@ export default function AdminPage() {
                                 <Button
                                   variant="outline"
                                   onClick={() => {
-                                    searchForm.setValue(
-                                      "artistName",
-                                      result.artistName,
-                                    );
+                                    searchForm.setValue("artistName", result.artistName);
                                     searchForm.setValue(
                                       "imageUrl",
                                       result.artworkUrl100.replace(
@@ -265,7 +268,7 @@ export default function AdminPage() {
                   <div className="flex gap-4">
                     <Input
                       placeholder="Image URL..."
-                      className=""
+                      value={searchForm.watch("imageUrl")}
                       onChange={(e) =>
                         searchForm.setValue("imageUrl", e.target.value)
                       }
@@ -273,8 +276,8 @@ export default function AdminPage() {
                     <Button
                       onClick={() =>
                         updateArtistImage.mutate({
-                          artistName: searchForm.getValues("artistName"),
-                          imageUrl: searchForm.getValues("imageUrl"),
+                          artistName: searchForm.getValues("artistName") || "",
+                          imageUrl: searchForm.getValues("imageUrl") || "",
                         })
                       }
                       disabled={updateArtistImage.isPending}
