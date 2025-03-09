@@ -14,11 +14,11 @@ router.use((req, res, next) => {
   next();
 });
 
-router.get("/auth/google",
+router.get("/api/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-router.get("/auth/google/callback",
+router.get("/api/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
     console.log('Google auth callback successful');
@@ -27,19 +27,19 @@ router.get("/auth/google/callback",
   }
 );
 
-router.get("/auth/user", isAuthenticated, (req, res) => {
+router.get("/api/auth/user", isAuthenticated, (req, res) => {
   console.log('Checking authenticated user:', req.user);
   res.json(req.user);
 });
 
-router.get("/auth/logout", (req, res) => {
+router.get("/api/auth/logout", (req, res) => {
   req.logout(() => {
     res.redirect("/");
   });
 });
 
 // Test admin access
-router.get("/auth/admin-check", isAdmin, (req, res) => {
+router.get("/api/auth/admin-check", isAdmin, (req, res) => {
   res.json({ message: "You have admin access" });
 });
 
