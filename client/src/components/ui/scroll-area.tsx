@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 
@@ -48,14 +49,13 @@ const ScrollBar = React.forwardRef<
 ))
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
-export { ScrollArea, ScrollBar }
-
+// List components for scrollable lists
 interface ScrollListProps {
   children: React.ReactNode;
   className?: string;
 }
 
-export function ScrollList({ children, className }: ScrollListProps) {
+function ScrollList({ children, className }: ScrollListProps) {
   return <ul className={cn("divide-y", className)}>{children}</ul>;
 }
 
@@ -65,11 +65,11 @@ interface ScrollListItemProps {
   onClick?: () => void;
 }
 
-export function ScrollListItem({ children, className, onClick }: ScrollListItemProps) {
+function ScrollListItem({ children, className, onClick }: ScrollListItemProps) {
   return (
     <li
       className={cn(
-        "p-3 flex justify-between items-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors",
+        "flex justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer",
         className
       )}
       onClick={onClick}
@@ -78,3 +78,5 @@ export function ScrollListItem({ children, className, onClick }: ScrollListItemP
     </li>
   );
 }
+
+export { ScrollArea, ScrollBar, ScrollList, ScrollListItem }
