@@ -38,7 +38,13 @@ export function ITunesSearch() {
   });
 
   const updateArtistImage = useMutation({
-    mutationFn: async ({ artistName, imageUrl }: { artistName: string; imageUrl: string }) => {
+    mutationFn: async ({
+      artistName,
+      imageUrl,
+    }: {
+      artistName: string;
+      imageUrl: string;
+    }) => {
       const res = await fetch("/api/admin/update-artist-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,54 +126,7 @@ export function ITunesSearch() {
 
           {searchResults && (
             <div className="mt-4 space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Search Results</h3>
-                <div className="grid gap-4">
-                  {searchResults.results?.map(
-                    (result: any, index: number) => (
-                      <Card key={index}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-4">
-                            <img
-                              src={result.artworkUrl100}
-                              alt={result.collectionName}
-                              className="w-20 h-20 object-cover rounded"
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium">
-                                {result.artistName}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                {result.collectionName}
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                onClick={() => {
-                                  searchForm.setValue("artistName", result.artistName);
-                                  searchForm.setValue(
-                                    "imageUrl",
-                                    result.artworkUrl100.replace(
-                                      "100x100",
-                                      "600x600",
-                                    ),
-                                  );
-                                }}
-                              >
-                                Use This Artist
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ),
-                  )}
-                </div>
-              </div>
-
               <div className="mt-4 space-y-4">
-                <h3 className="text-lg font-medium">Update Artist Image</h3>
                 <div className="flex gap-4">
                   <Input
                     placeholder="Image URL..."
@@ -194,6 +153,30 @@ export function ITunesSearch() {
                       "Update Artist"
                     )}
                   </Button>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium mb-2">Search Results</h3>
+                <div className="grid gap-4">
+                  {searchResults.results?.map((result: any, index: number) => (
+                    <Card key={index}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={result.artworkUrl100}
+                            alt={result.collectionName}
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                          <div className="flex-1">
+                            <p className="font-medium">{result.artistName}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {result.collectionName}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </div>
 
