@@ -11,19 +11,26 @@ export default function Admin() {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
+      console.log("Checking auth status...");
       const response = await fetch("/api/auth/user", {
         credentials: "include",
       });
       if (!response.ok) {
+        console.log("Auth check failed:", response.status);
         throw new Error("Not authenticated");
       }
-      return response.json();
+      const userData = await response.json();
+      console.log("Auth check successful:", userData);
+      return userData;
     },
+    retry: false, // Don't retry on failure
+    staleTime: 0, // Always check auth status
   });
 
   // Redirect to home if not authenticated
   useEffect(() => {
     if (error) {
+      console.log("Redirecting to home due to auth error:", error);
       setLocation("/");
     }
   }, [error, setLocation]);

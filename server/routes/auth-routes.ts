@@ -7,6 +7,10 @@ const router = Router();
 // Log authentication attempts
 router.use((req, res, next) => {
   console.log('Auth request path:', req.path);
+  console.log('Session:', {
+    cookie: req.session.cookie,
+  });
+  console.log('User:', req.user);
   next();
 });
 
@@ -18,11 +22,13 @@ router.get("/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
     console.log('Google auth callback successful');
+    console.log('User after auth:', req.user);
     res.redirect("/admin");
   }
 );
 
 router.get("/auth/user", isAuthenticated, (req, res) => {
+  console.log('Checking authenticated user:', req.user);
   res.json(req.user);
 });
 
