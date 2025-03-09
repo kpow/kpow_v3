@@ -17,6 +17,7 @@ import { SongStats } from "@/components/phashboard/song-stats";
 import { PageTitle } from "@/components/ui/page-title";
 import { VenueMap } from "@/components/phashboard/venue-map";
 import { SEO } from "@/components/global/SEO";
+import { ScrollArea, ScrollList, ScrollListItem } from "@/components/ui/scroll-area";
 
 const SHOWS_PER_PAGE = 6;
 const VENUES_PER_PAGE = 5;
@@ -98,39 +99,42 @@ export default function ShowStats() {
           <Card>
             <CardContent className="pt-6">
               <h2 className="text-lg font-slackey mb-4">venues</h2>
-              <div className="space-y-3 max-h-[450px] overflow-y-auto pr-2 venue-scrollbar">
+              <ScrollArea maxHeight="450px">
                 {venuesLoading ? (
-                  Array.from({ length: 10 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
-                    >
-                      <Skeleton className="h-5 w-40" />
-                      <Skeleton className="h-5 w-16" />
-                    </div>
-                  ))
+                  <div className="space-y-2 p-3">
+                    {Array.from({ length: 10 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center p-3 rounded-lg bg-muted/50"
+                      >
+                        <Skeleton className="h-5 w-40" />
+                        <Skeleton className="h-5 w-16" />
+                      </div>
+                    ))}
+                  </div>
                 ) : venuesData &&
                   venuesData.venues &&
                   venuesData.venues.length > 0 ? (
-                  venuesData.venues.map((venue) => (
-                    <div
-                      key={venue.venue}
-                      className="flex justify-between items-center p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer"
-                      onClick={() => {
-                        setSelectedVenue(venue.venue);
-                        setIsVenueModalOpen(true);
-                      }}
-                    >
-                      <span className="font-medium">{venue.venue}</span>
-                      <span className="text-muted-foreground">
-                        {venue.count} shows
-                      </span>
-                    </div>
-                  ))
+                  <ScrollList>
+                    {venuesData.venues.map((venue) => (
+                      <ScrollListItem
+                        key={venue.venue}
+                        onClick={() => {
+                          setSelectedVenue(venue.venue);
+                          setIsVenueModalOpen(true);
+                        }}
+                      >
+                        <span className="font-medium">{venue.venue}</span>
+                        <span className="text-muted-foreground">
+                          {venue.count} shows
+                        </span>
+                      </ScrollListItem>
+                    ))}
+                  </ScrollList>
                 ) : (
                   <div className="p-3 text-center">No venues found</div>
                 )}
-              </div>
+              </ScrollArea>
             </CardContent>
           </Card>
 

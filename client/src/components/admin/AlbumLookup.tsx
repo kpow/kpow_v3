@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea, ScrollList, ScrollListItem } from "@/components/ui/scroll-area";
 
 interface Album {
   name: string;
@@ -92,12 +93,12 @@ export function AlbumLookup() {
             ))}
           </div>
         ) : data?.topalbums?.album ? (
-          <div className="border rounded-md max-h-[500px] overflow-y-auto">
-            <ul className="divide-y">
+          <ScrollArea maxHeight="500px">
+            <ScrollList>
               {data.topalbums.album.map((album) => (
-                <li 
-                  key={album.url} 
-                  className="p-3 flex items-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                <ScrollListItem 
+                  key={album.url}
+                  className="items-center" 
                   onClick={() => {
                     navigator.clipboard.writeText(album.name);
                     toast({
@@ -120,10 +121,10 @@ export function AlbumLookup() {
                       Playcount: {album.playcount}
                     </p>
                   </div>
-                </li>
+                </ScrollListItem>
               ))}
-            </ul>
-          </div>
+            </ScrollList>
+          </ScrollArea>
         ) : null}
       </CardContent>
     </Card>
