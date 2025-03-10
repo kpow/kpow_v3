@@ -3,7 +3,7 @@ import { artists, songs } from "../db/schema";
 import { isNull, asc } from "drizzle-orm";
 import fs from "fs/promises";
 
-const OUTPUT_FILE = "./client/src/data/artists_without_images.json";
+const OUTPUT_FILE = "./artists_without_images.json";
 
 interface ArtistWithAlbum {
   id: number;
