@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AlbumLookup } from "@/components/admin/AlbumLookup";
 import { ITunesSearch } from "@/components/admin/iTunesSearch";
+import { SongsManager } from "@/components/admin/SongsManager";
 
 interface PendingUser {
   id: number;
@@ -97,6 +98,12 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Songs Without Plays Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Songs Without Plays</h2>
+        <SongsManager />
       </div>
 
       {/* Last.fm Album Lookup Section */}

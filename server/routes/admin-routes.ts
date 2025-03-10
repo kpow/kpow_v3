@@ -1,8 +1,8 @@
 import { Router } from "express";
 import axios from "axios";
 import { db } from "@db";
-import { artists } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { artists, songs, plays } from "@db/schema";
+import { eq, isNull } from "drizzle-orm";
 
 export function registerAdminRoutes(router: Router) {
   // iTunes search endpoint
@@ -91,6 +91,76 @@ export function registerAdminRoutes(router: Router) {
       console.error("Database Error:", error);
       res.status(500).json({
         error: "Failed to update artist image",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
+  // Get songs without plays
+  router.get("/api/admin/songs-without-plays", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    if (!req.user?.approved) {
+      return res.status(403).json({ error: "Account not approved" });
+    }
+
+    try {
+      console.log("[Songs] Fetching songs without plays");
+
+      const songsWithoutPlays = await db
+        .select({
+          id: songs.id,
+          name: songs.name,
+          albumName: songs.albumName,
+          artistName: artists.name,
+        })
+        .from(songs)
+        .leftJoin(plays, eq(plays.songId, songs.id))
+        .leftJoin(artists, eq(songs.artistId, artists.id))
+        .where(isNull(plays.id));
+
+      console.log(`[Songs] Found ${songsWithoutPlays.length} songs without plays`);
+      res.json(songsWithoutPlays);
+    } catch (error) {
+      console.error("Database Error:", error);
+      res.status(500).json({
+        error: "Failed to fetch songs without plays",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
+  // Delete selected songs
+  router.post("/api/admin/delete-songs", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    if (!req.user?.approved) {
+      return res.status(403).json({ error: "Account not approved" });
+    }
+
+    const { songIds } = req.body;
+    if (!Array.isArray(songIds) || songIds.length === 0) {
+      return res.status(400).json({ error: "Song IDs array is required" });
+    }
+
+    try {
+      console.log(`[Songs] Deleting ${songIds.length} songs`);
+
+      // Delete songs
+      await db.delete(songs).where(
+        songs.id.in(songIds)
+      );
+
+      console.log(`[Songs] Successfully deleted ${songIds.length} songs`);
+      res.json({ message: "Songs deleted successfully" });
+    } catch (error) {
+      console.error("Database Error:", error);
+      res.status(500).json({
+        error: "Failed to delete songs",
         details: error instanceof Error ? error.message : "Unknown error",
       });
     }
