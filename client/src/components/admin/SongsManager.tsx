@@ -13,6 +13,11 @@ interface Song {
   artistName: string;
 }
 
+interface SongsResponse {
+  songs: Song[];
+  totalSongs: number;
+}
+
 const ITEMS_PER_PAGE = 200;
 
 export function SongsManager() {
@@ -21,7 +26,7 @@ export function SongsManager() {
   const [selectedSongs, setSelectedSongs] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: songs, isLoading } = useQuery<Song[]>({
+  const { data, isLoading } = useQuery<SongsResponse>({
     queryKey: ["/api/admin/songs-without-plays"],
     queryFn: async () => {
       const res = await fetch("/api/admin/songs-without-plays");
@@ -57,11 +62,12 @@ export function SongsManager() {
     },
   });
 
-  const totalSongs = songs?.length || 0;
+  const songs = data?.songs || [];
+  const totalSongs = data?.totalSongs || 0; // Use totalSongs from response
   const totalPages = Math.ceil(totalSongs / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentSongs = songs?.slice(startIndex, endIndex) || [];
+  const currentSongs = songs.slice(startIndex, endIndex) || [];
 
   const toggleAllSongs = () => {
     if (selectedSongs.size === currentSongs.length) {
@@ -126,7 +132,7 @@ export function SongsManager() {
           </Button>
         </div>
         <div className="text-sm text-muted-foreground">
-          Total Songs: {totalSongs} | Page {currentPage} of {totalPages}
+          Songs Without Plays: {totalSongs} of {data?.totalSongs || 0} Total Songs | Page {currentPage} of {totalPages}
         </div>
       </div>
 
