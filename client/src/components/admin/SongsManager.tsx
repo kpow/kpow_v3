@@ -13,12 +13,6 @@ interface Song {
   artistName: string;
 }
 
-interface SongsResponse {
-  songs: Song[];
-  totalSongs: number;
-  filteredShops: number;
-}
-
 const ITEMS_PER_PAGE = 200;
 
 export function SongsManager() {
@@ -27,7 +21,7 @@ export function SongsManager() {
   const [selectedSongs, setSelectedSongs] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data, isLoading } = useQuery<SongsResponse>({
+  const { data: songs, isLoading } = useQuery<Song[]>({
     queryKey: ["/api/admin/songs-without-plays"],
     queryFn: async () => {
       const res = await fetch("/api/admin/songs-without-plays");
@@ -63,13 +57,11 @@ export function SongsManager() {
     },
   });
 
-  const songs = data?.songs || [];
-  const totalSongs = data?.totalSongs || 0; 
-  const filteredCount = data?.filteredShops || 0; 
-  const totalPages = Math.ceil(songs.length / ITEMS_PER_PAGE);
+  const totalSongs = songs?.length || 0;
+  const totalPages = Math.ceil(totalSongs / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentSongs = songs.slice(startIndex, endIndex) || [];
+  const currentSongs = songs?.slice(startIndex, endIndex) || [];
 
   const toggleAllSongs = () => {
     if (selectedSongs.size === currentSongs.length) {
@@ -134,7 +126,7 @@ export function SongsManager() {
           </Button>
         </div>
         <div className="text-sm text-muted-foreground">
-          Songs Without Plays: {filteredCount} of {totalSongs} Total Songs | Page {currentPage} of {totalPages}
+          Total Songs: {totalSongs} | Page {currentPage} of {totalPages}
         </div>
       </div>
 
@@ -174,7 +166,7 @@ export function SongsManager() {
           Previous
         </Button>
         <span>
-          Showing {startIndex + 1}-{Math.min(endIndex, songs.length)} of {songs.length}
+          Showing {startIndex + 1}-{Math.min(endIndex, totalSongs)} of {totalSongs}
         </span>
         <Button
           variant="outline"

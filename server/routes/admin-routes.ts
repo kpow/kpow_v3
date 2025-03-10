@@ -109,13 +109,6 @@ export function registerAdminRoutes(router: Router) {
     try {
       console.log("[Songs] Fetching songs without plays");
 
-      // Get total songs count
-      const totalCount = await db
-        .select({ count: songs.id })
-        .from(songs)
-        .then(result => result[0]?.count || 0);
-
-      // Get songs without plays
       const songsWithoutPlays = await db
         .select({
           id: songs.id,
@@ -128,12 +121,8 @@ export function registerAdminRoutes(router: Router) {
         .leftJoin(artists, eq(songs.artistId, artists.id))
         .where(isNull(plays.id));
 
-      console.log(`[Songs] Found ${songsWithoutPlays.length} songs without plays out of ${totalCount} total songs`);
-      res.json({
-        songs: songsWithoutPlays,
-        totalSongs: totalCount,
-        filteredShops: songsWithoutPlays.length
-      });
+      console.log(`[Songs] Found ${songsWithoutPlays.length} songs without plays`);
+      res.json(songsWithoutPlays);
     } catch (error) {
       console.error("Database Error:", error);
       res.status(500).json({
