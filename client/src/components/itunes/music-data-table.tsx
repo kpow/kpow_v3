@@ -55,7 +55,7 @@ export function MusicDataTable() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const { data, isLoading } = useQuery<TableData>({
+  const { data, isLoading, error } = useQuery<TableData>({
     queryKey: ["/api/music/table-data", { page, pageSize, type: dataType }],
     queryFn: async () => {
       const response = await fetch(
@@ -64,6 +64,8 @@ export function MusicDataTable() {
       if (!response.ok) throw new Error("Failed to fetch table data");
       return response.json();
     },
+    keepPreviousData: true, // Keep previous data while fetching new data
+    retry: 2, // Retry failed requests twice
   });
 
   const songColumns: ColumnDef<SongData>[] = [
@@ -130,54 +132,16 @@ export function MusicDataTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const TableSkeleton = () => (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-10 w-32" />
-      </div>
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              {columns.map((_, index) => (
-                <TableHead
-                  key={index}
-                  className="h-12 px-4 text-left align-middle font-medium"
-                >
-                  <Skeleton className="h-4 w-24" />
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {Array.from({ length: pageSize }).map((_, index) => (
-              <TableRow key={index}>
-                {columns.map((_, colIndex) => (
-                  <TableCell key={colIndex} className="p-4">
-                    <Skeleton className="h-4 w-full" />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-4 w-32" />
-        <div className="flex items-center space-x-2">
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-8 w-20" />
-        </div>
-      </div>
-    </div>
-  );
-
   if (isLoading) {
-    return <TableSkeleton />;
+    return <TableSkeleton columns={columns} pageSize={pageSize} />;
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-center text-red-500">
+        Failed to load data. Please try again.
+      </div>
+    );
   }
 
   return (
@@ -274,6 +238,54 @@ export function MusicDataTable() {
           >
             Next
           </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TableSkeleton({ columns, pageSize }: { columns: ColumnDef<any>[], pageSize: number }) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-32" />
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              {columns.map((_, index) => (
+                <TableHead
+                  key={index}
+                  className="h-12 px-4 text-left align-middle font-medium"
+                >
+                  <Skeleton className="h-4 w-24" />
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: pageSize }).map((_, index) => (
+              <TableRow key={index}>
+                {columns.map((_, colIndex) => (
+                  <TableCell key={colIndex} className="p-4">
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-32" />
+        <div className="flex items-center space-x-2">
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-8 w-20" />
         </div>
       </div>
     </div>

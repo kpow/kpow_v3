@@ -278,7 +278,12 @@ export function registerMusicRoutes(router: Router) {
           .leftJoin(plays, eq(plays.song_id, songs.id))
           .where(sql`${songs.name} IS NOT NULL`)
           .groupBy(songs.id, songs.name, songs.artist_id, artists.name)
-          .orderBy(desc(sql<number>`COUNT(DISTINCT ${plays.id})`))
+          .orderBy(
+            desc(sql<number>`COUNT(DISTINCT ${plays.id})`),
+            songs.name,
+            artists.name,
+            songs.id // Add song ID to ensure consistent ordering
+          )
           .limit(Number(pageSize))
           .offset(offset),
 
@@ -286,6 +291,11 @@ export function registerMusicRoutes(router: Router) {
             .from(songs)
             .where(sql`${songs.name} IS NOT NULL`)
         ]);
+
+        if (!songsData.length && Number(page) > 1) {
+          // If no data found and not on first page, return last available page
+          return res.redirect(`/api/music/table-data?page=1&pageSize=${pageSize}&type=${type}`);
+        }
 
         return res.json({
           data: songsData,
@@ -311,7 +321,11 @@ export function registerMusicRoutes(router: Router) {
         .leftJoin(plays, eq(plays.song_id, songs.id))
         .where(sql`${artists.name} IS NOT NULL`)
         .groupBy(artists.id, artists.name)
-        .orderBy(desc(sql<number>`COUNT(DISTINCT ${plays.id})`))
+        .orderBy(
+          desc(sql<number>`COUNT(DISTINCT ${plays.id})`),
+          artists.name,
+          artists.id // Add artist ID to ensure consistent ordering
+        )
         .limit(Number(pageSize))
         .offset(offset),
 
@@ -319,6 +333,11 @@ export function registerMusicRoutes(router: Router) {
           .from(artists)
           .where(sql`${artists.name} IS NOT NULL`)
       ]);
+
+      if (!artistsData.length && Number(page) > 1) {
+        // If no data found and not on first page, return last available page
+        return res.redirect(`/api/music/table-data?page=1&pageSize=${pageSize}&type=${type}`);
+      }
 
       return res.json({
         data: artistsData,
