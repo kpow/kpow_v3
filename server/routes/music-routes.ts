@@ -280,22 +280,27 @@ export function registerMusicRoutes(router: Router) {
           .from(songs)
           .innerJoin(artists, eq(songs.artistId, artists.id))
           .leftJoin(plays, eq(plays.songId, songs.id))
-          .groupBy(
-            songs.id,
-            songs.name,
-            songs.albumName,
-            songs.containerAlbumName, 
-            songs.containerType,
-            songs.mediaDurationMs,
-            artists.id,
-            artists.name
+          .where(
+            and(
+              sql`${songs.name} IS NOT NULL AND ${songs.name} != ''`,
+              sql`${artists.name} IS NOT NULL AND ${artists.name} != 'Unknown'`
+            )
           )
-          .orderBy(songs.name)
+          .groupBy(songs.id, songs.name, songs.albumName, songs.containerAlbumName, 
+                   songs.containerType, songs.mediaDurationMs, artists.id, artists.name)
+          .orderBy(desc(artists.name))
           .limit(Number(pageSize))
           .offset(offset),
 
           db.select({ count: sql<number>`count(*)` })
             .from(songs)
+            .innerJoin(artists, eq(songs.artistId, artists.id))
+            .where(
+              and(
+                sql`${songs.name} IS NOT NULL AND ${songs.name} != ''`,
+                sql`${artists.name} IS NOT NULL AND ${artists.name} != 'Unknown'`
+              )
+            )
             .then(result => Number(result[0].count))
         ]);
 
@@ -327,13 +332,15 @@ export function registerMusicRoutes(router: Router) {
         .from(artists)
         .leftJoin(songs, eq(songs.artistId, artists.id))
         .leftJoin(plays, eq(plays.songId, songs.id))
+        .where(sql`${artists.name} IS NOT NULL AND ${artists.name} != 'Unknown'`)
         .groupBy(artists.id)
-        .orderBy(artists.name)
+        .orderBy(desc(artists.name))
         .limit(Number(pageSize))
         .offset(offset),
 
         db.select({ count: sql<number>`count(*)` })
           .from(artists)
+          .where(sql`${artists.name} IS NOT NULL AND ${artists.name} != 'Unknown'`)
           .then(result => Number(result[0].count))
       ]);
 

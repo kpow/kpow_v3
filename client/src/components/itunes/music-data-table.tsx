@@ -76,10 +76,16 @@ export function MusicDataTable() {
     {
       accessorKey: "albumName",
       header: "Album",
+      cell: ({ row }) => {
+        const albumName = row.original.albumName;
+        const containerAlbumName = row.original.containerAlbumName;
+        return albumName || containerAlbumName || "-";
+      },
     },
     {
       accessorKey: "playCount",
       header: "Play Count",
+      cell: ({ row }) => row.original.playCount.toLocaleString(),
     },
     {
       accessorKey: "mediaDurationMs",
@@ -102,18 +108,22 @@ export function MusicDataTable() {
     {
       accessorKey: "songCount",
       header: "Songs",
+      cell: ({ row }) => row.original.songCount?.toLocaleString() || "0",
     },
     {
       accessorKey: "totalPlays",
       header: "Total Plays",
+      cell: ({ row }) => row.original.totalPlays?.toLocaleString() || "0",
     },
     {
       accessorKey: "listeners",
       header: "Listeners",
+      cell: ({ row }) => row.original.listeners?.toLocaleString() || "-",
     },
     {
       accessorKey: "playcount",
       header: "Play Count",
+      cell: ({ row }) => row.original.playcount?.toLocaleString() || "0",
     },
   ];
 
@@ -184,7 +194,10 @@ export function MusicDataTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Music Data Explorer</h2>
-        <Select value={dataType} onValueChange={(value: "songs" | "artists") => setDataType(value)}>
+        <Select value={dataType} onValueChange={(value: "songs" | "artists") => {
+          setDataType(value);
+          setPage(1); // Reset to first page when switching views
+        }}>
           <SelectTrigger className="w-32">
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
