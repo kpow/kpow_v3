@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Artist } from "@/types/artist";
 
 interface SongData {
@@ -124,8 +125,59 @@ export function MusicDataTable() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  const TableSkeleton = () => (
+    <div className="space-y-4">
+      {/* Header skeleton */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-32" />
+      </div>
+
+      {/* Table skeleton */}
+      <div className="rounded-md border">
+        <div className="relative">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                {columns.map((column, index) => (
+                  <TableHead
+                    key={index}
+                    className="h-12 px-4 text-left align-middle font-medium"
+                  >
+                    <Skeleton className="h-4 w-24" />
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: pageSize }).map((_, index) => (
+                <TableRow key={index}>
+                  {columns.map((_, colIndex) => (
+                    <TableCell key={colIndex} className="p-4">
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* Pagination skeleton */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-32" />
+        <div className="flex items-center space-x-2">
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-8 w-20" />
+        </div>
+      </div>
+    </div>
+  );
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <TableSkeleton />;
   }
 
   return (
