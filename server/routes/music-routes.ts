@@ -273,15 +273,24 @@ export function registerMusicRoutes(router: Router) {
             containerAlbumName: songs.containerAlbumName,
             containerType: songs.containerType,
             mediaDurationMs: songs.mediaDurationMs,
-            artistId: songs.artistId,
+            artistId: artists.id,
             artistName: artists.name,
-            playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
+            playCount: sql<number>`COUNT(DISTINCT ${plays.id})`.as('play_count'),
           })
           .from(songs)
-          .leftJoin(artists, eq(songs.artistId, artists.id))
+          .innerJoin(artists, eq(songs.artistId, artists.id))
           .leftJoin(plays, eq(plays.songId, songs.id))
-          .groupBy(songs.id, songs.name, songs.albumName, songs.containerAlbumName, 
-                   songs.containerType, songs.mediaDurationMs, songs.artistId, artists.name)
+          .groupBy(
+            songs.id,
+            songs.name,
+            songs.albumName,
+            songs.containerAlbumName, 
+            songs.containerType,
+            songs.mediaDurationMs,
+            artists.id,
+            artists.name
+          )
+          .orderBy(songs.name)
           .limit(Number(pageSize))
           .offset(offset),
 
@@ -313,12 +322,13 @@ export function registerMusicRoutes(router: Router) {
           playcount: artists.playcount,
           lastUpdated: artists.lastUpdated,
           songCount: sql<number>`COUNT(DISTINCT ${songs.id})`.as('song_count'),
-          totalPlays: sql<number>`COUNT(${plays.id})`.as('total_plays'),
+          totalPlays: sql<number>`COUNT(DISTINCT ${plays.id})`.as('total_plays'),
         })
         .from(artists)
         .leftJoin(songs, eq(songs.artistId, artists.id))
         .leftJoin(plays, eq(plays.songId, songs.id))
         .groupBy(artists.id)
+        .orderBy(artists.name)
         .limit(Number(pageSize))
         .offset(offset),
 
