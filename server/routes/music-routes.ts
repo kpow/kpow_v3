@@ -274,11 +274,12 @@ export function registerMusicRoutes(router: Router) {
             playCount: sql<number>`COUNT(DISTINCT ${plays.id})`.as('play_count'),
           })
           .from(songs)
-          .leftJoin(artists, eq(songs.artistId, artists.id))
-          .leftJoin(plays, eq(plays.songId, songs.id))
+          .leftJoin(artists, eq(songs.artist_id, artists.id))
+          .leftJoin(plays, eq(plays.song_id, songs.id))
           .where(
             and(
-              sql`${songs.name} IS NOT NULL AND ${songs.name} != ''`
+              sql`${songs.name} IS NOT NULL AND ${songs.name} != ''`,
+              sql`${artists.name} IS NOT NULL`
             )
           )
           .groupBy(songs.id, songs.name, artists.id, artists.name)
@@ -318,8 +319,8 @@ export function registerMusicRoutes(router: Router) {
           totalPlays: sql<number>`COUNT(DISTINCT ${plays.id})`.as('total_plays'),
         })
         .from(artists)
-        .leftJoin(songs, eq(songs.artistId, artists.id))
-        .leftJoin(plays, eq(plays.songId, songs.id))
+        .leftJoin(songs, eq(songs.artist_id, artists.id))
+        .leftJoin(plays, eq(plays.song_id, songs.id))
         .where(sql`${artists.name} IS NOT NULL AND ${artists.name} != 'Unknown'`)
         .groupBy(artists.id)
         .orderBy(desc(sql<number>`COUNT(DISTINCT ${plays.id})`))
