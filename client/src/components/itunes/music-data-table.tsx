@@ -55,7 +55,7 @@ export function MusicDataTable() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const { data, isLoading, error } = useQuery<TableData>({
+  const { data, isLoading, error, isFetching } = useQuery<TableData>({
     queryKey: ["/api/music/table-data", { page, pageSize, type: dataType }],
     queryFn: async () => {
       const response = await fetch(
@@ -64,8 +64,10 @@ export function MusicDataTable() {
       if (!response.ok) throw new Error("Failed to fetch table data");
       return response.json();
     },
-    keepPreviousData: true, // Keep previous data while fetching new data
-    retry: 2, // Retry failed requests twice
+    keepPreviousData: true,
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 
   const songColumns: ColumnDef<SongData>[] = [
@@ -73,7 +75,12 @@ export function MusicDataTable() {
       accessorKey: "name",
       header: "Song Name",
       cell: ({ row }) => (
-        <div className="font-medium">{row.original.name}</div>
+        <div className="font-medium">
+          {row.original.name}
+          <span className="text-xs text-muted-foreground ml-2">
+            (ID: {row.original.id})
+          </span>
+        </div>
       ),
     },
     {
@@ -82,6 +89,11 @@ export function MusicDataTable() {
       cell: ({ row }) => (
         <div className="font-medium">
           {row.original.artistName || "Unknown Artist"}
+          {row.original.artistId && (
+            <span className="text-xs text-muted-foreground ml-2">
+              (ID: {row.original.artistId})
+            </span>
+          )}
         </div>
       ),
     },
@@ -101,7 +113,12 @@ export function MusicDataTable() {
       accessorKey: "name",
       header: "Artist Name",
       cell: ({ row }) => (
-        <div className="font-medium">{row.original.name}</div>
+        <div className="font-medium">
+          {row.original.name}
+          <span className="text-xs text-muted-foreground ml-2">
+            (ID: {row.original.id})
+          </span>
+        </div>
       ),
     },
     {
@@ -139,7 +156,7 @@ export function MusicDataTable() {
   if (error) {
     return (
       <div className="p-4 text-center text-red-500">
-        Failed to load data. Please try again.
+        An error occurred while loading data. Please try again.
       </div>
     );
   }
@@ -165,7 +182,12 @@ export function MusicDataTable() {
         </Select>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border relative">
+        {isFetching && (
+          <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+            <div className="animate-pulse">Loading...</div>
+          </div>
+        )}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -223,7 +245,7 @@ export function MusicDataTable() {
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
+            disabled={page === 1 || isFetching}
           >
             Previous
           </Button>
@@ -234,7 +256,7 @@ export function MusicDataTable() {
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => p + 1)}
-            disabled={page === data?.pagination.totalPages}
+            disabled={page === data?.pagination.totalPages || isFetching}
           >
             Next
           </Button>
@@ -244,7 +266,13 @@ export function MusicDataTable() {
   );
 }
 
-function TableSkeleton({ columns, pageSize }: { columns: ColumnDef<any>[], pageSize: number }) {
+function TableSkeleton({
+  columns,
+  pageSize,
+}: {
+  columns: ColumnDef<any>[];
+  pageSize: number;
+}) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

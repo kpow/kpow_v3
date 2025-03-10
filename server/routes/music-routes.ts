@@ -282,7 +282,7 @@ export function registerMusicRoutes(router: Router) {
             desc(sql<number>`COUNT(DISTINCT ${plays.id})`),
             songs.name,
             artists.name,
-            songs.id // Add song ID to ensure consistent ordering
+            songs.id 
           )
           .limit(Number(pageSize))
           .offset(offset),
@@ -290,11 +290,13 @@ export function registerMusicRoutes(router: Router) {
           db.select({ count: sql<number>`count(DISTINCT ${songs.id})` })
             .from(songs)
             .where(sql`${songs.name} IS NOT NULL`)
-        ]);
+        ].map(p => p.catch(e => {
+          console.error('Query error:', e);
+          return null;
+        })));
 
-        if (!songsData.length && Number(page) > 1) {
-          // If no data found and not on first page, return last available page
-          return res.redirect(`/api/music/table-data?page=1&pageSize=${pageSize}&type=${type}`);
+        if (!songsData || !totalCount) {
+          throw new Error('Failed to fetch songs data');
         }
 
         return res.json({
@@ -324,7 +326,7 @@ export function registerMusicRoutes(router: Router) {
         .orderBy(
           desc(sql<number>`COUNT(DISTINCT ${plays.id})`),
           artists.name,
-          artists.id // Add artist ID to ensure consistent ordering
+          artists.id 
         )
         .limit(Number(pageSize))
         .offset(offset),
@@ -332,11 +334,13 @@ export function registerMusicRoutes(router: Router) {
         db.select({ count: sql<number>`count(DISTINCT ${artists.id})` })
           .from(artists)
           .where(sql`${artists.name} IS NOT NULL`)
-      ]);
+      ].map(p => p.catch(e => {
+        console.error('Query error:', e);
+        return null;
+      })));
 
-      if (!artistsData.length && Number(page) > 1) {
-        // If no data found and not on first page, return last available page
-        return res.redirect(`/api/music/table-data?page=1&pageSize=${pageSize}&type=${type}`);
+      if (!artistsData || !totalCount) {
+        throw new Error('Failed to fetch artists data');
       }
 
       return res.json({
