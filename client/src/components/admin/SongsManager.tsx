@@ -13,10 +13,13 @@ interface Song {
   artistName: string;
 }
 
+const ITEMS_PER_PAGE = 200;
+
 export function SongsManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedSongs, setSelectedSongs] = useState<Set<number>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: songs, isLoading } = useQuery<Song[]>({
     queryKey: ["/api/admin/songs-without-plays"],
@@ -54,11 +57,19 @@ export function SongsManager() {
     },
   });
 
+  const totalSongs = songs?.length || 0;
+  const totalPages = Math.ceil(totalSongs / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentSongs = songs?.slice(startIndex, endIndex) || [];
+
   const toggleAllSongs = () => {
-    if (selectedSongs.size === songs?.length) {
+    if (selectedSongs.size === currentSongs.length) {
       setSelectedSongs(new Set());
     } else {
-      setSelectedSongs(new Set(songs?.map(song => song.id) || []));
+      const newSelected = new Set(selectedSongs);
+      currentSongs.forEach(song => newSelected.add(song.id));
+      setSelectedSongs(newSelected);
     }
   };
 
@@ -88,14 +99,13 @@ export function SongsManager() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Songs Without Plays</h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center space-x-2">
             <Checkbox
-              checked={songs?.length ? selectedSongs.size === songs.length : false}
+              checked={currentSongs.length > 0 && selectedSongs.size === currentSongs.length}
               onClick={toggleAllSongs}
             />
-            <span>Select All</span>
+            <span>Select All on Page</span>
           </div>
           <Button
             onClick={handleDelete}
@@ -110,18 +120,21 @@ export function SongsManager() {
             ) : (
               <>
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete Selected
+                Delete Selected ({selectedSongs.size})
               </>
             )}
           </Button>
         </div>
+        <div className="text-sm text-muted-foreground">
+          Total Songs: {totalSongs} | Page {currentPage} of {totalPages}
+        </div>
       </div>
 
       <div className="grid gap-4">
-        {songs?.length === 0 ? (
+        {currentSongs.length === 0 ? (
           <p className="text-muted-foreground">No songs without plays found.</p>
         ) : (
-          songs?.map((song) => (
+          currentSongs.map((song) => (
             <Card key={song.id}>
               <CardContent className="flex items-center justify-between p-4">
                 <div className="flex items-center space-x-4">
@@ -141,6 +154,28 @@ export function SongsManager() {
             </Card>
           ))
         )}
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+        >
+          Previous
+        </Button>
+        <span>
+          Showing {startIndex + 1}-{Math.min(endIndex, totalSongs)} of {totalSongs}
+        </span>
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+          className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+        >
+          Next
+        </Button>
       </div>
     </div>
   );

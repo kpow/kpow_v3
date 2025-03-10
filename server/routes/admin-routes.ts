@@ -2,7 +2,7 @@ import { Router } from "express";
 import axios from "axios";
 import { db } from "@db";
 import { artists, songs, plays } from "@db/schema";
-import { eq, isNull } from "drizzle-orm";
+import { eq, isNull, inArray } from "drizzle-orm";
 
 export function registerAdminRoutes(router: Router) {
   // iTunes search endpoint
@@ -150,10 +150,8 @@ export function registerAdminRoutes(router: Router) {
     try {
       console.log(`[Songs] Deleting ${songIds.length} songs`);
 
-      // Delete songs
-      await db.delete(songs).where(
-        songs.id.in(songIds)
-      );
+      // Delete songs using inArray instead of in
+      await db.delete(songs).where(inArray(songs.id, songIds));
 
       console.log(`[Songs] Successfully deleted ${songIds.length} songs`);
       res.json({ message: "Songs deleted successfully" });
@@ -165,4 +163,5 @@ export function registerAdminRoutes(router: Router) {
       });
     }
   });
+  return router;
 }
