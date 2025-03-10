@@ -214,7 +214,7 @@ export function registerMusicRoutes(router: Router) {
       });
     }
   });
-    // Get top songs by year
+  // Get top songs by year
   router.get("/api/music/top-songs-by-year/:year", async (req, res) => {
     try {
       const year = parseInt(req.params.year);
@@ -254,6 +254,93 @@ export function registerMusicRoutes(router: Router) {
       console.error("Error fetching top songs by year:", error);
       res.status(500).json({ 
         message: error instanceof Error ? error.message : "Failed to fetch top songs by year" 
+      });
+    }
+  });
+
+  // New route for paginated table data
+  router.get("/api/music/table-data", async (req, res) => {
+    try {
+      const { page = 1, pageSize = 10, type = 'songs' } = req.query;
+      const offset = (Number(page) - 1) * Number(pageSize);
+
+      if (type === 'songs') {
+        const [songsData, totalCount] = await Promise.all([
+          db.select({
+            id: songs.id,
+            name: songs.name,
+            albumName: songs.albumName,
+            containerAlbumName: songs.containerAlbumName,
+            containerType: songs.containerType,
+            mediaDurationMs: songs.mediaDurationMs,
+            artistId: songs.artistId,
+            artistName: artists.name,
+            playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
+          })
+          .from(songs)
+          .leftJoin(artists, eq(songs.artistId, artists.id))
+          .leftJoin(plays, eq(plays.songId, songs.id))
+          .groupBy(songs.id, songs.name, songs.albumName, songs.containerAlbumName, 
+                   songs.containerType, songs.mediaDurationMs, songs.artistId, artists.name)
+          .limit(Number(pageSize))
+          .offset(offset),
+
+          db.select({ count: sql<number>`count(*)` })
+            .from(songs)
+            .then(result => Number(result[0].count))
+        ]);
+
+        return res.json({
+          data: songsData,
+          pagination: {
+            page: Number(page),
+            pageSize: Number(pageSize),
+            total: totalCount,
+            totalPages: Math.ceil(totalCount / Number(pageSize))
+          }
+        });
+      }
+
+      // Handle artists data
+      const [artistsData, totalCount] = await Promise.all([
+        db.select({
+          id: artists.id,
+          name: artists.name,
+          imageUrl: artists.imageUrl,
+          artistImageUrl: artists.artistImageUrl,
+          bio: artists.bio,
+          listeners: artists.listeners,
+          playcount: artists.playcount,
+          lastUpdated: artists.lastUpdated,
+          songCount: sql<number>`COUNT(DISTINCT ${songs.id})`.as('song_count'),
+          totalPlays: sql<number>`COUNT(${plays.id})`.as('total_plays'),
+        })
+        .from(artists)
+        .leftJoin(songs, eq(songs.artistId, artists.id))
+        .leftJoin(plays, eq(plays.songId, songs.id))
+        .groupBy(artists.id)
+        .limit(Number(pageSize))
+        .offset(offset),
+
+        db.select({ count: sql<number>`count(*)` })
+          .from(artists)
+          .then(result => Number(result[0].count))
+      ]);
+
+      return res.json({
+        data: artistsData,
+        pagination: {
+          page: Number(page),
+          pageSize: Number(pageSize),
+          total: totalCount,
+          totalPages: Math.ceil(totalCount / Number(pageSize))
+        }
+      });
+
+    } catch (error) {
+      console.error("Error fetching table data:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to fetch table data" 
       });
     }
   });
