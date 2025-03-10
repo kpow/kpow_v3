@@ -19,7 +19,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { Music } from "lucide-react";
 import { type Artist } from "@/types/artist";
-import { MusicDataTable } from "./music-data-table";
 
 interface Song {
   id: number;
@@ -217,43 +216,38 @@ export function YearlyTopSongs({
   );
 
   return (
-    <div className="space-y-12">
-      <div className="space-y-6">
-        <div className="flex items-center">
-          <h2 className="text-2xl font-bold font-slackey mr-4">
-            yearly top songs
-          </h2>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-36 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
-              <SelectValue placeholder="Select year" />
-            </SelectTrigger>
-            <SelectContent>
-              {yearsData?.years.map((year) => (
-                <SelectItem key={year} value={year} className="font-slackey">
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {carouselPosition === "left" ? (
-            <>
-              {CarouselSection}
-              {ListingSection}
-            </>
-          ) : (
-            <>
-              {ListingSection}
-              {CarouselSection}
-            </>
-          )}
-        </div>
+    <div className="space-y-6">
+      {/* Header with Title and Year Selector */}
+      <div className="flex items-center">
+        <h2 className="text-2xl font-bold font-slackey mr-4">
+          yearly top songs
+        </h2>
+        <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <SelectTrigger className="w-36 font-slackey text-2xl bg-blue-600 hover:bg-blue-700  text-white font-bold py-2 px-4 rounded">
+            <SelectValue placeholder="Select year" />
+          </SelectTrigger>
+          <SelectContent>
+            {yearsData?.years.map((year) => (
+              <SelectItem key={year} value={year} className="font-slackey">
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="pt-8 border-t">
-        <MusicDataTable />
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {carouselPosition === "left" ? (
+          <>
+            {CarouselSection}
+            {ListingSection}
+          </>
+        ) : (
+          <>
+            {ListingSection}
+            {CarouselSection}
+          </>
+        )}
       </div>
     </div>
   );

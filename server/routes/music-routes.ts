@@ -214,7 +214,7 @@ export function registerMusicRoutes(router: Router) {
       });
     }
   });
-  // Get top songs by year
+    // Get top songs by year
   router.get("/api/music/top-songs-by-year/:year", async (req, res) => {
     try {
       const year = parseInt(req.params.year);
@@ -254,123 +254,6 @@ export function registerMusicRoutes(router: Router) {
       console.error("Error fetching top songs by year:", error);
       res.status(500).json({ 
         message: error instanceof Error ? error.message : "Failed to fetch top songs by year" 
-      });
-    }
-  });
-
-  router.get("/api/music/table-data", async (req, res) => {
-    try {
-      const { page = '1', pageSize = '10', type = 'songs' } = req.query;
-      const offset = (Number(page) - 1) * Number(pageSize);
-
-      console.log(`Starting ${type} query with page ${page}, pageSize ${pageSize}`);
-
-      if (type === 'songs') {
-        try {
-          // Simple query just to test
-          const basicQuery = await db
-            .select()
-            .from(songs)
-            .limit(5);
-
-          console.log('Basic query result:', basicQuery);
-
-          // If basic query works, try the full query
-          const songsData = await db
-            .select({
-              id: songs.id,
-              name: songs.name,
-              artistId: songs.artist_id,
-              artistName: artists.name,
-              playCount: sql<number>`count(${plays.id})`.as('play_count'),
-            })
-            .from(songs)
-            .leftJoin(artists, eq(songs.artist_id, artists.id))
-            .leftJoin(plays, eq(plays.song_id, songs.id))
-            .groupBy(songs.id, songs.name, songs.artist_id, artists.name)
-            .orderBy(desc(sql<number>`count(${plays.id})`))
-            .limit(Number(pageSize))
-            .offset(offset);
-
-          console.log('Full songs query result:', songsData);
-
-          const total = await db
-            .select({ 
-              count: sql<number>`count(*)::int` 
-            })
-            .from(songs)
-            .then(result => result[0]?.count ?? 0);
-
-          console.log('Total count:', total);
-
-          return res.json({
-            data: songsData || [],
-            pagination: {
-              page: Number(page),
-              pageSize: Number(pageSize),
-              total,
-              totalPages: Math.ceil(total / Number(pageSize))
-            }
-          });
-        } catch (error) {
-          console.error("Error in songs query:", error);
-          throw error;
-        }
-      }
-
-      // Artists query
-      try {
-        const artistsData = await db
-          .select({
-            id: artists.id,
-            name: artists.name,
-            songCount: sql<number>`count(distinct ${songs.id})`.as('song_count'),
-            totalPlays: sql<number>`count(${plays.id})`.as('total_plays'),
-          })
-          .from(artists)
-          .leftJoin(songs, eq(songs.artist_id, artists.id))
-          .leftJoin(plays, eq(plays.song_id, songs.id))
-          .groupBy(artists.id, artists.name)
-          .orderBy(desc(sql<number>`count(${plays.id})`))
-          .limit(Number(pageSize))
-          .offset(offset);
-
-        console.log('Artists query result:', artistsData);
-
-        const total = await db
-          .select({ 
-            count: sql<number>`count(*)::int` 
-          })
-          .from(artists)
-          .then(result => result[0]?.count ?? 0);
-
-        console.log('Total artists count:', total);
-
-        return res.json({
-          data: artistsData || [],
-          pagination: {
-            page: Number(page),
-            pageSize: Number(pageSize),
-            total,
-            totalPages: Math.ceil(total / Number(pageSize))
-          }
-        });
-      } catch (error) {
-        console.error("Error in artists query:", error);
-        throw error;
-      }
-
-    } catch (error) {
-      console.error("Error in table data endpoint:", error);
-      return res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to fetch table data",
-        data: [],
-        pagination: {
-          page: Number(page || 1),
-          pageSize: Number(pageSize || 10),
-          total: 0,
-          totalPages: 0
-        }
       });
     }
   });
