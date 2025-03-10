@@ -50,116 +50,134 @@ interface TableData {
   };
 }
 
+// Column definitions for both tables
+const songColumns: ColumnDef<SongData>[] = [
+  {
+    accessorKey: "name",
+    header: "Song Name",
+    cell: ({ row }) => (
+      <div className="font-medium">
+        {row.original.name || "Untitled"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "artistName",
+    header: "Artist",
+    cell: ({ row }) => (
+      <div className="font-medium">
+        {row.original.artistName || "Unknown Artist"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "playCount",
+    header: "Play Count",
+    cell: ({ row }) => (
+      <div className="font-medium text-right">
+        {(row.original.playCount || 0).toLocaleString()}
+      </div>
+    ),
+  },
+];
+
+const artistColumns: ColumnDef<ArtistData>[] = [
+  {
+    accessorKey: "name",
+    header: "Artist Name",
+    cell: ({ row }) => (
+      <div className="font-medium">
+        {row.original.name || "Unknown Artist"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "songCount",
+    header: "Songs",
+    cell: ({ row }) => (
+      <div className="font-medium text-right">
+        {(row.original.songCount || 0).toLocaleString()}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "totalPlays",
+    header: "Total Plays",
+    cell: ({ row }) => (
+      <div className="font-medium text-right">
+        {(row.original.totalPlays || 0).toLocaleString()}
+      </div>
+    ),
+  },
+];
+
 export function MusicDataTable() {
   const [dataType, setDataType] = useState<"songs" | "artists">("songs");
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const { data, isLoading, error, isFetching } = useQuery<TableData>({
+  const { data, isLoading, error } = useQuery<TableData>({
     queryKey: ["/api/music/table-data", { page, pageSize, type: dataType }],
     queryFn: async () => {
+      console.log('Fetching table data:', { page, pageSize, type: dataType });
       const response = await fetch(
         `/api/music/table-data?page=${page}&pageSize=${pageSize}&type=${dataType}`
       );
-      if (!response.ok) throw new Error("Failed to fetch table data");
-      return response.json();
-    },
-    keepPreviousData: true,
-    retry: 3,
-    retryDelay: 1000,
-    staleTime: 30000, // Consider data fresh for 30 seconds
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch table data");
+      }
+
+      const jsonData = await response.json();
+      console.log('Received data:', jsonData);
+
+      return {
+        data: Array.isArray(jsonData.data) ? jsonData.data : [],
+        pagination: {
+          page: Number(page),
+          pageSize: Number(pageSize),
+          total: Number(jsonData.pagination?.total || 0),
+          totalPages: Math.ceil(Number(jsonData.pagination?.total || 0) / Number(pageSize))
+        }
+      };
+    }
   });
 
-  const songColumns: ColumnDef<SongData>[] = [
-    {
-      accessorKey: "name",
-      header: "Song Name",
-      cell: ({ row }) => (
-        <div className="font-medium">
-          {row.original.name}
-          <span className="text-xs text-muted-foreground ml-2">
-            (ID: {row.original.id})
-          </span>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "artistName",
-      header: "Artist",
-      cell: ({ row }) => (
-        <div className="font-medium">
-          {row.original.artistName || "Unknown Artist"}
-          {row.original.artistId && (
-            <span className="text-xs text-muted-foreground ml-2">
-              (ID: {row.original.artistId})
-            </span>
-          )}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "playCount",
-      header: "Play Count",
-      cell: ({ row }) => (
-        <div className="font-medium text-right">
-          {row.original.playCount.toLocaleString()}
-        </div>
-      ),
-    },
-  ];
+  console.log('Current table state:', { dataType, page, data });
 
-  const artistColumns: ColumnDef<ArtistData>[] = [
-    {
-      accessorKey: "name",
-      header: "Artist Name",
-      cell: ({ row }) => (
-        <div className="font-medium">
-          {row.original.name}
-          <span className="text-xs text-muted-foreground ml-2">
-            (ID: {row.original.id})
-          </span>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "songCount",
-      header: "Songs",
-      cell: ({ row }) => (
-        <div className="font-medium text-right">
-          {row.original.songCount.toLocaleString()}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "totalPlays",
-      header: "Total Plays",
-      cell: ({ row }) => (
-        <div className="font-medium text-right">
-          {row.original.totalPlays.toLocaleString()}
-        </div>
-      ),
-    },
-  ];
-
-  const columns = dataType === "songs" ? songColumns : artistColumns;
+  // Create table with explicit default values
+  const tableData = data?.data || [];
   const table = useReactTable({
-    data: data?.data ?? [],
-    columns,
+    data: tableData,
+    columns: dataType === "songs" ? songColumns : artistColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: Number(pageSize),
+        pageIndex: page - 1
+      }
+    },
   });
 
   if (isLoading) {
-    return <TableSkeleton columns={columns} pageSize={pageSize} />;
+    return <TableSkeleton columns={dataType === "songs" ? songColumns : artistColumns} pageSize={pageSize} />;
   }
 
   if (error) {
     return (
       <div className="p-4 text-center text-red-500">
-        An error occurred while loading data. Please try again.
+        {error instanceof Error ? error.message : "Failed to load data"}
       </div>
     );
   }
+
+  const pagination = data?.pagination || {
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 1
+  };
 
   return (
     <div className="space-y-4">
@@ -182,21 +200,13 @@ export function MusicDataTable() {
         </Select>
       </div>
 
-      <div className="rounded-md border relative">
-        {isFetching && (
-          <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
-            <div className="animate-pulse">Loading...</div>
-          </div>
-        )}
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted/50">
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="h-12 px-4 text-left align-middle font-medium text-muted-foreground hover:text-primary"
-                  >
+                  <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -209,11 +219,11 @@ export function MusicDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {tableData.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-muted/50">
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="p-4">
+                    <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -225,7 +235,7 @@ export function MusicDataTable() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={dataType === "songs" ? songColumns.length : artistColumns.length}
                   className="h-24 text-center"
                 >
                   No results.
@@ -238,25 +248,25 @@ export function MusicDataTable() {
 
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          {data?.pagination.total ?? 0} total entries
+          {pagination.total} total entries
         </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1 || isFetching}
+            disabled={page === 1}
           >
             Previous
           </Button>
           <div className="text-sm text-muted-foreground">
-            Page {page} of {data?.pagination.totalPages ?? 1}
+            Page {pagination.page} of {pagination.totalPages}
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => p + 1)}
-            disabled={page === data?.pagination.totalPages || isFetching}
+            disabled={page === pagination.totalPages}
           >
             Next
           </Button>
