@@ -258,7 +258,7 @@ export function registerMusicRoutes(router: Router) {
     }
   });
 
-  // New route for paginated table data
+  // Get table data
   router.get("/api/music/table-data", async (req, res) => {
     try {
       const { page = 1, pageSize = 10, type = 'songs' } = req.query;
@@ -269,28 +269,22 @@ export function registerMusicRoutes(router: Router) {
           db.select({
             id: songs.id,
             name: songs.name,
-            artistId: artists.id,
+            artistId: songs.artist_id,
             artistName: artists.name,
             playCount: sql<number>`COUNT(DISTINCT ${plays.id})`.as('play_count'),
           })
           .from(songs)
           .leftJoin(artists, eq(songs.artist_id, artists.id))
           .leftJoin(plays, eq(plays.song_id, songs.id))
-          .where(
-            and(
-              sql`${songs.name} IS NOT NULL AND ${songs.name} != ''`,
-              sql`${artists.name} IS NOT NULL`
-            )
-          )
-          .groupBy(songs.id, songs.name, artists.id, artists.name)
+          .where(sql`${songs.name} IS NOT NULL`)
+          .groupBy(songs.id, songs.name, songs.artist_id, artists.name)
           .orderBy(desc(sql<number>`COUNT(DISTINCT ${plays.id})`))
           .limit(Number(pageSize))
           .offset(offset),
 
-          db.select({ count: sql<number>`count(*)` })
+          db.select({ count: sql<number>`count(DISTINCT ${songs.id})` })
             .from(songs)
-            .where(sql`${songs.name} IS NOT NULL AND ${songs.name} != ''`)
-            .then(result => Number(result[0].count))
+            .where(sql`${songs.name} IS NOT NULL`)
         ]);
 
         return res.json({
@@ -298,8 +292,8 @@ export function registerMusicRoutes(router: Router) {
           pagination: {
             page: Number(page),
             pageSize: Number(pageSize),
-            total: totalCount,
-            totalPages: Math.ceil(totalCount / Number(pageSize))
+            total: totalCount[0].count,
+            totalPages: Math.ceil(totalCount[0].count / Number(pageSize))
           }
         });
       }
@@ -309,28 +303,21 @@ export function registerMusicRoutes(router: Router) {
         db.select({
           id: artists.id,
           name: artists.name,
-          imageUrl: artists.imageUrl,
-          artistImageUrl: artists.artistImageUrl,
-          bio: artists.bio,
-          listeners: artists.listeners,
-          playcount: artists.playcount,
-          lastUpdated: artists.lastUpdated,
           songCount: sql<number>`COUNT(DISTINCT ${songs.id})`.as('song_count'),
           totalPlays: sql<number>`COUNT(DISTINCT ${plays.id})`.as('total_plays'),
         })
         .from(artists)
         .leftJoin(songs, eq(songs.artist_id, artists.id))
         .leftJoin(plays, eq(plays.song_id, songs.id))
-        .where(sql`${artists.name} IS NOT NULL AND ${artists.name} != 'Unknown'`)
-        .groupBy(artists.id)
+        .where(sql`${artists.name} IS NOT NULL`)
+        .groupBy(artists.id, artists.name)
         .orderBy(desc(sql<number>`COUNT(DISTINCT ${plays.id})`))
         .limit(Number(pageSize))
         .offset(offset),
 
-        db.select({ count: sql<number>`count(*)` })
+        db.select({ count: sql<number>`count(DISTINCT ${artists.id})` })
           .from(artists)
-          .where(sql`${artists.name} IS NOT NULL AND ${artists.name} != 'Unknown'`)
-          .then(result => Number(result[0].count))
+          .where(sql`${artists.name} IS NOT NULL`)
       ]);
 
       return res.json({
@@ -338,8 +325,8 @@ export function registerMusicRoutes(router: Router) {
         pagination: {
           page: Number(page),
           pageSize: Number(pageSize),
-          total: totalCount,
-          totalPages: Math.ceil(totalCount / Number(pageSize))
+          total: totalCount[0].count,
+          totalPages: Math.ceil(totalCount[0].count / Number(pageSize))
         }
       });
 

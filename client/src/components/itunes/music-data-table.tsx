@@ -24,18 +24,24 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Artist } from "@/types/artist";
 
 interface SongData {
   id: number;
   name: string;
-  artistId: number;
-  artistName: string;
+  artistId: number | null;
+  artistName: string | null;
   playCount: number;
 }
 
+interface ArtistData {
+  id: number;
+  name: string;
+  songCount: number;
+  totalPlays: number;
+}
+
 interface TableData {
-  data: (SongData | Artist)[];
+  data: (SongData | ArtistData)[];
   pagination: {
     page: number;
     pageSize: number;
@@ -64,38 +70,55 @@ export function MusicDataTable() {
     {
       accessorKey: "name",
       header: "Song Name",
+      cell: ({ row }) => (
+        <div className="font-medium">{row.original.name}</div>
+      ),
     },
     {
       accessorKey: "artistName",
       header: "Artist",
-      cell: ({ row }) => row.original.artistName || "-",
+      cell: ({ row }) => (
+        <div className="font-medium">
+          {row.original.artistName || "Unknown Artist"}
+        </div>
+      ),
     },
     {
       accessorKey: "playCount",
       header: "Play Count",
-      cell: ({ row }) => row.original.playCount.toLocaleString(),
+      cell: ({ row }) => (
+        <div className="font-medium text-right">
+          {row.original.playCount.toLocaleString()}
+        </div>
+      ),
     },
   ];
 
-  const artistColumns: ColumnDef<Artist>[] = [
+  const artistColumns: ColumnDef<ArtistData>[] = [
     {
       accessorKey: "name",
       header: "Artist Name",
+      cell: ({ row }) => (
+        <div className="font-medium">{row.original.name}</div>
+      ),
     },
     {
       accessorKey: "songCount",
       header: "Songs",
-      cell: ({ row }) => row.original.songCount?.toLocaleString() || "0",
+      cell: ({ row }) => (
+        <div className="font-medium text-right">
+          {row.original.songCount.toLocaleString()}
+        </div>
+      ),
     },
     {
       accessorKey: "totalPlays",
       header: "Total Plays",
-      cell: ({ row }) => row.original.totalPlays?.toLocaleString() || "0",
-    },
-    {
-      accessorKey: "listeners",
-      header: "Listeners",
-      cell: ({ row }) => row.original.listeners?.toLocaleString() || "-",
+      cell: ({ row }) => (
+        <div className="font-medium text-right">
+          {row.original.totalPlays.toLocaleString()}
+        </div>
+      ),
     },
   ];
 
@@ -109,44 +132,39 @@ export function MusicDataTable() {
 
   const TableSkeleton = () => (
     <div className="space-y-4">
-      {/* Header skeleton */}
       <div className="flex items-center justify-between">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-10 w-32" />
       </div>
 
-      {/* Table skeleton */}
       <div className="rounded-md border">
-        <div className="relative">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                {columns.map((column, index) => (
-                  <TableHead
-                    key={index}
-                    className="h-12 px-4 text-left align-middle font-medium"
-                  >
-                    <Skeleton className="h-4 w-24" />
-                  </TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              {columns.map((_, index) => (
+                <TableHead
+                  key={index}
+                  className="h-12 px-4 text-left align-middle font-medium"
+                >
+                  <Skeleton className="h-4 w-24" />
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: pageSize }).map((_, index) => (
+              <TableRow key={index}>
+                {columns.map((_, colIndex) => (
+                  <TableCell key={colIndex} className="p-4">
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
                 ))}
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {Array.from({ length: pageSize }).map((_, index) => (
-                <TableRow key={index}>
-                  {columns.map((_, colIndex) => (
-                    <TableCell key={colIndex} className="p-4">
-                      <Skeleton className="h-4 w-full" />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
-      {/* Pagination skeleton */}
       <div className="flex items-center justify-between">
         <Skeleton className="h-4 w-32" />
         <div className="flex items-center space-x-2">
@@ -166,10 +184,13 @@ export function MusicDataTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Music Data Explorer</h2>
-        <Select value={dataType} onValueChange={(value: "songs" | "artists") => {
-          setDataType(value);
-          setPage(1); // Reset to first page when switching views
-        }}>
+        <Select
+          value={dataType}
+          onValueChange={(value: "songs" | "artists") => {
+            setDataType(value);
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="w-32">
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
@@ -188,7 +209,7 @@ export function MusicDataTable() {
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="h-12 px-4 text-left align-middle font-medium text-muted-foreground hover:text-primary transition-colors"
+                    className="h-12 px-4 text-left align-middle font-medium text-muted-foreground hover:text-primary"
                   >
                     {header.isPlaceholder
                       ? null
