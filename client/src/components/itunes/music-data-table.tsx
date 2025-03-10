@@ -29,10 +29,6 @@ import { Artist } from "@/types/artist";
 interface SongData {
   id: number;
   name: string;
-  albumName: string | null;
-  containerAlbumName: string | null;
-  containerType: string | null;
-  mediaDurationMs: number | null;
   artistId: number;
   artistName: string;
   playCount: number;
@@ -72,31 +68,12 @@ export function MusicDataTable() {
     {
       accessorKey: "artistName",
       header: "Artist",
-    },
-    {
-      accessorKey: "albumName",
-      header: "Album",
-      cell: ({ row }) => {
-        const albumName = row.original.albumName;
-        const containerAlbumName = row.original.containerAlbumName;
-        return albumName || containerAlbumName || "-";
-      },
+      cell: ({ row }) => row.original.artistName || "-",
     },
     {
       accessorKey: "playCount",
       header: "Play Count",
       cell: ({ row }) => row.original.playCount.toLocaleString(),
-    },
-    {
-      accessorKey: "mediaDurationMs",
-      header: "Duration",
-      cell: ({ row }) => {
-        const ms = row.original.mediaDurationMs;
-        if (!ms) return "-";
-        const minutes = Math.floor(ms / 60000);
-        const seconds = ((ms % 60000) / 1000).toFixed(0);
-        return `${minutes}:${seconds.padStart(2, "0")}`;
-      },
     },
   ];
 
@@ -119,11 +96,6 @@ export function MusicDataTable() {
       accessorKey: "listeners",
       header: "Listeners",
       cell: ({ row }) => row.original.listeners?.toLocaleString() || "-",
-    },
-    {
-      accessorKey: "playcount",
-      header: "Play Count",
-      cell: ({ row }) => row.original.playcount?.toLocaleString() || "0",
     },
   ];
 
