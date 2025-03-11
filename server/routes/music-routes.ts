@@ -272,7 +272,7 @@ export function registerMusicRoutes(router: Router) {
         .select({
           id: artists.id,
           name: artists.name,
-          imageUrl: artists.imageUrl,
+          imageUrl: artists.image_url,  // Updated to use image_url column
           totalPlays: sql<number>`COUNT(${plays.id})`.as('total_plays'),
           uniqueSongs: sql<number>`COUNT(DISTINCT ${songs.id})`.as('unique_songs'),
           firstPlayed: sql<string>`MIN(${plays.startTimestamp})`.as('first_played'),
@@ -281,7 +281,7 @@ export function registerMusicRoutes(router: Router) {
         .from(artists)
         .leftJoin(songs, eq(songs.artistId, artists.id))
         .leftJoin(plays, eq(plays.songId, songs.id))
-        .groupBy(artists.id, artists.name, artists.imageUrl);
+        .groupBy(artists.id, artists.name, artists.image_url);
 
       // Apply sorting
       if (sortBy && sortOrder) {
@@ -350,12 +350,12 @@ export function registerMusicRoutes(router: Router) {
           totalPlays: sql<number>`COUNT(${plays.id})`.as('total_plays'),
           firstPlayed: sql<string>`MIN(${plays.startTimestamp})`.as('first_played'),
           lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played'),
-          artistImage: artists.imageUrl,
+          artistImage: artists.image_url,  // Updated to use image_url column
         })
         .from(songs)
         .leftJoin(plays, eq(plays.songId, songs.id))
         .leftJoin(artists, eq(songs.artistId, artists.id))
-        .groupBy(songs.id, songs.name, artists.name, songs.albumName, artists.imageUrl);
+        .groupBy(songs.id, songs.name, artists.name, songs.albumName, artists.image_url);
 
       // Apply sorting
       if (sortBy && sortOrder) {
@@ -425,7 +425,7 @@ export function registerMusicRoutes(router: Router) {
           songName: songs.name,
           artistName: artists.name,
           albumName: songs.albumName,
-          artistImage: artists.imageUrl,
+          artistImage: artists.image_url,  // Updated to use image_url column
         })
         .from(plays)
         .innerJoin(songs, eq(plays.songId, songs.id))

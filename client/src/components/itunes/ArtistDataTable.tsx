@@ -56,7 +56,7 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
       cell: ({ row }) => (
         <Avatar className="w-8 h-8">
           <img 
-            src={row.original.image || "/default-artist.png"} 
+            src={row.original.imageUrl || "/default-artist.png"} 
             alt={row.original.name}
             className="object-cover"
           />
@@ -79,7 +79,11 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
         <Button 
           variant="link" 
           className="p-0 h-auto"
-          onClick={() => onArtistClick(row.original)}
+          onClick={() => onArtistClick({
+            id: row.original.id,
+            name: row.original.name,
+            image: row.original.imageUrl
+          })}
         >
           {row.original.name}
         </Button>

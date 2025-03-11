@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { type Artist } from "@/types/artist";
+import { Avatar } from "@/components/ui/avatar";
 
 interface SongStats {
   id: string;
@@ -70,17 +71,24 @@ export function SongDataTable({ onArtistClick }: SongDataTableProps) {
       accessorKey: "artistName",
       header: "Artist",
       cell: ({ row }) => (
-        <Button 
-          variant="link" 
-          className="p-0 h-auto"
-          onClick={() => onArtistClick({ 
-            id: row.original.id,
-            name: row.original.artistName,
-            image: row.original.artistImage
-          })}
-        >
-          {row.original.artistName}
-        </Button>
+        <div className="flex items-center gap-2">
+          {row.original.artistImage && (
+            <Avatar className="h-8 w-8">
+              <img src={row.original.artistImage} alt={row.original.artistName} />
+            </Avatar>
+          )}
+          <Button 
+            variant="link" 
+            className="p-0 h-auto"
+            onClick={() => onArtistClick({ 
+              id: row.original.id,
+              name: row.original.artistName,
+              image: row.original.artistImage
+            })}
+          >
+            {row.original.artistName}
+          </Button>
+        </div>
       ),
     },
     {
