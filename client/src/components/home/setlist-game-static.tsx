@@ -22,15 +22,15 @@ import { getSetlist } from "@/lib/phish-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Info } from "lucide-react";
 import BlurText from "@/reactbits/BlurText/BlurText";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-const formSchema = z.object({
-  year: z.string().min(1, "Year is required"),
-  tour: z.enum(["summer", "fall", "winter", "spring", ""]),
-});
+const handleAnimationComplete = () => {
+  console.log("Animation completed!");
+};
 
-type GameFormValues = z.infer<typeof formSchema>;
+interface GameFormValues {
+  year: string;
+  tour: "summer" | "fall" | "winter" | "spring" | "";
+}
 
 interface ShowData {
   showid: string;
@@ -67,7 +67,9 @@ export function SetlistGame() {
   );
 
   const form = useForm<GameFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: (data) => {
+      return formSchema.safeParse(data).success ? { errors: {} } : { errors: formSchema.safeParse(data).error.errors };
+    },
     defaultValues: {
       year: "",
       tour: "",
@@ -465,3 +467,10 @@ export function SetlistGame() {
     </Card>
   );
 }
+
+const formSchema = z.object({
+  year: z.string().min(1, "Year is required"),
+  tour: z.enum(["summer", "fall", "winter", "spring", ""]),
+});
+
+import * as z from "zod";
