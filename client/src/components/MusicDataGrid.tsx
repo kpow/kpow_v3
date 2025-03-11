@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
-import { DataGrid } from 'react-data-grid';
-import 'react-data-grid/lib/styles.css';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type SortingState,
+  flexRender,
+  createColumnHelper,
+} from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -12,6 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface Song {
   id: number;
@@ -39,7 +54,10 @@ const formatDuration = (ms: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
+const columnHelper = createColumnHelper<Song>();
+
 export function MusicDataGrid() {
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
@@ -52,55 +70,49 @@ export function MusicDataGrid() {
   });
 
   const columns = [
-    {
-      key: 'name',
-      name: 'Song',
-      width: 200,
-      resizable: true,
-    },
-    {
-      key: 'artistName',
-      name: 'Artist',
-      width: 150,
-      resizable: true,
-      formatter(props: { row: Song }) {
-        return (
-          <span className="text-blue-500 cursor-pointer hover:underline">
-            {props.row.artistName}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'albumName',
-      name: 'Album',
-      width: 200,
-      resizable: true,
-    },
-    {
-      key: 'mediaDurationMs',
-      name: 'Duration',
-      width: 100,
-      formatter(props: { row: Song }) {
-        return formatDuration(props.row.mediaDurationMs);
-      },
-    },
-    {
-      key: 'lastPlayed',
-      name: 'Last Played',
-      width: 150,
-      formatter(props: { row: Song }) {
-        return props.row.lastPlayed 
-          ? format(new Date(props.row.lastPlayed), 'MMM d, yyyy') 
-          : 'Never';
-      },
-    },
-    {
-      key: 'playCount',
-      name: 'Play Count',
-      width: 100,
-    },
+    columnHelper.accessor('name', {
+      header: 'Song',
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('artistName', {
+      header: 'Artist',
+      cell: info => (
+        <span className="text-blue-500 cursor-pointer hover:underline">
+          {info.getValue()}
+        </span>
+      ),
+    }),
+    columnHelper.accessor('albumName', {
+      header: 'Album',
+      cell: info => info.getValue() || '-',
+    }),
+    columnHelper.accessor('mediaDurationMs', {
+      header: 'Duration',
+      cell: info => formatDuration(info.getValue()),
+    }),
+    columnHelper.accessor('lastPlayed', {
+      header: 'Last Played',
+      cell: info => info.getValue() 
+        ? format(new Date(info.getValue()), 'MMM d, yyyy')
+        : 'Never',
+    }),
+    columnHelper.accessor('playCount', {
+      header: 'Play Count',
+      cell: info => info.getValue(),
+    }),
   ];
+
+  const table = useReactTable({
+    data: data?.songs || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    state: {
+      sorting,
+    },
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -110,7 +122,7 @@ export function MusicDataGrid() {
     return <div>Error loading data</div>;
   }
 
-  const { songs, pagination } = data;
+  const { pagination } = data;
 
   return (
     <div className="w-full space-y-4">
@@ -152,12 +164,35 @@ export function MusicDataGrid() {
         </div>
       </div>
 
-      <DataGrid
-        columns={columns}
-        rows={songs}
-        className="h-[600px]"
-        rowHeight={50}
-      />
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id}>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map(row => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
