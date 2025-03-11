@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DataGrid, GridRow } from 'react-data-grid';
+import { DataGrid } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -63,11 +63,13 @@ export function MusicDataGrid() {
       name: 'Artist',
       width: 150,
       resizable: true,
-      formatter: ({ row }: { row: Song }) => (
-        <span className="text-blue-500 cursor-pointer hover:underline">
-          {row.artistName}
-        </span>
-      ),
+      formatter(props: { row: Song }) {
+        return (
+          <span className="text-blue-500 cursor-pointer hover:underline">
+            {props.row.artistName}
+          </span>
+        );
+      },
     },
     {
       key: 'albumName',
@@ -79,14 +81,19 @@ export function MusicDataGrid() {
       key: 'mediaDurationMs',
       name: 'Duration',
       width: 100,
-      formatter: ({ row }: { row: Song }) => formatDuration(row.mediaDurationMs),
+      formatter(props: { row: Song }) {
+        return formatDuration(props.row.mediaDurationMs);
+      },
     },
     {
       key: 'lastPlayed',
       name: 'Last Played',
       width: 150,
-      formatter: ({ row }: { row: Song }) =>
-        row.lastPlayed ? format(new Date(row.lastPlayed), 'MMM d, yyyy') : 'Never',
+      formatter(props: { row: Song }) {
+        return props.row.lastPlayed 
+          ? format(new Date(props.row.lastPlayed), 'MMM d, yyyy') 
+          : 'Never';
+      },
     },
     {
       key: 'playCount',
