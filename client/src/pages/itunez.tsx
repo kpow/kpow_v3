@@ -9,6 +9,7 @@ import { YearlyTopArtists } from "@/components/itunes/yearly-top-artists";
 import { PlayDataTable } from "@/components/itunes/PlayDataTable";
 import { type Artist } from "@/types/artist";
 import { useQuery } from "@tanstack/react-query";
+import { MusicDataExplorer } from "@/components/itunes/MusicDataExplorer";
 
 export default function ITunezPage() {
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
@@ -80,8 +81,7 @@ export default function ITunezPage() {
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-2xl font-bold mb-4">All Plays</h2>
-          <PlayDataTable onArtistClick={setSelectedArtist} />
+          <MusicDataExplorer onArtistClick={setSelectedArtist} />
         </Card>
 
         <ArtistDetailsModal
