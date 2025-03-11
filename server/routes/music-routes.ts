@@ -258,7 +258,7 @@ export function registerMusicRoutes(router: Router) {
     }
   });
 
-  // New paginated artists endpoint
+  // Get paginated artists endpoint
   router.get("/api/music/artists", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
@@ -267,13 +267,19 @@ export function registerMusicRoutes(router: Router) {
       const limit = 10;
       const offset = (page - 1) * limit;
 
+      // Get total count for pagination
+      const totalCount = await db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(artists)
+        .then(result => result[0].count);
+
       // Build the query
       let query = db
         .select({
           id: artists.id,
           name: artists.name,
-          imageUrl: artists.image_url,  // Updated to use image_url column
-          totalPlays: sql<number>`COUNT(${plays.id})`.as('total_plays'),
+          imageUrl: artists.image_url,
+          totalPlays: sql<number>`COUNT(DISTINCT ${plays.id})`.as('total_plays'),
           uniqueSongs: sql<number>`COUNT(DISTINCT ${songs.id})`.as('unique_songs'),
           firstPlayed: sql<string>`MIN(${plays.startTimestamp})`.as('first_played'),
           lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played'),
@@ -281,7 +287,7 @@ export function registerMusicRoutes(router: Router) {
         .from(artists)
         .leftJoin(songs, eq(songs.artistId, artists.id))
         .leftJoin(plays, eq(plays.songId, songs.id))
-        .groupBy(artists.id, artists.name, artists.image_url);
+        .groupBy(artists.id);
 
       // Apply sorting
       if (sortBy && sortOrder) {
@@ -309,12 +315,6 @@ export function registerMusicRoutes(router: Router) {
         query = query.orderBy(desc(sql`total_plays`));
       }
 
-      // Get total count for pagination
-      const totalCount = await db
-        .select({ count: sql<number>`COUNT(DISTINCT ${artists.id})` })
-        .from(artists)
-        .then(result => result[0].count);
-
       // Apply pagination
       query = query.limit(limit).offset(offset);
 
@@ -341,21 +341,27 @@ export function registerMusicRoutes(router: Router) {
       const limit = 10;
       const offset = (page - 1) * limit;
 
+      // Get total count for pagination
+      const totalCount = await db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(songs)
+        .then(result => result[0].count);
+
       let query = db
         .select({
           id: songs.id,
           songName: songs.name,
           artistName: artists.name,
           albumName: songs.albumName,
-          totalPlays: sql<number>`COUNT(${plays.id})`.as('total_plays'),
+          totalPlays: sql<number>`COUNT(DISTINCT ${plays.id})`.as('total_plays'),
           firstPlayed: sql<string>`MIN(${plays.startTimestamp})`.as('first_played'),
           lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played'),
-          artistImage: artists.image_url,  // Updated to use image_url column
+          artistImage: artists.image_url,
         })
         .from(songs)
         .leftJoin(plays, eq(plays.songId, songs.id))
         .leftJoin(artists, eq(songs.artistId, artists.id))
-        .groupBy(songs.id, songs.name, artists.name, songs.albumName, artists.image_url);
+        .groupBy(songs.id);
 
       // Apply sorting
       if (sortBy && sortOrder) {
@@ -386,12 +392,6 @@ export function registerMusicRoutes(router: Router) {
         query = query.orderBy(desc(sql`total_plays`));
       }
 
-      // Get total count for pagination
-      const totalCount = await db
-        .select({ count: sql<number>`COUNT(DISTINCT ${songs.id})` })
-        .from(songs)
-        .then(result => result[0].count);
-
       // Apply pagination
       query = query.limit(limit).offset(offset);
 
@@ -418,6 +418,12 @@ export function registerMusicRoutes(router: Router) {
       const limit = 10;
       const offset = (page - 1) * limit;
 
+      // Get total count for pagination
+      const totalCount = await db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(plays)
+        .then(result => result[0].count);
+
       let query = db
         .select({
           id: plays.id,
@@ -425,7 +431,7 @@ export function registerMusicRoutes(router: Router) {
           songName: songs.name,
           artistName: artists.name,
           albumName: songs.albumName,
-          artistImage: artists.image_url,  // Updated to use image_url column
+          artistImage: artists.image_url,
         })
         .from(plays)
         .innerJoin(songs, eq(plays.songId, songs.id))
@@ -453,12 +459,6 @@ export function registerMusicRoutes(router: Router) {
       } else {
         query = query.orderBy(desc(plays.startTimestamp));
       }
-
-      // Get total count for pagination
-      const totalCount = await db
-        .select({ count: sql<number>`COUNT(${plays.id})` })
-        .from(plays)
-        .then(result => result[0].count);
 
       // Apply pagination
       query = query.limit(limit).offset(offset);
