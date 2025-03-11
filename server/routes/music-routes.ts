@@ -214,7 +214,7 @@ export function registerMusicRoutes(router: Router) {
       });
     }
   });
-  // Get top songs by year
+    // Get top songs by year
   router.get("/api/music/top-songs-by-year/:year", async (req, res) => {
     try {
       const year = parseInt(req.params.year);
@@ -254,59 +254,6 @@ export function registerMusicRoutes(router: Router) {
       console.error("Error fetching top songs by year:", error);
       res.status(500).json({ 
         message: error instanceof Error ? error.message : "Failed to fetch top songs by year" 
-      });
-    }
-  });
-
-  // New route for paginated songs data
-  router.get("/api/music/songs", async (req, res) => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const pageSize = parseInt(req.query.pageSize as string) || 25;
-      const offset = (page - 1) * pageSize;
-
-      const songsQuery = await db
-        .select({
-          id: songs.id,
-          name: songs.name,
-          albumName: songs.albumName,
-          mediaDurationMs: songs.mediaDurationMs,
-          artistId: artists.id,
-          artistName: artists.name,
-          artistImageUrl: artists.artistImageUrl,
-          playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
-          lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played')
-        })
-        .from(songs)
-        .leftJoin(artists, eq(songs.artistId, artists.id))
-        .leftJoin(plays, eq(plays.songId, songs.id))
-        .groupBy(songs.id, songs.name, songs.albumName, songs.mediaDurationMs, 
-                artists.id, artists.name, artists.artistImageUrl)
-        .limit(pageSize)
-        .offset(offset);
-
-      // Get total count for pagination
-      const totalCountResult = await db
-        .select({ count: sql<number>`COUNT(*)`.as('count') })
-        .from(songs)
-        .execute();
-
-      const totalCount = totalCountResult[0].count;
-      const totalPages = Math.ceil(totalCount / pageSize);
-
-      res.json({
-        songs: songsQuery,
-        pagination: {
-          currentPage: page,
-          totalPages,
-          pageSize,
-          totalCount
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching paginated songs:", error);
-      res.status(500).json({
-        message: error instanceof Error ? error.message : "Failed to fetch songs"
       });
     }
   });
