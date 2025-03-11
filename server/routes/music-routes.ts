@@ -36,8 +36,8 @@ export function registerMusicRoutes(router: Router) {
       res.json({ artists: rankedArtists });
     } catch (error) {
       console.error("Error fetching top artists:", error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to fetch top artists" 
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to fetch top artists"
       });
     }
   });
@@ -68,13 +68,13 @@ export function registerMusicRoutes(router: Router) {
       // Transform the data to match the expected format
       const artist = {
         ...artistWithSongs,
-        plays: artistWithSongs.songs.flatMap(song => 
+        plays: artistWithSongs.songs.flatMap(song =>
           song.plays.map(play => ({
             id: play.id,
             startTimestamp: play.startTimestamp,
             songName: song.name
           }))
-        ).sort((a, b) => 
+        ).sort((a, b) =>
           new Date(b.startTimestamp).getTime() - new Date(a.startTimestamp).getTime()
         ).slice(0, 10)
       };
@@ -82,8 +82,8 @@ export function registerMusicRoutes(router: Router) {
       res.json({ artist });
     } catch (error) {
       console.error("Error fetching artist details:", error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to fetch artist details" 
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to fetch artist details"
       });
     }
   });
@@ -98,7 +98,7 @@ export function registerMusicRoutes(router: Router) {
           songName: songs.name,
           artistId: artists.id,
           artistName: artists.name,
-          imageUrl: artists.imageUrl,  
+          imageUrl: artists.imageUrl,
           playCount: sql<number>`COUNT(${plays.id})`.as('play_count'),
         })
         .from(plays)
@@ -113,7 +113,7 @@ export function registerMusicRoutes(router: Router) {
           songs.name,
           artists.id,
           artists.name,
-          artists.imageUrl  
+          artists.imageUrl
         )
         .orderBy(
           desc(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`),
@@ -174,8 +174,8 @@ export function registerMusicRoutes(router: Router) {
       res.json({ years });
     } catch (error) {
       console.error("Error fetching available years:", error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to fetch available years" 
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to fetch available years"
       });
     }
   });
@@ -209,8 +209,8 @@ export function registerMusicRoutes(router: Router) {
       res.json({ artists: topArtists });
     } catch (error) {
       console.error("Error fetching top artists by year:", error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to fetch top artists by year" 
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to fetch top artists by year"
       });
     }
   });
@@ -252,8 +252,8 @@ export function registerMusicRoutes(router: Router) {
       res.json({ songs: topSongs });
     } catch (error) {
       console.error("Error fetching top songs by year:", error);
-      res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to fetch top songs by year" 
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to fetch top songs by year"
       });
     }
   });
@@ -271,7 +271,9 @@ export function registerMusicRoutes(router: Router) {
       const totalCount = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(artists)
-        .then(result => result[0].count);
+        .then(result => Number(result[0].count));
+
+      console.log('Total artists count:', totalCount);
 
       // Build the query
       let query = db
@@ -287,7 +289,7 @@ export function registerMusicRoutes(router: Router) {
         .from(artists)
         .leftJoin(songs, eq(songs.artistId, artists.id))
         .leftJoin(plays, eq(plays.songId, songs.id))
-        .groupBy(artists.id);
+        .groupBy(artists.id, artists.name, artists.image_url);
 
       // Apply sorting
       if (sortBy && sortOrder) {
@@ -319,6 +321,7 @@ export function registerMusicRoutes(router: Router) {
       query = query.limit(limit).offset(offset);
 
       const data = await query;
+      console.log('Artist query results:', data);
 
       res.json({
         data,
@@ -345,7 +348,9 @@ export function registerMusicRoutes(router: Router) {
       const totalCount = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(songs)
-        .then(result => result[0].count);
+        .then(result => Number(result[0].count));
+
+      console.log('Total songs count:', totalCount);
 
       let query = db
         .select({
@@ -361,7 +366,7 @@ export function registerMusicRoutes(router: Router) {
         .from(songs)
         .leftJoin(plays, eq(plays.songId, songs.id))
         .leftJoin(artists, eq(songs.artistId, artists.id))
-        .groupBy(songs.id);
+        .groupBy(songs.id, songs.name, songs.albumName, artists.name, artists.image_url);
 
       // Apply sorting
       if (sortBy && sortOrder) {
@@ -396,6 +401,7 @@ export function registerMusicRoutes(router: Router) {
       query = query.limit(limit).offset(offset);
 
       const data = await query;
+      console.log('Songs query results:', data);
 
       res.json({
         data,
@@ -422,7 +428,9 @@ export function registerMusicRoutes(router: Router) {
       const totalCount = await db
         .select({ count: sql<number>`COUNT(*)` })
         .from(plays)
-        .then(result => result[0].count);
+        .then(result => Number(result[0].count));
+
+      console.log('Total plays count:', totalCount);
 
       let query = db
         .select({
@@ -464,6 +472,7 @@ export function registerMusicRoutes(router: Router) {
       query = query.limit(limit).offset(offset);
 
       const data = await query;
+      console.log('Plays query results:', data);
 
       res.json({
         data,
