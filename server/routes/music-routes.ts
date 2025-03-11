@@ -262,66 +262,36 @@ export function registerMusicRoutes(router: Router) {
   router.get("/api/music/artists", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const sortBy = req.query.sortBy as string;
-      const sortOrder = req.query.sortOrder as string;
       const limit = 10;
       const offset = (page - 1) * limit;
 
-      // Get total count for pagination
-      const totalCount = await db
-        .select({ count: sql<number>`COUNT(*)` })
-        .from(artists)
-        .then(result => Number(result[0].count));
+      // First get total count
+      const countResult = await db
+        .select({
+          count: sql<number>`count(distinct ${artists.id})`
+        })
+        .from(artists);
 
-      console.log('Total artists count:', totalCount);
+      const totalCount = Number(countResult[0].count);
 
-      // Build the query
-      let query = db
+      // Then get paginated data
+      const data = await db
         .select({
           id: artists.id,
           name: artists.name,
           imageUrl: artists.image_url,
-          totalPlays: sql<number>`COUNT(DISTINCT ${plays.id})`.as('total_plays'),
-          uniqueSongs: sql<number>`COUNT(DISTINCT ${songs.id})`.as('unique_songs'),
-          firstPlayed: sql<string>`MIN(${plays.startTimestamp})`.as('first_played'),
-          lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played'),
+          totalPlays: sql<number>`count(distinct ${plays.id})`.as('total_plays'),
+          uniqueSongs: sql<number>`count(distinct ${songs.id})`.as('unique_songs'),
+          firstPlayed: sql<string>`min(${plays.start_timestamp})`.as('first_played'),
+          lastPlayed: sql<string>`max(${plays.start_timestamp})`.as('last_played')
         })
         .from(artists)
-        .leftJoin(songs, eq(songs.artistId, artists.id))
-        .leftJoin(plays, eq(plays.songId, songs.id))
-        .groupBy(artists.id, artists.name, artists.image_url);
-
-      // Apply sorting
-      if (sortBy && sortOrder) {
-        const sortDirection = sortOrder === 'desc' ? desc : asc;
-        switch (sortBy) {
-          case 'name':
-            query = query.orderBy(sortDirection(artists.name));
-            break;
-          case 'totalPlays':
-            query = query.orderBy(sortDirection(sql`total_plays`));
-            break;
-          case 'uniqueSongs':
-            query = query.orderBy(sortDirection(sql`unique_songs`));
-            break;
-          case 'firstPlayed':
-            query = query.orderBy(sortDirection(sql`first_played`));
-            break;
-          case 'lastPlayed':
-            query = query.orderBy(sortDirection(sql`last_played`));
-            break;
-          default:
-            query = query.orderBy(desc(sql`total_plays`));
-        }
-      } else {
-        query = query.orderBy(desc(sql`total_plays`));
-      }
-
-      // Apply pagination
-      query = query.limit(limit).offset(offset);
-
-      const data = await query;
-      console.log('Artist query results:', data);
+        .leftJoin(songs, eq(songs.artist_id, artists.id))
+        .leftJoin(plays, eq(plays.song_id, songs.id))
+        .groupBy(artists.id, artists.name, artists.image_url)
+        .orderBy(desc(sql`count(distinct ${plays.id})`))
+        .limit(limit)
+        .offset(offset);
 
       res.json({
         data,
@@ -335,73 +305,41 @@ export function registerMusicRoutes(router: Router) {
     }
   });
 
-  // Get paginated songs with play counts
+  // Get paginated songs endpoint
   router.get("/api/music/songs", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const sortBy = req.query.sortBy as string;
-      const sortOrder = req.query.sortOrder as string;
       const limit = 10;
       const offset = (page - 1) * limit;
 
-      // Get total count for pagination
-      const totalCount = await db
-        .select({ count: sql<number>`COUNT(*)` })
-        .from(songs)
-        .then(result => Number(result[0].count));
+      // First get total count
+      const countResult = await db
+        .select({
+          count: sql<number>`count(distinct ${songs.id})`
+        })
+        .from(songs);
 
-      console.log('Total songs count:', totalCount);
+      const totalCount = Number(countResult[0].count);
 
-      let query = db
+      // Then get paginated data
+      const data = await db
         .select({
           id: songs.id,
           songName: songs.name,
           artistName: artists.name,
-          albumName: songs.albumName,
-          totalPlays: sql<number>`COUNT(DISTINCT ${plays.id})`.as('total_plays'),
-          firstPlayed: sql<string>`MIN(${plays.startTimestamp})`.as('first_played'),
-          lastPlayed: sql<string>`MAX(${plays.startTimestamp})`.as('last_played'),
-          artistImage: artists.image_url,
+          albumName: songs.album_name,
+          totalPlays: sql<number>`count(distinct ${plays.id})`.as('total_plays'),
+          firstPlayed: sql<string>`min(${plays.start_timestamp})`.as('first_played'),
+          lastPlayed: sql<string>`max(${plays.start_timestamp})`.as('last_played'),
+          artistImage: artists.image_url
         })
         .from(songs)
-        .leftJoin(plays, eq(plays.songId, songs.id))
-        .leftJoin(artists, eq(songs.artistId, artists.id))
-        .groupBy(songs.id, songs.name, songs.albumName, artists.name, artists.image_url);
-
-      // Apply sorting
-      if (sortBy && sortOrder) {
-        const sortDirection = sortOrder === 'desc' ? desc : asc;
-        switch (sortBy) {
-          case 'songName':
-            query = query.orderBy(sortDirection(songs.name));
-            break;
-          case 'artistName':
-            query = query.orderBy(sortDirection(artists.name));
-            break;
-          case 'albumName':
-            query = query.orderBy(sortDirection(songs.albumName));
-            break;
-          case 'totalPlays':
-            query = query.orderBy(sortDirection(sql`total_plays`));
-            break;
-          case 'firstPlayed':
-            query = query.orderBy(sortDirection(sql`first_played`));
-            break;
-          case 'lastPlayed':
-            query = query.orderBy(sortDirection(sql`last_played`));
-            break;
-          default:
-            query = query.orderBy(desc(sql`total_plays`));
-        }
-      } else {
-        query = query.orderBy(desc(sql`total_plays`));
-      }
-
-      // Apply pagination
-      query = query.limit(limit).offset(offset);
-
-      const data = await query;
-      console.log('Songs query results:', data);
+        .leftJoin(artists, eq(songs.artist_id, artists.id))
+        .leftJoin(plays, eq(plays.song_id, songs.id))
+        .groupBy(songs.id, songs.name, songs.album_name, artists.name, artists.image_url)
+        .orderBy(desc(sql`count(distinct ${plays.id})`))
+        .limit(limit)
+        .offset(offset);
 
       res.json({
         data,
@@ -415,64 +353,38 @@ export function registerMusicRoutes(router: Router) {
     }
   });
 
-  // Get paginated play records
+  // Get paginated plays endpoint
   router.get("/api/music/plays", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const sortBy = req.query.sortBy as string;
-      const sortOrder = req.query.sortOrder as string;
       const limit = 10;
       const offset = (page - 1) * limit;
 
-      // Get total count for pagination
-      const totalCount = await db
-        .select({ count: sql<number>`COUNT(*)` })
-        .from(plays)
-        .then(result => Number(result[0].count));
+      // First get total count
+      const countResult = await db
+        .select({
+          count: sql<number>`count(*)`
+        })
+        .from(plays);
 
-      console.log('Total plays count:', totalCount);
+      const totalCount = Number(countResult[0].count);
 
-      let query = db
+      // Then get paginated data
+      const data = await db
         .select({
           id: plays.id,
-          startTimestamp: plays.startTimestamp,
+          startTimestamp: plays.start_timestamp,
           songName: songs.name,
           artistName: artists.name,
-          albumName: songs.albumName,
-          artistImage: artists.image_url,
+          albumName: songs.album_name,
+          artistImage: artists.image_url
         })
         .from(plays)
-        .innerJoin(songs, eq(plays.songId, songs.id))
-        .innerJoin(artists, eq(songs.artistId, artists.id));
-
-      // Apply sorting
-      if (sortBy && sortOrder) {
-        const sortDirection = sortOrder === 'desc' ? desc : asc;
-        switch (sortBy) {
-          case 'startTimestamp':
-            query = query.orderBy(sortDirection(plays.startTimestamp));
-            break;
-          case 'songName':
-            query = query.orderBy(sortDirection(songs.name));
-            break;
-          case 'artistName':
-            query = query.orderBy(sortDirection(artists.name));
-            break;
-          case 'albumName':
-            query = query.orderBy(sortDirection(songs.albumName));
-            break;
-          default:
-            query = query.orderBy(desc(plays.startTimestamp));
-        }
-      } else {
-        query = query.orderBy(desc(plays.startTimestamp));
-      }
-
-      // Apply pagination
-      query = query.limit(limit).offset(offset);
-
-      const data = await query;
-      console.log('Plays query results:', data);
+        .innerJoin(songs, eq(plays.song_id, songs.id))
+        .innerJoin(artists, eq(songs.artist_id, artists.id))
+        .orderBy(desc(plays.start_timestamp))
+        .limit(limit)
+        .offset(offset);
 
       res.json({
         data,
