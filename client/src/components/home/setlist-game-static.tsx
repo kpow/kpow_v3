@@ -10,7 +10,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
 } from "@/components/ui/form";
 import {
   Select,
@@ -23,15 +22,15 @@ import { getSetlist } from "@/lib/phish-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Info } from "lucide-react";
 import BlurText from "@/reactbits/BlurText/BlurText";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const handleAnimationComplete = () => {
-  console.log("Animation completed!");
-};
+const formSchema = z.object({
+  year: z.string().min(1, "Year is required"),
+  tour: z.enum(["summer", "fall", "winter", "spring", ""]),
+});
 
-interface GameFormValues {
-  year: string;
-  tour: "summer" | "fall" | "winter" | "spring" | "";
-}
+type GameFormValues = z.infer<typeof formSchema>;
 
 interface ShowData {
   showid: string;
@@ -68,6 +67,7 @@ export function SetlistGame() {
   );
 
   const form = useForm<GameFormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       year: "",
       tour: "",
@@ -245,9 +245,7 @@ export function SetlistGame() {
                     className="text-center flex justify-center font-slackey text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold"
                   />
 
-                  {/* <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
-                    Ready to test your Phish knowledge?
-                  </h2> */}
+
                 </div>
 
                 <div>

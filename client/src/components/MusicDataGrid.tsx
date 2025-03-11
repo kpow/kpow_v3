@@ -27,19 +27,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
 import { type Artist } from "@/types/artist";
 
 interface Song {
   id: number;
   name: string;
-  albumName: string;
+  albumName: string | null;
   mediaDurationMs: number;
   artistId: number;
   artistName: string;
-  artistImageUrl: string;
+  artistImageUrl: string | null;
   playCount: number;
-  lastPlayed: string;
+  lastPlayed: string | null;
 }
 
 interface PaginationData {
@@ -78,39 +78,27 @@ export function MusicDataGrid({ onArtistClick }: MusicDataGridProps) {
   const columns = [
     columnHelper.accessor('name', {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          Song
-          {column.getIsSorted() === "asc" ? (
-            <ArrowUp className="ml-2 h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
-            <ArrowDown className="ml-2 h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+        <div className="flex items-center">
+          <span className="mr-2">Song</span>
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" ? 
+              <ArrowUp className="h-4 w-4" /> : 
+              <ArrowDown className="h-4 w-4" />
           )}
-        </Button>
+        </div>
       ),
       cell: info => info.getValue(),
     }),
     columnHelper.accessor('artistName', {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          Artist
-          {column.getIsSorted() === "asc" ? (
-            <ArrowUp className="ml-2 h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
-            <ArrowDown className="ml-2 h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+        <div className="flex items-center">
+          <span className="mr-2">Artist</span>
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" ? 
+              <ArrowUp className="h-4 w-4" /> : 
+              <ArrowDown className="h-4 w-4" />
           )}
-        </Button>
+        </div>
       ),
       cell: info => (
         <Button
@@ -127,79 +115,55 @@ export function MusicDataGrid({ onArtistClick }: MusicDataGridProps) {
     }),
     columnHelper.accessor('albumName', {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          Album
-          {column.getIsSorted() === "asc" ? (
-            <ArrowUp className="ml-2 h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
-            <ArrowDown className="ml-2 h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+        <div className="flex items-center">
+          <span className="mr-2">Album</span>
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" ? 
+              <ArrowUp className="h-4 w-4" /> : 
+              <ArrowDown className="h-4 w-4" />
           )}
-        </Button>
+        </div>
       ),
       cell: info => info.getValue() || '-',
     }),
     columnHelper.accessor('mediaDurationMs', {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          Duration
-          {column.getIsSorted() === "asc" ? (
-            <ArrowUp className="ml-2 h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
-            <ArrowDown className="ml-2 h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+        <div className="flex items-center">
+          <span className="mr-2">Duration</span>
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" ? 
+              <ArrowUp className="h-4 w-4" /> : 
+              <ArrowDown className="h-4 w-4" />
           )}
-        </Button>
+        </div>
       ),
       cell: info => formatDuration(info.getValue()),
     }),
     columnHelper.accessor('lastPlayed', {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          Last Played
-          {column.getIsSorted() === "asc" ? (
-            <ArrowUp className="ml-2 h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
-            <ArrowDown className="ml-2 h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+        <div className="flex items-center">
+          <span className="mr-2">Last Played</span>
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" ? 
+              <ArrowUp className="h-4 w-4" /> : 
+              <ArrowDown className="h-4 w-4" />
           )}
-        </Button>
+        </div>
       ),
-      cell: info => info.getValue() 
+      cell: info => info.getValue()
         ? format(new Date(info.getValue()), 'MMM d, yyyy')
         : 'Never',
     }),
     columnHelper.accessor('playCount', {
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
-        >
-          Play Count
-          {column.getIsSorted() === "asc" ? (
-            <ArrowUp className="ml-2 h-4 w-4" />
-          ) : column.getIsSorted() === "desc" ? (
-            <ArrowDown className="ml-2 h-4 w-4" />
-          ) : (
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+        <div className="flex items-center">
+          <span className="mr-2">Play Count</span>
+          {column.getIsSorted() && (
+            column.getIsSorted() === "asc" ? 
+              <ArrowUp className="h-4 w-4" /> : 
+              <ArrowDown className="h-4 w-4" />
           )}
-        </Button>
+        </div>
       ),
       cell: info => info.getValue(),
     }),
@@ -215,10 +179,16 @@ export function MusicDataGrid({ onArtistClick }: MusicDataGridProps) {
     state: {
       sorting,
     },
+    manualPagination: true,
+    pageCount: data?.pagination?.totalPages ?? -1,
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-48">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
   if (isError) {
@@ -251,16 +221,18 @@ export function MusicDataGrid({ onArtistClick }: MusicDataGridProps) {
             variant="outline"
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
           >
             Previous
           </Button>
           <span>
-            Page {pagination.currentPage} of {pagination.totalPages}
+            Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, pagination?.totalCount ?? 0)} of {pagination?.totalCount ?? 0}
           </span>
           <Button
             variant="outline"
-            onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
-            disabled={page === pagination.totalPages}
+            onClick={() => setPage(p => Math.min(pagination?.totalPages ?? 1, p + 1))}
+            disabled={page === (pagination?.totalPages ?? 1)}
+            className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
           >
             Next
           </Button>
@@ -273,7 +245,11 @@ export function MusicDataGrid({ onArtistClick }: MusicDataGridProps) {
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <TableHead key={header.id}>
+                  <TableHead 
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="cursor-pointer"
+                  >
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
