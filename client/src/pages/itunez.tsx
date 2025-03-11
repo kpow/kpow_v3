@@ -81,7 +81,7 @@ export default function ITunezPage() {
 
         <Card className="p-6">
           <h2 className="text-2xl font-bold font-slackey mb-6">music explorer</h2>
-          <MusicDataGrid />
+          <MusicDataGrid onArtistClick={setSelectedArtist} />
         </Card>
 
         <ArtistDetailsModal
