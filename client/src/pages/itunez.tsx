@@ -6,6 +6,7 @@ import { PageTitle } from "@/components/ui/page-title";
 import { ArtistDetailsModal } from "@/components/itunes/artist-details-modal";
 import { YearlyTopSongs } from "@/components/itunes/yearly-top-songs";
 import { YearlyTopArtists } from "@/components/itunes/yearly-top-artists";
+import { PlayDataTable } from "@/components/itunes/PlayDataTable";
 import { type Artist } from "@/types/artist";
 import { useQuery } from "@tanstack/react-query";
 
@@ -76,6 +77,11 @@ export default function ITunezPage() {
             onArtistClick={setSelectedArtist}
             carouselPosition="left"
           />
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold mb-4">All Plays</h2>
+          <PlayDataTable onArtistClick={setSelectedArtist} />
         </Card>
 
         <ArtistDetailsModal
