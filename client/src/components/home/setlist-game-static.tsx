@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -24,10 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Info } from "lucide-react";
 import BlurText from "@/reactbits/BlurText/BlurText";
 
-const handleAnimationComplete = () => {
-  console.log("Animation completed!");
-};
-
+// Move interfaces and schema definitions before component
 interface GameFormValues {
   year: string;
   tour: "summer" | "fall" | "winter" | "spring" | "";
@@ -40,7 +39,23 @@ interface ShowData {
   setlistdata: string;
 }
 
+const formSchema = z.object({
+  year: z.string().min(1, "Year is required"),
+  tour: z.enum(["summer", "fall", "winter", "spring", ""]),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
 export function SetlistGame() {
+  // Initialize form with proper type and resolver
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      year: "",
+      tour: "",
+    },
+  });
+
   const [gameState, setGameState] = useState<
     "idle" | "loading" | "viewing" | "guessing" | "results"
   >("idle");
@@ -66,13 +81,6 @@ export function SetlistGame() {
   const years = Array.from({ length: 2025 - 1984 + 1 }, (_, i) => 2025 - i).map(
     String,
   );
-
-  const form = useForm<GameFormValues>({
-    defaultValues: {
-      year: "",
-      tour: "",
-    },
-  });
 
   useEffect(() => {
     const savedHighScore = localStorage.getItem("phishSetlistHighScore");
@@ -213,6 +221,10 @@ export function SetlistGame() {
     });
 
     setGameState("results");
+  };
+
+  const handleAnimationComplete = () => {
+    console.log("Animation completed!");
   };
 
   return (
