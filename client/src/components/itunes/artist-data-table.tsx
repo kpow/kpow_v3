@@ -21,10 +21,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const columnHelper = createColumnHelper<Artist>();
 
 const columns = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    cell: (info) => info.getValue(),
+  }),
   columnHelper.accessor((row) => ({ name: row.name, imageUrl: row.imageUrl || row.artistImageUrl }), {
     id: "artist",
     header: "Artist",
@@ -83,7 +94,7 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
     queryFn: async () => {
       const sortBy = sorting[0]?.id || "id";
       const sortOrder = sorting[0]?.desc ? "desc" : "asc";
-      
+
       const response = await fetch(
         `/api/table/artists?page=${pageIndex + 1}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`
       );
@@ -109,6 +120,7 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
+    manualSorting: true,
   });
 
   if (isLoading) {
@@ -123,6 +135,9 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
     );
   }
 
+  const totalPages = data?.pagination?.totalPages || 1;
+  const currentPage = pageIndex + 1;
+
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
@@ -131,11 +146,23 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
+                  <TableHead 
+                    key={header.id}
+                    className="cursor-pointer"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    <div className="flex items-center gap-2">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      <span>
+                        {{
+                          asc: "↑",
+                          desc: "↓",
+                        }[header.column.getIsSorted() as string] ?? ""}
+                      </span>
+                    </div>
                   </TableHead>
                 ))}
               </TableRow>
@@ -169,6 +196,24 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
           >
             Previous
           </Button>
+          <Select
+            value={currentPage.toString()}
+            onValueChange={(value) => {
+              const page = parseInt(value) - 1;
+              table.setPageIndex(page);
+            }}
+          >
+            <SelectTrigger className="w-[100px]">
+              <SelectValue placeholder="Page..." />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <SelectItem key={page} value={page.toString()}>
+                  Page {page}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button
             variant="outline"
             size="sm"
