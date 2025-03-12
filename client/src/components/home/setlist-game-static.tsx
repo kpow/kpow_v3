@@ -25,26 +25,23 @@ const formSchema = z.object({
   tour: z.enum(["summer", "fall", "winter", "spring"]),
 })
 
-type FormSchema = z.infer<typeof formSchema>
-
-const years = ["2023", "2024"]
-
 const SetlistGame = () => {
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       year: "",
       tour: "summer",
     },
+    resolver: zodResolver(formSchema),
   })
 
-  function onSubmit(values: FormSchema) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values)
   }
 
   return (
     <Card className="w-full h-full min-h-[400px]">
       <CardContent className="p-6">
+        <div className="text-2xl font-bold mb-4">Setlist Game</div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -62,11 +59,8 @@ const SetlistGame = () => {
                         <SelectValue placeholder="Select year" />
                       </SelectTrigger>
                       <SelectContent>
-                        {years.map((year) => (
-                          <SelectItem key={year} value={year}>
-                            {year}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="2023">2023</SelectItem>
+                        <SelectItem value="2024">2024</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
