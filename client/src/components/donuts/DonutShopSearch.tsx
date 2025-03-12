@@ -69,8 +69,12 @@ export function DonutShopSearch({
     if (localSearchState.state) {
       onSearchStateChange("state", localSearchState.state);
     }
-    // Then trigger the search
-    onSearch();
+    
+    // Small delay to ensure state updates before search
+    setTimeout(() => {
+      // Then trigger the search
+      onSearch();
+    }, 0);
   };
 
   return (
