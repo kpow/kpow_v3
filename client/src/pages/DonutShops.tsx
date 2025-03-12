@@ -128,7 +128,17 @@ export default function DonutShops() {
   // =========================================================================
 
   /**
-   * Validates search criteria and initiates search
+   * Updates search state when inputs change
+   */
+  const handleSearchStateChange = (
+    field: keyof SearchState,
+    value: string | number,
+  ) => {
+    setSearchState((prev) => ({ ...prev, [field]: value }));
+  };
+
+  /**
+   * Handles the search action
    */
   const handleSearch = async () => {
     const validationMessage = getValidationMessage();
@@ -199,15 +209,6 @@ export default function DonutShops() {
     return null;
   };
 
-  /**
-   * Updates search state when inputs change
-   */
-  const handleInputChange = (
-    value: string | number,
-    field: keyof SearchState,
-  ) => {
-    setSearchState((prev) => ({ ...prev, [field]: value }));
-  };
 
   /**
    * Handles shop selection on map or slider
@@ -397,7 +398,7 @@ export default function DonutShops() {
           {/* Right Sidebar - Search Component */}
           <DonutShopSearch
             searchState={searchState}
-            onSearchStateChange={handleInputChange}
+            onSearchStateChange={handleSearchStateChange}
             minRating={minRating}
             onMinRatingChange={handleRatingChange}
             onSearch={handleSearch}

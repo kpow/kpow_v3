@@ -49,17 +49,11 @@ export function DonutShopSearch({
   };
 
   const handleSearch = () => {
-    // Directly update parent component state
+    // Update parent state
     onSearchStateChange("city", localCity);
     onSearchStateChange("state", localState);
-
-    // Log for debugging
-    console.log("Searching with:", localCity, localState);
-
-    // Wait for React to update parent state before triggering search
-    setTimeout(() => {
-      onSearch();
-    }, 300);
+    // Trigger search immediately
+    onSearch();
   };
 
   return (
