@@ -1,42 +1,45 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import * as React from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form";
+  FormMessage,
+} from "@/components/ui/form"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 
 const formSchema = z.object({
   year: z.string().min(1, "Year is required"),
   tour: z.enum(["summer", "fall", "winter", "spring"]),
-});
+})
 
-type FormData = z.infer<typeof formSchema>;
+type FormSchema = z.infer<typeof formSchema>
 
-export function SetlistGame() {
-  const form = useForm<FormData>({
+const years = ["2023", "2024"]
+
+const SetlistGame = () => {
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       year: "",
       tour: "summer",
     },
-  });
+  })
 
-  function onSubmit(data: FormData) {
-    console.log("Form submitted:", data);
+  function onSubmit(values: FormSchema) {
+    console.log(values)
   }
 
   return (
@@ -59,11 +62,15 @@ export function SetlistGame() {
                         <SelectValue placeholder="Select year" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="2023">2023</SelectItem>
-                        <SelectItem value="2024">2024</SelectItem>
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year}>
+                            {year}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -89,6 +96,7 @@ export function SetlistGame() {
                       </SelectContent>
                     </Select>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -99,5 +107,7 @@ export function SetlistGame() {
         </Form>
       </CardContent>
     </Card>
-  );
+  )
 }
+
+export default SetlistGame

@@ -1,6 +1,6 @@
 import { ContentSection } from "@/components/home/ContentSection";
 import { RecentPlays } from "@/components/home/RecentPlays";
-import { SetlistGame } from "@/components/home/setlist-game-static";
+import SetlistGame from "@/components/home/setlist-game-static";
 import { CubeFrame } from "@/components/home/cube-frame";
 import { BookFeed } from "@/components/BookFeed";
 import { GitHubSection } from "@/components/home/GitHubSection";
