@@ -34,15 +34,43 @@ export function DonutShopSearch({
   isLoading,
   metricsData,
 }: DonutShopSearchProps) {
+  const [localSearchState, setLocalSearchState] = useState<SearchState>({
+    city: searchState.city || "",
+    state: searchState.state || "",
+  });
+
+  // Update local state when props change
+  useEffect(() => {
+    setLocalSearchState({
+      city: searchState.city || "",
+      state: searchState.state || "",
+    });
+  }, [searchState.city, searchState.state]);
+
   const handleInputChange = (
     value: string | number,
     field: keyof SearchState,
   ) => {
-    onSearchStateChange(field, value);
+    setLocalSearchState(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleRatingChange = (value: number[]) => {
     onMinRatingChange(value);
+  };
+
+  const handleSearch = () => {
+    // Update parent component with local state values
+    if (localSearchState.city) {
+      onSearchStateChange("city", localSearchState.city);
+    }
+    if (localSearchState.state) {
+      onSearchStateChange("state", localSearchState.state);
+    }
+    // Then trigger the search
+    onSearch();
   };
 
   return (
@@ -67,7 +95,7 @@ export function DonutShopSearch({
               <h3 className="font-medium mb-0">city name</h3>
               <Input
                 placeholder="Enter city name"
-                value={searchState.city || ""}
+                value={localSearchState.city}
                 onChange={(e) =>
                   handleInputChange(e.target.value, "city")
                 }
@@ -77,7 +105,7 @@ export function DonutShopSearch({
                <h3 className="font-medium mb-0">state</h3>
               <Input
                 placeholder="Enter state (e.g., CA)"
-                value={searchState.state || ""}
+                value={localSearchState.state}
                 onChange={(e) =>
                   handleInputChange(e.target.value, "state")
                 }
@@ -87,7 +115,7 @@ export function DonutShopSearch({
 
           <div className="mt-6">
             <Button
-              onClick={onSearch}
+              onClick={handleSearch}
               className="w-full bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
               disabled={isLoading}
             >
