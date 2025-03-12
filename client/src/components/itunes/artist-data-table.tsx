@@ -62,14 +62,14 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
       header: "Last Updated",
       cell: (info) => 
         info.getValue() 
-          ? format(new Date(info.getValue()), "PPP")
+          ? format(new Date(info.getValue() || ''), "PPP")
           : "-",
     }),
     columnHelper.accessor("lastPlayed", {
       header: "Last Played",
       cell: (info) => 
         info.getValue()
-          ? format(new Date(info.getValue()), "PPP")
+          ? format(new Date(info.getValue() || ''), "PPP")
           : "-",
     }),
     columnHelper.accessor("rank", {
@@ -78,14 +78,32 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
     }),
   ];
 
-  const { data: artistsData, isLoading } = useQuery({
-    queryKey: ["/api/music/artists"],
+  const { data: artistsData, isLoading, error } = useQuery({
+    queryKey: ["/api/music/top-artists"], // Updated endpoint
     queryFn: async () => {
-      const response = await fetch("/api/music/artists");
-      if (!response.ok) throw new Error("Failed to fetch artists");
-      const data = await response.json();
-      return data as { artists: Artist[] };
+      try {
+        const response = await fetch("/api/music/top-artists");
+        console.log("API Status:", response.status);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch artists: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        if (!data || !Array.isArray(data.artists)) {
+          console.error("Invalid data format:", data);
+          throw new Error("Invalid response format: expected {artists: Artist[]}");
+        }
+
+        return data;
+      } catch (error) {
+        console.error("Error fetching artists:", error);
+        throw error;
+      }
     },
+    retry: 1,
   });
 
   const table = useReactTable({
@@ -101,6 +119,14 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
         <Skeleton className="h-8 w-full" />
         <Skeleton className="h-8 w-full" />
         <Skeleton className="h-8 w-full" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-4 text-red-500">
+        Failed to load artists: {error instanceof Error ? error.message : 'Unknown error'}
       </div>
     );
   }
