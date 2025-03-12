@@ -34,49 +34,32 @@ export function DonutShopSearch({
   isLoading,
   metricsData,
 }: DonutShopSearchProps) {
-  const [localSearchState, setLocalSearchState] = useState<SearchState>({
-    city: searchState.city || "",
-    state: searchState.state || "",
-  });
+  // Initialize local state with props
+  const [localCity, setLocalCity] = useState<string>(searchState.city || "");
+  const [localState, setLocalState] = useState<string>(searchState.state || "");
 
   // Update local state when props change
   useEffect(() => {
-    setLocalSearchState({
-      city: searchState.city || "",
-      state: searchState.state || "",
-    });
+    setLocalCity(searchState.city || "");
+    setLocalState(searchState.state || "");
   }, [searchState.city, searchState.state]);
-
-  const handleInputChange = (
-    value: string | number,
-    field: keyof SearchState,
-  ) => {
-    setLocalSearchState(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
   const handleRatingChange = (value: number[]) => {
     onMinRatingChange(value);
   };
 
   const handleSearch = () => {
-    // First update the parent component with local state values
-    if (localSearchState.city) {
-      onSearchStateChange("city", localSearchState.city);
-    }
-    if (localSearchState.state) {
-      onSearchStateChange("state", localSearchState.state);
-    }
-    
-    // Force React to finish state updates before searching
-    // This ensures the search uses the updated values
+    // Directly update parent component state
+    onSearchStateChange("city", localCity);
+    onSearchStateChange("state", localState);
+
+    // Log for debugging
+    console.log("Searching with:", localCity, localState);
+
+    // Wait for React to update parent state before triggering search
     setTimeout(() => {
-      // Log to verify the values are updated
-      console.log("Searching with:", localSearchState.city, localSearchState.state);
       onSearch();
-    }, 200);
+    }, 300);
   };
 
   return (
@@ -101,20 +84,16 @@ export function DonutShopSearch({
               <h3 className="font-medium mb-0">city name</h3>
               <Input
                 placeholder="Enter city name"
-                value={localSearchState.city}
-                onChange={(e) =>
-                  handleInputChange(e.target.value, "city")
-                }
+                value={localCity}
+                onChange={(e) => setLocalCity(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
                <h3 className="font-medium mb-0">state</h3>
               <Input
                 placeholder="Enter state (e.g., CA)"
-                value={localSearchState.state}
-                onChange={(e) =>
-                  handleInputChange(e.target.value, "state")
-                }
+                value={localState}
+                onChange={(e) => setLocalState(e.target.value)}
               />
             </div>
           </div>
@@ -136,7 +115,7 @@ export function DonutShopSearch({
             </div>
           </div>
         </div>
-      
+
       </CardContent>
     </Card>
   );
