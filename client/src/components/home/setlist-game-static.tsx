@@ -10,6 +10,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormControl,
 } from "@/components/ui/form";
 import {
   Select,
@@ -67,9 +68,6 @@ export function SetlistGame() {
   );
 
   const form = useForm<GameFormValues>({
-    resolver: (data) => {
-      return formSchema.safeParse(data).success ? { errors: {} } : { errors: formSchema.safeParse(data).error.errors };
-    },
     defaultValues: {
       year: "",
       tour: "",
@@ -247,7 +245,9 @@ export function SetlistGame() {
                     className="text-center flex justify-center font-slackey text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold"
                   />
 
-
+                  {/* <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4">
+                    Ready to test your Phish knowledge?
+                  </h2> */}
                 </div>
 
                 <div>
@@ -467,10 +467,3 @@ export function SetlistGame() {
     </Card>
   );
 }
-
-const formSchema = z.object({
-  year: z.string().min(1, "Year is required"),
-  tour: z.enum(["summer", "fall", "winter", "spring", ""]),
-});
-
-import * as z from "zod";
