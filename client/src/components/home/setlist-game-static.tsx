@@ -308,21 +308,23 @@ export function SetlistGame() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-lg">Year</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="h-12">
-                              <SelectValue placeholder="Select year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {years.map((year) => (
-                                <SelectItem key={year} value={year}>
-                                  {year}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger className="h-12">
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {years.map((year) => (
+                                  <SelectItem key={year} value={year}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />
@@ -332,20 +334,22 @@ export function SetlistGame() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-lg">Tour</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="h-12">
-                              <SelectValue placeholder="Choose one" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="summer">Summer</SelectItem>
-                              <SelectItem value="fall">Fall</SelectItem>
-                              <SelectItem value="winter">Winter</SelectItem>
-                              <SelectItem value="spring">Spring</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger className="h-12">
+                                <SelectValue placeholder="Choose one" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="summer">Summer</SelectItem>
+                                <SelectItem value="fall">Fall</SelectItem>
+                                <SelectItem value="winter">Winter</SelectItem>
+                                <SelectItem value="spring">Spring</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />
