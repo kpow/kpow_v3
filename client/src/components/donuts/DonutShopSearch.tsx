@@ -62,19 +62,23 @@ export function DonutShopSearch({
   };
 
   const handleSearch = () => {
-    // Update parent component with local state values
-    if (localSearchState.city) {
-      onSearchStateChange("city", localSearchState.city);
-    }
-    if (localSearchState.state) {
-      onSearchStateChange("state", localSearchState.state);
-    }
+    // Update parent component with local state values and trigger search
+    const updateAndSearch = async () => {
+      // Only update if values exist
+      if (localSearchState.city) {
+        onSearchStateChange("city", localSearchState.city);
+      }
+      if (localSearchState.state) {
+        onSearchStateChange("state", localSearchState.state);
+      }
+      
+      // Give React a chance to update the parent state
+      setTimeout(() => {
+        onSearch();
+      }, 100);
+    };
     
-    // Small delay to ensure state updates before search
-    setTimeout(() => {
-      // Then trigger the search
-      onSearch();
-    }, 0);
+    updateAndSearch();
   };
 
   return (
