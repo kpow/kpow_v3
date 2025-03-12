@@ -15,6 +15,7 @@ import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
 import yelpRoutes from "./routes/yelp";
+import tableRoutes from "./routes/table";
 
 export function registerRoutes(app: Express): Server {
   const router = Router();
@@ -29,7 +30,7 @@ export function registerRoutes(app: Express): Server {
   registerFeedbinRoutes(router);
   registerGithubRoutes(router);
   registerMusicRoutes(router);
-  registerAdminRoutes(router); // Add the new admin routes
+  registerAdminRoutes(router);
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
@@ -39,6 +40,9 @@ export function registerRoutes(app: Express): Server {
 
   // Register Yelp routes
   router.use('/api/yelp', yelpRoutes);
+
+  // Register table routes
+  router.use('/api/table', tableRoutes);
 
   // Register contact routes
   router.use('/', contactRoutes);

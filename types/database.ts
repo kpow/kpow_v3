@@ -20,3 +20,23 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+// Table specific types
+export interface TableColumn {
+  id: string;
+  label: string;
+  accessor: string;
+  sortable?: boolean;
+  className?: string;
+}
+
+export interface TableState {
+  page: number;
+  pageSize: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface TableQueryParams extends TableState {
+  filters?: Record<string, string | number | boolean>;
+}
