@@ -9,7 +9,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "@/components/map-styles.css"; // Import our custom map styles
+import "@/components/map-styles.css";
 import { useEffect, useRef, useState } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,6 @@ function MapController({
     if (shouldFitBounds && (shops.length > 0 || cityCenter)) {
       const bounds = L.latLngBounds([]);
 
-      // Add city center to bounds if available
       if (cityCenter?.coordinates) {
         bounds.extend([
           cityCenter.coordinates.latitude,
@@ -47,7 +46,6 @@ function MapController({
         ]);
       }
 
-      // Add all shop coordinates to bounds
       shops.forEach((shop) => {
         if (shop.coordinates) {
           bounds.extend([
@@ -67,7 +65,6 @@ function MapController({
     }
   }, [shouldFitBounds, shops, cityCenter, map]);
 
-  // Handle selected shop updates
   useEffect(() => {
     if (selectedShopId && markersRef.current[selectedShopId]) {
       const marker = markersRef.current[selectedShopId];
@@ -93,6 +90,7 @@ interface DonutShopMapProps {
   shouldFitBounds?: boolean;
   selectedShopId?: string;
   cityCenter: CityCenter | null;
+  isLoading?: boolean;
 }
 
 export function DonutShopMap({
@@ -102,10 +100,12 @@ export function DonutShopMap({
   shouldFitBounds = false,
   selectedShopId,
   cityCenter,
+  isLoading = false,
 }: DonutShopMapProps) {
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [showChainStores, setShowChainStores] = useState(false);
+  const mapRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem("donutLuv");
@@ -148,156 +148,101 @@ export function DonutShopMap({
   return (
     <div className="relative h-full w-full">
       <div className="h-full w-full rounded-lg overflow-hidden">
-        <MapContainer
-          center={[39.8283, -98.5795]}
-          zoom={4}
-          style={{ height: "100%", width: "100%" }}
-          className="z-0"
-        >
-          <MapController
-            shops={shops}
-            shouldFitBounds={shouldFitBounds}
-            selectedShopId={selectedShopId}
-            markersRef={markersRef}
-            cityCenter={cityCenter}
-          />
+        {isLoading ? (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-600">Loading shops...</p>
+            </div>
+          </div>
+        ) : (
+          <MapContainer
+            center={[39.8283, -98.5795]}
+            zoom={4}
+            style={{ height: "100%", width: "100%" }}
+            className="z-0"
+            ref={mapRef}
+          >
+            <MapController
+              shops={shops}
+              shouldFitBounds={shouldFitBounds}
+              selectedShopId={selectedShopId}
+              markersRef={markersRef}
+              cityCenter={cityCenter}
+            />
 
-          <LayersControl position="topright">
-            <BaseLayer checked name="Toner-lite">
-              <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>'
-              />
-            </BaseLayer>
-            <BaseLayer name="CartoLight">
-              <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://carto.com/">Carto</a>'
-              />
-            </BaseLayer>
-            <BaseLayer name="OpenStreetMap">
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-              />
-            </BaseLayer>
-            <BaseLayer name="Watercolor">
-              <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
-                attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>'
-              />
-            </BaseLayer>
-          </LayersControl>
+            <LayersControl position="topright">
+              <BaseLayer checked name="Toner-lite">
+                <TileLayer
+                  url="https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png"
+                  attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>'
+                />
+              </BaseLayer>
+              <BaseLayer name="CartoLight">
+                <TileLayer
+                  url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                  attribution='&copy; <a href="https://carto.com/">Carto</a>'
+                />
+              </BaseLayer>
+              <BaseLayer name="OpenStreetMap">
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+                />
+              </BaseLayer>
+              <BaseLayer name="Watercolor">
+                <TileLayer
+                  url="https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg"
+                  attribution='&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>'
+                />
+              </BaseLayer>
+            </LayersControl>
 
-          {/* City center marker */}
-          {cityCenter && (
-            <>
-              <Marker
-                position={[
-                  cityCenter.coordinates.latitude,
-                  cityCenter.coordinates.longitude,
-                ]}
-                icon={markerIcons.green}
-              >
-                <Popup>
-                  <div className="p-1">
-                    <h3 className="text-lg font-bold">City Center</h3>
-                    <p className="text-sm text-gray-600">
-                      {cityCenter.display_name}
-                    </p>
-                  </div>
-                </Popup>
-              </Marker>
-              <Circle
-                center={[
-                  cityCenter.coordinates.latitude,
-                  cityCenter.coordinates.longitude,
-                ]}
-                radius={24150} /* 15 miles in meters (1 mile = 1609.3 meters) */
-                pathOptions={{
-                  fillColor: "#3388ff",
-                  fillOpacity: 0.2,
-                  weight: 1,
-                  color: "#3388ff",
-                  opacity: 0.5,
-                }}
-              />
-            </>
-          )}
-
-          {/* Shop markers */}
-          {shops.map((shop) => (
-            <Marker
-              key={shop.id}
-              position={[shop.coordinates.latitude, shop.coordinates.longitude]}
-              icon={markerIcons[shop.isNearby ? "blue" : "red"]}
-              ref={(el) => {
-                if (el) {
-                  markersRef.current[shop.id] = el;
-                }
-              }}
-              eventHandlers={{
-                click: () => onShopClick?.(shop),
-              }}
-            >
-              <Popup>
-                <div className="p-1">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold">{shop.name}</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFavorite(shop);
-                        }}
-                      >
-                        <Heart
-                          className={`h-4 w-4 ${
-                            favorites.has(shop.id)
-                              ? "fill-red-500 text-red-500"
-                              : ""
-                          }`}
-                        />
-                      </Button>
+            {cityCenter && (
+              <>
+                <Marker
+                  position={[
+                    cityCenter.coordinates.latitude,
+                    cityCenter.coordinates.longitude,
+                  ]}
+                  icon={markerIcons.green}
+                >
+                  <Popup>
+                    <div className="p-1">
+                      <h3 className="text-lg font-bold">City Center</h3>
+                      <p className="text-sm text-gray-600">
+                        {cityCenter.display_name}
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-600">{shop.address}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium">Rating:</span>
-                        <span>{shop.rating} ⭐</span>
-                      </div>
-                      {shop.price && (
-                        <div className="flex items-center gap-1">
-                          <span className="font-medium">Price:</span>
-                          <span>{shop.price}</span>
-                        </div>
-                      )}
-                    </div>
-                    {shop.image_url && (
-                      <img
-                        src={shop.image_url}
-                        alt={shop.name}
-                        className="w-full h-48 object-cover rounded-lg"
-                      />
-                    )}
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                  </Popup>
+                </Marker>
+                <Circle
+                  center={[
+                    cityCenter.coordinates.latitude,
+                    cityCenter.coordinates.longitude,
+                  ]}
+                  radius={24150}
+                  pathOptions={{
+                    fillColor: "#3388ff",
+                    fillOpacity: 0.2,
+                    weight: 1,
+                    color: "#3388ff",
+                    opacity: 0.5,
+                  }}
+                />
+              </>
+            )}
 
-          {/* Chain store markers */}
-          {showChainStores &&
-            chainStores.map((shop) => (
+            {shops.map((shop) => (
               <Marker
                 key={shop.id}
-                position={[
-                  shop.coordinates.latitude,
-                  shop.coordinates.longitude,
-                ]}
-                icon={markerIcons.grey}
+                position={[shop.coordinates.latitude, shop.coordinates.longitude]}
+                icon={markerIcons[shop.isNearby ? "blue" : "red"]}
+                ref={(el) => {
+                  if (el) {
+                    markersRef.current[shop.id] = el;
+                  }
+                }}
                 eventHandlers={{
                   click: () => onShopClick?.(shop),
                 }}
@@ -307,6 +252,22 @@ export function DonutShopMap({
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xl font-bold">{shop.name}</h3>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(shop);
+                          }}
+                        >
+                          <Heart
+                            className={`h-4 w-4 ${
+                              favorites.has(shop.id)
+                                ? "fill-red-500 text-red-500"
+                                : ""
+                            }`}
+                          />
+                        </Button>
                       </div>
                       <p className="text-sm text-gray-600">{shop.address}</p>
                       <div className="flex items-center justify-between">
@@ -333,21 +294,70 @@ export function DonutShopMap({
                 </Popup>
               </Marker>
             ))}
-        </MapContainer>
+
+            {showChainStores &&
+              chainStores.map((shop) => (
+                <Marker
+                  key={shop.id}
+                  position={[
+                    shop.coordinates.latitude,
+                    shop.coordinates.longitude,
+                  ]}
+                  icon={markerIcons.grey}
+                  eventHandlers={{
+                    click: () => onShopClick?.(shop),
+                  }}
+                >
+                  <Popup>
+                    <div className="p-1">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xl font-bold">{shop.name}</h3>
+                        </div>
+                        <p className="text-sm text-gray-600">{shop.address}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">Rating:</span>
+                            <span>{shop.rating} ⭐</span>
+                          </div>
+                          {shop.price && (
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">Price:</span>
+                              <span>{shop.price}</span>
+                            </div>
+                          )}
+                        </div>
+                        {shop.image_url && (
+                          <img
+                            src={shop.image_url}
+                            alt={shop.name}
+                            className="w-full h-48 object-cover rounded-lg"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+          </MapContainer>
+        )}
       </div>
 
-      {/* Chain store toggle */}
-      <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg switch-container">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="show-chains"
-            checked={showChainStores}
-            onCheckedChange={setShowChainStores}
-            className="switch data-[state=checked]:bg-blue-600"
-          />
-          <Label htmlFor="show-chains" className="text-black font-bold">Show Chain Stores</Label>
+      {!isLoading && (
+        <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-lg">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="show-chains"
+              checked={showChainStores}
+              onCheckedChange={setShowChainStores}
+              className="switch data-[state=checked]:bg-blue-600"
+            />
+            <Label htmlFor="show-chains" className="text-black font-bold">
+              Show Chain Stores
+            </Label>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

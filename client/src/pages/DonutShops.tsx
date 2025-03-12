@@ -52,7 +52,7 @@ export default function DonutShops() {
   const [searchState, setSearchState] = useState<SearchState>(initialCity);
   const [selectedShopId, setSelectedShopId] = useState<string | undefined>(undefined);
   const [minRating, setMinRating] = useState(0);
-  const [shouldFitBounds, setShouldFitBounds] = useState(true);
+  const [shouldFitBounds, setShouldFitBounds] = useState(false);
 
   const { data, refetch } = useQuery<YelpResponse>({
     queryKey: ["donutShops", searchState],
@@ -86,7 +86,7 @@ export default function DonutShops() {
 
   const handleSearchStateChange = (
     field: keyof SearchState,
-    value: string | number,
+    value: string,
   ) => {
     setSearchState((prev) => ({ ...prev, [field]: value }));
   };
@@ -102,6 +102,7 @@ export default function DonutShops() {
     }
 
     setIsLoadingShops(true);
+    setSelectedShopId(undefined);
 
     setLocation(
       `/donut-tour/${encodeURIComponent(searchState.city)}/${encodeURIComponent(
@@ -111,6 +112,7 @@ export default function DonutShops() {
 
     try {
       await refetch();
+      setShouldFitBounds(true);
     } catch (error) {
       toast({
         title: "Error",
@@ -125,7 +127,7 @@ export default function DonutShops() {
   const handleRandomCity = async () => {
     const newCity = getRandomCity();
     setSearchState(newCity);
-    setShouldFitBounds(true);
+    setSelectedShopId(undefined);
     setLocation(
       `/donut-tour/${encodeURIComponent(newCity.city)}/${encodeURIComponent(
         newCity.state,
@@ -143,12 +145,14 @@ export default function DonutShops() {
     setMinRating(value[0]);
   };
 
+  // Effect to handle initial search on mount
   useEffect(() => {
     if (searchState.city && searchState.state) {
       handleSearch();
     }
   }, []);
 
+  // Effect to handle URL parameter changes
   useEffect(() => {
     if (params) {
       const newState = {
@@ -160,6 +164,7 @@ export default function DonutShops() {
     }
   }, [params?.city, params?.state]);
 
+  // Reset fit bounds after a delay when data changes
   useEffect(() => {
     if (shouldFitBounds) {
       const timer = setTimeout(() => setShouldFitBounds(false), 1000);
@@ -176,7 +181,6 @@ export default function DonutShops() {
     if (shopId) {
       setSelectedShopId(shopId);
     }
-    setShouldFitBounds(true);
     handleSearch();
   };
 
@@ -219,24 +223,15 @@ export default function DonutShops() {
           <div className="lg:col-span-2 lg:row-span-2">
             <Card>
               <CardContent className="p-0 h-full min-w-[300px] sm:min-w-[400px] lg:min-w-[800px] xl:min-w-[780px] lg:min-h-[600px] sm:min-h-[400px] min-h-[350px]">
-                {isLoadingShops ? (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                  </div>
-                ) : shops && shops.length > 0 ? (
-                  <DonutShopMap
-                    shops={shops}
-                    chainStores={chainStores}
-                    onShopClick={handleShopClick}
-                    shouldFitBounds={shouldFitBounds}
-                    selectedShopId={selectedShopId}
-                    cityCenter={data?.cityCenter || null}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-600">Enter a city and state to search for donut shops</p>
-                  </div>
-                )}
+                <DonutShopMap
+                  shops={shops}
+                  chainStores={chainStores}
+                  onShopClick={handleShopClick}
+                  shouldFitBounds={shouldFitBounds}
+                  selectedShopId={selectedShopId}
+                  cityCenter={data?.cityCenter || null}
+                  isLoading={isLoadingShops}
+                />
               </CardContent>
             </Card>
           </div>
