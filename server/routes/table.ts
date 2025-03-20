@@ -26,7 +26,7 @@ router.get('/artists', async (req, res) => {
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize as string) || 10));
     const sortBy = (req.query.sortBy as string) || 'id';
-    const sortOrder = (req.query.sortOrder as string)?.toLowerCase() === 'desc' ? 'desc' : 'asc';
+    let sortOrder = (req.query.sortOrder as string)?.toLowerCase() === 'desc' ? 'desc' : 'asc';
 
     const offset = (page - 1) * pageSize;
 
@@ -41,16 +41,22 @@ router.get('/artists', async (req, res) => {
     // Build the query with proper sorting
     let sortColumn;
     
-    // Handle special case for 'artist' column which should sort by name
+    // Handle special cases for sorting
     if (sortBy === 'artist') {
       sortColumn = artists.name;
+    } else if (sortBy === 'rank') {
+      // For rank, we need to use a subquery or view in the future,
+      // but for now we'll use playcount as a proxy for rank
+      sortColumn = artists.playcount;
+      // Flip the sort order for rank (since lower rank = higher playcount)
+      sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
     } else {
       sortColumn = (artists as any)[sortBy] || artists.id;
     }
     
     const orderBy = sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn);
 
-    // Get paginated data with explicit fields
+    // Get paginated data with explicit fields including ranking
     const data = await db.select({
       id: artists.id,
       name: artists.name,
@@ -60,6 +66,7 @@ router.get('/artists', async (req, res) => {
       listeners: artists.listeners,
       playcount: artists.playcount,
       lastUpdated: artists.lastUpdated,
+      rank: sql<number>`row_number() over (order by ${artists.playcount} desc)`.mapWith(Number),
     })
     .from(artists)
     .limit(pageSize)

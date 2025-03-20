@@ -55,6 +55,11 @@ function SortableHeader({
 }
 
 const columns = [
+  columnHelper.accessor("rank", {
+    header: ({ column }) => <SortableHeader column={column} title="Rank" />,
+    cell: (info) => <span className="font-semibold text-primary">#{info.getValue()}</span>,
+    enableSorting: true,
+  }),
   columnHelper.accessor((row) => ({ name: row.name, imageUrl: row.imageUrl || row.artistImageUrl }), {
     id: "artist",
     header: ({ column }) => <SortableHeader column={column} title="Artist" />,
