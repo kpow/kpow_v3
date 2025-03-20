@@ -71,7 +71,6 @@ export default function ITunezPage() {
         </Card>
 
         <Card className="p-6">
-          <h2 className="text-2xl font-bold mb-6">all artists</h2>
           <ArtistDataTable onArtistClick={setSelectedArtist} />
         </Card>
 

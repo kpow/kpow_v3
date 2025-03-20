@@ -40,7 +40,7 @@ function SortableHeader({
       className="flex items-center gap-1 cursor-pointer select-none"
       onClick={() => column.toggleSorting()}
     >
-      <span>{title}</span>
+      <span className="font-slackey">{title}</span>
       {column.getIsSorted() === "asc" && <ArrowUp className="h-4 w-4 ml-1" />}
       {column.getIsSorted() === "desc" && (
         <ArrowDown className="h-4 w-4 ml-1" />
@@ -144,28 +144,7 @@ function TablePagination({
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} of {totalPages}
-        </span>
+      
 
         <div className="flex items-center gap-1">
           <Input
@@ -183,12 +162,37 @@ function TablePagination({
           <Button
             variant="outline"
             size="sm"
+            className="font-slackey bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
             onClick={handleGoToPage}
             disabled={!totalPages}
           >
             Go
           </Button>
         </div>
+        <span className="text-sm font-bold text-black">
+          Page {table.getState().pagination.pageIndex + 1} of {totalPages}
+        </span>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="font-slackey bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="font-slackey bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
       </div>
     </div>
   );
@@ -209,7 +213,7 @@ export function ArtistDataTable({
   ]);
   const [{ pageIndex, pageSize }, setPagination] = useState({
     pageIndex: initialPage,
-    pageSize: 10,
+    pageSize: 8,
   });
 
   const [pageInput, setPageInput] = useState<string>(
@@ -219,7 +223,7 @@ export function ArtistDataTable({
   // Handle direct page navigation
   const handleGoToPage = () => {
     const totalPages = data?.pagination?.totalPages || 1;
-    const parsedPage = parseInt(pageInput, 10);
+    const parsedPage = parseInt(pageInput, 8);
 
     if (isNaN(parsedPage) || parsedPage < 1 || parsedPage > totalPages) {
       // Reset to current page if invalid
@@ -295,6 +299,7 @@ export function ArtistDataTable({
 
   return (
     <div className="space-y-4">
+      <h2 className="text-2xl font-bold mb-6">all artists played since 2016:</h2>
       <TablePagination
         table={table}
         pageInput={pageInput}
