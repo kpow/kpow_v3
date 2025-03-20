@@ -88,13 +88,25 @@ const columns = [
     sortingFn: (rowA, rowB) => 
       rowA.original.name.localeCompare(rowB.original.name),
   }),
+  columnHelper.accessor("personalPlayCount", {
+    header: ({ column }) => <SortableHeader column={column} title="Your Plays" />,
+    cell: (info) => {
+      const count = info.getValue();
+      return (
+        <span className="font-medium">
+          {count ? count.toLocaleString() : "0"}
+        </span>
+      );
+    },
+    enableSorting: true,
+  }),
   columnHelper.accessor("listeners", {
     header: ({ column }) => <SortableHeader column={column} title="Listeners" />,
     cell: (info) => info.getValue()?.toLocaleString() || "N/A",
     enableSorting: true,
   }),
   columnHelper.accessor("playcount", {
-    header: ({ column }) => <SortableHeader column={column} title="Play Count" />,
+    header: ({ column }) => <SortableHeader column={column} title="Global Plays" />,
     cell: (info) => info.getValue()?.toLocaleString() || "N/A",
     enableSorting: true,
   }),

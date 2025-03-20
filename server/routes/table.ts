@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '@db';
-import { artists } from '@db/schema';
-import { sql, desc, asc } from 'drizzle-orm';
+import { artists, songs, plays } from '@db/schema';
+import { sql, desc, asc, count } from 'drizzle-orm';
 import type { PaginatedResponse, TableQueryParams } from '../../types/database';
 
 const router = Router();
@@ -44,17 +44,42 @@ router.get('/artists', async (req, res) => {
     // Handle special cases for sorting
     if (sortBy === 'artist') {
       sortColumn = artists.name;
-    } else if (sortBy === 'rank') {
-      // For rank, we need to use a subquery or view in the future,
-      // but for now we'll use playcount as a proxy for rank
-      sortColumn = artists.playcount;
-      // Flip the sort order for rank (since lower rank = higher playcount)
-      sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+    } else if (sortBy === 'rank' || sortBy === 'personalPlayCount') {
+      // For rank based on personal play count, we'll handle this using a subquery
+      // We'll use a special orderBy clause below
+      sortColumn = artists.id; // Placeholder, will be replaced
     } else {
       sortColumn = (artists as any)[sortBy] || artists.id;
     }
     
-    const orderBy = sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn);
+    // Before getting paginated data, first get all artists with their play counts using a subquery
+    // This creates a CTE (Common Table Expression) for play counts per artist
+    const artistsWithPlayCounts = db
+      .select({
+        artistId: artists.id,
+        personalPlayCount: count(plays.id).as('personalPlayCount'),
+      })
+      .from(artists)
+      .leftJoin(songs, sql`${artists.id} = ${songs.artistId}`)
+      .leftJoin(plays, sql`${songs.id} = ${plays.songId}`)
+      .groupBy(artists.id)
+      .as('artist_play_counts');
+
+    // Customize the order by clause for rank sorting
+    let orderByClause = [];
+    if (sortBy === 'rank' || sortBy === 'personalPlayCount') {
+      // When sorting by rank/personalPlayCount, we want to sort by play count
+      if (sortOrder === 'desc') {
+        // For descending, higher play count = higher rank (lower number)
+        orderByClause.push(sql`"artist_play_counts"."personalPlayCount" ASC`);
+      } else {
+        // For ascending, lower play count = lower rank (higher number)
+        orderByClause.push(sql`"artist_play_counts"."personalPlayCount" DESC`);
+      }
+    } else {
+      // For other columns, use the standard order by
+      orderByClause.push(sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn));
+    }
 
     // Get paginated data with explicit fields including ranking
     const data = await db.select({
@@ -66,12 +91,15 @@ router.get('/artists', async (req, res) => {
       listeners: artists.listeners,
       playcount: artists.playcount,
       lastUpdated: artists.lastUpdated,
-      rank: sql<number>`row_number() over (order by ${artists.playcount} desc)`.mapWith(Number),
+      personalPlayCount: artistsWithPlayCounts.personalPlayCount,
+      // Rank calculation - row_number over personal play count
+      rank: sql<number>`row_number() over (order by "artist_play_counts"."personalPlayCount" desc)`.mapWith(Number),
     })
     .from(artists)
+    .leftJoin(artistsWithPlayCounts, sql`${artists.id} = ${artistsWithPlayCounts.artistId}`)
     .limit(pageSize)
     .offset(offset)
-    .orderBy(orderBy);
+    .orderBy(...orderByClause);
 
     // Construct the response
     const response: PaginatedResponse<typeof data[0]> = {
