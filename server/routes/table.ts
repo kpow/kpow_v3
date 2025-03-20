@@ -39,7 +39,15 @@ router.get('/artists', async (req, res) => {
     const total = countResult[0].count;
 
     // Build the query with proper sorting
-    const sortColumn = (artists as any)[sortBy] || artists.id;
+    let sortColumn;
+    
+    // Handle special case for 'artist' column which should sort by name
+    if (sortBy === 'artist') {
+      sortColumn = artists.name;
+    } else {
+      sortColumn = (artists as any)[sortBy] || artists.id;
+    }
+    
     const orderBy = sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn);
 
     // Get paginated data with explicit fields
