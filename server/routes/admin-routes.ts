@@ -163,5 +163,48 @@ export function registerAdminRoutes(router: Router) {
       });
     }
   });
+
+  // Get artists without images
+  router.get("/api/admin/artists-without-images", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    if (!req.user?.approved) {
+      return res.status(403).json({ error: "Account not approved" });
+    }
+
+    try {
+      console.log("[Artists] Fetching artists without images");
+
+      // Get artists without images and their first song (for album name)
+      const artistsToUpdate = await db.query.artists.findMany({
+        where: isNull(artists.imageUrl),
+        with: {
+          songs: {
+            limit: 1,
+          },
+        },
+        orderBy: [artists.name],
+      });
+
+      // Format the response to match the expected format
+      const artistList = artistsToUpdate.map((artist) => ({
+        id: artist.id,
+        name: artist.name,
+        albumName: artist.songs?.[0]?.albumName || null,
+      }));
+
+      console.log(`[Artists] Found ${artistList.length} artists without images`);
+      res.json(artistList);
+    } catch (error) {
+      console.error("Database Error:", error);
+      res.status(500).json({
+        error: "Failed to fetch artists without images",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+  
   return router;
 }

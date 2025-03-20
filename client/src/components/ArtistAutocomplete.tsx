@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react"
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,8 +16,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { Input } from "@/components/ui/input"
-import artistsData from '@/data/artists_without_images.json'
+import { useQuery } from "@tanstack/react-query"
+import { useToast } from "@/hooks/use-toast"
 
 interface Artist {
   id: number
@@ -33,13 +33,41 @@ export function ArtistAutocomplete({ onArtistSelect }: ArtistAutocompleteProps) 
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
   const [inputValue, setInputValue] = React.useState("")
+  const { toast } = useToast()
 
-  const artists: Artist[] = artistsData
+  // Fetch artists without images from API
+  const { data: artists, isLoading, error } = useQuery<Artist[]>({
+    queryKey: ["artistsWithoutImages"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/artists-without-images")
+      if (!response.ok) {
+        const errorData = await response.text()
+        console.error("API Error:", errorData)
+        throw new Error(`Failed to fetch artists: ${response.statusText}`)
+      }
+      return response.json()
+    },
+    staleTime: 60 * 1000, // Cache for 1 minute
+  })
+
+  // Show error toast if the query fails
+  React.useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error fetching artists",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      })
+    }
+  }, [error, toast])
 
   // Filter artists based on input value
-  const filteredArtists = artists.filter((artist) =>
-    artist.name.toLowerCase().includes(inputValue.toLowerCase())
-  )
+  const filteredArtists = React.useMemo(() => {
+    if (!artists) return []
+    return artists.filter((artist) =>
+      artist.name.toLowerCase().includes(inputValue.toLowerCase())
+    )
+  }, [artists, inputValue])
 
   return (
     <div className="flex flex-col gap-2">
@@ -68,29 +96,43 @@ export function ArtistAutocomplete({ onArtistSelect }: ArtistAutocompleteProps) 
                   onArtistSelect({ name: search })
                 }}
               />
-              <CommandEmpty>No artist found.</CommandEmpty>
-              <CommandGroup className="max-h-[300px] overflow-y-auto">
-                {filteredArtists.map((artist) => (
-                  <CommandItem
-                    key={artist.id}
-                    value={artist.name}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue)
-                      setInputValue(currentValue)
-                      onArtistSelect({ name: currentValue })
-                      setOpen(false)
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === artist.name ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {artist.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              {isLoading ? (
+                <div className="py-6 text-center text-sm">
+                  <Loader2 className="mb-2 h-4 w-4 animate-spin mx-auto" />
+                  Loading artists...
+                </div>
+              ) : (
+                <>
+                  <CommandEmpty>No artist found.</CommandEmpty>
+                  <CommandGroup className="max-h-[300px] overflow-y-auto">
+                    {filteredArtists.map((artist) => (
+                      <CommandItem
+                        key={artist.id}
+                        value={artist.name}
+                        onSelect={(currentValue) => {
+                          setValue(currentValue)
+                          setInputValue(currentValue)
+                          onArtistSelect({ name: currentValue })
+                          setOpen(false)
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            value === artist.name ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {artist.name}
+                        {artist.albumName && (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            ({artist.albumName})
+                          </span>
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </>
+              )}
             </Command>
           </PopoverContent>
         </Popover>
