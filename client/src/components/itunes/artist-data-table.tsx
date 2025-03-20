@@ -5,9 +5,11 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
   type SortingState,
+  type Column,
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { type Artist } from "@/types/artist";
 import {
@@ -25,10 +27,37 @@ import { format } from "date-fns";
 
 const columnHelper = createColumnHelper<Artist>();
 
+// Sortable header component
+function SortableHeader({ 
+  column, 
+  title 
+}: { 
+  column: Column<Artist, unknown>, 
+  title: string 
+}) {
+  return (
+    <div 
+      className="flex items-center gap-1 cursor-pointer select-none"
+      onClick={() => column.toggleSorting()}
+    >
+      <span>{title}</span>
+      {column.getIsSorted() === "asc" && (
+        <ArrowUp className="h-4 w-4 ml-1" />
+      )}
+      {column.getIsSorted() === "desc" && (
+        <ArrowDown className="h-4 w-4 ml-1" />
+      )}
+      {!column.getIsSorted() && (
+        <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
+      )}
+    </div>
+  );
+}
+
 const columns = [
   columnHelper.accessor((row) => ({ name: row.name, imageUrl: row.imageUrl || row.artistImageUrl }), {
     id: "artist",
-    header: "Artist",
+    header: ({ column }) => <SortableHeader column={column} title="Artist" />,
     cell: (info) => {
       const { name, imageUrl } = info.getValue();
       return (
@@ -50,20 +79,33 @@ const columns = [
         </div>
       );
     },
+    enableSorting: true,
+    sortingFn: (rowA, rowB) => 
+      rowA.original.name.localeCompare(rowB.original.name),
   }),
   columnHelper.accessor("listeners", {
-    header: "Listeners",
+    header: ({ column }) => <SortableHeader column={column} title="Listeners" />,
     cell: (info) => info.getValue()?.toLocaleString() || "N/A",
+    enableSorting: true,
   }),
   columnHelper.accessor("playcount", {
-    header: "Play Count",
+    header: ({ column }) => <SortableHeader column={column} title="Play Count" />,
     cell: (info) => info.getValue()?.toLocaleString() || "N/A",
+    enableSorting: true,
   }),
   columnHelper.accessor("lastUpdated", {
-    header: "Last Updated",
+    header: ({ column }) => <SortableHeader column={column} title="Last Updated" />,
     cell: (info) => {
       const date = info.getValue();
       return date ? format(new Date(date), "PPP") : "N/A";
+    },
+    enableSorting: true,
+    sortingFn: (rowA, rowB) => {
+      // Handle null dates
+      if (!rowA.original.lastUpdated) return 1;
+      if (!rowB.original.lastUpdated) return -1;
+      return new Date(rowA.original.lastUpdated).getTime() - 
+             new Date(rowB.original.lastUpdated).getTime();
     },
   }),
 ];
@@ -74,7 +116,10 @@ interface ArtistDataTableProps {
 }
 
 export function ArtistDataTable({ onArtistClick, initialPage = 0 }: ArtistDataTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  // Default to sorting by artist name ascending
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'artist', desc: false }
+  ]);
   const [{ pageIndex, pageSize }, setPagination] = useState({
     pageIndex: initialPage,
     pageSize: 10,
