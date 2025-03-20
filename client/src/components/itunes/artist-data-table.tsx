@@ -222,7 +222,7 @@ export function ArtistDataTable({ onArtistClick, initialPage = 0 }: ArtistDataTa
             {table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                className="cursor-pointer hover:bg-muted/50 even:bg-white odd:bg-gray-50"
+                className="cursor-pointer hover:bg-gray-200 even:bg-white odd:bg-gray-50"
                 onClick={() => onArtistClick?.(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (
