@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -106,14 +107,20 @@ export default function AdminPage() {
         <SongsManager />
       </div>
 
-      {/* Last.fm Album Lookup Section */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Last.fm Album Lookup</h2>
-        <AlbumLookup />
-      </div>
+      {/* Two Column Layout for Last.fm and iTunes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Last.fm Album Lookup Column */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Last.fm Album Lookup</h2>
+          <AlbumLookup />
+        </div>
 
-      {/* iTunes Search Section */}
-      <ITunesSearch />
+        {/* iTunes Search Column */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">iTunes Search</h2>
+          <ITunesSearch />
+        </div>
+      </div>
     </div>
   );
 }
