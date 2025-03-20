@@ -200,13 +200,6 @@ export function ITunesSearch() {
                   ))}
                 </div>
               </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-2">Raw Response</h3>
-                <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto">
-                  {JSON.stringify(searchResults, null, 2)}
-                </pre>
-              </div>
             </div>
           )}
         </CardContent>

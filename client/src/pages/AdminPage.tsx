@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -66,7 +65,7 @@ export default function AdminPage() {
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
       {/* User Approval Section */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <h2 className="text-xl font-semibold">Pending Users</h2>
         {pendingUsers?.length === 0 ? (
           <p className="text-muted-foreground">No pending users to approve.</p>
@@ -99,13 +98,13 @@ export default function AdminPage() {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Songs Without Plays Section */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <h2 className="text-xl font-semibold">Songs Without Plays</h2>
         <SongsManager />
-      </div>
+      </div> */}
 
       {/* Two Column Layout for Last.fm and iTunes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
