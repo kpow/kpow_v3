@@ -64,6 +64,8 @@ export function AlbumLookup() {
   };
 
   return (
+    <>
+       <h2 className="text-xl font-semibold">Last.fm Album Lookup</h2>
     <Card className="w-full">
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4 mt-10">
@@ -123,5 +125,6 @@ export function AlbumLookup() {
         ) : null}
       </CardContent>
     </Card>
+    </>
   );
 }
