@@ -115,6 +115,69 @@ const columns = [
   }),
 ];
 
+interface TablePaginationProps {
+  table: any;
+  pageInput: string;
+  setPageInput: (value: string) => void;
+  handleGoToPage: () => void;
+  totalPages: number;
+}
+
+function TablePagination({ table, pageInput, setPageInput, handleGoToPage, totalPages }: TablePaginationProps) {
+  return (
+    <div className="flex items-center justify-between px-2">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {totalPages}
+        </span>
+        
+        <div className="flex items-center gap-1">
+          <Input
+            className="h-8 w-16 text-center"
+            value={pageInput}
+            onChange={(e) => setPageInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleGoToPage();
+              }
+            }}
+            aria-label="Go to page"
+          />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleGoToPage}
+            disabled={!totalPages}
+          >
+            Go
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface ArtistDataTableProps {
   onArtistClick?: (artist: Artist) => void;
   initialPage?: number;
@@ -245,56 +308,13 @@ export function ArtistDataTable({ onArtistClick, initialPage = 0 }: ArtistDataTa
         </Table>
       </div>
 
-      <div className="flex items-center justify-between px-2">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {data?.pagination?.totalPages || 1}
-          </span>
-          
-          <div className="flex items-center gap-1">
-            <Input
-              className="h-8 w-16 text-center"
-              value={pageInput}
-              onChange={(e) => setPageInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleGoToPage();
-                }
-              }}
-              aria-label="Go to page"
-            />
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleGoToPage}
-              disabled={!data?.pagination?.totalPages}
-            >
-              Go
-            </Button>
-          </div>
-        </div>
-      </div>
+      <TablePagination 
+        table={table}
+        pageInput={pageInput}
+        setPageInput={setPageInput}
+        handleGoToPage={handleGoToPage}
+        totalPages={data?.pagination?.totalPages || 1}
+      />
     </div>
   );
 }
