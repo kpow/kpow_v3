@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
@@ -69,14 +70,40 @@ const columns = [
 
 interface ArtistDataTableProps {
   onArtistClick?: (artist: Artist) => void;
+  initialPage?: number;
 }
 
-export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
+export function ArtistDataTable({ onArtistClick, initialPage = 0 }: ArtistDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [{ pageIndex, pageSize }, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
+    pageIndex: initialPage,
+    pageSize: 10,
   });
+  
+  const [pageInput, setPageInput] = useState<string>((initialPage + 1).toString());
+
+  // Handle direct page navigation
+  const handleGoToPage = () => {
+    const totalPages = data?.pagination?.totalPages || 1;
+    const parsedPage = parseInt(pageInput, 10);
+    
+    if (isNaN(parsedPage) || parsedPage < 1 || parsedPage > totalPages) {
+      // Reset to current page if invalid
+      setPageInput((pageIndex + 1).toString());
+      return;
+    }
+    
+    // TanStack Table uses 0-based index for pages
+    setPagination({
+      pageIndex: parsedPage - 1,
+      pageSize,
+    });
+  };
+
+  // Update page input when page changes
+  useEffect(() => {
+    setPageInput((pageIndex + 1).toString());
+  }, [pageIndex]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["/api/table/artists", pageIndex, pageSize, sorting],
@@ -178,9 +205,35 @@ export function ArtistDataTable({ onArtistClick }: ArtistDataTableProps) {
             Next
           </Button>
         </div>
-        <div className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {data?.pagination?.totalPages || 1}
+        
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {data?.pagination?.totalPages || 1}
+          </span>
+          
+          <div className="flex items-center gap-1">
+            <Input
+              className="h-8 w-16 text-center"
+              value={pageInput}
+              onChange={(e) => setPageInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleGoToPage();
+                }
+              }}
+              aria-label="Go to page"
+            />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleGoToPage}
+              disabled={!data?.pagination?.totalPages}
+            >
+              Go
+            </Button>
+          </div>
         </div>
       </div>
     </div>
