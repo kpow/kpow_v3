@@ -59,11 +59,13 @@ export function BookCard({ review }: BookCardProps) {
     <Card className="overflow-hidden">
       <CardContent className="p-4">
         <div className="flex flex-col md:flex-row gap-4">
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full md:w-36 h-48 object-cover"
-          />
+          <div className="w-full md:w-48 relative bg-black">
+            <img
+              src={imageUrl}
+              alt={title}
+              className="absolute inset-0 w-full h-full object-contain"
+            />
+          </div>
           <div className="flex-1">
             <h3 className="font-semibold text-lg">{title}</h3>
             <p className="text-sm text-muted-foreground mt-1">
