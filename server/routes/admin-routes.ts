@@ -1,7 +1,16 @@
 import { Router } from "express";
 import axios from "axios";
 import { db } from "@db";
-import { artists, songs, plays, books, authors, shelves, bookAuthors, bookShelves } from "@db/schema";
+import { 
+  artists, 
+  songs, 
+  plays, 
+  books, 
+  authors as dbAuthors, 
+  shelves as dbShelves, 
+  bookAuthors, 
+  bookShelves 
+} from "@db/schema";
 import { eq, isNull, inArray, desc, sql, and, like } from "drizzle-orm";
 
 export function registerAdminRoutes(router: Router) {
@@ -354,8 +363,8 @@ export function registerAdminRoutes(router: Router) {
       // Transform to include authors and shelves directly
       const transformedBook = {
         ...book,
-        authors: book.bookAuthors.map(ba => ba.author),
-        shelves: book.bookShelves.map(bs => bs.shelf),
+        authors: book.bookAuthors?.map(ba => ba.author) || [],
+        shelves: book.bookShelves?.map(bs => bs.shelf) || [],
         // Remove the nested relation fields
         bookAuthors: undefined,
         bookShelves: undefined
@@ -413,17 +422,17 @@ export function registerAdminRoutes(router: Router) {
             // Check if author exists by name
             const existingAuthor = authorData.id 
               ? await tx.query.authors.findFirst({
-                  where: eq(authors.id, Number(authorData.id))
+                  where: eq(dbAuthors.id, Number(authorData.id))
                 }) 
               : await tx.query.authors.findFirst({
-                  where: eq(authors.name, String(authorData.name))
+                  where: eq(dbAuthors.name, String(authorData.name))
                 });
               
             if (existingAuthor) {
               authorId = existingAuthor.id;
             } else {
               // Create new author
-              const [newAuthor] = await tx.insert(authors).values({
+              const [newAuthor] = await tx.insert(dbAuthors).values({
                 name: authorData.name,
                 imageUrl: authorData.imageUrl,
                 dateCreated: new Date(),
@@ -449,17 +458,17 @@ export function registerAdminRoutes(router: Router) {
             // Check if shelf exists
             const existingShelf = shelfData.id
               ? await tx.query.shelves.findFirst({
-                  where: eq(shelves.id, shelfData.id)
+                  where: eq(dbShelves.id, shelfData.id)
                 })
               : await tx.query.shelves.findFirst({
-                  where: eq(shelves.name, shelfData.name)
+                  where: eq(dbShelves.name, shelfData.name)
                 });
                 
             if (existingShelf) {
               shelfId = existingShelf.id;
             } else {
               // Create new shelf
-              const [newShelf] = await tx.insert(shelves).values({
+              const [newShelf] = await tx.insert(dbShelves).values({
                 name: shelfData.name,
                 dateCreated: new Date()
               }).returning();
@@ -493,13 +502,13 @@ export function registerAdminRoutes(router: Router) {
         });
         
         // Transform for response
-        const transformedBook = {
+        const transformedBook = fullBook ? {
           ...fullBook,
-          authors: fullBook.bookAuthors.map(ba => ba.author),
-          shelves: fullBook.bookShelves.map(bs => bs.shelf),
+          authors: fullBook.bookAuthors?.map(ba => ba.author) || [],
+          shelves: fullBook.bookShelves?.map(bs => bs.shelf) || [],
           bookAuthors: undefined,
           bookShelves: undefined
-        };
+        } : null;
         
         res.status(201).json(transformedBook);
       });
@@ -546,6 +555,24 @@ export function registerAdminRoutes(router: Router) {
         return res.status(404).json({ error: "Book not found" });
       }
       
+      // Process dates
+      const processedData = { ...bookData };
+      
+      // Handle date fields properly
+      if (processedData.dateRead) {
+        processedData.dateRead = processedData.dateRead ? new Date(processedData.dateRead) : null;
+      } else {
+        // Don't modify the field if it's empty
+        delete processedData.dateRead;
+      }
+      
+      if (processedData.dateAdded) {
+        processedData.dateAdded = processedData.dateAdded ? new Date(processedData.dateAdded) : null;
+      } else {
+        // Don't modify the field if it's empty
+        delete processedData.dateAdded;
+      }
+      
       // Start a transaction to ensure data consistency
       return await db.transaction(async (tx) => {
         // Update the book
@@ -554,7 +581,7 @@ export function registerAdminRoutes(router: Router) {
             title,
             description,
             imageUrl,
-            ...bookData,
+            ...processedData,
             lastUpdated: new Date()
           })
           .where(eq(books.id, bookId))
@@ -575,17 +602,17 @@ export function registerAdminRoutes(router: Router) {
             // Check if author exists
             const existingAuthor = authorData.id 
               ? await tx.query.authors.findFirst({
-                  where: eq(authors.id, authorData.id)
+                  where: eq(dbAuthors.id, authorData.id)
                 }) 
               : await tx.query.authors.findFirst({
-                  where: eq(authors.name, authorData.name)
+                  where: eq(dbAuthors.name, authorData.name)
                 });
                 
             if (existingAuthor) {
               authorId = existingAuthor.id;
             } else {
               // Create new author
-              const [newAuthor] = await tx.insert(authors).values({
+              const [newAuthor] = await tx.insert(dbAuthors).values({
                 name: authorData.name,
                 imageUrl: authorData.imageUrl,
                 dateCreated: new Date(),
@@ -616,17 +643,17 @@ export function registerAdminRoutes(router: Router) {
             // Check if shelf exists
             const existingShelf = shelfData.id
               ? await tx.query.shelves.findFirst({
-                  where: eq(shelves.id, shelfData.id)
+                  where: eq(dbShelves.id, shelfData.id)
                 })
               : await tx.query.shelves.findFirst({
-                  where: eq(shelves.name, shelfData.name)
+                  where: eq(dbShelves.name, shelfData.name)
                 });
                 
             if (existingShelf) {
               shelfId = existingShelf.id;
             } else {
               // Create new shelf
-              const [newShelf] = await tx.insert(shelves).values({
+              const [newShelf] = await tx.insert(dbShelves).values({
                 name: shelfData.name,
                 dateCreated: new Date()
               }).returning();
@@ -660,13 +687,13 @@ export function registerAdminRoutes(router: Router) {
         });
         
         // Transform for response
-        const transformedBook = {
+        const transformedBook = fullBook ? {
           ...fullBook,
-          authors: fullBook.bookAuthors.map(ba => ba.author),
-          shelves: fullBook.bookShelves.map(bs => bs.shelf),
+          authors: fullBook.bookAuthors?.map(ba => ba.author) || [],
+          shelves: fullBook.bookShelves?.map(bs => bs.shelf) || [],
           bookAuthors: undefined,
           bookShelves: undefined
-        };
+        } : null;
         
         res.json(transformedBook);
       });
@@ -744,7 +771,7 @@ export function registerAdminRoutes(router: Router) {
       console.log("[Books Admin] Fetching all authors");
       
       const authorsList = await db.query.authors.findMany({
-        orderBy: [authors.name]
+        orderBy: [dbAuthors.name]
       });
       
       res.json(authorsList);
@@ -772,7 +799,7 @@ export function registerAdminRoutes(router: Router) {
       console.log("[Books Admin] Fetching all shelves");
       
       const shelvesList = await db.query.shelves.findMany({
-        orderBy: [shelves.name]
+        orderBy: [dbShelves.name]
       });
       
       res.json(shelvesList);
