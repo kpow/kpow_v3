@@ -258,7 +258,7 @@ export function ArtistDataTable({
   // Handle direct page navigation
   const handleGoToPage = () => {
     const totalPages = data?.pagination?.totalPages || 1;
-    const parsedPage = parseInt(pageInput, 8);
+    const parsedPage = parseInt(pageInput, 10);
 
     if (isNaN(parsedPage) || parsedPage < 1 || parsedPage > totalPages) {
       // Reset to current page if invalid
