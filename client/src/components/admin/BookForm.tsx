@@ -44,8 +44,8 @@ const bookFormSchema = z.object({
   isbn13: z.string().optional(),
   numPages: z.coerce.number().int().positive().optional(),
   publicationYear: z.coerce.number().int().positive().optional(),
-  userRating: z.coerce.number().min(0).max(5).optional(),
-  averageRating: z.coerce.number().min(0).max(5).optional(),
+  userRating: z.coerce.number().min(0).max(5).step(0.01).optional(),
+  averageRating: z.coerce.number().min(0).max(5).step(0.01).optional(),
   dateRead: z.string().optional().or(z.literal("")),
   dateAdded: z.string().optional().or(z.literal("")),
   link: z.string().url("Must be a valid URL").optional().or(z.literal("")),
@@ -458,7 +458,7 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
                 <FormControl>
                   <Input 
                     type="number" 
-                    step="0.1" 
+                    step="0.01" 
                     min="0" 
                     max="5"
                     placeholder="0-5" 
@@ -482,7 +482,7 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
                 <FormControl>
                   <Input 
                     type="number" 
-                    step="0.1" 
+                    step="0.01" 
                     min="0" 
                     max="5"
                     placeholder="0-5" 
