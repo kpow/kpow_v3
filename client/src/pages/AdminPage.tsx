@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AlbumLookup } from "@/components/admin/AlbumLookup";
 import { ITunesSearch } from "@/components/admin/iTunesSearch";
 import { SongsManager } from "@/components/admin/SongsManager";
+import { BookManager } from "@/components/admin/BookManager";
 
 interface PendingUser {
   id: number;
@@ -106,6 +107,11 @@ export default function AdminPage() {
         <SongsManager />
       </div> */}
 
+      {/* Book Management Section */}
+      <div className="space-y-4 mb-8">
+        <BookManager />
+      </div>
+      
       {/* Two Column Layout for Last.fm and iTunes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Last.fm Album Lookup Column */}
