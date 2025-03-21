@@ -52,8 +52,11 @@ export function DonutShopSearch({
     // Update parent state
     onSearchStateChange("city", localCity);
     onSearchStateChange("state", localState);
-    // Trigger search immediately
-    onSearch();
+    
+    // Use setTimeout to ensure state updates are processed before search
+    setTimeout(() => {
+      onSearch();
+    }, 0);
   };
 
   return (
