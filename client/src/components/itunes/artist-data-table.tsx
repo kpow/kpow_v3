@@ -334,6 +334,7 @@ export function ArtistDataTable({
             </div>
           </div>
         </div>
+        <LoadingPagination />
       </div>
     );
   }
