@@ -105,24 +105,19 @@ const columns = [
     cell: (info) => info.getValue()?.toLocaleString() || "N/A",
     enableSorting: true,
   }),
-  columnHelper.accessor("lastUpdated", {
+  columnHelper.accessor("songCount", {
     header: ({ column }) => (
-      <SortableHeader column={column} title="Last Updated" />
+      <SortableHeader column={column} title="Songs in DB" />
     ),
     cell: (info) => {
-      const date = info.getValue();
-      return date ? format(new Date(date), "PPP") : "N/A";
-    },
-    enableSorting: true,
-    sortingFn: (rowA, rowB) => {
-      // Handle null dates
-      if (!rowA.original.lastUpdated) return 1;
-      if (!rowB.original.lastUpdated) return -1;
+      const count = info.getValue();
       return (
-        new Date(rowA.original.lastUpdated).getTime() -
-        new Date(rowB.original.lastUpdated).getTime()
+        <span className="font-medium">
+          {count !== undefined ? count.toLocaleString() : "0"}
+        </span>
       );
     },
+    enableSorting: true,
   }),
 ];
 

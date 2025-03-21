@@ -52,18 +52,19 @@ router.get('/artists', async (req, res) => {
       sortColumn = (artists as any)[sortBy] || artists.id;
     }
     
-    // Before getting paginated data, first get all artists with their play counts using a subquery
-    // This creates a CTE (Common Table Expression) for play counts per artist
-    const artistsWithPlayCounts = db
+    // Before getting paginated data, first get all artists with their play counts and song counts using a subquery
+    // This creates a CTE (Common Table Expression) for play counts and song counts per artist
+    const artistsWithCounts = db
       .select({
         artistId: artists.id,
         personalPlayCount: count(plays.id).as('personalPlayCount'),
+        songCount: sql<number>`count(distinct ${songs.id})`.mapWith(Number).as('songCount'),
       })
       .from(artists)
       .leftJoin(songs, sql`${artists.id} = ${songs.artistId}`)
       .leftJoin(plays, sql`${songs.id} = ${plays.songId}`)
       .groupBy(artists.id)
-      .as('artist_play_counts');
+      .as('artist_counts');
 
     // Customize the order by clause for rank sorting
     let orderByClause = [];
@@ -71,11 +72,16 @@ router.get('/artists', async (req, res) => {
       // When sorting by rank/personalPlayCount, we want to sort by play count
       if (sortOrder === 'desc') {
         // For descending, higher play count = higher rank (lower number)
-        orderByClause.push(sql`"artist_play_counts"."personalPlayCount" ASC`);
+        orderByClause.push(sql`"artist_counts"."personalPlayCount" ASC`);
       } else {
         // For ascending, lower play count = lower rank (higher number)
-        orderByClause.push(sql`"artist_play_counts"."personalPlayCount" DESC`);
+        orderByClause.push(sql`"artist_counts"."personalPlayCount" DESC`);
       }
+    } else if (sortBy === 'songCount') {
+      // Handle sorting by song count
+      orderByClause.push(sortOrder === 'desc' 
+        ? sql`"artist_counts"."songCount" DESC` 
+        : sql`"artist_counts"."songCount" ASC`);
     } else {
       // For other columns, use the standard order by
       orderByClause.push(sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn));
@@ -91,12 +97,13 @@ router.get('/artists', async (req, res) => {
       listeners: artists.listeners,
       playcount: artists.playcount,
       lastUpdated: artists.lastUpdated,
-      personalPlayCount: artistsWithPlayCounts.personalPlayCount,
+      personalPlayCount: artistsWithCounts.personalPlayCount,
+      songCount: artistsWithCounts.songCount,
       // Rank calculation - row_number over personal play count
-      rank: sql<number>`row_number() over (order by "artist_play_counts"."personalPlayCount" desc)`.mapWith(Number),
+      rank: sql<number>`row_number() over (order by "artist_counts"."personalPlayCount" desc)`.mapWith(Number),
     })
     .from(artists)
-    .leftJoin(artistsWithPlayCounts, sql`${artists.id} = ${artistsWithPlayCounts.artistId}`)
+    .leftJoin(artistsWithCounts, sql`${artists.id} = ${artistsWithCounts.artistId}`)
     .limit(pageSize)
     .offset(offset)
     .orderBy(...orderByClause);
