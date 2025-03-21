@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Music } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +23,9 @@ const searchFormSchema = z.object({
 });
 
 type SearchFormValues = z.infer<typeof searchFormSchema>;
+
+// Default music note image path
+const DEFAULT_MUSIC_IMAGE = "/images/music-note.svg";
 
 export function ITunesSearch() {
   const { toast } = useToast();
@@ -92,6 +95,15 @@ export function ITunesSearch() {
     searchForm.setValue("artistName", result.artistName);
     searchForm.setValue("imageUrl", artworkUrl);
   };
+  
+  const handleUseDefaultImage = () => {
+    // Set the image URL to the default music note image
+    searchForm.setValue("imageUrl", DEFAULT_MUSIC_IMAGE);
+    toast({
+      title: "Default Image Applied",
+      description: "The music note image has been set as the default artwork.",
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -136,13 +148,24 @@ export function ITunesSearch() {
             <div className="mt-4 space-y-6">
               <div className="mt-4 space-y-4">
                 <div className="flex flex-col gap-4">
-                  <Input
-                    placeholder="Image URL..."
-                    value={searchForm.watch("imageUrl")}
-                    onChange={(e) =>
-                      searchForm.setValue("imageUrl", e.target.value)
-                    }
-                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Image URL..."
+                      value={searchForm.watch("imageUrl")}
+                      onChange={(e) =>
+                        searchForm.setValue("imageUrl", e.target.value)
+                      }
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleUseDefaultImage}
+                      title="Use default music note image"
+                    >
+                      <Music className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <Input
                     placeholder="Artist name..."
                     value={searchForm.watch("artistName")}
@@ -150,24 +173,34 @@ export function ITunesSearch() {
                       searchForm.setValue("artistName", e.target.value)
                     }
                   />
-                  <Button
-                    onClick={() =>
-                      updateArtistImage.mutate({
-                        artistName: searchForm.getValues("artistName") || "",
-                        imageUrl: searchForm.getValues("imageUrl") || "",
-                      })
-                    }
-                    disabled={updateArtistImage.isPending}
-                  >
-                    {updateArtistImage.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Updating...
-                      </>
-                    ) : (
-                      "Update Artist"
-                    )}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1"
+                      onClick={() =>
+                        updateArtistImage.mutate({
+                          artistName: searchForm.getValues("artistName") || "",
+                          imageUrl: searchForm.getValues("imageUrl") || "",
+                        })
+                      }
+                      disabled={updateArtistImage.isPending}
+                    >
+                      {updateArtistImage.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        "Update Artist"
+                      )}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={handleUseDefaultImage}
+                    >
+                      <Music className="mr-2 h-4 w-4" />
+                      Use Default Image
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div>
