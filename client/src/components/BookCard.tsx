@@ -59,7 +59,7 @@ export function BookCard({ review }: BookCardProps) {
     <Card className="overflow-hidden">
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-48 relative bg-black">
+          <div className="w-full md:w-48 h-full min-h-[300px] relative bg-black">
             <img
               src={imageUrl}
               alt={title}
