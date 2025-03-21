@@ -60,8 +60,8 @@ export function BookManager() {
           search,
           page: currentPage,
           limit: booksPerPage,
-          sortBy,
-          sortOrder,
+          sortField: sortBy,
+          sortDirection: sortOrder,
         },
       });
       console.log("[Books Admin] Found", response.data.books.length, "books (total:", response.data.pagination.total, ")");
@@ -222,7 +222,15 @@ export function BookManager() {
                     <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
                   )}
                 </TableHead>
-                <TableHead>Authors</TableHead>
+                <TableHead
+                  className={`cursor-pointer ${sortBy === "author" ? "bg-muted/50" : ""}`}
+                  onClick={() => handleSort("author")}
+                >
+                  Authors
+                  {sortBy === "author" && (
+                    <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                  )}
+                </TableHead>
                 <TableHead
                   className={`cursor-pointer ${sortBy === "userRating" ? "bg-muted/50" : ""}`}
                   onClick={() => handleSort("userRating")}

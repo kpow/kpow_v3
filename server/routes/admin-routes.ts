@@ -254,7 +254,70 @@ export function registerAdminRoutes(router: Router) {
       
       const total = Number(countResult.count);
       
-      // Dynamically build order by clause
+      // Special case for author sorting
+      if (sortField === 'author') {
+        // For author sorting, we need to get all books with their authors first
+        // then sort them manually by the first author's name
+        const allBooks = await db.query.books.findMany({
+          where: whereClause,
+          with: {
+            bookAuthors: {
+              with: {
+                author: true
+              }
+            },
+            bookShelves: {
+              with: {
+                shelf: true
+              }
+            }
+          }
+        });
+        
+        // Sort the books by author name
+        const sortedBooks = allBooks.sort((a, b) => {
+          // Get first author name for each book (or empty string if none)
+          const authorA = a.bookAuthors[0]?.author?.name || '';
+          const authorB = b.bookAuthors[0]?.author?.name || '';
+          
+          // Sort by author name
+          if (sortDirection === 'asc') {
+            return authorA.localeCompare(authorB);
+          } else {
+            return authorB.localeCompare(authorA);
+          }
+        });
+        
+        // Apply pagination
+        const paginatedBooks = sortedBooks.slice(offset, offset + limit);
+        
+        console.log(`[Books Admin] Found ${paginatedBooks.length} books (total: ${total})`);
+        
+        // Transform the data to include nested relations in a more accessible format
+        const transformedBooks = paginatedBooks.map(book => {
+          return {
+            ...book,
+            authors: book.bookAuthors.map(ba => ba.author),
+            shelves: book.bookShelves.map(bs => bs.shelf),
+            // Remove the nested relation fields
+            bookAuthors: undefined,
+            bookShelves: undefined
+          }
+        });
+        
+        // Return with pagination metadata
+        return res.json({
+          books: transformedBooks,
+          pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+          }
+        });
+      }
+      
+      // For other fields, proceed with normal sorting
       let orderByField;
       if (sortField === 'title') {
         orderByField = books.title;
