@@ -106,9 +106,7 @@ const columns = [
     enableSorting: true,
   }),
   columnHelper.accessor("songCount", {
-    header: ({ column }) => (
-      <SortableHeader column={column} title="Songs in DB" />
-    ),
+    header: ({ column }) => <SortableHeader column={column} title="Songs" />,
     cell: (info) => {
       const count = info.getValue();
       return (
@@ -127,6 +125,8 @@ interface TablePaginationProps {
   setPageInput: (value: string) => void;
   handleGoToPage: () => void;
   totalPages: number;
+  pageSize: number;
+  onPageSizeChange: (newSize: number) => void;
 }
 
 function TablePagination({
@@ -135,6 +135,8 @@ function TablePagination({
   setPageInput,
   handleGoToPage,
   totalPages,
+  pageSize,
+  onPageSizeChange,
 }: TablePaginationProps) {
   return (
     <div className="flex items-center justify-between px-2">
@@ -162,11 +164,24 @@ function TablePagination({
             Go
           </Button>
         </div>
+
         <span className="text-sm font-bold text-black">
           Page {table.getState().pagination.pageIndex + 1} of {totalPages}
         </span>
       </div>
-
+      <div className="flex items-center gap-2 ml-4">
+        <select
+          value={pageSize}
+          onChange={(e) => onPageSizeChange(Number(e.target.value))}
+          className="w-16 font-slackey text-l bg-blue-600 hover:bg-blue-700  text-white font-bold py-1 px-2 rounded"
+          aria-label="Items per page"
+        >
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={50}>50</option>
+        </select>
+        <span className="text-sm text-black font-bold">per page</span>
+      </div>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
@@ -195,17 +210,31 @@ function LoadingPagination() {
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex items-center gap-2">
-        <Input className="h-8 w-16 text-center" disabled value="1" />
-        <Button
-          variant="outline"
-          size="sm"
-          disabled
-          className="font-slackey bg-blue-600 text-white"
-        >
-          Go
-        </Button>
+        <div className="flex items-center gap-1">
+          <Input className="h-8 w-16 text-center" disabled value="1" />
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="font-slackey bg-blue-600 text-white"
+          >
+            Go
+          </Button>
+        </div>
         <span className="text-sm font-bold text-black">Page 1 of -</span>
+
+        <div className="flex items-center gap-2 ml-4">
+          <select
+            disabled
+            className="h-8 px-2 py-0 text-sm border rounded-md bg-gray-100 text-gray-500"
+            aria-label="Items per page"
+          >
+            <option value={10}>10</option>
+          </select>
+          <span className="text-sm text-black font-bold">per page</span>
+        </div>
       </div>
+
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
@@ -243,7 +272,7 @@ export function ArtistDataTable({
   ]);
   const [{ pageIndex, pageSize }, setPagination] = useState({
     pageIndex: initialPage,
-    pageSize: 8,
+    pageSize: 10,
   });
 
   const [pageInput, setPageInput] = useState<string>(
@@ -323,7 +352,7 @@ export function ArtistDataTable({
               ))}
             </div>
             <div className="space-y-3">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: 10 }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full mb-2" />
               ))}
             </div>
@@ -333,6 +362,14 @@ export function ArtistDataTable({
       </div>
     );
   }
+
+  // Handle changing page size
+  const handlePageSizeChange = (newSize: number) => {
+    setPagination({
+      pageIndex: 0, // Reset to first page when changing page size
+      pageSize: newSize,
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -345,6 +382,8 @@ export function ArtistDataTable({
         setPageInput={setPageInput}
         handleGoToPage={handleGoToPage}
         totalPages={data?.pagination?.totalPages || 1}
+        pageSize={pageSize}
+        onPageSizeChange={handlePageSizeChange}
       />
       <div className="rounded-md border">
         <Table>
@@ -386,6 +425,8 @@ export function ArtistDataTable({
         setPageInput={setPageInput}
         handleGoToPage={handleGoToPage}
         totalPages={data?.pagination?.totalPages || 1}
+        pageSize={pageSize}
+        onPageSizeChange={handlePageSizeChange}
       />
     </div>
   );
