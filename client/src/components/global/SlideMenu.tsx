@@ -14,18 +14,15 @@ import {
   Fish,
   Circle,
   Mail,
-  LogOut, // Added import
-  Settings, // Added import
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
 interface SlideMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any; // Added user prop
 }
 
-export function SlideMenu({ isOpen, onClose, user }: SlideMenuProps) { // Added user to props
+export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -127,29 +124,6 @@ export function SlideMenu({ isOpen, onClose, user }: SlideMenuProps) { // Added 
             </div>
           </div>
 
-          {user && (
-            <>
-              <Link
-                href="/logout"
-                onClick={onClose}
-                className="flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="text-[13px]">logout</span>
-              </Link>
-
-              {user.isAdmin && (
-                <Link
-                  href="/admin"
-                  onClick={onClose}
-                  className="flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span className="text-[13px]">admin</span>
-                </Link>
-              )}
-            </>
-          )}
           {menuItems.map((item) =>
             item.href.startsWith("http") ? (
               <a
