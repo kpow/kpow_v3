@@ -1,7 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, unique, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, unique, jsonb, primaryKey, date } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { z } from "zod";
-import { Artist, ArtistInsert, Song, SongInsert, Play, PlayInsert } from '@types/database';
+import { Artist, ArtistInsert, Song, SongInsert, Play, PlayInsert, Book, BookInsert, Author, AuthorInsert, Shelf, ShelfInsert, BookAuthorInsert, BookShelfInsert } from '@types/database';
 import { artistSchema } from '@types/artist';
 
 // Users table for authentication
@@ -62,6 +62,67 @@ export const plays = pgTable("plays", {
   eventType: text("event_type"),
 });
 
+// Books table to store book data from Goodreads
+export const books = pgTable("books", {
+  id: serial("id").primaryKey(),
+  goodreadsId: text("goodreads_id").unique(),
+  title: text("title").notNull(),
+  titleWithoutSeries: text("title_without_series"),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  link: text("link"),
+  averageRating: text("average_rating"),
+  pages: integer("pages"),
+  publicationYear: integer("publication_year"),
+  isbn: text("isbn"),
+  isbn13: text("isbn13"),
+  publisher: text("publisher"),
+  language: text("language"),
+  dateAdded: timestamp("date_added"),
+  dateRead: timestamp("date_read"),
+  userRating: text("user_rating"),
+  dateCreated: timestamp("date_created").defaultNow(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// Authors table to store book authors
+export const authors = pgTable("authors", {
+  id: serial("id").primaryKey(),
+  goodreadsId: text("goodreads_id").unique(),
+  name: text("name").notNull(),
+  imageUrl: text("image_url"),
+  averageRating: text("average_rating"),
+  ratingsCount: integer("ratings_count"),
+  textReviewsCount: integer("text_reviews_count"),
+  dateCreated: timestamp("date_created").defaultNow(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// Shelves table to store book shelves/categories
+export const shelves = pgTable("shelves", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  dateCreated: timestamp("date_created").defaultNow(),
+});
+
+// Many-to-many relationship between books and authors
+export const bookAuthors = pgTable("book_authors", {
+  bookId: integer("book_id").references(() => books.id).notNull(),
+  authorId: integer("author_id").references(() => authors.id).notNull(),
+  role: text("role"), // e.g. "Author", "Translator", etc.
+}, (table) => ({
+  pk: primaryKey(table.bookId, table.authorId),
+}));
+
+// Many-to-many relationship between books and shelves
+export const bookShelves = pgTable("book_shelves", {
+  bookId: integer("book_id").references(() => books.id).notNull(),
+  shelfId: integer("shelf_id").references(() => shelves.id).notNull(),
+  dateAdded: timestamp("date_added").defaultNow(),
+}, (table) => ({
+  pk: primaryKey(table.bookId, table.shelfId),
+}));
+
 // Define relationships
 export const artistsRelations = relations(artists, ({ many }) => ({
   songs: many(songs),
@@ -82,6 +143,42 @@ export const playsRelations = relations(plays, ({ one }) => ({
   }),
 }));
 
+// Book relationships
+export const booksRelations = relations(books, ({ many }) => ({
+  bookAuthors: many(bookAuthors),
+  bookShelves: many(bookShelves),
+}));
+
+export const authorsRelations = relations(authors, ({ many }) => ({
+  bookAuthors: many(bookAuthors),
+}));
+
+export const shelvesRelations = relations(shelves, ({ many }) => ({
+  bookShelves: many(bookShelves),
+}));
+
+export const bookAuthorsRelations = relations(bookAuthors, ({ one }) => ({
+  book: one(books, {
+    fields: [bookAuthors.bookId],
+    references: [books.id],
+  }),
+  author: one(authors, {
+    fields: [bookAuthors.authorId],
+    references: [authors.id],
+  }),
+}));
+
+export const bookShelvesRelations = relations(bookShelves, ({ one }) => ({
+  book: one(books, {
+    fields: [bookShelves.bookId],
+    references: [books.id],
+  }),
+  shelf: one(shelves, {
+    fields: [bookShelves.shelfId],
+    references: [shelves.id],
+  }),
+}));
+
 // Export types from the shared types directory
 export type {
   Artist,
@@ -90,6 +187,14 @@ export type {
   SongInsert,
   Play,
   PlayInsert,
+  Book,
+  BookInsert,
+  Author,
+  AuthorInsert,
+  Shelf,
+  ShelfInsert,
+  BookAuthorInsert,
+  BookShelfInsert,
   InsertUser,
   SelectUser
 };

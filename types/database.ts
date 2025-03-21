@@ -1,4 +1,4 @@
-import { artists, songs, plays } from '../db/schema';
+import { artists, songs, plays, books, authors, shelves, bookAuthors, bookShelves } from '../db/schema';
 
 // Export database types from schema
 export type Artist = typeof artists.$inferSelect;
@@ -9,6 +9,36 @@ export type SongInsert = typeof songs.$inferInsert;
 
 export type Play = typeof plays.$inferSelect;
 export type PlayInsert = typeof plays.$inferInsert;
+
+// Book related types
+export type Book = typeof books.$inferSelect;
+export type BookInsert = typeof books.$inferInsert;
+
+export type Author = typeof authors.$inferSelect;
+export type AuthorInsert = typeof authors.$inferInsert;
+
+export type Shelf = typeof shelves.$inferSelect;
+export type ShelfInsert = typeof shelves.$inferInsert;
+
+export type BookAuthor = typeof bookAuthors.$inferSelect;
+export type BookAuthorInsert = typeof bookAuthors.$inferInsert;
+
+export type BookShelf = typeof bookShelves.$inferSelect;
+export type BookShelfInsert = typeof bookShelves.$inferInsert;
+
+// For API responses with extended relationship data
+export interface BookWithRelations extends Book {
+  authors?: Author[];
+  shelves?: Shelf[];
+}
+
+export interface AuthorWithRelations extends Author {
+  books?: Book[];
+}
+
+export interface ShelfWithRelations extends Shelf {
+  books?: Book[];
+}
 
 // Common database response types
 export interface PaginatedResponse<T> {
