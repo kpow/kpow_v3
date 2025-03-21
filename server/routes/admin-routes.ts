@@ -1,5 +1,6 @@
 import { Router } from "express";
 import axios from "axios";
+import * as cheerio from 'cheerio';
 import { db } from "@db";
 import { 
   artists, 
@@ -766,6 +767,74 @@ export function registerAdminRoutes(router: Router) {
       res.status(500).json({
         error: "Failed to update book",
         details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
+  // Refine book cover image
+  router.post("/api/admin/books/refine-cover", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    if (!req.user?.approved) {
+      return res.status(403).json({ error: "Account not approved" });
+    }
+
+    const { bookUrl } = req.body;
+    
+    if (!bookUrl) {
+      return res.status(400).json({ error: "Book URL is required" });
+    }
+
+    try {
+      console.log(`[Books Admin] Refining book cover from URL: ${bookUrl}`);
+      
+      // Fetch the HTML content from the Goodreads book page
+      const response = await axios.get(bookUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      
+      const html = response.data;
+      const $ = cheerio.load(html);
+      
+      // Look for the BookCover__image div which contains the high quality image
+      const bookCoverImage = $('.BookCover__image img');
+      
+      if (!bookCoverImage.length) {
+        return res.status(404).json({ 
+          error: "Book cover image not found on the page", 
+          message: "Could not find the high-quality book cover image on the Goodreads page."
+        });
+      }
+      
+      // Extract the source URL of the image
+      const refinedImageUrl = bookCoverImage.attr('src');
+      
+      if (!refinedImageUrl) {
+        return res.status(404).json({ 
+          error: "Image URL not found", 
+          message: "Found the image element but could not extract the source URL."
+        });
+      }
+      
+      console.log(`[Books Admin] Found refined book cover image: ${refinedImageUrl}`);
+      
+      // Return the refined image URL
+      res.json({ 
+        success: true, 
+        imageUrl: refinedImageUrl,
+        message: "Successfully retrieved high-quality book cover image."
+      });
+      
+    } catch (error) {
+      console.error("Error refining book cover:", error);
+      res.status(500).json({
+        error: "Failed to refine book cover image",
+        details: error instanceof Error ? error.message : "Unknown error",
+        message: "An error occurred while trying to fetch and parse the Goodreads page."
       });
     }
   });

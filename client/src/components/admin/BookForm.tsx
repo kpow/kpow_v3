@@ -32,7 +32,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Plus, X, AlertCircle, Check } from "lucide-react";
+import { Loader2, Plus, X, AlertCircle, Check, Image as ImageIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 // Form validation schema
@@ -78,6 +78,7 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefiningImage, setIsRefiningImage] = useState(false);
   
   // Load authors and shelves for dropdowns
   const { data: authorsData, isLoading: authorsLoading } = useQuery({
@@ -167,6 +168,51 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
       setIsSubmitting(false);
     },
   });
+
+  // Refine book cover image mutation
+  const refineImageMutation = useMutation({
+    mutationFn: async (bookUrl: string) => {
+      setIsRefiningImage(true);
+      return axios.post("/api/admin/books/refine-cover", { bookUrl });
+    },
+    onSuccess: (response) => {
+      const refinedImageUrl = response.data.imageUrl;
+      
+      // Update the image URL field in the form
+      form.setValue("imageUrl", refinedImageUrl);
+      
+      toast({
+        title: "Image Refined",
+        description: "Successfully retrieved a high-quality book cover image.",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Error refining image:", error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to refine book cover. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setIsRefiningImage(false);
+    },
+  });
+
+  const handleRefineImage = () => {
+    const bookUrl = form.getValues("link");
+    
+    if (!bookUrl) {
+      toast({
+        title: "Missing Book Link",
+        description: "Please enter a Goodreads book link first to refine the cover image.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    refineImageMutation.mutate(bookUrl);
+  };
 
   async function onSubmit(values: BookFormValues) {
     bookMutation.mutate(values);
@@ -292,9 +338,39 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
                     </a>
                   )}
                 </div>
-                <FormControl>
-                  <Input placeholder="https://example.com/book-cover.jpg" {...field} />
-                </FormControl>
+                <div className="flex space-x-2">
+                  <FormControl className="flex-1">
+                    <Input placeholder="https://example.com/book-cover.jpg" {...field} />
+                  </FormControl>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleRefineImage}
+                          disabled={isRefiningImage || !form.getValues("link")}
+                          className="whitespace-nowrap"
+                        >
+                          {isRefiningImage ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <ImageIcon className="h-4 w-4 mr-1" />
+                          )}
+                          Refine Image
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Get high-quality cover image from Goodreads</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                {isRefiningImage && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Fetching high-quality image from Goodreads...
+                  </p>
+                )}
                 <FormMessage />
               </FormItem>
             )}
