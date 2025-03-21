@@ -29,13 +29,9 @@ import {
 } from "@/components/ui/select";
 import { BookForm } from "./BookForm";
 import { 
-  Book, 
-  Author, 
-  Shelf, 
   BookWithRelations,
   PaginatedResponse 
-} from "../../../types/database";
-import { BookWithRelations as BookWithRelationsClient } from "@/lib/types";
+} from "@/lib/types";
 import { Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 
 export function BookManager() {
@@ -44,7 +40,7 @@ export function BookManager() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [booksPerPage, setBooksPerPage] = useState(10);
-  const [editingBook, setEditingBook] = useState<BookWithRelationsClient | null>(null);
+  const [editingBook, setEditingBook] = useState<BookWithRelations | null>(null);
   const [isAddingBook, setIsAddingBook] = useState(false);
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState("id");
@@ -55,7 +51,7 @@ export function BookManager() {
     data: booksData,
     isLoading,
     error,
-  } = useQuery<PaginatedResponse<BookWithRelationsClient>>({
+  } = useQuery<PaginatedResponse<BookWithRelations>>({
     queryKey: ["admin-books", search, currentPage, booksPerPage, sortBy, sortOrder],
     queryFn: async () => {
       console.log("[Books Admin] Fetching books with search:", search, "page:", currentPage, "limit:", booksPerPage);
@@ -107,7 +103,7 @@ export function BookManager() {
   };
 
   // Handle editing a book
-  const handleEditBook = (book: BookWithRelationsClient) => {
+  const handleEditBook = (book: BookWithRelations) => {
     setEditingBook(book);
   };
 
