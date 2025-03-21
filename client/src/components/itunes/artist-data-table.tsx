@@ -328,8 +328,8 @@ export function ArtistDataTable({
               ))}
             </div>
             <div className="space-y-3">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full" />
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full mb-2" />
               ))}
             </div>
           </div>
