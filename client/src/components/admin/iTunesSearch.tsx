@@ -135,7 +135,7 @@ export function ITunesSearch() {
           {searchResults && (
             <div className="mt-4 space-y-6">
               <div className="mt-4 space-y-4">
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-4">
                   <Input
                     placeholder="Image URL..."
                     value={searchForm.watch("imageUrl")}
@@ -175,7 +175,7 @@ export function ITunesSearch() {
                 <div className="grid gap-4">
                   {searchResults.results?.map((result: any, index: number) => (
                     <Card key={index}>
-                      <CardContent className="p-4">
+                      <CardContent className="p-0">
                         <div className="flex items-center gap-4">
                           <img
                             src={result.artworkUrl100}
@@ -190,6 +190,7 @@ export function ITunesSearch() {
                           </div>
                           <Button
                             variant="outline"
+                            className="mr-2"
                             onClick={() => handleUseArtwork(result)}
                           >
                             Use Artwork

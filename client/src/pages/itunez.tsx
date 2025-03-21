@@ -52,25 +52,25 @@ export default function ITunezPage() {
           <PageTitle size="lg">my itunez data</PageTitle>
         </div>
 
-        <Card className="p-6">
+        <Card className="p-4">
           <TopArtistsSlider onArtistClick={setSelectedArtist} />
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4">
           <YearlyTopArtists
             onArtistClick={setSelectedArtist}
             carouselPosition="right"
           />
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4">
           <YearlyTopSongs
             onArtistClick={setSelectedArtist}
             carouselPosition="left"
           />
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4">
           <ArtistDataTable onArtistClick={setSelectedArtist} />
         </Card>
 
