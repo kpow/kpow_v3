@@ -6,8 +6,120 @@ import {
   GOODREADS_USER_ID,
   GOODREADS_API_KEY,
 } from "../utils/api-utils";
+import { db } from "../../db";
+import { books, authors, shelves, bookAuthors, bookShelves } from "../../db/schema";
+import { desc, eq, sql } from "drizzle-orm";
 
 export function registerGoodreadsRoutes(router: Router) {
+  // New endpoint to fetch books from database
+  router.get("/api/db-books", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string || "1");
+      const perPage = parseInt(req.query.per_page as string || "6");
+      
+      console.log(`Fetching books page ${page} with ${perPage} items per page from database`);
+      
+      // Calculate offset
+      const offset = (page - 1) * perPage;
+      
+      // Get total count
+      const [countResult] = await db.select({ 
+        count: sql<number>`count(*)` 
+      }).from(books);
+      
+      const total = Number(countResult.count);
+      const totalPages = Math.ceil(total / perPage);
+      
+      // Fetch books with pagination
+      const booksData = await db.query.books.findMany({
+        limit: perPage,
+        offset,
+        orderBy: [desc(books.dateRead), desc(books.dateAdded), desc(books.id)],
+        with: {
+          // Load related authors
+          bookAuthors: {
+            with: {
+              author: true
+            }
+          },
+          // Load related shelves
+          bookShelves: {
+            with: {
+              shelf: true
+            }
+          }
+        }
+      });
+      
+      // Transform data to match Goodreads API response format
+      const transformedBooks = booksData.map(book => {
+        // Format data in the structure expected by the frontend
+        return {
+          book: [
+            {
+              id: [book.goodreadsId],
+              title: [book.title],
+              title_without_series: [book.titleWithoutSeries],
+              description: [book.description],
+              image_url: [book.imageUrl],
+              link: [book.link],
+              average_rating: [book.averageRating],
+              authors: [
+                {
+                  author: book.bookAuthors.map(ba => ({
+                    id: [ba.author.goodreadsId],
+                    name: [ba.author.name]
+                  }))
+                }
+              ]
+            }
+          ],
+          ratings: {
+            user_rating: book.userRating,
+            average_rating: book.averageRating
+          },
+          shelves: {
+            shelf: book.bookShelves.map(bs => ({
+              $: {
+                name: bs.shelf.name
+              }
+            }))
+          }
+        };
+      });
+      
+      // Create response
+      const responseData = {
+        GoodreadsResponse: {
+          reviews: [
+            {
+              $: { 
+                total: total.toString(), 
+                start: (offset + 1).toString(), 
+                end: Math.min(offset + perPage, total).toString() 
+              },
+              review: transformedBooks
+            }
+          ]
+        },
+        pagination: {
+          total,
+          start: offset + 1,
+          end: Math.min(offset + perPage, total),
+          currentPage: page,
+          totalPages,
+          hasMore: page < totalPages
+        }
+      };
+      
+      res.json(responseData);
+    } catch (error) {
+      console.error("Error fetching books from database:", error);
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Failed to fetch books from database"
+      });
+    }
+  });
   router.get("/api/books", async (req, res) => {
     try {
       const page = req.query.page || "1";

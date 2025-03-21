@@ -61,12 +61,36 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Always use port 5000 as required by the workflow
-  const PORT = 5000;
-  console.log(`[Server] Attempting to start server on port ${PORT}...`);
-
-  server.listen(PORT, "0.0.0.0", () => {
-    console.log(`[Server] Server is now running on port ${PORT}`);
-    log(`serving on port ${PORT}`);
-  });
+  // Try multiple ports, starting with 5000
+  const PORTS = [5000, 3000, 5001, 8080, 4000];
+  let currentPortIndex = 0;
+  
+  const startServer = () => {
+    if (currentPortIndex >= PORTS.length) {
+      console.error("[Server] Failed to start on any port");
+      process.exit(1);
+      return;
+    }
+    
+    const PORT = PORTS[currentPortIndex];
+    console.log(`[Server] Attempting to start server on port ${PORT}...`);
+    
+    server.listen(PORT, "0.0.0.0")
+      .on("listening", () => {
+        console.log(`[Server] Server is now running on port ${PORT}`);
+        log(`serving on port ${PORT}`);
+      })
+      .on("error", (err: any) => {
+        if (err.code === 'EADDRINUSE') {
+          console.log(`[Server] Port ${PORT} is already in use, trying next port...`);
+          currentPortIndex++;
+          startServer(); // Try next port
+        } else {
+          console.error("[Server] Error starting server:", err);
+          process.exit(1);
+        }
+      });
+  };
+  
+  startServer();
 })();

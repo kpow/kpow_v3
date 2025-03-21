@@ -3,6 +3,8 @@ import { db } from "../db";
 import { parseXMLAsync, GOODREADS_API_BASE, GOODREADS_USER_ID, GOODREADS_API_KEY } from "../server/utils/api-utils";
 import { eq } from "drizzle-orm";
 import { books, authors, shelves, bookAuthors, bookShelves } from "../db/schema";
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Type definitions for Goodreads XML response
 interface GoodreadsResponse {
@@ -14,58 +16,119 @@ interface GoodreadsResponse {
   };
 }
 
+interface MigrationState {
+  lastProcessedPage: number;
+  totalBooks: number;
+  processedBooks: number;
+}
+
+const STATE_FILE = path.join(process.cwd(), 'migration_state.json');
+
 /**
- * Migrate all books from Goodreads to our database
+ * Migrate books from Goodreads to the database using a batched approach
+ * to prevent timeouts
  */
-async function migrateBooks() {
+async function migrateBooksBatch() {
   console.log("Starting migration of books from Goodreads to database");
 
   try {
-    // Get the total count of books
-    const totalBooks = await getTotalBooksCount();
-    console.log(`Found ${totalBooks} books to migrate`);
+    // Get or create migration state
+    let state = await loadState();
+    
+    // If starting fresh, get the total count of books
+    if (state.lastProcessedPage === 0) {
+      state.totalBooks = await getTotalBooksCount();
+      console.log(`Found ${state.totalBooks} books to migrate`);
+      await saveState(state);
+    } else {
+      console.log(`Resuming migration from page ${state.lastProcessedPage + 1}`);
+      console.log(`Processed ${state.processedBooks}/${state.totalBooks} books so far`);
+    }
 
-    // For testing, just process the first page with a small batch size
-    const batchSize = 2;
-    let processedBooks = 0;
+    // Process a small batch per run
+    const batchSize = 5; // Limit per page
+    const currentPage = state.lastProcessedPage + 1;
     
-    console.log(`Processing only first page with ${batchSize} books for testing`);
+    console.log(`Processing page ${currentPage} with batch size ${batchSize}`);
     
-    const booksData = await fetchGoodreadsPage(1, batchSize);
+    const booksData = await fetchGoodreadsPage(currentPage, batchSize);
     console.log("Successfully received data from Goodreads API");
     
     if (!booksData || !booksData.GoodreadsResponse || !booksData.GoodreadsResponse.reviews) {
-      console.error("Unexpected API response format:", JSON.stringify(booksData));
-      return 0;
+      console.error("Unexpected API response format");
+      return state.processedBooks;
     }
     
     const reviews = booksData.GoodreadsResponse.reviews[0].review;
     
     if (!reviews || !Array.isArray(reviews) || reviews.length === 0) {
-      console.warn("No reviews found on first page");
-      return 0;
+      console.warn(`No reviews found on page ${currentPage}, migration may be complete`);
+      return state.processedBooks;
     }
     
-    console.log(`Found ${reviews.length} books on page 1, processing...`);
+    console.log(`Found ${reviews.length} books on page ${currentPage}, processing...`);
     
-    // Process each book in the current page
+    // Process each book in the current batch
     for (const review of reviews) {
       try {
         console.log(`Processing book: ${review.book?.[0]?.title?.[0] || "Unknown Title"}`);
         await processBook(review);
-        processedBooks++;
-        console.log(`Successfully processed book ${processedBooks}`);
+        state.processedBooks++;
+        console.log(`Successfully processed book ${state.processedBooks}/${state.totalBooks}`);
       } catch (err) {
         console.error("Error processing individual book:", err);
         // Continue with next book
       }
     }
 
-    console.log("✅ Testing migration completed successfully");
-    return processedBooks;
+    // Update state for the next batch
+    state.lastProcessedPage = currentPage;
+    await saveState(state);
+
+    console.log(`✅ Batch migration completed successfully - ${state.processedBooks}/${state.totalBooks} books processed`);
+    
+    // Check if migration is complete
+    if (state.processedBooks >= state.totalBooks) {
+      console.log("🎉 Full migration completed!");
+    } else {
+      console.log(`📝 Migration in progress. Run again to process the next batch.`);
+    }
+    
+    return state.processedBooks;
   } catch (error) {
     console.error("Error during migration:", error);
     throw error;
+  }
+}
+
+/**
+ * Load the current migration state from file
+ */
+async function loadState(): Promise<MigrationState> {
+  try {
+    if (fs.existsSync(STATE_FILE)) {
+      const data = fs.readFileSync(STATE_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    console.warn("Could not load migration state, starting fresh:", err);
+  }
+  
+  return {
+    lastProcessedPage: 0,
+    totalBooks: 0,
+    processedBooks: 0
+  };
+}
+
+/**
+ * Save the current migration state to file
+ */
+async function saveState(state: MigrationState): Promise<void> {
+  try {
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  } catch (err) {
+    console.error("Error saving migration state:", err);
   }
 }
 
@@ -124,10 +187,9 @@ async function fetchGoodreadsPage(page: number, perPage: number): Promise<Goodre
 
 /**
  * Process a single book and insert it into the database
+ * Using camelCase property names to match the schema
  */
-async function processBook(
-  review: any
-): Promise<void> {
+async function processBook(review: any): Promise<void> {
   try {
     const bookData = review.book[0];
     const goodreadsId = bookData.id?.[0] || null;
@@ -135,7 +197,7 @@ async function processBook(
     // Check if the book already exists
     const existingBook = goodreadsId 
       ? await db.query.books.findFirst({
-          where: eq(books.goodreads_id, goodreadsId)
+          where: eq(books.goodreadsId, goodreadsId)
         })
       : null;
     
@@ -144,24 +206,24 @@ async function processBook(
       return;
     }
     
-    // Insert book
+    // Insert book with camelCase property names
     const [insertedBook] = await db.insert(books).values({
-      goodreads_id: goodreadsId,
+      goodreadsId: goodreadsId,
       title: bookData.title?.[0] || "Untitled",
-      title_without_series: bookData.title_without_series?.[0] || null,
+      titleWithoutSeries: bookData.title_without_series?.[0] || null,
       description: bookData.description?.[0] || null,
-      image_url: bookData.image_url?.[0] || null,
+      imageUrl: bookData.image_url?.[0] || null,
       link: bookData.link?.[0] || null,
-      average_rating: bookData.average_rating?.[0] || null,
+      averageRating: bookData.average_rating?.[0] || null,
       isbn: bookData.isbn?.[0] || null,
       isbn13: bookData.isbn13?.[0] || null,
       pages: bookData.num_pages?.[0] ? parseInt(bookData.num_pages[0]) : null,
-      publication_year: bookData.publication_year?.[0] ? parseInt(bookData.publication_year[0]) : null,
+      publicationYear: bookData.publication_year?.[0] ? parseInt(bookData.publication_year[0]) : null,
       publisher: bookData.publisher?.[0] || null,
       language: bookData.language_code?.[0] || null,
-      date_added: bookData.date_added?.[0] ? new Date(bookData.date_added[0]) : null,
-      date_read: bookData.date_read?.[0] ? new Date(bookData.date_read[0]) : null,
-      user_rating: review.rating?.[0] || "0"
+      dateAdded: bookData.date_added?.[0] ? new Date(bookData.date_added[0]) : null,
+      dateRead: bookData.date_read?.[0] ? new Date(bookData.date_read[0]) : null,
+      userRating: review.rating?.[0] || "0"
     }).returning();
     
     // Process authors
@@ -190,17 +252,16 @@ async function processBook(
 
 /**
  * Process an author and insert or update in the database
+ * Using camelCase property names to match the schema
  */
-async function processAuthor(
-  authorData: any
-): Promise<number> {
+async function processAuthor(authorData: any): Promise<number> {
   try {
     const goodreadsId = authorData.id?.[0] || null;
     
     // Check if author already exists
     let author = goodreadsId 
       ? await db.query.authors.findFirst({
-          where: eq(authors.goodreads_id, goodreadsId)
+          where: eq(authors.goodreadsId, goodreadsId)
         })
       : null;
     
@@ -208,14 +269,14 @@ async function processAuthor(
       return author.id;
     }
     
-    // Insert author
+    // Insert author with camelCase property names
     const [insertedAuthor] = await db.insert(authors).values({
-      goodreads_id: goodreadsId,
+      goodreadsId: goodreadsId,
       name: authorData.name?.[0] || "Unknown Author",
-      image_url: authorData.image_url?.[0] || null,
-      average_rating: authorData.average_rating?.[0] || null,
-      ratings_count: authorData.ratings_count?.[0] ? parseInt(authorData.ratings_count[0]) : null,
-      text_reviews_count: authorData.text_reviews_count?.[0] ? parseInt(authorData.text_reviews_count[0]) : null
+      imageUrl: authorData.image_url?.[0] || null,
+      averageRating: authorData.average_rating?.[0] || null,
+      ratingsCount: authorData.ratings_count?.[0] ? parseInt(authorData.ratings_count[0]) : null,
+      textReviewsCount: authorData.text_reviews_count?.[0] ? parseInt(authorData.text_reviews_count[0]) : null
     }).returning();
     
     return insertedAuthor.id;
@@ -228,9 +289,7 @@ async function processAuthor(
 /**
  * Process a shelf and insert or update in the database
  */
-async function processShelf(
-  shelfName: string
-): Promise<number> {
+async function processShelf(shelfName: string): Promise<number> {
   try {
     // Check if shelf already exists
     let shelf = await db.query.shelves.findFirst({
@@ -255,12 +314,13 @@ async function processShelf(
 
 /**
  * Link an author to a book
+ * Using camelCase property names to match the schema
  */
 async function linkAuthorToBook(authorId: number, bookId: number): Promise<void> {
   try {
     await db.insert(bookAuthors).values({
-      book_id: bookId,
-      author_id: authorId
+      bookId: bookId,
+      authorId: authorId
     }).onConflictDoNothing();
   } catch (error) {
     console.error("Error linking author to book:", error);
@@ -270,12 +330,13 @@ async function linkAuthorToBook(authorId: number, bookId: number): Promise<void>
 
 /**
  * Link a shelf to a book
+ * Using camelCase property names to match the schema
  */
 async function linkShelfToBook(shelfId: number, bookId: number): Promise<void> {
   try {
     await db.insert(bookShelves).values({
-      book_id: bookId,
-      shelf_id: shelfId
+      bookId: bookId,
+      shelfId: shelfId
     }).onConflictDoNothing();
   } catch (error) {
     console.error("Error linking shelf to book:", error);
@@ -283,18 +344,16 @@ async function linkShelfToBook(shelfId: number, bookId: number): Promise<void> {
   }
 }
 
-// Run the script if executed directly
-if (true) { // Always run when imported with tsx
-  console.log("Starting book migration script...");
-  migrateBooks()
-    .then(count => {
-      console.log(`Successfully migrated ${count} books from Goodreads`);
-      process.exit(0);
-    })
-    .catch(error => {
-      console.error("Migration failed:", error);
-      process.exit(1);
-    });
-}
+// Always run when imported with tsx
+console.log("Starting book migration script...");
+migrateBooksBatch()
+  .then(count => {
+    console.log(`Successfully migrated ${count} books from Goodreads`);
+    process.exit(0);
+  })
+  .catch(error => {
+    console.error("Migration failed:", error);
+    process.exit(1);
+  });
 
-export { migrateBooks };
+export { migrateBooksBatch };

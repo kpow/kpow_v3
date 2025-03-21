@@ -16,6 +16,7 @@ interface GoodreadsResponse {
 
 /**
  * Migrate all books from Goodreads to our database
+ * This version uses a limited batch to prevent timeout
  */
 async function migrateBooks() {
   console.log("Starting migration of books from Goodreads to database");
@@ -25,7 +26,7 @@ async function migrateBooks() {
     const totalBooks = await getTotalBooksCount();
     console.log(`Found ${totalBooks} books to migrate`);
 
-    // For testing, just process the first page with a small batch size
+    // For testing, just process one page with a small batch
     const batchSize = 2;
     let processedBooks = 0;
     
@@ -124,6 +125,7 @@ async function fetchGoodreadsPage(page: number, perPage: number): Promise<Goodre
 
 /**
  * Process a single book and insert it into the database
+ * Using snake_case for all property names to match database column names
  */
 async function processBook(
   review: any
@@ -144,7 +146,9 @@ async function processBook(
       return;
     }
     
-    // Insert book
+    console.log("Inserting new book:", bookData.title?.[0]);
+    
+    // Insert book with snake_case property names
     const [insertedBook] = await db.insert(books).values({
       goodreads_id: goodreadsId,
       title: bookData.title?.[0] || "Untitled",
@@ -163,6 +167,8 @@ async function processBook(
       date_read: bookData.date_read?.[0] ? new Date(bookData.date_read[0]) : null,
       user_rating: review.rating?.[0] || "0"
     }).returning();
+    
+    console.log("Book inserted successfully with ID:", insertedBook.id);
     
     // Process authors
     if (bookData.authors && bookData.authors[0] && bookData.authors[0].author) {
@@ -190,6 +196,7 @@ async function processBook(
 
 /**
  * Process an author and insert or update in the database
+ * Using snake_case for all property names to match database column names
  */
 async function processAuthor(
   authorData: any
@@ -208,7 +215,9 @@ async function processAuthor(
       return author.id;
     }
     
-    // Insert author
+    console.log("Inserting new author:", authorData.name?.[0]);
+    
+    // Insert author with snake_case property names
     const [insertedAuthor] = await db.insert(authors).values({
       goodreads_id: goodreadsId,
       name: authorData.name?.[0] || "Unknown Author",
@@ -217,6 +226,8 @@ async function processAuthor(
       ratings_count: authorData.ratings_count?.[0] ? parseInt(authorData.ratings_count[0]) : null,
       text_reviews_count: authorData.text_reviews_count?.[0] ? parseInt(authorData.text_reviews_count[0]) : null
     }).returning();
+    
+    console.log("Author inserted successfully with ID:", insertedAuthor.id);
     
     return insertedAuthor.id;
   } catch (error) {
@@ -241,10 +252,14 @@ async function processShelf(
       return shelf.id;
     }
     
+    console.log("Inserting new shelf:", shelfName);
+    
     // Insert shelf
     const [insertedShelf] = await db.insert(shelves).values({
       name: shelfName
     }).returning();
+    
+    console.log("Shelf inserted successfully with ID:", insertedShelf.id);
     
     return insertedShelf.id;
   } catch (error) {
@@ -255,13 +270,18 @@ async function processShelf(
 
 /**
  * Link an author to a book
+ * Using snake_case for all property names to match database column names
  */
 async function linkAuthorToBook(authorId: number, bookId: number): Promise<void> {
   try {
+    console.log(`Linking author ${authorId} to book ${bookId}`);
+    
     await db.insert(bookAuthors).values({
       book_id: bookId,
       author_id: authorId
     }).onConflictDoNothing();
+    
+    console.log("Author-book link created successfully");
   } catch (error) {
     console.error("Error linking author to book:", error);
     throw error;
@@ -270,31 +290,34 @@ async function linkAuthorToBook(authorId: number, bookId: number): Promise<void>
 
 /**
  * Link a shelf to a book
+ * Using snake_case for all property names to match database column names
  */
 async function linkShelfToBook(shelfId: number, bookId: number): Promise<void> {
   try {
+    console.log(`Linking shelf ${shelfId} to book ${bookId}`);
+    
     await db.insert(bookShelves).values({
       book_id: bookId,
       shelf_id: shelfId
     }).onConflictDoNothing();
+    
+    console.log("Shelf-book link created successfully");
   } catch (error) {
     console.error("Error linking shelf to book:", error);
     throw error;
   }
 }
 
-// Run the script if executed directly
-if (true) { // Always run when imported with tsx
-  console.log("Starting book migration script...");
-  migrateBooks()
-    .then(count => {
-      console.log(`Successfully migrated ${count} books from Goodreads`);
-      process.exit(0);
-    })
-    .catch(error => {
-      console.error("Migration failed:", error);
-      process.exit(1);
-    });
-}
+// Always run when imported with tsx
+console.log("Starting book migration script...");
+migrateBooks()
+  .then(count => {
+    console.log(`Successfully migrated ${count} books from Goodreads`);
+    process.exit(0);
+  })
+  .catch(error => {
+    console.error("Migration failed:", error);
+    process.exit(1);
+  });
 
 export { migrateBooks };

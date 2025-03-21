@@ -56,11 +56,11 @@ export default function Books({ params }: { params?: { page?: string } }) {
   }
 
   const { data, isLoading, error } = useQuery<GoodreadsResponse>({
-    queryKey: [`/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`],
+    queryKey: [`/api/db-books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`],
     queryFn: async () => {
-      console.log(`Fetching page ${currentPage} of books...`);
+      console.log(`Fetching page ${currentPage} of books from database...`);
       const response = await fetch(
-        `/api/books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`,
+        `/api/db-books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`,
         {
           credentials: "include",
         },
