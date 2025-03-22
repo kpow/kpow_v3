@@ -10,6 +10,7 @@ BATCH_SIZE=${1:-5}
 echo "Running book genre enrichment script with batch size: $BATCH_SIZE"
 
 # Run the TypeScript script with appropriate node flags
-node --no-warnings --import tsx/esm scripts/enrich_book_genres.ts $BATCH_SIZE
+# Use the correct path relative to the current directory
+node --no-warnings --import tsx/esm enrich_book_genres.ts $BATCH_SIZE
 
 echo "Genre enrichment process completed"
