@@ -50,11 +50,34 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 18;
+import { useState, useEffect } from "react";
+
+function useResponsivePageSize() {
+  const [pageSize, setPageSize] = useState(6); // Default to mobile size
+
+  useEffect(() => {
+    function updatePageSize() {
+      if (window.matchMedia("(min-width: 1024px)").matches) {
+        setPageSize(18); // Large screens
+      } else if (window.matchMedia("(min-width: 768px)").matches) {
+        setPageSize(12); // Medium screens
+      } else {
+        setPageSize(6); // Mobile
+      }
+    }
+
+    updatePageSize();
+    window.addEventListener("resize", updatePageSize);
+    return () => window.removeEventListener("resize", updatePageSize);
+  }, []);
+
+  return pageSize;
+}
 
 export default function Books({ params }: { params?: { page?: string } }) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
   const [, setLocation] = useLocation();
+  const booksPerPage = useResponsivePageSize();
 
   // Handle invalid page numbers
   if (params?.page && (isNaN(currentPage) || currentPage < 1)) {
@@ -63,11 +86,11 @@ export default function Books({ params }: { params?: { page?: string } }) {
   }
 
   const { data, isLoading, error } = useQuery<GoodreadsResponse>({
-    queryKey: [`/api/db-books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`],
+    queryKey: [`/api/db-books?page=${currentPage}&per_page=${booksPerPage}`],
     queryFn: async () => {
       console.log(`Fetching page ${currentPage} of books from database...`);
       const response = await fetch(
-        `/api/db-books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`,
+        `/api/db-books?page=${currentPage}&per_page=${booksPerPage}`,
         {
           credentials: "include",
         },
@@ -156,7 +179,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           </div>
         </div>
         <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-          {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
+          {[...Array(booksPerPage)].map((_, i) => (
             <Skeleton key={i} className="h-[100px] w-full" />
           ))}
         </div>
