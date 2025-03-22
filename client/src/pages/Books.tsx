@@ -50,7 +50,7 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 12;
+const BOOKS_PER_PAGE = 15;
 
 export default function Books({ params }: { params?: { page?: string } }) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
