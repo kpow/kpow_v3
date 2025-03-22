@@ -13,14 +13,19 @@ import axios from "axios";
 import * as cheerio from 'cheerio';
 import { db } from "../db";
 import { books } from "../db/schema";
-import { eq, sql, isNull, or, like } from "drizzle-orm";
+import { eq, sql, isNull, or, like, and } from "drizzle-orm";
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from "util";
+import { fileURLToPath } from 'url';
+
+// Get directory name in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Constants
 const STATE_FILE = path.join(__dirname, 'book_images_enrichment_state.json');
-const BATCH_SIZE = 10; // Default number of books to process in one run
+let BATCH_SIZE = 10; // Default number of books to process in one run
 const DELAY_MS = 1000; // Delay between requests to avoid rate limiting
 
 // Promise-based setTimeout
@@ -220,27 +225,37 @@ async function getTotalBooksCount(): Promise<number> {
  */
 async function getBooksForImageEnrichment(lastBookId: number | null, limit: number) {
   try {
-    let query = `
-      SELECT id, title, link, image_url
-      FROM books
-      WHERE link LIKE '%goodreads.com%'
-      AND (
-        image_url IS NULL
-        OR image_url LIKE '%nophoto%'
-        OR image_url LIKE '%nocover%'
-        OR image_url LIKE '%s.gr-assets.com%'
+    // Using drizzle query API instead of raw SQL to avoid parameterization issues
+    let baseQuery = db.select({
+      id: books.id,
+      title: books.title,
+      link: books.link,
+      image_url: books.imageUrl
+    })
+    .from(books)
+    .where(
+      and(
+        like(books.link, '%goodreads.com%'),
+        or(
+          isNull(books.imageUrl),
+          like(books.imageUrl, '%nophoto%'),
+          like(books.imageUrl, '%nocover%'),
+          like(books.imageUrl, '%s.gr-assets.com%')
+        ),
+        // Add the lastBookId condition if provided
+        lastBookId !== null ? sql`${books.id} > ${lastBookId}` : undefined
       )
-    `;
+    );
     
-    if (lastBookId !== null) {
-      query += ` AND id > $1`;
-    }
+    // Add order by and limit
+    const query = baseQuery.limit(limit);
     
-    query += ` ORDER BY id LIMIT $${lastBookId !== null ? '2' : '1'}`;
+    // Run the query and format the result to match the expected structure
+    const results = await query;
     
-    const params = lastBookId !== null ? [lastBookId, limit] : [limit];
-    
-    return await db.execute(sql.raw(query, params));
+    return {
+      rows: results
+    };
   } catch (error) {
     console.error("Error fetching books for image enrichment:", error);
     throw error;
