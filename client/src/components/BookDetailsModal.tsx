@@ -1,0 +1,208 @@
+import * as React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Book, BookOpen, Calendar, User, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Bio section component with proper hook usage
+const DescriptionSection = ({ description }: { description: string }) => {
+  const [showFullDescription, setShowFullDescription] = React.useState(false);
+  const MAX_VISIBLE_CHARACTERS = 720; // Show first characters initially
+  
+  // Truncate by character count
+  const visibleDescription = showFullDescription 
+    ? description 
+    : description.substring(0, MAX_VISIBLE_CHARACTERS) + (description.length > MAX_VISIBLE_CHARACTERS ? '...' : '');
+  
+  const hasMoreContent = description.length > MAX_VISIBLE_CHARACTERS;
+  
+  return (
+    <div className="text-sm leading-relaxed">
+      <p>{visibleDescription}</p>
+      {hasMoreContent && (
+        <Button 
+          variant="link" 
+          size="sm" 
+          className="px-0 mt-2 font-bold" 
+          onClick={() => setShowFullDescription(!showFullDescription)}
+        >
+          {showFullDescription ? "Show Less -" : "Show More +"}
+        </Button>
+      )}
+    </div>
+  );
+};
+
+interface Book {
+  book: {
+    title: string[];
+    description: string[];
+    image_url: string[];
+    link: string[];
+    authors: Array<{
+      author: Array<{
+        name: string[];
+      }>;
+    }>;
+  };
+  ratings: {
+    user_rating: string;
+    average_rating: string;
+  };
+  shelves?: {
+    shelf: Array<{
+      $: {
+        name: string;
+      };
+    }>;
+  };
+}
+
+interface BookDetailsModalProps {
+  review: Book;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function BookDetailsModal({
+  review,
+  isOpen,
+  onClose,
+}: BookDetailsModalProps) {
+  if (!review || !review.book) return null;
+
+  const title = review?.book[0]?.title?.[0] ?? "Untitled Book";
+  const imageUrl = review?.book[0]?.image_url?.[0] ?? "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
+  const authorName = review?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
+  const description = review?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "No description available";
+  const bookLink = review?.book[0]?.link?.[0] ?? "#";
+  const userRating = parseFloat(review.ratings?.user_rating ?? "0");
+  const averageRating = parseFloat(review.ratings?.average_rating ?? "0");
+  const shelves = review.shelves?.shelf ?? [];
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[820px] max-h-[80vh] min-h-[600px] overflow-y-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+        <DialogHeader className="flex flex-col space-y-2">
+          <DialogTitle className="font-slackey text-2xl text-center">
+            {title}
+          </DialogTitle>
+          <p className="text-center text-sm text-muted-foreground">
+            by {authorName}
+          </p>
+        </DialogHeader>
+
+        <motion.div 
+          className="space-y-4 pt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Stats and Image Section - Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Stats Section - Left 1/2 */}
+            <div className="flex flex-col space-y-3">
+              <div className="flex items-center space-x-2 bg-primary/10 p-3 rounded-lg border border-primary/20">
+                <Star className="h-4 w-4 text-primary" />
+                <div className="flex flex-col">
+                  <span className="text-xs">Your Rating</span>
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <span
+                        key={`user-${i}`}
+                        className={`text-sm ${i < userRating ? "text-yellow-400" : "text-gray-300"}`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
+                <Star className="h-4 w-4 text-primary" />
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground">Average Rating</span>
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <span
+                        key={`avg-${i}`}
+                        className={`text-sm ${i < averageRating ? "text-yellow-400" : "text-gray-300"}`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {shelves && shelves.length > 0 && (
+                <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
+                  <BookOpen className="h-4 w-4 text-primary" />
+                  <div className="flex flex-col">
+                    <span className="text-xs text-muted-foreground">Shelves</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {shelves.map((shelf, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {shelf.$.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <a
+                href={bookLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg hover:bg-muted/80 transition-colors"
+              >
+                <Book className="h-4 w-4 text-primary" />
+                <span className="text-sm">View on Goodreads</span>
+              </a>
+            </div>
+
+            {/* Book Image - Right 1/2 */}
+            <div className="md:col-span-1">
+              <div className="relative overflow-hidden rounded-lg max-h-[300px]">
+                <motion.img
+                  src={imageUrl}
+                  alt={title}
+                  className="w-full h-full object-contain rounded-lg"
+                  initial={{ scale: 1.1 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Description Section */}
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <Book className="h-4 w-4 text-primary" />
+              <h3 className="text-lg font-semibold">Description</h3>
+            </div>
+
+            <motion.div 
+              className="space-y-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <DescriptionSection description={description} />
+            </motion.div>
+          </div>
+        </motion.div>
+      </DialogContent>
+    </Dialog>
+  );
+}

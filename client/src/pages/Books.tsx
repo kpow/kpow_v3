@@ -24,6 +24,13 @@ interface Book {
     user_rating: string;
     average_rating: string;
   };
+  shelves?: {
+    shelf: Array<{
+      $: {
+        name: string;
+      };
+    }>;
+  };
 }
 
 interface GoodreadsResponse {
@@ -43,7 +50,7 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 8;
+const BOOKS_PER_PAGE = 12;
 
 export default function Books({ params }: { params?: { page?: string } }) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
@@ -148,9 +155,9 @@ export default function Books({ params }: { params?: { page?: string } }) {
             </Button>
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
-            <Skeleton key={i} className="h-[240px] w-full" />
+            <Skeleton key={i} className="h-[140px] w-full" />
           ))}
         </div>
         <div className="flex justify-center gap-2 items-center mt-3">
@@ -203,7 +210,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
           {books.map((review: Book, index: number) => (
             <BookCard key={`${currentPage}-${index}`} review={review} />
           ))}

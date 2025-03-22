@@ -1,4 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
+import { BookDetailsModal } from "@/components/BookDetailsModal";
 
 interface Book {
   book: {
@@ -30,12 +32,14 @@ interface BookCardProps {
 }
 
 export function BookCard({ review }: BookCardProps) {
+  const [modalOpen, setModalOpen] = useState(false);
+
   if (!review || !review.book) {
     return (
       <Card className="overflow-hidden h-full">
         <CardContent className="p-4">
           <div className="flex gap-4">
-            <div className="w-36 h-48 bg-muted flex items-center justify-center">
+            <div className="w-24 h-36 bg-muted flex items-center justify-center">
               No Image
             </div>
             <div className="flex-1">
@@ -56,63 +60,50 @@ export function BookCard({ review }: BookCardProps) {
   const averageRating = parseFloat(review.ratings?.average_rating ?? "0");
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-0">
-        <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-48 h-full min-h-[300px] relative bg-black">
-            <img
-              src={imageUrl}
-              alt={title}
-              className="absolute inset-0 w-full h-full object-contain"
-            />
-          </div>
-          <div className="flex-1 p-4">
-            <h3 className="font-semibold text-lg">{title}</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              by {authorName}
-            </p>
-            <div className="flex gap-4 mt-2">
-              <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">Your Rating</span>
+    <>
+      <Card 
+        className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200"
+        onClick={() => setModalOpen(true)}
+      >
+        <CardContent className="p-0">
+          <div className="flex flex-row">
+            <div className="w-24 h-36 relative bg-black flex-shrink-0">
+              <img
+                src={imageUrl}
+                alt={title}
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            </div>
+            <div className="flex-1 p-3">
+              <h3 className="font-semibold text-base line-clamp-1">{title}</h3>
+              <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                by {authorName}
+              </p>
+              <div className="flex gap-2 mt-2">
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, i) => (
                     <span
                       key={`user-${i}`}
-                      className={`text-sm ${i < userRating ? "text-yellow-400" : "text-gray-300"}`}
+                      className={`text-xs ${i < userRating ? "text-yellow-400" : "text-gray-300"}`}
                     >
                       ★
                     </span>
                   ))}
                 </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">Average</span>
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <span
-                      key={`avg-${i}`}
-                      className={`text-sm ${i < averageRating ? "text-yellow-400" : "text-gray-300"}`}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-              </div>
+              <p className="text-xs text-muted-foreground line-clamp-2 mt-2">
+                {description}
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-6 mt-2">
-              {description}
-            </p>
-            <a
-              href={bookLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-            >
-              View on Goodreads →
-            </a>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <BookDetailsModal 
+        review={review} 
+        isOpen={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+      />
+    </>
   );
 }
