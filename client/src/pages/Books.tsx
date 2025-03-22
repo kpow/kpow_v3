@@ -155,7 +155,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
             </Button>
           </div>
         </div>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
             <Skeleton key={i} className="h-[140px] w-full" />
           ))}
@@ -210,7 +210,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           />
         </div>
 
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 mb-8">
           {books.map((review: Book, index: number) => (
             <BookCard key={`${currentPage}-${index}`} review={review} />
           ))}
