@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Script to run the book genre enrichment process
+# Usage: ./run_book_genre_enrichment.sh [batch_size]
+# Example: ./run_book_genre_enrichment.sh 10
 
-echo "Starting book genre enrichment..."
+# Default batch size
+BATCH_SIZE=${1:-5}
 
-# Run the enrichment script with node and the proper ESM import flag
-node --import tsx scripts/enrich_book_genres.ts
+echo "Running book genre enrichment script with batch size: $BATCH_SIZE"
 
-# Check if the script was successful
-if [ $? -eq 0 ]; then
-  echo "Book genre enrichment completed successfully!"
-else
-  echo "Book genre enrichment failed. Check the logs for details."
-fi
+# Run the TypeScript script with appropriate node flags
+node --no-warnings --import tsx/esm scripts/enrich_book_genres.ts $BATCH_SIZE
+
+echo "Genre enrichment process completed"

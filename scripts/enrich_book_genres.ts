@@ -29,7 +29,8 @@ const initialState: EnrichmentState = {
 };
 
 // Max number of books to process in one run (can be adjusted)
-const BATCH_SIZE = 10;
+// Using a smaller batch size for testing - this can be overridden via command line
+let BATCH_SIZE = 5;
 
 /**
  * Main function to enrich book genres from Goodreads
@@ -372,6 +373,15 @@ async function saveState(state: EnrichmentState): Promise<void> {
 const isMainModule = import.meta.url === `file://${process.argv[1]}`;
 
 if (isMainModule) {
+  // Check if a custom batch size was provided
+  const customBatchSize = process.argv[2] ? parseInt(process.argv[2], 10) : null;
+  
+  // If a valid batch size was provided, override the default
+  if (customBatchSize && !isNaN(customBatchSize) && customBatchSize > 0) {
+    console.log(`Using custom batch size: ${customBatchSize}`);
+    BATCH_SIZE = customBatchSize;
+  }
+  
   enrichBookGenres()
     .then(() => {
       console.log("Book genre enrichment process completed");
