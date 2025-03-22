@@ -134,15 +134,15 @@ export function BookDetailsModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Stats Section - Left 1/2 */}
             <div className="flex flex-col space-y-3">
-              <div className="flex items-center space-x-2 bg-primary/10 p-3 rounded-lg border border-primary/20">
+              <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg border border-primary/20">
                 <Star className="h-4 w-4 text-primary" />
                 <div className="flex flex-col">
-                  <span className="text-xs">Your Rating</span>
+                  <span className="text-xs font-bold font-slackey">Your Rating</span>
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={`user-${i}`}
-                        className={`text-sm ${i < userRating ? "text-yellow-400" : "text-gray-300"}`}
+                        className={`text-sm ${i < userRating ? "text-black" : "text-gray-400"}`}
                       >
                         ★
                       </span>
@@ -154,12 +154,15 @@ export function BookDetailsModal({
               <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
                 <Star className="h-4 w-4 text-primary" />
                 <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground">Average Rating</span>
+                  <div>
+                     <span className="text-xs font-bold font-slackey">Average Rating: </span><span className="text-xs">{averageRating}</span>
+                  </div>
+                 
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={`avg-${i}`}
-                        className={`text-sm ${i < averageRating ? "text-yellow-400" : "text-gray-300"}`}
+                        className={`text-sm ${i < averageRating ? "text-black" : "text-gray-400"}`}
                       >
                         ★
                       </span>
@@ -170,12 +173,12 @@ export function BookDetailsModal({
 
               {shelves && shelves.length > 0 && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
-                  <BookOpen className="h-4 w-4 text-primary" />
+                  <BookOpen className="h-8 w-8 text-primary" />
                   <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground">Shelves</span>
+                    <span className="text-xs font-bold font-slackey">Shelves</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {shelves.map((shelf, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} variant="outline" className="text-xs border-black">
                           {shelf.$.name}
                         </Badge>
                       ))}
@@ -191,8 +194,30 @@ export function BookDetailsModal({
                 className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg hover:bg-muted/80 transition-colors"
               >
                 <Book className="h-4 w-4 text-primary" />
-                <span className="text-sm">View on Goodreads</span>
+                <span className="text-xs font-bold font-slackey">View on Goodreads</span>
               </a>
+
+              <div className="flex justify-between items-center mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrevious}
+                  disabled={currentIdx === 0}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNext}
+                  disabled={currentIdx === allBooks.length - 1}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+              
             </div>
 
             {/* Book Image - Right 1/2 */}
@@ -211,26 +236,7 @@ export function BookDetailsModal({
           </div>
 
           {/* Description Section */}
-          <div className="flex justify-between items-center mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePrevious}
-              disabled={currentIdx === 0}
-            >
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNext}
-              disabled={currentIdx === allBooks.length - 1}
-            >
-              Next
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
+          
 
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-2">

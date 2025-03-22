@@ -91,7 +91,8 @@ export function BookCard({ review, allBooks, currentIndex }: BookCardProps) {
                 <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
                   by {authorName}
                 </p>
-                <div className="flex gap-2 mt-1 ml-2">
+                <div className="flex gap-2 mt-1 ml-4">
+                 
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <span
