@@ -225,11 +225,11 @@ export function BookDetailsModal({
 
             {/* Book Image - Right 1/2 */}
             <div className="md:col-span-1 flex items-center justify-center">
-              <div className="relative overflow-hidden rounded-lg w-full h-[450px]">
+              <div className="relative overflow-hidden rounded-lg w-full h-[450px] bg-black flex items-center justify-center">
                 <motion.img
                   src={imageUrl}
                   alt={title}
-                  className="w-full h-full object-cover rounded-lg shadow-md"
+                  className="w-auto h-auto max-w-full max-h-full object-contain rounded-lg shadow-md"
                   initial={{ scale: 1.1 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.4 }}
