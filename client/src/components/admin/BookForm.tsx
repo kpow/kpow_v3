@@ -272,9 +272,13 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
                         />
                       </FormControl>
                       <datalist id={`author-suggestions-${index}`}>
-                        {authorsData?.map((author: any) => (
-                          <option key={author.id} value={author.name} />
-                        ))}
+                        {Array.isArray(authorsData) 
+                          ? authorsData.map((author: any) => (
+                              <option key={author.id} value={author.name} />
+                            ))
+                          : authorsData?.authors?.map((author: any) => (
+                              <option key={author.id} value={author.name} />
+                            ))}
                       </datalist>
                       <FormMessage />
                     </FormItem>
@@ -593,9 +597,13 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
                         />
                       </FormControl>
                       <datalist id={`shelf-suggestions-${index}`}>
-                        {shelvesData?.map((shelf: any) => (
-                          <option key={shelf.id} value={shelf.name} />
-                        ))}
+                        {Array.isArray(shelvesData) 
+                          ? shelvesData.map((shelf: any) => (
+                              <option key={shelf.id} value={shelf.name} />
+                            ))
+                          : shelvesData?.shelves?.map((shelf: any) => (
+                              <option key={shelf.id} value={shelf.name} />
+                            ))}
                       </datalist>
                       <FormMessage />
                     </FormItem>

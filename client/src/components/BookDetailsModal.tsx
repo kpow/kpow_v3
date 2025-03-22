@@ -5,7 +5,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Book as BookIcon, BookOpen, Calendar, User, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Book as BookIcon,
+  BookOpen,
+  Calendar,
+  User,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -16,22 +24,23 @@ import { Book } from "@/types/books";
 const DescriptionSection = ({ description }: { description: string }) => {
   const [showFullDescription, setShowFullDescription] = React.useState(false);
   const MAX_VISIBLE_CHARACTERS = 720; // Show first characters initially
-  
+
   // Truncate by character count
-  const visibleDescription = showFullDescription 
-    ? description 
-    : description.substring(0, MAX_VISIBLE_CHARACTERS) + (description.length > MAX_VISIBLE_CHARACTERS ? '...' : '');
-  
+  const visibleDescription = showFullDescription
+    ? description
+    : description.substring(0, MAX_VISIBLE_CHARACTERS) +
+      (description.length > MAX_VISIBLE_CHARACTERS ? "..." : "");
+
   const hasMoreContent = description.length > MAX_VISIBLE_CHARACTERS;
-  
+
   return (
     <div className="text-sm leading-relaxed">
       <p>{visibleDescription}</p>
       {hasMoreContent && (
-        <Button 
-          variant="link" 
-          size="sm" 
-          className="px-0 mt-2 font-bold" 
+        <Button
+          variant="link"
+          size="sm"
+          className="px-0 mt-2 font-bold"
           onClick={() => setShowFullDescription(!showFullDescription)}
         >
           {showFullDescription ? "Show Less -" : "Show More +"}
@@ -80,9 +89,15 @@ export function BookDetailsModal({
   if (!review || !review.book) return null;
 
   const title = currentBook?.book[0]?.title?.[0] ?? "Untitled Book";
-  const imageUrl = currentBook?.book[0]?.image_url?.[0] ?? "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
-  const authorName = currentBook?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
-  const description = currentBook?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "No description available";
+  const imageUrl =
+    currentBook?.book[0]?.image_url?.[0] ??
+    "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
+  const authorName =
+    currentBook?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ??
+    "Unknown Author";
+  const description =
+    currentBook?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ??
+    "No description available";
   const bookLink = currentBook?.book[0]?.link?.[0] ?? "#";
   const userRating = parseFloat(currentBook.ratings?.user_rating ?? "0");
   const averageRating = parseFloat(currentBook.ratings?.average_rating ?? "0");
@@ -100,7 +115,7 @@ export function BookDetailsModal({
           </p>
         </DialogHeader>
 
-        <motion.div 
+        <motion.div
           className="space-y-4 pt-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -113,7 +128,9 @@ export function BookDetailsModal({
               <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg border border-primary/20">
                 <Star className="h-4 w-4 text-primary" />
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold font-slackey">Your Rating</span>
+                  <span className="text-sm font-bold font-slackey">
+                    Your Rating
+                  </span>
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <span
@@ -131,9 +148,12 @@ export function BookDetailsModal({
                 <Star className="h-4 w-4 text-primary" />
                 <div className="flex flex-col">
                   <div>
-                     <span className="text-xs font-bold font-slackey">Average Rating: </span><span className="text-xs">{averageRating}</span>
+                    <span className="text-sm font-bold font-slackey">
+                      Average Rating:{" "}
+                    </span>
+                    <span className="text-xs">{averageRating}</span>
                   </div>
-                 
+
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
                       <span
@@ -149,12 +169,18 @@ export function BookDetailsModal({
 
               {shelves && shelves.length > 0 && (
                 <div className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg">
-                  <BookOpen className="h-8 w-8 text-primary" />
+                  <BookOpen className="h-10 w-10 text-primary" />
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold font-slackey">Shelves</span>
+                    <span className="text-sm font-bold font-slackey">
+                      Shelves
+                    </span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {shelves.map((shelf, index) => (
-                        <Badge key={index} variant="outline" className="text-xs border-black">
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="text-xs border-black"
+                        >
                           {shelf.$.name}
                         </Badge>
                       ))}
@@ -170,7 +196,9 @@ export function BookDetailsModal({
                 className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg hover:bg-muted/80 transition-colors"
               >
                 <BookIcon className="h-4 w-4 text-primary" />
-                <span className="text-xs font-bold font-slackey">View on Goodreads</span>
+                <span className="text-sm font-bold font-slackey">
+                  View on Goodreads
+                </span>
               </a>
 
               <div className="flex justify-between items-center mt-4">
@@ -193,7 +221,6 @@ export function BookDetailsModal({
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               </div>
-              
             </div>
 
             {/* Book Image - Right 1/2 */}
@@ -212,7 +239,6 @@ export function BookDetailsModal({
           </div>
 
           {/* Description Section */}
-          
 
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-2">
@@ -220,7 +246,7 @@ export function BookDetailsModal({
               <h3 className="text-lg font-semibold">Description</h3>
             </div>
 
-            <motion.div 
+            <motion.div
               className="space-y-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
