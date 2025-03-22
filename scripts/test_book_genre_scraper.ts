@@ -23,7 +23,23 @@ async function testWithDatabaseBook() {
       return;
     }
     
-    const testBook = rows[0];
+    // Define interface for book record
+    interface BookRecord {
+      id: number;
+      title: string;
+      link: string | null;
+    }
+    
+    // Extract and validate the book data
+    const bookData = rows[0];
+    
+    // Type safety checks and conversion
+    const testBook: BookRecord = {
+      id: Number(bookData.id || 0),
+      title: String(bookData.title || ''),
+      link: bookData.link ? String(bookData.link) : null
+    };
+    
     console.log(`Testing with book: ${testBook.title} (ID: ${testBook.id})`);
     console.log(`Link: ${testBook.link}`);
     

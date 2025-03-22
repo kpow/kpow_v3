@@ -19,83 +19,64 @@ async function testGenreScraper(url: string) {
     
     console.log(`Fetching page: ${fullUrl}`);
     
-    // Fetch the page HTML
-    const response = await axios.get(fullUrl);
+    // Fetch the page HTML with a user agent to ensure we get the full page
+    const response = await axios.get(fullUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+      }
+    });
     console.log("Page fetched successfully");
     
     // Load the HTML into cheerio
     const $ = cheerio.load(response.data);
     
-    // Find the genres list element using multiple possible selectors
-    // Option 1: Original selector
-    let genresList = $('ul[aria-label="Top genres for this book"]');
+    // Based on the screenshots provided, look for div with data-testid="genresList"
+    const genresContainer = $('div[data-testid="genresList"]');
+    console.log(`Found genresList container: ${genresContainer.length > 0 ? 'Yes' : 'No'}`);
     
-    // Option 2: Look for genre containers
-    if (genresList.length === 0) {
-      genresList = $('.bookGenreListRootContainer');
-    }
+    // Try to find the specific ul with aria-label="Top genres for this book"
+    const genresList = $('ul.CollapsableList[aria-label="Top genres for this book"]');
+    console.log(`Found genres list: ${genresList.length > 0 ? 'Yes' : 'No'}`);
     
-    // Option 3: Look for genre links
-    if (genresList.length === 0) {
-      genresList = $('.bookPageGenreLink');
-    }
+    // Look for genre buttons inside the container
+    const genreButtons = $('.BookPageMetadataSection__genreButton');
+    console.log(`Found genre buttons: ${genreButtons.length}`);
     
-    // Option 4: Try to find shelves section
-    const shelvesList = $('.bookShelf');
+    // Extract genres from the genre buttons
+    const genres: string[] = [];
     
-    // Log the page structure to help diagnose
-    console.log("Page structure analysis:");
-    console.log(`- Number of elements with class 'bookGenreListRootContainer': ${$('.bookGenreListRootContainer').length}`);
-    console.log(`- Number of elements with class 'bookPageGenreLink': ${$('.bookPageGenreLink').length}`);
-    console.log(`- Number of elements with class 'bookShelf': ${$('.bookShelf').length}`);
+    // Method 1: Look for Button__labelItem spans within the genre buttons
+    genreButtons.find('.Button__labelItem').each((i, element) => {
+      const genreText = $(element).text().trim();
+      if (genreText && !genres.includes(genreText)) {
+        genres.push(genreText);
+        console.log(`  Genre ${genres.length}: ${genreText}`);
+      }
+    });
     
-    // Check if the genres list was found using original selector
-    if (genresList.length === 0) {
-      console.log("No genres list found with primary selectors");
-      console.log("Searching for alternative elements that might contain genres...");
-      
-      // Search for any elements containing text like "genre" or "shelves"
-      console.log("Searching for elements with text related to genres or shelves:");
-      $('*:contains("Genre"), *:contains("genre"), *:contains("Shelve"), *:contains("shelve")').each((i, el) => {
-        // Only log if the element itself has this text, not just its children
-        const ownText = $(el).clone().children().remove().end().text().trim();
-        if (ownText.match(/genre|Genre|shelve|Shelve/)) {
-          console.log(`  Potential element ${i+1}: ${$(el).prop('tagName')} with text: "${ownText}"`);
-          console.log(`    Classes: ${$(el).attr('class') || 'none'}`);
-        }
-      });
-      
-      // Try to find any links that might be genres
-      console.log("Looking for links that might be genres:");
-      $('a[href*="/genres/"]').each((i, el) => {
-        console.log(`  Genre link ${i+1}: ${$(el).text().trim()}`);
-      });
-      
-      // Extract and return any genres we found from links
-      const genres: string[] = [];
-      $('a[href*="/genres/"]').each((i, el) => {
-        const genreText = $(el).text().trim();
+    // If we didn't find genres with the first method, try method 2
+    if (genres.length === 0) {
+      // Method 2: Find all links in the genres container that point to genre pages
+      genresContainer.find('a[href*="/genres/"]').each((i, element) => {
+        const genreText = $(element).text().trim();
         if (genreText && !genres.includes(genreText)) {
           genres.push(genreText);
+          console.log(`  Genre ${genres.length}: ${genreText}`);
         }
       });
-      
-      if (genres.length > 0) {
-        console.log(`Found ${genres.length} genres from links:`);
-        genres.forEach((genre, i) => console.log(`  Genre ${i+1}: ${genre}`));
-        return genres;
-      }
-      
-      return [];
     }
     
-    // Extract genres from list items
-    const genres: string[] = [];
-    genresList.find('li').each((i, element) => {
-      const genreText = $(element).text().trim();
-      genres.push(genreText);
-      console.log(`  Genre ${i+1}: ${genreText}`);
-    });
+    // If we still didn't find genres, try a more general approach
+    if (genres.length === 0) {
+      // Method 3: Look for any anchors with href containing "/genres/"
+      $('a[href*="/genres/"]').each((i, element) => {
+        const genreText = $(element).text().trim();
+        if (genreText && !genres.includes(genreText)) {
+          genres.push(genreText);
+          console.log(`  Genre ${genres.length}: ${genreText} (fallback method)`);
+        }
+      });
+    }
     
     console.log(`Found ${genres.length} genres`);
     return genres;

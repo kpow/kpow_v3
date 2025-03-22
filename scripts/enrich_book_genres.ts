@@ -42,7 +42,8 @@ async function enrichBookGenres() {
     let state = await loadState();
     
     // Get books that have Goodreads links
-    const booksToProcess = await getBooksWithLinks(state.lastBookId, BATCH_SIZE);
+    const result = await getBooksWithLinks(state.lastBookId, BATCH_SIZE);
+    const booksToProcess = result.rows || [];
     
     if (booksToProcess.length === 0) {
       console.log("No books found with Goodreads links to process");
@@ -58,8 +59,27 @@ async function enrichBookGenres() {
     console.log(`Found ${state.totalBooks} total books with Goodreads links`);
     console.log(`Processing batch of ${booksToProcess.length} books`);
     
+    // Define interface for book record from query result
+    interface BookRecord {
+      id: number;
+      title: string;
+      link: string | null;
+    }
+    
     // Process each book
-    for (const book of booksToProcess) {
+    for (const bookRecord of booksToProcess) {
+      // Type checking and ensuring required fields
+      if (!bookRecord || typeof bookRecord !== 'object') {
+        console.error("Invalid book record:", bookRecord);
+        continue;
+      }
+      
+      const book: BookRecord = {
+        id: Number(bookRecord.id || 0),
+        title: String(bookRecord.title || ''),
+        link: bookRecord.link ? String(bookRecord.link) : null
+      };
+      
       try {
         console.log(`Processing book ${book.id}: ${book.title}`);
         
@@ -145,13 +165,17 @@ async function enrichBookGenres() {
  * Get the total count of books with Goodreads links
  */
 async function getTotalBooksCount(): Promise<number> {
-  const result = await db.select({ value: count() })
-    .from(books)
-    .where(
-      sql`${books.link} IS NOT NULL AND ${books.link} LIKE '%goodreads.com%'`
-    );
+  const result = await db.execute(sql`
+    SELECT COUNT(*) AS count
+    FROM books
+    WHERE link IS NOT NULL AND link LIKE '%goodreads.com%'
+  `);
   
-  return Number(result[0].value);
+  if (result.rows && result.rows.length > 0) {
+    return Number(result.rows[0].count);
+  }
+  
+  return 0;
 }
 
 /**
@@ -204,29 +228,58 @@ function extractGoodreadsIdFromUrl(url: string): string | null {
  */
 async function scrapeGenresFromGoodreads(url: string): Promise<string[]> {
   try {
-    // Fetch the page
-    const response = await axios.get(url);
+    // Fetch the page with a user agent to ensure we get the full page
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+      }
+    });
     const html = response.data;
     
     // Load HTML into cheerio
     const $ = cheerio.load(html);
     
-    // Find the genres list (as mentioned: <ul> with aria-label="Top genres for this book")
-    const genresList = $('ul[aria-label="Top genres for this book"]');
+    // Based on the screenshots provided, look for div with data-testid="genresList"
+    const genresContainer = $('div[data-testid="genresList"]');
     
-    if (!genresList.length) {
-      console.log("No genres list found on the page");
-      return [];
-    }
+    // Try to find the specific ul with aria-label="Top genres for this book"
+    const genresList = $('ul.CollapsableList[aria-label="Top genres for this book"]');
     
-    // Extract genres from list items
+    // Look for genre buttons inside the container
+    const genreButtons = $('.BookPageMetadataSection__genreButton');
+    
+    // Extract genres from the genre buttons
     const genres: string[] = [];
-    genresList.find('li').each((_, element) => {
+    
+    // Method 1: Look for Button__labelItem spans within the genre buttons
+    genreButtons.find('.Button__labelItem').each((_, element) => {
       const genreText = $(element).text().trim();
-      if (genreText) {
+      if (genreText && !genres.includes(genreText)) {
         genres.push(genreText);
       }
     });
+    
+    // If we didn't find genres with the first method, try method 2
+    if (genres.length === 0 && genresContainer.length > 0) {
+      // Method 2: Find all links in the genres container that point to genre pages
+      genresContainer.find('a[href*="/genres/"]').each((_, element) => {
+        const genreText = $(element).text().trim();
+        if (genreText && !genres.includes(genreText)) {
+          genres.push(genreText);
+        }
+      });
+    }
+    
+    // If we still didn't find genres, try a more general approach
+    if (genres.length === 0) {
+      // Method 3: Look for any anchors with href containing "/genres/"
+      $('a[href*="/genres/"]').each((_, element) => {
+        const genreText = $(element).text().trim();
+        if (genreText && !genres.includes(genreText)) {
+          genres.push(genreText);
+        }
+      });
+    }
     
     return genres;
   } catch (error) {
