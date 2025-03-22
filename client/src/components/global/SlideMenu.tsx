@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { Wand2, LogOut } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
 import { cn } from "@/lib/utils";
 import {
   Home,
@@ -24,6 +29,21 @@ interface SlideMenuProps {
 
 export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
   const [mounted, setMounted] = useState(false);
+  const { user, logoutMutation } = useAuth();
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast({
+          title: "Logged out",
+          description: "You have been successfully logged out.",
+        });
+        setLocation("/auth");
+      },
+    });
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -154,6 +174,31 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
                 <span className="text-[13px]">{item.label}</span>
               </Link>
             ),
+          )}
+          {user && (
+        <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              disabled={logoutMutation.isPending}
+              className="text-black hover:text-white hover:bg-white/10"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              {logoutMutation.isPending ? "Logging out..." : "Logout"}
+            </Button>
+          <Link
+            key="admin"
+            href="/admin"
+            onClick={onClose}
+            className={cn(
+              "flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors"
+            )}
+          >
+            <span className="text-[13px]">admin</span>
+          </Link>
+        
+          </>
           )}
         </nav>
       </div>

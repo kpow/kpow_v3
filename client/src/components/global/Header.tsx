@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { SlideMenu } from "./SlideMenu";
 import { Link, useLocation } from "wouter";
 import { ContactDialog } from "@/components/ContactDialog";
-import MetallicPaint, { parseLogoImage } from "@/reactbits/MetallicPaint/MetallicPaint";
+import MetallicPaint, {
+  parseLogoImage,
+} from "@/reactbits/MetallicPaint/MetallicPaint";
 import { Wand2, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -105,16 +107,9 @@ export function Header() {
           </Link>
           <nav className="flex items-center gap-4">
             {user && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                disabled={logoutMutation.isPending}
-                className="text-white hover:text-white hover:bg-white/10"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                {logoutMutation.isPending ? "Logging out..." : "Logout"}
-              </Button>
+              <span className="hidden sm:block text-xs text-white font-bold">
+                logged in
+              </span>
             )}
             <div className="hidden md:block">
               <ContactDialog />
