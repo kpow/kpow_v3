@@ -211,7 +211,12 @@ export default function Books({ params }: { params?: { page?: string } }) {
         </div>
 
            <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">          {books.map((review: Book, index: number) => (
-            <BookCard key={`${currentPage}-${index}`} review={review} />
+            <BookCard 
+              key={`${currentPage}-${index}`} 
+              review={review}
+              allBooks={books}
+              currentIndex={index}
+            />
           ))}
         </div>
 

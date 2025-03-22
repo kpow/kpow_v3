@@ -30,9 +30,11 @@ interface Book {
 
 interface BookCardProps {
   review: Book;
+  allBooks: Book[];
+  currentIndex: number;
 }
 
-export function BookCard({ review }: BookCardProps) {
+export function BookCard({ review, allBooks, currentIndex }: BookCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
   if (!review || !review.book) {
@@ -109,7 +111,9 @@ export function BookCard({ review }: BookCardProps) {
       <BookDetailsModal 
         review={review} 
         isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
+        onClose={() => setModalOpen(false)}
+        allBooks={allBooks}
+        currentIndex={currentIndex}
       />
     </>
   );

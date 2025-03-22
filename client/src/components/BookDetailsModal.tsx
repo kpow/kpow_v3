@@ -69,23 +69,48 @@ interface BookDetailsModalProps {
   review: Book;
   isOpen: boolean;
   onClose: () => void;
+  allBooks: Book[];
+  currentIndex: number;
 }
 
 export function BookDetailsModal({
   review,
   isOpen,
   onClose,
+  allBooks,
+  currentIndex,
 }: BookDetailsModalProps) {
+  const [currentBook, setCurrentBook] = React.useState(review);
+  const [currentIdx, setCurrentIdx] = React.useState(currentIndex);
+
+  const handlePrevious = () => {
+    if (currentIdx > 0) {
+      setCurrentIdx(currentIdx - 1);
+      setCurrentBook(allBooks[currentIdx - 1]);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIdx < allBooks.length - 1) {
+      setCurrentIdx(currentIdx + 1);
+      setCurrentBook(allBooks[currentIdx + 1]);
+    }
+  };
+
+  React.useEffect(() => {
+    setCurrentBook(review);
+    setCurrentIdx(currentIndex);
+  }, [review, currentIndex]);
   if (!review || !review.book) return null;
 
-  const title = review?.book[0]?.title?.[0] ?? "Untitled Book";
-  const imageUrl = review?.book[0]?.image_url?.[0] ?? "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
-  const authorName = review?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
-  const description = review?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "No description available";
-  const bookLink = review?.book[0]?.link?.[0] ?? "#";
-  const userRating = parseFloat(review.ratings?.user_rating ?? "0");
-  const averageRating = parseFloat(review.ratings?.average_rating ?? "0");
-  const shelves = review.shelves?.shelf ?? [];
+  const title = currentBook?.book[0]?.title?.[0] ?? "Untitled Book";
+  const imageUrl = currentBook?.book[0]?.image_url?.[0] ?? "https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png";
+  const authorName = currentBook?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ?? "Unknown Author";
+  const description = currentBook?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ?? "No description available";
+  const bookLink = currentBook?.book[0]?.link?.[0] ?? "#";
+  const userRating = parseFloat(currentBook.ratings?.user_rating ?? "0");
+  const averageRating = parseFloat(currentBook.ratings?.average_rating ?? "0");
+  const shelves = currentBook.shelves?.shelf ?? [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -186,6 +211,27 @@ export function BookDetailsModal({
           </div>
 
           {/* Description Section */}
+          <div className="flex justify-between items-center mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrevious}
+              disabled={currentIdx === 0}
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNext}
+              disabled={currentIdx === allBooks.length - 1}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-2">
               <Book className="h-4 w-4 text-primary" />
