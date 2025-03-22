@@ -21,6 +21,8 @@ The script performs the following steps:
 
 ### Running the Script
 
+#### Option 1: Using the Shell Script
+
 Use the provided shell script to run the enrichment process:
 
 ```bash
@@ -32,6 +34,21 @@ Where `[batch_size]` is an optional parameter to specify how many books to proce
 Example:
 ```bash
 ./run_book_genre_enrichment.sh 10
+```
+
+#### Option 2: Running Node.js Directly
+
+You can also run the script directly with Node.js:
+
+```bash
+cd scripts
+node --no-warnings --import tsx/esm enrich_book_genres.ts [batch_size]
+```
+
+Example:
+```bash
+cd scripts
+node --no-warnings --import tsx/esm enrich_book_genres.ts 10
 ```
 
 ### State Tracking
