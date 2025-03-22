@@ -50,7 +50,7 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 12;
+const BOOKS_PER_PAGE = 18;
 
 export default function Books({ params }: { params?: { page?: string } }) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
@@ -157,7 +157,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
         </div>
         <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
-            <Skeleton key={i} className="h-[140px] w-full" />
+            <Skeleton key={i} className="h-[100px] w-full" />
           ))}
         </div>
         <div className="flex justify-center gap-2 items-center mt-3">
@@ -210,9 +210,11 @@ export default function Books({ params }: { params?: { page?: string } }) {
           />
         </div>
 
-           <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">          {books.map((review: Book, index: number) => (
-            <BookCard 
-              key={`${currentPage}-${index}`} 
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+          {" "}
+          {books.map((review: Book, index: number) => (
+            <BookCard
+              key={`${currentPage}-${index}`}
               review={review}
               allBooks={books}
               currentIndex={index}
