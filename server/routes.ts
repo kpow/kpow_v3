@@ -7,6 +7,7 @@ import path from "path";
 import { registerPhishRoutes } from "./routes/phish-routes";
 import { registerLastFmRoutes } from "./routes/lastfm-routes";
 import { registerGoodreadsRoutes } from "./routes/goodreads-routes";
+import { registerBooksRoutes } from "./routes/books-routes";
 import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
 import { registerMusicRoutes } from "./routes/music-routes";
@@ -27,6 +28,7 @@ export function registerRoutes(app: Express): Server {
   registerPhishRoutes(router);
   registerLastFmRoutes(router);
   registerGoodreadsRoutes(router);
+  registerBooksRoutes(router);
   registerFeedbinRoutes(router);
   registerGithubRoutes(router);
   registerMusicRoutes(router);

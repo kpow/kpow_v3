@@ -2,31 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { BookDetailsModal } from "@/components/BookDetailsModal";
 import { Book as BookIcon } from "lucide-react";
-
-interface Book {
-  book: {
-    title: string[];
-    description: string[];
-    image_url: string[];
-    link: string[];
-    authors: Array<{
-      author: Array<{
-        name: string[];
-      }>;
-    }>;
-  };
-  ratings: {
-    user_rating: string;
-    average_rating: string;
-  };
-  shelves: {
-    shelf: Array<{
-      $: {
-        name: string;
-      };
-    }>;
-  };
-}
+import { Book } from "@/types/books";
 
 interface BookCardProps {
   review: Book;

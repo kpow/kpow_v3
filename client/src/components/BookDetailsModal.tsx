@@ -5,11 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Book, BookOpen, Calendar, User, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Book as BookIcon, BookOpen, Calendar, User, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Book } from "@/types/books";
 
 // Bio section component with proper hook usage
 const DescriptionSection = ({ description }: { description: string }) => {
@@ -39,31 +40,6 @@ const DescriptionSection = ({ description }: { description: string }) => {
     </div>
   );
 };
-
-interface Book {
-  book: {
-    title: string[];
-    description: string[];
-    image_url: string[];
-    link: string[];
-    authors: Array<{
-      author: Array<{
-        name: string[];
-      }>;
-    }>;
-  };
-  ratings: {
-    user_rating: string;
-    average_rating: string;
-  };
-  shelves?: {
-    shelf: Array<{
-      $: {
-        name: string;
-      };
-    }>;
-  };
-}
 
 interface BookDetailsModalProps {
   review: Book;
@@ -193,7 +169,7 @@ export function BookDetailsModal({
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 bg-muted/50 p-3 rounded-lg hover:bg-muted/80 transition-colors"
               >
-                <Book className="h-4 w-4 text-primary" />
+                <BookIcon className="h-4 w-4 text-primary" />
                 <span className="text-xs font-bold font-slackey">View on Goodreads</span>
               </a>
 
@@ -240,7 +216,7 @@ export function BookDetailsModal({
 
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-2">
-              <Book className="h-4 w-4 text-primary" />
+              <BookIcon className="h-4 w-4 text-primary" />
               <h3 className="text-lg font-semibold">Description</h3>
             </div>
 

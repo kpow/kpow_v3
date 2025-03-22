@@ -1,55 +1,48 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Search, 
+  X, 
+  SlidersHorizontal,
+  ArrowUpDown,
+  BookOpen 
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { BookCard } from "@/components/BookCard";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { SEO } from "@/components/global/SEO";
-
-interface Book {
-  book: {
-    title: string[];
-    description: string[];
-    image_url: string[];
-    link: string[];
-    authors: Array<{
-      author: Array<{
-        name: string[];
-      }>;
-    }>;
-  };
-  ratings: {
-    user_rating: string;
-    average_rating: string;
-  };
-  shelves?: {
-    shelf: Array<{
-      $: {
-        name: string;
-      };
-    }>;
-  };
-}
-
-interface GoodreadsResponse {
-  GoodreadsResponse: {
-    reviews: Array<{
-      $: { start: string; end: string; total: string };
-      review: Book[];
-    }>;
-  };
-  pagination: {
-    total: number;
-    start: number;
-    end: number;
-    currentPage: number;
-    totalPages: number;
-    hasMore: boolean;
-  };
-}
+import { Input } from "@/components/ui/input";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { debounce } from "lodash";
+import { Book, BookResponse, Shelf, ShelvesResponse } from "@/types/books";
 
 
 
@@ -76,6 +69,16 @@ function useResponsivePageSize() {
 }
 
 export default function Books({ params }: { params?: { page?: string } }) {
+  // Component state for search, filter, and sorting
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInDescription, setSearchInDescription] = useState(false);
+  const [selectedShelf, setSelectedShelf] = useState("");
+  const [sortBy, setSortBy] = useState("userRating");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [pageToNavigate, setPageToNavigate] = useState("");
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+
+  // URL and navigation handling
   const currentPage = params?.page ? parseInt(params.page) : 1;
   const [, setLocation] = useLocation();
   const booksPerPage = useResponsivePageSize();
@@ -86,56 +89,158 @@ export default function Books({ params }: { params?: { page?: string } }) {
     return null;
   }
 
-  const { data, isLoading, error } = useQuery<GoodreadsResponse>({
-    queryKey: [`/api/db-books?page=${currentPage}&per_page=${booksPerPage}`],
+  // Fetch shelves for filtering
+  const { data: shelvesData } = useQuery<ShelvesResponse>({
+    queryKey: ["shelves"],
     queryFn: async () => {
-      console.log(`Fetching page ${currentPage} of books from database...`);
-      const response = await fetch(
-        `/api/db-books?page=${currentPage}&per_page=${booksPerPage}`,
-        {
-          credentials: "include",
-        },
-      );
+      const response = await fetch("/api/books/shelves", {
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error(`${response.status}: ${await response.text()}`);
       }
-      const data = await response.json();
-
-      // Log ratings data for each book
-      data.GoodreadsResponse.reviews[0].review.forEach((review: Book) => {
-        console.log("Book ratings:", {
-          title: review.book[0]?.title?.[0],
-          user_rating: review.ratings.user_rating,
-          average_rating: review.ratings.average_rating,
-        });
-      });
-
-      return data;
+      return response.json();
     },
-    staleTime: 0,
-    gcTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
+    gcTime: 1000 * 60 * 60, // Keep for 1 hour
+  });
+  
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      setSearchQuery(value);
+    }, 500),
+    []
+  );
+  
+  // Handle search input changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSearch(e.target.value);
+  };
+  
+  // Handle "Go to Page" navigation
+  const handleGoToPage = () => {
+    const pageNum = parseInt(pageToNavigate);
+    if (!isNaN(pageNum) && pageNum > 0) {
+      setLocation(pageNum === 1 ? "/books" : `/books/${pageNum}`);
+      setPageToNavigate("");
+    }
+  };
+  
+  // Reset all filters
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setSearchInDescription(false);
+    setSelectedShelf("");
+    setSortBy("userRating");
+    setSortOrder("desc");
+    setLocation("/books");
+  };
+
+  // Main data query with all filter parameters
+  const { data, isLoading, error } = useQuery<BookResponse>({
+    queryKey: [
+      "books", 
+      currentPage, 
+      booksPerPage, 
+      searchQuery, 
+      searchInDescription, 
+      selectedShelf,
+      sortBy,
+      sortOrder
+    ],
+    queryFn: async () => {
+      // Build the query parameters for the API
+      const queryParams = new URLSearchParams({
+        page: currentPage.toString(),
+        per_page: booksPerPage.toString(),
+      });
+      
+      // Add search parameters if present
+      if (searchQuery) {
+        queryParams.append("search", searchQuery);
+      }
+      
+      // Add description search flag if enabled
+      if (searchInDescription) {
+        queryParams.append("search_description", "true");
+      }
+      
+      // Add shelf filter if selected
+      if (selectedShelf) {
+        queryParams.append("shelf", selectedShelf);
+      }
+      
+      // Add sorting parameters
+      queryParams.append("sort_by", sortBy);
+      queryParams.append("sort_order", sortOrder);
+      
+      console.log(`Fetching books with params: ${queryParams.toString()}`);
+      
+      const response = await fetch(
+        `/api/books/search?${queryParams.toString()}`,
+        {
+          credentials: "include",
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${await response.text()}`);
+      }
+      
+      return response.json();
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
   });
 
+  // Helper functions for SEO and metadata
   const getPageTitle = () => {
-    return `KPOW Book Collection ${currentPage > 1 ? `- Page ${currentPage}` : ""}`;
+    let title = "KPOW Book Collection";
+    
+    if (searchQuery) {
+      title += ` - Search: ${searchQuery}`;
+    }
+    
+    if (selectedShelf) {
+      title += ` - Shelf: ${selectedShelf}`;
+    }
+    
+    if (currentPage > 1) {
+      title += ` - Page ${currentPage}`;
+    }
+    
+    return title;
   };
 
   const getPageDescription = () => {
     if (data?.GoodreadsResponse?.reviews?.[0]?.review) {
       const recentBooks = data.GoodreadsResponse.reviews[0].review
         .slice(0, 3)
-        .map((review) => review.book?.title?.[0])
+        .map((review: Book) => review.book[0]?.title?.[0])
         .join(", ");
-      return `Currently reading and recently finished books including: ${recentBooks}. Page ${currentPage} of my book collection.`;
+        
+      let desc = `Currently reading and recently finished books including: ${recentBooks}.`;
+      
+      if (searchQuery) {
+        desc += ` Filtered by search: "${searchQuery}"`;
+      }
+      
+      if (selectedShelf) {
+        desc += ` in shelf: ${selectedShelf}`;
+      }
+      
+      return desc;
     }
     return "Explore my reading list and book recommendations. Updated regularly with new discoveries and favorite reads.";
   };
 
   const getPreviewImage = () => {
-    const firstBook = data?.GoodreadsResponse?.reviews?.[0]?.review?.[0]?.book;
+    const firstBook = data?.GoodreadsResponse?.reviews?.[0]?.review?.[0]?.book[0];
     return firstBook?.image_url?.[0] ?? "/book-placeholder.png";
   };
 
+  // Render error state
   if (error) {
     return (
       <div className="container mx-auto p-4">
@@ -151,6 +256,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
     );
   }
 
+  // Render loading state
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
@@ -179,39 +285,23 @@ export default function Books({ params }: { params?: { page?: string } }) {
             </Button>
           </div>
         </div>
-        <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+        <div className="grid gap-2 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
           {[...Array(booksPerPage)].map((_, i) => (
-            <Skeleton key={i} className="h-[100px] w-full" />
+            <Skeleton key={i} className="h-[200px] w-full rounded-lg" />
           ))}
-        </div>
-        <div className="flex justify-center gap-2 items-center mt-3">
-          <Button
-            variant="outline"
-            size="icon"
-            disabled
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">Loading</span>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled
-            className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     );
   }
 
+  // Extract data for rendering
   const books = data?.GoodreadsResponse?.reviews?.[0]?.review ?? [];
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
   const totalBooks = pagination?.total ?? 0;
+  const shelves = shelvesData?.shelves ?? [];
 
+  // Render the main component
   return (
     <>
       <SEO
@@ -221,10 +311,172 @@ export default function Books({ params }: { params?: { page?: string } }) {
         type="books.reads"
       />
       <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center flex-col sm:flex-row">
+        <div className="flex justify-between items-center flex-col sm:flex-row mb-4">
           <PageTitle size="lg" alignment="left">
-            book feed:
+            book feed
+            {searchQuery && <span className="text-sm font-normal ml-2">searching: {searchQuery}</span>}
+            {selectedShelf && <span className="text-sm font-normal ml-2">in shelf: {selectedShelf}</span>}
           </PageTitle>
+        </div>
+        
+        {/* Search and Filter Panel */}
+        <div className="mb-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            {/* Search Input */}
+            <div className="flex-1 flex flex-col gap-2 md:flex-row md:items-center">
+              <div className="relative flex-1">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input 
+                  placeholder="Search books by title or author..." 
+                  className="pl-8"
+                  defaultValue={searchQuery}
+                  onChange={handleSearchChange}
+                />
+                {searchQuery && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
+                    onClick={() => setSearchQuery("")}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Checkbox 
+                  id="search-description" 
+                  checked={searchInDescription}
+                  onCheckedChange={(checked) => 
+                    setSearchInDescription(checked === true)}
+                />
+                <Label htmlFor="search-description" className="text-sm">
+                  Include description
+                </Label>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => setShowFilterPanel(!showFilterPanel)}>
+                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                  {showFilterPanel ? "Hide Filters" : "Show Filters"}
+                </Button>
+                {(searchQuery || searchInDescription || selectedShelf || sortBy !== "userRating" || sortOrder !== "desc") && (
+                  <Button variant="ghost" onClick={handleResetFilters}>
+                    <X className="h-4 w-4 mr-2" />
+                    Reset
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Advanced Filters Panel */}
+          {showFilterPanel && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Shelf Filter */}
+              <div>
+                <Label htmlFor="shelf-filter" className="text-sm font-medium mb-1 block">
+                  Shelf
+                </Label>
+                <Select 
+                  value={selectedShelf} 
+                  onValueChange={setSelectedShelf}
+                >
+                  <SelectTrigger id="shelf-filter">
+                    <SelectValue placeholder="All Shelves" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Shelves</SelectItem>
+                    {shelves.map(shelf => (
+                      <SelectItem key={shelf.id} value={shelf.name}>
+                        {shelf.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Sort By */}
+              <div>
+                <Label htmlFor="sort-by" className="text-sm font-medium mb-1 block">
+                  Sort By
+                </Label>
+                <Select 
+                  value={sortBy} 
+                  onValueChange={setSortBy}
+                >
+                  <SelectTrigger id="sort-by">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="title">Title</SelectItem>
+                    <SelectItem value="userRating">User Rating</SelectItem>
+                    <SelectItem value="averageRating">Average Rating</SelectItem>
+                    <SelectItem value="dateRead">Date Read</SelectItem>
+                    <SelectItem value="dateAdded">Date Added</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Sort Direction */}
+              <div>
+                <Label htmlFor="sort-order" className="text-sm font-medium mb-1 block">
+                  Sort Direction
+                </Label>
+                <Select 
+                  value={sortOrder} 
+                  onValueChange={setSortOrder}
+                >
+                  <SelectTrigger id="sort-order">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="desc">Descending</SelectItem>
+                    <SelectItem value="asc">Ascending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Go to Page */}
+              <div>
+                <Label htmlFor="go-to-page" className="text-sm font-medium mb-1 block">
+                  Go to Page
+                </Label>
+                <div className="flex gap-2">
+                  <Input 
+                    id="go-to-page"
+                    type="number"
+                    min="1"
+                    max={totalPages}
+                    value={pageToNavigate}
+                    onChange={(e) => setPageToNavigate(e.target.value)}
+                    placeholder={`1-${totalPages}`}
+                  />
+                  <Button onClick={handleGoToPage}>Go</Button>
+                </div>
+              </div>
+              
+              {/* Summary Info */}
+              <div className="md:col-span-2 flex flex-col justify-end">
+                <div className="text-sm text-gray-500">
+                  Showing {books.length} of {totalBooks} books {searchQuery && `matching "${searchQuery}"`} 
+                  {selectedShelf && ` in shelf "${selectedShelf}"`}
+                </div>
+                <div className="text-sm text-gray-500">
+                  Page {currentPage} of {totalPages}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Results Count */}
+        <div className="mb-2 flex justify-between items-center">
+          <span className="text-sm text-gray-500">
+            Found {totalBooks} books {searchQuery && `matching "${searchQuery}"`}
+            {selectedShelf && ` in shelf "${selectedShelf}"`}
+          </span>
           <CustomPagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -234,24 +486,36 @@ export default function Books({ params }: { params?: { page?: string } }) {
           />
         </div>
 
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-          {" "}
-          {books.map((review: Book, index: number) => (
-            <BookCard
-              key={`${currentPage}-${index}`}
-              review={review}
-              allBooks={books}
-              currentIndex={index}
-            />
-          ))}
-        </div>
+        {/* Book Grid */}
+        {books.length === 0 ? (
+          <div className="text-center py-12">
+            <BookOpen className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-xl font-medium mb-1">No books found</h3>
+            <p className="text-gray-500 mb-4">Try changing your search or filter criteria</p>
+            <Button onClick={handleResetFilters}>Clear All Filters</Button>
+          </div>
+        ) : (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+            {books.map((review: Book, index: number) => (
+              <BookCard
+                key={`${currentPage}-${index}`}
+                review={review}
+                allBooks={books}
+                currentIndex={index}
+              />
+            ))}
+          </div>
+        )}
 
-        <CustomPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          baseUrl="/books"
-          onPageChange={() => {}}
-        />
+        {/* Bottom Pagination */}
+        <div className="mt-6">
+          <CustomPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            baseUrl="/books"
+            onPageChange={() => {}}
+          />
+        </div>
       </div>
     </>
   );
