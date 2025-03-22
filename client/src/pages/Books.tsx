@@ -72,7 +72,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
   // Component state for search, filter, and sorting
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInDescription, setSearchInDescription] = useState(false);
-  const [selectedShelf, setSelectedShelf] = useState("");
+  const [selectedShelf, setSelectedShelf] = useState("all");
   const [sortBy, setSortBy] = useState("userRating");
   const [sortOrder, setSortOrder] = useState("desc");
   const [pageToNavigate, setPageToNavigate] = useState("");
@@ -122,7 +122,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
   const handleGoToPage = () => {
     const pageNum = parseInt(pageToNavigate);
     if (!isNaN(pageNum) && pageNum > 0) {
-      setLocation(pageNum === 1 ? "/books" : `/books/${pageNum}`);
+      setLocation(pageNum === 1 ? "/books" : `/books/page/${pageNum}`);
       setPageToNavigate("");
     }
   };
@@ -131,7 +131,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
   const handleResetFilters = () => {
     setSearchQuery("");
     setSearchInDescription(false);
-    setSelectedShelf("");
+    setSelectedShelf("all");
     setSortBy("userRating");
     setSortOrder("desc");
     setLocation("/books");
@@ -166,8 +166,8 @@ export default function Books({ params }: { params?: { page?: string } }) {
         queryParams.append("search_description", "true");
       }
       
-      // Add shelf filter if selected
-      if (selectedShelf) {
+      // Add shelf filter if selected (and not "all")
+      if (selectedShelf && selectedShelf !== "all") {
         queryParams.append("shelf", selectedShelf);
       }
       
@@ -315,7 +315,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           <PageTitle size="lg" alignment="left">
             book feed
             {searchQuery && <span className="text-sm font-normal ml-2">searching: {searchQuery}</span>}
-            {selectedShelf && <span className="text-sm font-normal ml-2">in shelf: {selectedShelf}</span>}
+            {selectedShelf && selectedShelf !== "all" && <span className="text-sm font-normal ml-2">in shelf: {selectedShelf}</span>}
           </PageTitle>
         </div>
         
@@ -387,7 +387,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
                     <SelectValue placeholder="All Shelves" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Shelves</SelectItem>
+                    <SelectItem value="all">All Shelves</SelectItem>
                     {shelves.map(shelf => (
                       <SelectItem key={shelf.id} value={shelf.name}>
                         {shelf.name}
@@ -461,7 +461,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
               <div className="md:col-span-2 flex flex-col justify-end">
                 <div className="text-sm text-gray-500">
                   Showing {books.length} of {totalBooks} books {searchQuery && `matching "${searchQuery}"`} 
-                  {selectedShelf && ` in shelf "${selectedShelf}"`}
+                  {selectedShelf && selectedShelf !== "all" && ` in shelf "${selectedShelf}"`}
                 </div>
                 <div className="text-sm text-gray-500">
                   Page {currentPage} of {totalPages}
@@ -475,7 +475,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
         <div className="mb-2 flex justify-between items-center">
           <span className="text-sm text-gray-500">
             Found {totalBooks} books {searchQuery && `matching "${searchQuery}"`}
-            {selectedShelf && ` in shelf "${selectedShelf}"`}
+            {selectedShelf && selectedShelf !== "all" && ` in shelf "${selectedShelf}"`}
           </span>
           <CustomPagination
             currentPage={currentPage}
