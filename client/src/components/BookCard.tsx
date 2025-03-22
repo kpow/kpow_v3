@@ -79,7 +79,7 @@ export function BookCard({ review }: BookCardProps) {
               />
             </div>
             <div className="flex-1 p-3 flex flex-col">
-              <h3 className="font-semibold text-base line-clamp-1">{title}</h3>
+              <h3 className="font-semibold text-base line-clamp-2">{title}</h3>
               <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
                 by {authorName}
               </p>

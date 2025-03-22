@@ -93,15 +93,15 @@ export default function Books({ params }: { params?: { page?: string } }) {
   });
 
   const getPageTitle = () => {
-    return `KPOW Book Collection ${currentPage > 1 ? `- Page ${currentPage}` : ''}`;
+    return `KPOW Book Collection ${currentPage > 1 ? `- Page ${currentPage}` : ""}`;
   };
 
   const getPageDescription = () => {
     if (data?.GoodreadsResponse?.reviews?.[0]?.review) {
       const recentBooks = data.GoodreadsResponse.reviews[0].review
         .slice(0, 3)
-        .map(review => review.book?.title?.[0])
-        .join(', ');
+        .map((review) => review.book?.title?.[0])
+        .join(", ");
       return `Currently reading and recently finished books including: ${recentBooks}. Page ${currentPage} of my book collection.`;
     }
     return "Explore my reading list and book recommendations. Updated regularly with new discoveries and favorite reads.";
@@ -155,7 +155,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
             </Button>
           </div>
         </div>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
           {[...Array(BOOKS_PER_PAGE)].map((_, i) => (
             <Skeleton key={i} className="h-[140px] w-full" />
           ))}
@@ -190,7 +190,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
 
   return (
     <>
-      <SEO 
+      <SEO
         title={getPageTitle()}
         description={getPageDescription()}
         image={getPreviewImage()}
@@ -199,7 +199,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center flex-col sm:flex-row">
           <PageTitle size="lg" alignment="left">
-            book feed: {totalBooks} books
+            book feed:
           </PageTitle>
           <CustomPagination
             currentPage={currentPage}
