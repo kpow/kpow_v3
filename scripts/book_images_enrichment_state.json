@@ -1,7 +1,7 @@
 {
-  "processedBooks": 1,
-  "totalBooks": 1,
-  "lastBookId": null,
+  "processedBooks": 428,
+  "totalBooks": 433,
+  "lastBookId": 404,
   "errors": [],
-  "successfulUpdates": 1
+  "successfulUpdates": 428
 }

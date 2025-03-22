@@ -50,7 +50,7 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = 15;
+const BOOKS_PER_PAGE = 12;
 
 export default function Books({ params }: { params?: { page?: string } }) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
@@ -210,8 +210,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
           />
         </div>
 
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 mb-8">
-          {books.map((review: Book, index: number) => (
+           <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">          {books.map((review: Book, index: number) => (
             <BookCard key={`${currentPage}-${index}`} review={review} />
           ))}
         </div>

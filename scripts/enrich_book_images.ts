@@ -17,14 +17,10 @@ import { eq, sql, isNull, or, like, and } from "drizzle-orm";
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from "util";
-import { fileURLToPath } from 'url';
 
-// Get directory name in ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Constants
-const STATE_FILE = path.join(__dirname, 'book_images_enrichment_state.json');
+// Use process.cwd() to get the current working directory instead of __dirname
+// This is more reliable in ES modules
+const STATE_FILE = path.join(process.cwd(), 'scripts', 'book_images_enrichment_state.json');
 let BATCH_SIZE = 10; // Default number of books to process in one run
 const DELAY_MS = 1000; // Delay between requests to avoid rate limiting
 
@@ -123,13 +119,10 @@ async function enrichBookImages() {
           continue;
         }
         
-        // Check if the image URL is different than what we already have
+        // Since we want to update all books, even those with existing images,
+        // we'll just log if the image is the same but still proceed with the update
         if (book.imageUrl === refinedImageUrl) {
-          console.log(`  - Already has the highest quality image`);
-          state.processedBooks++;
-          state.lastBookId = book.id;
-          await saveState(state);
-          continue;
+          console.log(`  - Image URL remains the same, but updating anyway`);
         }
         
         // Update the book in the database with the refined image URL
@@ -199,18 +192,9 @@ async function getTotalBooksCount(): Promise<number> {
     })
     .from(books)
     .where(
-      and(
-        // Only include books with a Goodreads link
-        like(books.link, '%goodreads.com%'),
-        or(
-          // Missing image URL
-          isNull(books.imageUrl),
-          // Has a default or low-quality image URL
-          like(books.imageUrl, '%nophoto%'),
-          like(books.imageUrl, '%nocover%'),
-          like(books.imageUrl, '%s.gr-assets.com%')
-        )
-      )
+      // Only include books with a Goodreads link
+      like(books.link, '%goodreads.com%')
+      // Removed the filtering conditions to process ALL books with Goodreads links
     );
     
     return Number(countResult.count);
@@ -235,13 +219,8 @@ async function getBooksForImageEnrichment(lastBookId: number | null, limit: numb
     .from(books)
     .where(
       and(
+        // Only include books with a Goodreads link
         like(books.link, '%goodreads.com%'),
-        or(
-          isNull(books.imageUrl),
-          like(books.imageUrl, '%nophoto%'),
-          like(books.imageUrl, '%nocover%'),
-          like(books.imageUrl, '%s.gr-assets.com%')
-        ),
         // Add the lastBookId condition if provided
         lastBookId !== null ? sql`${books.id} > ${lastBookId}` : undefined
       )
