@@ -8,7 +8,7 @@ import {
 } from "../utils/api-utils";
 import { db } from "../../db";
 import { books, authors, shelves, bookAuthors, bookShelves } from "../../db/schema";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, asc, eq, sql, and, or, ilike } from "drizzle-orm";
 
 export function registerGoodreadsRoutes(router: Router) {
   // New endpoint to fetch books from database
