@@ -50,33 +50,7 @@ interface GoodreadsResponse {
   };
 }
 
-const BOOKS_PER_PAGE = {
-  mobile: 6,
-  medium: 12,
-  large: 18
-};
-
-function useResponsivePageSize() {
-  const [pageSize, setPageSize] = useState(BOOKS_PER_PAGE.mobile);
-
-  useEffect(() => {
-    function updatePageSize() {
-      if (window.matchMedia('(min-width: 1024px)').matches) {
-        setPageSize(BOOKS_PER_PAGE.large);
-      } else if (window.matchMedia('(min-width: 768px)').matches) {
-        setPageSize(BOOKS_PER_PAGE.medium);
-      } else {
-        setPageSize(BOOKS_PER_PAGE.mobile);
-      }
-    }
-
-    updatePageSize();
-    window.addEventListener('resize', updatePageSize);
-    return () => window.removeEventListener('resize', updatePageSize);
-  }, []);
-
-  return pageSize;
-}
+const BOOKS_PER_PAGE = 18;
 
 export default function Books({ params }: { params?: { page?: string } }) {
   const currentPage = params?.page ? parseInt(params.page) : 1;
@@ -88,9 +62,8 @@ export default function Books({ params }: { params?: { page?: string } }) {
     return null;
   }
 
-  const pageSize = useResponsivePageSize();
   const { data, isLoading, error } = useQuery<GoodreadsResponse>({
-    queryKey: [`/api/db-books?page=${currentPage}&per_page=${pageSize}`],
+    queryKey: [`/api/db-books?page=${currentPage}&per_page=${BOOKS_PER_PAGE}`],
     queryFn: async () => {
       console.log(`Fetching page ${currentPage} of books from database...`);
       const response = await fetch(
