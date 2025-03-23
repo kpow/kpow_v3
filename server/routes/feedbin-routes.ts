@@ -14,16 +14,16 @@ export function registerFeedbinRoutes(router: Router) {
       // Build since date parameter if month and year are provided
       let sinceDate = since;
       if (!since && month && year) {
-        // Convert to zero-based month (January is 0)
-        const monthValue = parseInt(month) - 1;
+        // Month from UI is 1-based (January is 1)
+        const monthValue = parseInt(month) - 1; // Convert to 0-based for JS Date
         sinceDate = new Date(parseInt(year), monthValue, 1).toISOString();
       }
 
       // Build until date parameter if month and year are provided and no explicit until
       let untilDate = until;
       if (!until && month && year) {
-        // Convert to zero-based month (January is 0)
-        const monthValue = parseInt(month) - 1;
+        // Month from UI is 1-based (January is 1)
+        const monthValue = parseInt(month) - 1; // Convert to 0-based for JS Date
         // Get the last day of the month
         const lastDay = new Date(parseInt(year), monthValue + 1, 0).getDate();
         untilDate = new Date(parseInt(year), monthValue, lastDay, 23, 59, 59).toISOString();
@@ -35,8 +35,10 @@ export function registerFeedbinRoutes(router: Router) {
 
       console.log(`Date filters applied - since: ${sinceDate || 'none'}, until: ${untilDate || 'none'}`);
 
-      // First, get total count from starred_entries endpoint - with date filters if applicable
+      // First, get total count from starred_entries endpoint
       console.log('Fetching total starred entries count...');
+      
+      // Important: We need to first get the IDs of all starred entries for the date range
       const starredEntriesParams: Record<string, any> = {};
       if (sinceDate) {
         starredEntriesParams.since = sinceDate;
@@ -53,33 +55,39 @@ export function registerFeedbinRoutes(router: Router) {
         }
       });
 
-      const totalCount = Array.isArray(starredEntriesResponse.data) ? starredEntriesResponse.data.length : 0;
+      // Get the array of starred entry IDs
+      const starredEntryIds = Array.isArray(starredEntriesResponse.data) ? starredEntriesResponse.data : [];
+      const totalCount = starredEntryIds.length;
       console.log(`Total starred entries: ${totalCount}`);
 
-      // Then get paginated data
+      // Then get paginated data - we need to fetch specific entry IDs
       console.log(`Fetching page ${page} of starred articles...`);
-      const params: Record<string, any> = {
-        starred: true,
-        per_page: perPage,
-        page: page,
-        order: 'desc' // Ensure we're getting newest first
-      };
       
-      // Add date filters if applicable
-      if (sinceDate) {
-        params.since = sinceDate;
+      // Calculate pagination for the entry IDs
+      const startIndex = (page - 1) * perPage;
+      const endIndex = Math.min(startIndex + perPage, totalCount);
+      
+      // Get the subset of IDs for the current page
+      const pageEntryIds = starredEntryIds.slice(startIndex, endIndex);
+      
+      let response;
+      
+      if (pageEntryIds.length > 0) {
+        // Fetch entries by IDs (when we have IDs for the current page)
+        response = await axios.get('https://api.feedbin.com/v2/entries.json', {
+          params: {
+            ids: pageEntryIds.join(','),
+            order: 'desc' // Ensure we're getting newest first
+          },
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+          }
+        });
+      } else {
+        // When there are no entries matching the filter, return an empty array
+        response = { data: [] };
       }
-      if (untilDate) {
-        params.until = untilDate;
-      }
-
-      const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
-        params,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Basic ${process.env.FEEDBIN_KEY}`
-        }
-      });
 
       // Fetch content details for each article
       const articlesWithDetails = await Promise.all(
