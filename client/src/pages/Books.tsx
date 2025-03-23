@@ -316,7 +316,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
         image={getPreviewImage()}
         type="books.reads"
       />
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-2">
         <div className="flex justify-between items-center flex-col sm:flex-row mb-4">
           <PageTitle size="lg" alignment="left">
             book feed
@@ -478,66 +478,56 @@ export default function Books({ params }: { params?: { page?: string } }) {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Go to Page */}
-              <div>
-                <Label
-                  htmlFor="go-to-page"
-                  className="text-sm font-medium mb-1 block"
-                >
-                  Go to Page
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="go-to-page"
-                    type="number"
-                    min="1"
-                    max={totalPages}
-                    value={pageToNavigate}
-                    onChange={(e) => setPageToNavigate(e.target.value)}
-                    placeholder={`1-${totalPages}`}
-                  />
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                    onClick={handleGoToPage}
-                  >
-                    Go
-                  </Button>
-                </div>
-              </div>
-
-              {/* Summary Info */}
-              <div className="md:col-span-2 flex flex-col justify-end">
-                <div className="text-sm text-gray-500">
-                  Showing {books.length} of {totalBooks} books{" "}
-                  {searchQuery && `matching "${searchQuery}"`}
-                  {selectedShelf &&
-                    selectedShelf !== "all" &&
-                    ` in shelf "${selectedShelf}"`}
-                </div>
-                <div className="text-sm text-gray-500">
-                  Page {currentPage} of {totalPages}
-                </div>
-              </div>
             </div>
           )}
         </div>
 
         {/* Results Count */}
         <div className="mb-2 flex justify-between items-center">
-          <span className="text-sm text-gray-500">
-            Found {totalBooks} books{" "}
-            {searchQuery && `matching "${searchQuery}"`}
-            {selectedShelf &&
-              selectedShelf !== "all" &&
-              ` in shelf "${selectedShelf}"`}
-          </span>
+          <div className="flex justify-between items-center">
+            {/* Go to Page */}
+            <div className="flex">
+              <div className="flex gap-2">
+                <Input
+                  id="go-to-page"
+                  type="number"
+                  min="1"
+                  className="w-[80px]"
+                  max={totalPages}
+                  value={pageToNavigate}
+                  onChange={(e) => setPageToNavigate(e.target.value)}
+                  placeholder={`1-${totalPages}`}
+                />
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                  onClick={handleGoToPage}
+                >
+                  Go
+                </Button>
+              </div>
+            </div>
+
+            {/* Summary Info */}
+            <div className="flex flex-col justify-end ml-4">
+              <div className="text-sm text-gray-500">
+                {books.length} of {totalBooks} books{" "}
+                {searchQuery && `matching "${searchQuery}"`}
+                {selectedShelf &&
+                  selectedShelf !== "all" &&
+                  ` in shelf "${selectedShelf}"`}
+              </div>
+              <div className="text-sm text-gray-500">
+                Page {currentPage} of {totalPages}
+              </div>
+            </div>
+          </div>
+
           <CustomPagination
             currentPage={currentPage}
             totalPages={totalPages}
             baseUrl="/books"
             onPageChange={() => {}}
-            className="mb-3"
+            className="mb-0"
           />
         </div>
 
