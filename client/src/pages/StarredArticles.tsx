@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { SEO } from "@/components/global/SEO";
+import { getRandomDefaultImage } from "@/lib/utils";
 
 interface PaginationData {
   current_page: number;
@@ -78,14 +79,14 @@ export default function StarredArticles({
         day: "numeric",
         year: "numeric",
       }),
-      imageSrc: article.lead_image_url ?? "/placeholder-star.png",
+      imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
       type: "star" as const,
       url: article.url ?? "#",
       excerpt: article.summary ?? "No excerpt available",
     })) ?? [];
 
   // Get the first article's image for the SEO preview, if available
-  const previewImage = articles[0]?.imageSrc ?? "/placeholder-star.png";
+  const previewImage = articles[0]?.imageSrc ?? getRandomDefaultImage();
   const pageTitle = `Star Feed ${currentPage > 1 ? `- Page ${currentPage}` : ""}`;
   const pageDescription = `Curated collection of starred articles. ${articles
     .slice(0, 3)

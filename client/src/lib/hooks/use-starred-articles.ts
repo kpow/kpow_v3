@@ -54,7 +54,7 @@ export function useStarredArticles(page = 1, perPage = 6) {
           month: 'short',
           day: 'numeric'
         }),
-        imageSrc: article.lead_image_url ?? "/placeholder-star.png",
+        imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
         type: "star" as const,
         url: article.url ?? '#',
         excerpt: article.summary ?? 'No excerpt available'

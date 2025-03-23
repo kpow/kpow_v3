@@ -3,6 +3,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ContentSection } from "@/components/home/ContentSection";
 import { StarredArticle } from "@/lib/hooks/use-starred-articles";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getRandomDefaultImage } from "@/lib/utils";
 
 interface StarFeedResponse {
   articles: StarredArticle[];
@@ -52,7 +53,7 @@ export function StarFeed() {
       day: "numeric",
       year: "numeric",
     }),
-    imageSrc: article.lead_image_url ?? "/placeholder-star.png",
+    imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
     type: "star" as const,
     url: article.url ?? "#",
     excerpt: article.summary ?? "No excerpt available",
