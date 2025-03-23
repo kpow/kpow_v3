@@ -1,17 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { ContentSection } from "@/components/home/ContentSection";
-import { StarredArticle, useStarredArticles } from "@/lib/hooks/use-starred-articles";
+import { useStarredArticles } from "@/lib/hooks/use-starred-articles";
 import { useToast } from "@/hooks/use-toast";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { SEO } from "@/components/global/SEO";
 import { getRandomDefaultImage } from "@/lib/utils";
 import { MonthYearPicker } from "@/components/ui/month-year-picker";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -29,8 +28,19 @@ interface DateFilter {
   year: number | null;
 }
 
+interface TransformedArticle {
+  title: string;
+  subtitle: string;
+  author: string;
+  date: string;
+  imageSrc: string;
+  type: 'star';
+  url: string;
+  excerpt: string;
+}
+
 interface StarredResponse {
-  articles: StarredArticle[];
+  articles: TransformedArticle[];
   pagination: PaginationData;
   dateFilter: DateFilter;
 }

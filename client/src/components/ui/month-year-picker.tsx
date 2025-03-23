@@ -89,14 +89,14 @@ export function MonthYearPicker({
       </Button>
       
       <Select
-        value={month ? month.toString() : ""}
-        onValueChange={(value) => onChange(value ? parseInt(value) : null, year)}
+        value={month ? month.toString() : "all-months"}
+        onValueChange={(value) => onChange(value !== "all-months" ? parseInt(value) : null, year)}
       >
         <SelectTrigger className="w-[130px]">
           <SelectValue placeholder="Month" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All months</SelectItem>
+          <SelectItem value="all-months">All months</SelectItem>
           {months.map((m) => (
             <SelectItem key={m.value} value={m.value.toString()}>
               {m.label}
@@ -106,14 +106,14 @@ export function MonthYearPicker({
       </Select>
       
       <Select
-        value={year ? year.toString() : ""}
-        onValueChange={(value) => onChange(month, value ? parseInt(value) : null)}
+        value={year ? year.toString() : "all-years"}
+        onValueChange={(value) => onChange(month, value !== "all-years" ? parseInt(value) : null)}
       >
         <SelectTrigger className="w-[100px]">
           <SelectValue placeholder="Year" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All years</SelectItem>
+          <SelectItem value="all-years">All years</SelectItem>
           {years.map((y) => (
             <SelectItem key={y} value={y.toString()}>
               {y}
