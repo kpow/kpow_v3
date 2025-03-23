@@ -42,24 +42,65 @@ export function registerFeedbinRoutes(router: Router) {
         
         console.log(`Date range: ${sinceDate} to ${untilDate}`);
         
-        // We need to get all entries for the month first
-        // This is because we're filtering by publication date, not by when they were starred
-        const monthEntriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
-          params: {
-            starred: true,
-            per_page: 100, // Get a lot at once to minimize API calls
-            published_since: sinceDate,
-            published_before: untilDate,
-          },
+        // First find the exact entry IDs from the time period
+        const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
           headers: {
             Accept: 'application/json',
             Authorization: `Basic ${process.env.FEEDBIN_KEY}`
           }
         });
         
-        // Entries for the month
-        const monthEntries = monthEntriesResponse.data;
-        totalCount = monthEntries.length;
+        // Get the array of all starred entry IDs
+        const starredEntryIds = Array.isArray(starredEntriesResponse.data) ? starredEntriesResponse.data : [];
+        console.log(`Got ${starredEntryIds.length} total starred entries`);
+        
+        // Now we need to get the actual entry data for these IDs to filter by date
+        // We'll get them in batches to avoid overwhelming the API
+        const BATCH_SIZE = 100;
+        let allFilteredEntries: any[] = [];
+        
+        // Process starred entries in batches to filter by date
+        for (let i = 0; i < starredEntryIds.length; i += BATCH_SIZE) {
+          const batchIds = starredEntryIds.slice(i, i + BATCH_SIZE);
+          
+          try {
+            const batchResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
+              params: {
+                ids: batchIds.join(','),
+              },
+              headers: {
+                Accept: 'application/json',
+                Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+              }
+            });
+            
+            // Filter entries by publication date
+            const batchEntries = batchResponse.data;
+            const filteredBatch = batchEntries.filter((entry: any) => {
+              const publishDate = new Date(entry.published);
+              const sinceDateObj = sinceDate ? new Date(sinceDate) : null;
+              const untilDateObj = untilDate ? new Date(untilDate) : null;
+              
+              return (
+                (!sinceDateObj || publishDate >= sinceDateObj) && 
+                (!untilDateObj || publishDate <= untilDateObj)
+              );
+            });
+            
+            allFilteredEntries = [...allFilteredEntries, ...filteredBatch];
+            console.log(`Processed batch ${i/BATCH_SIZE + 1}, found ${filteredBatch.length} matching entries`);
+          } catch (error) {
+            console.error(`Error processing batch ${i/BATCH_SIZE + 1}:`, error);
+          }
+        }
+        
+        // Sort by published date descending (newest first)
+        allFilteredEntries.sort((a: any, b: any) => {
+          return new Date(b.published).getTime() - new Date(a.published).getTime();
+        });
+        
+        // Calculate total and pagination
+        totalCount = allFilteredEntries.length;
         console.log(`Found ${totalCount} articles for ${month}/${year}`);
         
         // Calculate pagination manually
@@ -67,16 +108,16 @@ export function registerFeedbinRoutes(router: Router) {
         const endIndex = Math.min(startIndex + perPage, totalCount);
         
         // Get the page slice
-        const pageEntries = monthEntries.slice(startIndex, endIndex);
+        const pageEntries = allFilteredEntries.slice(startIndex, endIndex);
         
-        // Construct fake response for processing
+        // Construct response for processing
         response = { data: pageEntries };
       
       } else {
         // No date filtering - get all starred entries
         console.log('No date filtering, getting all starred entries');
         
-        // First, get all starred entry IDs
+        // Step 1: First, get all starred entry IDs
         const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
           headers: {
             Accept: 'application/json',
@@ -89,24 +130,36 @@ export function registerFeedbinRoutes(router: Router) {
         totalCount = starredEntryIds.length;
         console.log(`Total starred entries: ${totalCount}`);
         
-        // Calculate pagination for the entry IDs
+        // Calculate pagination for the entry IDs - we want to fetch a bit more than needed
+        // to ensure we can sort them properly
+        const batchSize = Math.min(perPage * 2, 100); // Limit batch size to avoid API limits
         const startIndex = (page - 1) * perPage;
-        const endIndex = Math.min(startIndex + perPage, totalCount);
+        const endIndex = Math.min(startIndex + batchSize, totalCount);
         
-        // Get the subset of IDs for the current page
+        // Get the subset of IDs for the current page plus some extra for sorting
         const pageEntryIds = starredEntryIds.slice(startIndex, endIndex);
         
         // Fetch entries for the current page
-        response = await axios.get('https://api.feedbin.com/v2/entries.json', {
+        const entriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
           params: {
-            ids: pageEntryIds.join(','),
-            order: 'desc' // Newest first
+            ids: pageEntryIds.join(',')
           },
           headers: {
             Accept: 'application/json',
             Authorization: `Basic ${process.env.FEEDBIN_KEY}`
           }
         });
+        
+        // Sort entries by published date (newest first)
+        const sortedEntries = entriesResponse.data.sort((a: any, b: any) => {
+          return new Date(b.published).getTime() - new Date(a.published).getTime();
+        });
+        
+        // Take only the entries we need for this page
+        const pageEntries = sortedEntries.slice(0, perPage);
+        
+        // Create the response object for further processing
+        response = { data: pageEntries };
       }
 
       // Fetch content details for each article
