@@ -6,14 +6,47 @@ export function registerFeedbinRoutes(router: Router) {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const perPage = parseInt(req.query.per_page as string) || 20;
+      const since = req.query.since as string || null;
+      const until = req.query.until as string || null;
+      const month = req.query.month as string || null;
+      const year = req.query.year as string || null;
+
+      // Build since date parameter if month and year are provided
+      let sinceDate = since;
+      if (!since && month && year) {
+        // Convert to zero-based month (January is 0)
+        const monthValue = parseInt(month) - 1;
+        sinceDate = new Date(parseInt(year), monthValue, 1).toISOString();
+      }
+
+      // Build until date parameter if month and year are provided and no explicit until
+      let untilDate = until;
+      if (!until && month && year) {
+        // Convert to zero-based month (January is 0)
+        const monthValue = parseInt(month) - 1;
+        // Get the last day of the month
+        const lastDay = new Date(parseInt(year), monthValue + 1, 0).getDate();
+        untilDate = new Date(parseInt(year), monthValue, lastDay, 23, 59, 59).toISOString();
+      }
 
       if (!process.env.FEEDBIN_KEY) {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
 
-      // First, get total count from starred_entries endpoint
+      console.log(`Date filters applied - since: ${sinceDate || 'none'}, until: ${untilDate || 'none'}`);
+
+      // First, get total count from starred_entries endpoint - with date filters if applicable
       console.log('Fetching total starred entries count...');
+      const starredEntriesParams: Record<string, any> = {};
+      if (sinceDate) {
+        starredEntriesParams.since = sinceDate;
+      }
+      if (untilDate) {
+        starredEntriesParams.until = untilDate;
+      }
+
       const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
+        params: starredEntriesParams,
         headers: {
           Accept: 'application/json',
           Authorization: `Basic ${process.env.FEEDBIN_KEY}`
@@ -25,13 +58,23 @@ export function registerFeedbinRoutes(router: Router) {
 
       // Then get paginated data
       console.log(`Fetching page ${page} of starred articles...`);
+      const params: Record<string, any> = {
+        starred: true,
+        per_page: perPage,
+        page: page,
+        order: 'desc' // Ensure we're getting newest first
+      };
+      
+      // Add date filters if applicable
+      if (sinceDate) {
+        params.since = sinceDate;
+      }
+      if (untilDate) {
+        params.until = untilDate;
+      }
+
       const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
-        params: {
-          starred: true,
-          per_page: perPage,
-          page: page,
-          order: 'desc' // Ensure we're getting newest first
-        },
+        params,
         headers: {
           Accept: 'application/json',
           Authorization: `Basic ${process.env.FEEDBIN_KEY}`
@@ -81,6 +124,12 @@ export function registerFeedbinRoutes(router: Router) {
           per_page: perPage,
           total: totalCount,
           total_pages: totalPages
+        },
+        dateFilter: {
+          since: sinceDate,
+          until: untilDate,
+          month: month ? parseInt(month) : null,
+          year: year ? parseInt(year) : null
         }
       });
 
@@ -94,6 +143,12 @@ export function registerFeedbinRoutes(router: Router) {
           per_page: 20,
           total: 0,
           total_pages: 0
+        },
+        dateFilter: {
+          since: null,
+          until: null,
+          month: null,
+          year: null
         }
       });
     }

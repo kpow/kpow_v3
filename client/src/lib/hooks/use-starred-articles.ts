@@ -21,9 +21,17 @@ interface PaginationData {
   total: number;
 }
 
+interface DateFilter {
+  since: string | null;
+  until: string | null;
+  month: number | null;
+  year: number | null;
+}
+
 interface StarredResponse {
   articles: StarredArticle[];
   pagination: PaginationData;
+  dateFilter: DateFilter;
 }
 
 interface TransformedArticle {
@@ -40,6 +48,7 @@ interface TransformedArticle {
 interface TransformedResponse {
   articles: TransformedArticle[];
   pagination: PaginationData;
+  dateFilter: DateFilter;
 }
 
 export function useStarredArticles(page = 1, perPage = 6) {
