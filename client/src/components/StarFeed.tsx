@@ -24,7 +24,12 @@ export function StarFeed() {
       if (!response.ok) {
         throw new Error("Failed to fetch starred articles");
       }
-      return response.json();
+      const data = await response.json();
+      // Ensure we have dateFilter property for compatibility
+      if (!data.dateFilter) {
+        data.dateFilter = { since: null, until: null, month: null, year: null };
+      }
+      return data;
     },
   });
 

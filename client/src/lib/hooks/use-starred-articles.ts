@@ -51,9 +51,27 @@ interface TransformedResponse {
   dateFilter: DateFilter;
 }
 
-export function useStarredArticles(page = 1, perPage = 6) {
+export function useStarredArticles(
+  page = 1, 
+  perPage = 6, 
+  month: number | null = null, 
+  year: number | null = null
+) {
+  // Build the query string
+  const params = new URLSearchParams();
+  params.append('page', page.toString());
+  params.append('per_page', perPage.toString());
+  
+  if (month !== null) {
+    params.append('month', month.toString());
+  }
+  
+  if (year !== null) {
+    params.append('year', year.toString());
+  }
+  
   return useQuery<StarredResponse, Error, TransformedResponse>({
-    queryKey: [`/api/starred-articles?page=${page}&per_page=${perPage}`],
+    queryKey: [`/api/starred-articles?${params.toString()}`],
     select: (data) => ({
       articles: data.articles.map(article => ({
         title: article.title ?? 'Untitled Article',
@@ -61,14 +79,16 @@ export function useStarredArticles(page = 1, perPage = 6) {
         author: article.author ?? 'Unknown Author',
         date: new Date(article.published).toLocaleDateString('en-US', {
           month: 'short',
-          day: 'numeric'
+          day: 'numeric',
+          year: 'numeric'
         }),
         imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
         type: "star" as const,
         url: article.url ?? '#',
         excerpt: article.summary ?? 'No excerpt available'
       })),
-      pagination: data.pagination
+      pagination: data.pagination,
+      dateFilter: data.dateFilter
     })
   });
 }
