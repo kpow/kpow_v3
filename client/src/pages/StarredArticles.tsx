@@ -213,6 +213,30 @@ export default function StarredArticles({
             <PaginationLoader />
           </div>
         </div>
+        
+        {/* Loading message specifically when filtering */}
+        {month !== null || year !== null ? (
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+                  <span className="text-lg font-medium">Loading articles...</span>
+                </div>
+                <p className="text-muted-foreground text-center max-w-md">
+                  {month !== null && year !== null 
+                    ? `Fetching articles from ${getMonthName(month)} ${year}. This may take a moment as we search through thousands of articles.`
+                    : `Fetching articles. This may take a moment.`
+                  }
+                </p>
+                <p className="text-muted-foreground text-sm mt-4">
+                  After the first load, results will be cached for faster access next time.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {Array.from({ length: ARTICLES_PER_PAGE }).map((_, i) => (
             <div key={i} className="space-y-4">
