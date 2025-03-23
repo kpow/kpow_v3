@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { getRandomDefaultImage } from "@/lib/utils";
 
 export interface StarredArticle {
   id: number;
