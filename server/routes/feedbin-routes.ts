@@ -4,12 +4,14 @@ import axios from "axios";
 // Simple in-memory cache for API responses
 const starredArticlesCache: Record<string, {
   timestamp: number,
-  data: any[]
+  data: any[],
+  count: number
 }> = {};
 
 // Cache expiration time: 10 minutes
 const CACHE_TTL = 10 * 60 * 1000;
 
+// A much simpler implementation that directly uses the Feedbin API's date filtering
 export function registerFeedbinRoutes(router: Router) {
   router.get("/api/starred-articles", async (req, res) => {
     try {
@@ -22,172 +24,122 @@ export function registerFeedbinRoutes(router: Router) {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
 
-      // Initialize variables with default values
+      // Initialize variables
       let articleEntries: any[] = [];
       let totalCount = 0;
       let sinceDate: string | null = null;
       let untilDate: string | null = null;
       
-      // Create a cache key if filtering by date
+      // Create a cache key
       const isDateFiltered = month && year;
       const cacheKey = isDateFiltered ? `month-${month}-year-${year}` : 'recent';
       
-      // Check if we have a recent cached response for this filter
-      const cachedResponse = starredArticlesCache[cacheKey];
+      // Check cache first
+      const cachedData = starredArticlesCache[cacheKey];
       const now = Date.now();
       
-      if (cachedResponse && (now - cachedResponse.timestamp < CACHE_TTL)) {
-        console.log(`Using cached data for ${cacheKey}, age: ${Math.floor((now - cachedResponse.timestamp) / 1000)} seconds`);
-        articleEntries = cachedResponse.data;
+      if (cachedData && (now - cachedData.timestamp < CACHE_TTL)) {
+        // Use cached data
+        console.log(`Using cached data for ${cacheKey}, age: ${Math.floor((now - cachedData.timestamp) / 1000)} seconds`);
+        articleEntries = cachedData.data;
+        totalCount = cachedData.count;
         
+        // Set date range for metadata
         if (isDateFiltered) {
-          // Calculate date range for response metadata
-          const jsMonth = parseInt(month) - 1; // Convert to JS 0-based month
+          const jsMonth = parseInt(month) - 1;
           const jsYear = parseInt(year);
-          
-          const firstDay = new Date(Date.UTC(jsYear, jsMonth, 1, 0, 0, 0));
-          const lastDay = new Date(Date.UTC(jsYear, jsMonth + 1, 0, 23, 59, 59));
-          
-          sinceDate = firstDay.toISOString();
-          untilDate = lastDay.toISOString();
+          sinceDate = new Date(Date.UTC(jsYear, jsMonth, 1, 0, 0, 0)).toISOString();
+          untilDate = new Date(Date.UTC(jsYear, jsMonth + 1, 0, 23, 59, 59)).toISOString();
         }
-        
-        totalCount = articleEntries.length;
       } else {
-        // No cache hit, need to fetch from API
+        // No cache hit, fetch from API
         console.log(`No valid cache for ${cacheKey}, fetching from API`);
         
-        // First, get all starred entry IDs
-        const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Basic ${process.env.FEEDBIN_KEY}`
-          }
-        });
+        // Set up request parameters
+        const params: Record<string, any> = {
+          starred: true,
+          per_page: 100
+        };
         
-        const allStarredIds = Array.isArray(starredEntriesResponse.data) 
-          ? starredEntriesResponse.data 
-          : [];
-        
-        console.log(`Total starred entries: ${allStarredIds.length}`);
-        
+        // Add date filtering if needed
         if (isDateFiltered) {
-          // Calculate date range for the month/year
-          const jsMonth = parseInt(month) - 1; // Convert to JS 0-based month
+          const jsMonth = parseInt(month) - 1;
           const jsYear = parseInt(year);
           
-          // First day of the month
+          // Calculate date range
           const firstDay = new Date(Date.UTC(jsYear, jsMonth, 1, 0, 0, 0));
-          // Last day of the month (get day 0 of next month, which is the last day of current month)
           const lastDay = new Date(Date.UTC(jsYear, jsMonth + 1, 0, 23, 59, 59));
           
           sinceDate = firstDay.toISOString();
           untilDate = lastDay.toISOString();
           
+          params.since = sinceDate;
+          params.until = untilDate;
+          
           console.log(`Filtering by date range: ${sinceDate} to ${untilDate}`);
+        }
+        
+        // Initial API request
+        try {
+          const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
+            params: {
+              ...params,
+              page: 1
+            },
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+            }
+          });
           
-          // For date-filtered requests, we'll use a more optimized approach
-          // Instead of processing all articles in batches (which is very slow),
-          // we'll use the since/until parameters of the Feedbin API
+          // Store results
+          articleEntries = response.data;
           
-          try {
-            // Get entries directly filtered by date
-            const entriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
-              params: {
-                starred: true,
-                since: sinceDate,
-                until: untilDate,
-                per_page: 100, // Maximum allowed by API
-                order: 'desc'  // Newest first
-              },
-              headers: {
-                Accept: 'application/json',
-                Authorization: `Basic ${process.env.FEEDBIN_KEY}`
-              }
-            });
+          // If we got max results, there might be more pages
+          if (articleEntries.length === 100) {
+            // Fetch additional pages (up to 10 for performance)
+            let currentPage = 2;
+            let hasMore = true;
             
-            // Add to our collection
-            articleEntries = entriesResponse.data;
-            
-            // If we got max results, we need to paginate through additional pages
-            // (Feedbin API has a limit of 100 per page)
-            if (articleEntries.length === 100) {
-              let currentPage = 2;
-              let hasMore = true;
-              
-              // Maximum of 10 pages (1000 articles) for performance reasons
-              while (hasMore && currentPage <= 10) {
-                try {
-                  const nextPageResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
-                    params: {
-                      starred: true,
-                      since: sinceDate,
-                      until: untilDate,
-                      page: currentPage,
-                      per_page: 100,
-                      order: 'desc'
-                    },
-                    headers: {
-                      Accept: 'application/json',
-                      Authorization: `Basic ${process.env.FEEDBIN_KEY}`
-                    }
-                  });
-                  
-                  const nextPageEntries = nextPageResponse.data;
-                  if (nextPageEntries.length > 0) {
-                    articleEntries = [...articleEntries, ...nextPageEntries];
-                    currentPage++;
-                  } else {
-                    hasMore = false;
+            while (hasMore && currentPage <= 10) {
+              try {
+                const nextResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
+                  params: {
+                    ...params,
+                    page: currentPage
+                  },
+                  headers: {
+                    Accept: 'application/json',
+                    Authorization: `Basic ${process.env.FEEDBIN_KEY}`
                   }
-                } catch (error) {
-                  console.error(`Error fetching page ${currentPage}:`, error);
+                });
+                
+                const nextEntries = nextResponse.data;
+                if (nextEntries.length > 0) {
+                  articleEntries = [...articleEntries, ...nextEntries];
+                  currentPage++;
+                } else {
                   hasMore = false;
                 }
+              } catch (error) {
+                console.error(`Error fetching page ${currentPage}:`, error);
+                hasMore = false;
               }
             }
-            
-            totalCount = articleEntries.length;
-            console.log(`Total entries for ${month}/${year}: ${totalCount}`);
-            
-            // Cache the results
-            starredArticlesCache[cacheKey] = {
-              timestamp: now,
-              data: articleEntries
-            };
-            
-          } catch (error) {
-            console.error('Error fetching filtered entries:', error);
           }
-        } else {
-          // No date filtering - get the latest starred entries
-          try {
-            // Get entries directly from the API with pagination
-            const entriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
-              params: {
-                starred: true,
-                page: 1,
-                per_page: 100, // Max per page
-                order: 'desc'  // Newest first
-              },
-              headers: {
-                Accept: 'application/json',
-                Authorization: `Basic ${process.env.FEEDBIN_KEY}`
-              }
-            });
-            
-            articleEntries = entriesResponse.data;
-            totalCount = allStarredIds.length;
-            
-            // Cache the results
-            starredArticlesCache[cacheKey] = {
-              timestamp: now,
-              data: articleEntries
-            };
-            
-          } catch (error) {
-            console.error('Error fetching recent entries:', error);
-          }
+          
+          // Count and cache
+          totalCount = articleEntries.length;
+          console.log(`Total entries for ${isDateFiltered ? `${month}/${year}` : 'recent'}: ${totalCount}`);
+          
+          // Cache the results
+          starredArticlesCache[cacheKey] = {
+            timestamp: now,
+            data: articleEntries,
+            count: totalCount
+          };
+        } catch (error) {
+          console.error(`Error fetching entries for ${cacheKey}:`, error);
         }
       }
       
