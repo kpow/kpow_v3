@@ -11,82 +11,102 @@ export function registerFeedbinRoutes(router: Router) {
       const month = req.query.month as string || null;
       const year = req.query.year as string || null;
 
-      // Build since date parameter if month and year are provided
-      let sinceDate = since;
-      if (!since && month && year) {
-        // Month from UI is 1-based (January is 1)
-        const monthValue = parseInt(month) - 1; // Convert to 0-based for JS Date
-        sinceDate = new Date(parseInt(year), monthValue, 1).toISOString();
-      }
-
-      // Build until date parameter if month and year are provided and no explicit until
-      let untilDate = until;
-      if (!until && month && year) {
-        // Month from UI is 1-based (January is 1)
-        const monthValue = parseInt(month) - 1; // Convert to 0-based for JS Date
-        // Get the last day of the month
-        const lastDay = new Date(parseInt(year), monthValue + 1, 0).getDate();
-        untilDate = new Date(parseInt(year), monthValue, lastDay, 23, 59, 59).toISOString();
-      }
-
       if (!process.env.FEEDBIN_KEY) {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
 
-      console.log(`Date filters applied - since: ${sinceDate || 'none'}, until: ${untilDate || 'none'}`);
-
-      // First, get total count from starred_entries endpoint
-      console.log('Fetching total starred entries count...');
+      // First determine if we need date filtering
+      const isDateFiltered = month && year;
       
-      // Important: We need to first get the IDs of all starred entries for the date range
-      const starredEntriesParams: Record<string, any> = {};
-      if (sinceDate) {
-        starredEntriesParams.since = sinceDate;
-      }
-      if (untilDate) {
-        starredEntriesParams.until = untilDate;
-      }
-
-      const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
-        params: starredEntriesParams,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Basic ${process.env.FEEDBIN_KEY}`
-        }
-      });
-
-      // Get the array of starred entry IDs
-      const starredEntryIds = Array.isArray(starredEntriesResponse.data) ? starredEntriesResponse.data : [];
-      const totalCount = starredEntryIds.length;
-      console.log(`Total starred entries: ${totalCount}`);
-
-      // Then get paginated data - we need to fetch specific entry IDs
-      console.log(`Fetching page ${page} of starred articles...`);
+      // Initialize variables with default values
+      let response: { data: any[] } = { data: [] };
+      let totalCount = 0;
+      let sinceDate: string | null = null;
+      let untilDate: string | null = null;
       
-      // Calculate pagination for the entry IDs
-      const startIndex = (page - 1) * perPage;
-      const endIndex = Math.min(startIndex + perPage, totalCount);
-      
-      // Get the subset of IDs for the current page
-      const pageEntryIds = starredEntryIds.slice(startIndex, endIndex);
-      
-      let response;
-      
-      if (pageEntryIds.length > 0) {
-        // Fetch entries by IDs (when we have IDs for the current page)
-        response = await axios.get('https://api.feedbin.com/v2/entries.json', {
+      if (isDateFiltered) {
+        console.log(`Filtering by date: Month ${month}, Year ${year}`);
+        
+        // Convert month to a JS month (0-based)
+        const jsMonth = parseInt(month) - 1;
+        const jsYear = parseInt(year);
+        
+        // First day of the month
+        const firstDay = new Date(jsYear, jsMonth, 1);
+        // Last day of the month (get day 0 of next month, which is the last day of current month)
+        const lastDay = new Date(jsYear, jsMonth + 1, 0, 23, 59, 59);
+        
+        // Format dates for Feedbin API
+        sinceDate = firstDay.toISOString();
+        untilDate = lastDay.toISOString();
+        
+        console.log(`Date range: ${sinceDate} to ${untilDate}`);
+        
+        // We need to get all entries for the month first
+        // This is because we're filtering by publication date, not by when they were starred
+        const monthEntriesResponse = await axios.get('https://api.feedbin.com/v2/entries.json', {
           params: {
-            ids: pageEntryIds.join(','),
-            order: 'desc' // Ensure we're getting newest first
+            starred: true,
+            per_page: 100, // Get a lot at once to minimize API calls
+            published_since: sinceDate,
+            published_before: untilDate,
           },
           headers: {
             Accept: 'application/json',
             Authorization: `Basic ${process.env.FEEDBIN_KEY}`
           }
         });
+        
+        // Entries for the month
+        const monthEntries = monthEntriesResponse.data;
+        totalCount = monthEntries.length;
+        console.log(`Found ${totalCount} articles for ${month}/${year}`);
+        
+        // Calculate pagination manually
+        const startIndex = (page - 1) * perPage;
+        const endIndex = Math.min(startIndex + perPage, totalCount);
+        
+        // Get the page slice
+        const pageEntries = monthEntries.slice(startIndex, endIndex);
+        
+        // Construct fake response for processing
+        response = { data: pageEntries };
+      
       } else {
-        // When there are no entries matching the filter, return an empty array
-        response = { data: [] };
+        // No date filtering - get all starred entries
+        console.log('No date filtering, getting all starred entries');
+        
+        // First, get all starred entry IDs
+        const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+          }
+        });
+        
+        // Get the array of starred entry IDs
+        const starredEntryIds = Array.isArray(starredEntriesResponse.data) ? starredEntriesResponse.data : [];
+        totalCount = starredEntryIds.length;
+        console.log(`Total starred entries: ${totalCount}`);
+        
+        // Calculate pagination for the entry IDs
+        const startIndex = (page - 1) * perPage;
+        const endIndex = Math.min(startIndex + perPage, totalCount);
+        
+        // Get the subset of IDs for the current page
+        const pageEntryIds = starredEntryIds.slice(startIndex, endIndex);
+        
+        // Fetch entries for the current page
+        response = await axios.get('https://api.feedbin.com/v2/entries.json', {
+          params: {
+            ids: pageEntryIds.join(','),
+            order: 'desc' // Newest first
+          },
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+          }
+        });
       }
 
       // Fetch content details for each article
