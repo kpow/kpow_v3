@@ -9,7 +9,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowUpDown, Search, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { type Artist } from "@/types/artist";
 import {
@@ -274,6 +274,8 @@ export function ArtistDataTable({
     pageIndex: initialPage,
     pageSize: 10,
   });
+  const [nameSearch, setNameSearch] = useState<string>("");
+  const [activeNameSearch, setActiveNameSearch] = useState<string>("");
 
   const [pageInput, setPageInput] = useState<string>(
     (initialPage + 1).toString(),
@@ -302,15 +304,41 @@ export function ArtistDataTable({
     setPageInput((pageIndex + 1).toString());
   }, [pageIndex]);
 
+  // Handle search submission
+  const handleSearch = () => {
+    // Reset to first page when performing a new search
+    setPagination({
+      pageIndex: 0,
+      pageSize,
+    });
+    setActiveNameSearch(nameSearch);
+  };
+
+  // Clear search
+  const handleClearSearch = () => {
+    setNameSearch("");
+    setActiveNameSearch("");
+    // Reset to first page
+    setPagination({
+      pageIndex: 0,
+      pageSize,
+    });
+  };
+
   const { data, isLoading } = useQuery({
-    queryKey: ["/api/table/artists", pageIndex, pageSize, sorting],
+    queryKey: ["/api/table/artists", pageIndex, pageSize, sorting, activeNameSearch],
     queryFn: async () => {
       const sortBy = sorting[0]?.id || "id";
       const sortOrder = sorting[0]?.desc ? "desc" : "asc";
+      
+      let url = `/api/table/artists?page=${pageIndex + 1}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+      
+      // Add name search parameter if there's an active search
+      if (activeNameSearch) {
+        url += `&nameSearch=${encodeURIComponent(activeNameSearch)}`;
+      }
 
-      const response = await fetch(
-        `/api/table/artists?page=${pageIndex + 1}&pageSize=${pageSize}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
-      );
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch artists");
       return response.json();
     },
@@ -373,9 +401,58 @@ export function ArtistDataTable({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold mb-6">
-        all artists played since 2016:
-      </h2>
+      <div className="flex justify-between">
+        <h2 className="text-2xl font-bold mb-6">
+          all artists played:
+        </h2>
+
+        {/* Search input and button */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 md:flex-initial flex items-center gap-2">
+            <div className="relative flex-1 md:w-64">
+              <Input
+                type="text"
+                placeholder="Search artist name..."
+                value={nameSearch}
+                onChange={(e) => setNameSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSearch();
+                  }
+                }}
+                className="pr-8"
+              />
+              {nameSearch && (
+                <button 
+                  onClick={handleClearSearch}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <Button 
+              onClick={handleSearch}
+              className="font-slackey bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center gap-1"
+            >
+              <Search className="h-4 w-4" />
+              Search
+            </Button>
+
+            {activeNameSearch && (
+              <div className="flex items-center gap-1 text-sm">
+                <span className="font-medium">Filtering by:</span>
+                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center gap-1">
+                  {activeNameSearch}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    
+      
       <TablePagination
         table={table}
         pageInput={pageInput}

@@ -27,14 +27,21 @@ router.get('/artists', async (req, res) => {
     const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize as string) || 10));
     const sortBy = (req.query.sortBy as string) || 'id';
     let sortOrder = (req.query.sortOrder as string)?.toLowerCase() === 'desc' ? 'desc' : 'asc';
+    const nameSearch = (req.query.nameSearch as string) || '';
 
     const offset = (page - 1) * pageSize;
 
-    // Get total count first
+    // Prepare where clause for name search
+    const whereClause = nameSearch 
+      ? sql`LOWER(${artists.name}) LIKE ${`%${nameSearch.toLowerCase()}%`}`
+      : undefined;
+
+    // Get total count first with search filter if provided
     const countResult = await db.select({ 
       count: sql<number>`count(*)`.mapWith(Number) 
     })
-    .from(artists);
+    .from(artists)
+    .where(whereClause);
 
     const total = countResult[0].count;
 
@@ -104,6 +111,7 @@ router.get('/artists', async (req, res) => {
     })
     .from(artists)
     .leftJoin(artistsWithCounts, sql`${artists.id} = ${artistsWithCounts.artistId}`)
+    .where(whereClause) // Apply name search filter
     .limit(pageSize)
     .offset(offset)
     .orderBy(...orderByClause);
