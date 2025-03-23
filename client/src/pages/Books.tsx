@@ -120,7 +120,6 @@ export default function Books({ params }: { params?: { page?: string } }) {
   // Handle search button click
   const handleSearchClick = () => {
     setSearchQuery(searchInputValue);
-    setLocation("/books"); // Reset to page 1
   };
 
   // Handle "Go to Page" navigation
