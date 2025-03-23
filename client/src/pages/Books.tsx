@@ -384,7 +384,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
         </div>
 
         {/* Search and Filter Panel */}
-        <div className="mb-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
+        <div className="mb-2 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             {/* Search Input */}
             <div className="flex-1 flex flex-col gap-2 md:flex-row md:items-center">
@@ -537,7 +537,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
         </div>
 
         {/* Results Count */}
-        <div className="mb-2 flex justify-between items-center">
+        <div className="mb-4 flex justify-between items-center">
           <div className="flex justify-between items-center">
             {/* Go to Page */}
             <div className="flex">
