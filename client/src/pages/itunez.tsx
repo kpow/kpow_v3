@@ -4,9 +4,8 @@ import { Card } from "@/components/ui/card";
 import { SEO } from "@/components/global/SEO";
 import { PageTitle } from "@/components/ui/page-title";
 import { ArtistDetailsModal } from "@/components/itunes/artist-details-modal";
-import { YearlyTopSongs } from "@/components/itunes/yearly-top-songs";
-import { YearlyTopArtists } from "@/components/itunes/yearly-top-artists";
-import { ArtistDataTable } from "@/components/itunes/artist-data-table"; // Added import
+import { YearlyTopMusic } from "@/components/itunes/yearly-top-music";
+import { ArtistDataTable } from "@/components/itunes/artist-data-table";
 import { type Artist } from "@/types/artist";
 import { useQuery } from "@tanstack/react-query";
 
@@ -57,16 +56,8 @@ export default function ITunezPage() {
         </Card>
 
         <Card className="p-4">
-          <YearlyTopArtists
+          <YearlyTopMusic
             onArtistClick={setSelectedArtist}
-            carouselPosition="right"
-          />
-        </Card>
-
-        <Card className="p-4">
-          <YearlyTopSongs
-            onArtistClick={setSelectedArtist}
-            carouselPosition="left"
           />
         </Card>
 
