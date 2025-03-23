@@ -89,7 +89,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
   }
 
   // Fetch shelves for filtering
-  const { data: shelvesData } = useQuery<ShelvesResponse>({
+  const { data: shelvesData, isLoading: isShelvesLoading } = useQuery<ShelvesResponse>({
     queryKey: ["shelves"],
     queryFn: async () => {
       const response = await fetch("/api/books/shelves", {
@@ -266,31 +266,81 @@ export default function Books({ params }: { params?: { page?: string } }) {
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center flex-col md:flex-row">
+        <div className="flex justify-between items-center flex-col sm:flex-row mb-4">
           <PageTitle size="lg" alignment="left">
             book feed
           </PageTitle>
-
-          <div className="flex justify-center gap-2 items-center mb-3">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled
-              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm">Loading</span>
-            <Button
-              variant="outline"
-              size="icon"
-              disabled
-              className="bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-2 px-4 rounded"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+        </div>
+        
+        {/* Search and Filter Panel Loading Skeleton */}
+        <div className="mb-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1 flex flex-col gap-2 md:flex-row md:items-center">
+              <div className="flex flex-1 gap-2">
+                <div className="relative flex-1">
+                  <Skeleton className="h-10 w-full rounded" />
+                </div>
+                <Skeleton className="h-10 w-24 rounded" />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-32 rounded" />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-10 w-32 rounded" />
+                <Skeleton className="h-10 w-24 rounded" />
+              </div>
+            </div>
+          </div>
+          
+          {/* Advanced Filters Loading Skeleton */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Shelf Filter Skeleton */}
+            <div>
+              <Skeleton className="h-4 w-16 mb-2 rounded" />
+              <Skeleton className="h-10 w-full rounded" />
+            </div>
+            
+            {/* Sort By Skeleton */}
+            <div>
+              <Skeleton className="h-4 w-16 mb-2 rounded" />
+              <Skeleton className="h-10 w-full rounded" />
+            </div>
+            
+            {/* Sort Direction Skeleton */}
+            <div>
+              <Skeleton className="h-4 w-24 mb-2 rounded" />
+              <Skeleton className="h-10 w-full rounded" />
+            </div>
           </div>
         </div>
+        
+        {/* Results Count Loading Skeleton */}
+        <div className="mb-2 flex justify-between items-center">
+          <div className="flex justify-between items-center">
+            <div className="flex">
+              <div className="flex gap-2">
+                <Skeleton className="h-10 w-[80px] rounded" />
+                <Skeleton className="h-10 w-12 rounded" />
+              </div>
+            </div>
+            
+            <div className="flex flex-col justify-end ml-4">
+              <Skeleton className="h-4 w-48 rounded mb-1" />
+              <Skeleton className="h-4 w-24 rounded" />
+            </div>
+          </div>
+          
+          <div className="flex justify-center gap-2 items-center">
+            <Skeleton className="h-10 w-10 rounded" />
+            <Skeleton className="h-6 w-24 rounded" />
+            <Skeleton className="h-10 w-10 rounded" />
+          </div>
+        </div>
+        
+        {/* Books Grid Loading Skeleton */}
         <div className="grid gap-2 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
           {[...Array(booksPerPage)].map((_, i) => (
             <Skeleton key={i} className="h-[200px] w-full rounded-lg" />
@@ -421,19 +471,23 @@ export default function Books({ params }: { params?: { page?: string } }) {
                 >
                   Shelf
                 </Label>
-                <Select value={selectedShelf} onValueChange={setSelectedShelf}>
-                  <SelectTrigger id="shelf-filter">
-                    <SelectValue placeholder="All Shelves" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Shelves</SelectItem>
-                    {shelves.map((shelf) => (
-                      <SelectItem key={shelf.id} value={shelf.name}>
-                        {shelf.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isShelvesLoading ? (
+                  <Skeleton className="h-10 w-full rounded" />
+                ) : (
+                  <Select value={selectedShelf} onValueChange={setSelectedShelf}>
+                    <SelectTrigger id="shelf-filter">
+                      <SelectValue placeholder="All Shelves" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Shelves</SelectItem>
+                      {shelves.map((shelf) => (
+                        <SelectItem key={shelf.id} value={shelf.name}>
+                          {shelf.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               {/* Sort By */}
