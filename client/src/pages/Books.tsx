@@ -89,20 +89,21 @@ export default function Books({ params }: { params?: { page?: string } }) {
   }
 
   // Fetch shelves for filtering
-  const { data: shelvesData, isLoading: isShelvesLoading } = useQuery<ShelvesResponse>({
-    queryKey: ["shelves"],
-    queryFn: async () => {
-      const response = await fetch("/api/books/shelves", {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error(`${response.status}: ${await response.text()}`);
-      }
-      return response.json();
-    },
-    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
-    gcTime: 1000 * 60 * 60, // Keep for 1 hour
-  });
+  const { data: shelvesData, isLoading: isShelvesLoading } =
+    useQuery<ShelvesResponse>({
+      queryKey: ["shelves"],
+      queryFn: async () => {
+        const response = await fetch("/api/books/shelves", {
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error(`${response.status}: ${await response.text()}`);
+        }
+        return response.json();
+      },
+      staleTime: 1000 * 60 * 30, // Cache for 30 minutes
+      gcTime: 1000 * 60 * 60, // Keep for 1 hour
+    });
 
   // Debounced search function
   const debouncedSearch = useCallback(
@@ -120,6 +121,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
   // Handle search button click
   const handleSearchClick = () => {
     setSearchQuery(searchInputValue);
+    setLocation("/books");
   };
 
   // Handle "Go to Page" navigation
@@ -271,7 +273,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
             book feed
           </PageTitle>
         </div>
-        
+
         {/* Search and Filter Panel Loading Skeleton */}
         <div className="mb-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -282,19 +284,19 @@ export default function Books({ params }: { params?: { page?: string } }) {
                 </div>
                 <Skeleton className="h-10 w-24 rounded" />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Skeleton className="h-4 w-4 rounded" />
                 <Skeleton className="h-4 w-32 rounded" />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Skeleton className="h-10 w-32 rounded" />
                 <Skeleton className="h-10 w-24 rounded" />
               </div>
             </div>
           </div>
-          
+
           {/* Advanced Filters Loading Skeleton */}
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Shelf Filter Skeleton */}
@@ -302,13 +304,13 @@ export default function Books({ params }: { params?: { page?: string } }) {
               <Skeleton className="h-4 w-16 mb-2 rounded" />
               <Skeleton className="h-10 w-full rounded" />
             </div>
-            
+
             {/* Sort By Skeleton */}
             <div>
               <Skeleton className="h-4 w-16 mb-2 rounded" />
               <Skeleton className="h-10 w-full rounded" />
             </div>
-            
+
             {/* Sort Direction Skeleton */}
             <div>
               <Skeleton className="h-4 w-24 mb-2 rounded" />
@@ -316,7 +318,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
             </div>
           </div>
         </div>
-        
+
         {/* Results Count Loading Skeleton */}
         <div className="mb-2 flex justify-between items-center">
           <div className="flex justify-between items-center">
@@ -326,20 +328,20 @@ export default function Books({ params }: { params?: { page?: string } }) {
                 <Skeleton className="h-10 w-12 rounded" />
               </div>
             </div>
-            
+
             <div className="flex flex-col justify-end ml-4">
               <Skeleton className="h-4 w-48 rounded mb-1" />
               <Skeleton className="h-4 w-24 rounded" />
             </div>
           </div>
-          
+
           <div className="flex justify-center gap-2 items-center">
             <Skeleton className="h-10 w-10 rounded" />
             <Skeleton className="h-6 w-24 rounded" />
             <Skeleton className="h-10 w-10 rounded" />
           </div>
         </div>
-        
+
         {/* Books Grid Loading Skeleton */}
         <div className="grid gap-2 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
           {[...Array(booksPerPage)].map((_, i) => (
@@ -474,7 +476,10 @@ export default function Books({ params }: { params?: { page?: string } }) {
                 {isShelvesLoading ? (
                   <Skeleton className="h-10 w-full rounded" />
                 ) : (
-                  <Select value={selectedShelf} onValueChange={setSelectedShelf}>
+                  <Select
+                    value={selectedShelf}
+                    onValueChange={setSelectedShelf}
+                  >
                     <SelectTrigger id="shelf-filter">
                       <SelectValue placeholder="All Shelves" />
                     </SelectTrigger>
@@ -536,12 +541,18 @@ export default function Books({ params }: { params?: { page?: string } }) {
           )}
         </div>
 
-        {/* Results Count */}
+        {/* nav */}
         <div className="mb-4 flex justify-between items-center">
           <div className="flex justify-between items-center">
             {/* Go to Page */}
             <div className="flex">
               <div className="flex gap-2">
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
+                  onClick={handleGoToPage}
+                >
+                  Go
+                </Button>
                 <Input
                   id="go-to-page"
                   type="number"
@@ -552,26 +563,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
                   onChange={(e) => setPageToNavigate(e.target.value)}
                   placeholder={`1-${totalPages}`}
                 />
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold py-2 px-4 rounded"
-                  onClick={handleGoToPage}
-                >
-                  Go
-                </Button>
-              </div>
-            </div>
-
-            {/* Summary Info */}
-            <div className="flex flex-col justify-end ml-4">
-              <div className="text-sm text-gray-500">
-                {books.length} of {totalBooks} books{" "}
-                {searchQuery && `matching "${searchQuery}"`}
-                {selectedShelf &&
-                  selectedShelf !== "all" &&
-                  ` in shelf "${selectedShelf}"`}
-              </div>
-              <div className="text-sm text-gray-500">
-                Page {currentPage} of {totalPages}
+                
               </div>
             </div>
           </div>
