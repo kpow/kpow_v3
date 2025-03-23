@@ -68,6 +68,10 @@ export default function StarredArticles({
   const [year, setYear] = useState<number | null>(
     params?.year ? parseInt(params.year) : null
   );
+  
+  // Temporary state for the picker controls
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(month);
+  const [selectedYear, setSelectedYear] = useState<number | null>(year);
 
   // Handle invalid page numbers
   if (params?.page && (isNaN(currentPage) || currentPage < 1)) {
@@ -97,8 +101,14 @@ export default function StarredArticles({
   const totalArticles = data?.pagination?.total ?? 0;
   const dateFilter = data?.dateFilter;
 
-  // Handle date range selection
-  const handleDateChange = (newMonth: number | null, newYear: number | null) => {
+  // Handle selection changes (without applying filter)
+  const handleSelectionChange = (newMonth: number | null, newYear: number | null) => {
+    setSelectedMonth(newMonth);
+    setSelectedYear(newYear);
+  };
+  
+  // Handle search button click
+  const handleSearch = (newMonth: number | null, newYear: number | null) => {
     // Reset to page 1 when date filter changes
     setMonth(newMonth);
     setYear(newYear);
@@ -121,6 +131,15 @@ export default function StarredArticles({
     
     window.scrollTo({ top: 0, behavior: "smooth" });
     setLocation(newPath);
+  };
+  
+  // Handle reset
+  const handleReset = () => {
+    setSelectedMonth(null);
+    setSelectedYear(null);
+    setMonth(null);
+    setYear(null);
+    setLocation("/starred-articles");
   };
 
   // Handle page change
@@ -244,18 +263,20 @@ export default function StarredArticles({
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full sm:w-auto">
+              <div className="flex flex-col gap-2 items-start w-full sm:w-auto">
                 <MonthYearPicker
-                  month={month}
-                  year={year}
-                  onChange={handleDateChange}
+                  month={selectedMonth}
+                  year={selectedYear}
+                  onChange={handleSelectionChange}
+                  onSearch={handleSearch}
+                  onReset={handleReset}
                   minYear={2016}
                   maxYear={new Date().getFullYear()}
-                  onReset={() => handleDateChange(null, null)}
                 />
                 
                 {(month !== null || year !== null) && (
-                  <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <p className="text-sm font-medium mr-2">Active filters:</p>
                     {month !== null && (
                       <Badge variant="secondary" className="text-xs py-1">
                         {getMonthName(month)}
@@ -266,14 +287,6 @@ export default function StarredArticles({
                         {year}
                       </Badge>
                     )}
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => handleDateChange(null, null)}
-                      className="h-7 text-xs"
-                    >
-                      Clear
-                    </Button>
                   </div>
                 )}
               </div>
