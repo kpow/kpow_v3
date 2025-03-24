@@ -145,6 +145,10 @@ export function registerFeedbinRoutes(router: Router) {
           total: totalCount,
           total_pages: totalPages
         },
+        filter: {
+          month: month !== null ? month : undefined,
+          year: year !== null ? year : undefined
+        },
         monthIndex: {
           availableMonths: availableMonths.map(entry => ({
             month: entry.month,
@@ -164,6 +168,10 @@ export function registerFeedbinRoutes(router: Router) {
           per_page: 20,
           total: 0,
           total_pages: 0
+        },
+        filter: {
+          month: month !== null ? month : undefined,
+          year: year !== null ? year : undefined
         }
       });
     }

@@ -40,6 +40,10 @@ interface TransformedArticle {
 interface TransformedResponse {
   articles: TransformedArticle[];
   pagination: PaginationData;
+  filter?: {
+    month?: number;
+    year?: number;
+  };
 }
 
 export function useStarredArticles(
