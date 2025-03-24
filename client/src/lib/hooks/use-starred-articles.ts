@@ -24,6 +24,10 @@ interface PaginationData {
 interface StarredResponse {
   articles: StarredArticle[];
   pagination: PaginationData;
+  filter?: {
+    month?: number;
+    year?: number;
+  };
 }
 
 interface TransformedArticle {
@@ -81,23 +85,25 @@ export function useStarredArticles(
       }
       return response.json();
     },
-    select: (data) => ({
-      articles: data.articles.map(article => ({
-        title: article.title ?? 'Untitled Article',
-        subtitle: `by ${article.author ?? 'Unknown Author'}`,
-        author: article.author ?? 'Unknown Author',
-        date: new Date(article.published).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
-        }),
-        imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
-        type: "star" as const,
-        url: article.url ?? '#',
-        excerpt: article.summary ?? 'No excerpt available'
-      })),
-      pagination: data.pagination,
-      filter: data.filter
-    })
+    select: (data) => {
+      return {
+        articles: data.articles.map(article => ({
+          title: article.title ?? 'Untitled Article',
+          subtitle: `by ${article.author ?? 'Unknown Author'}`,
+          author: article.author ?? 'Unknown Author',
+          date: new Date(article.published).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          }),
+          imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
+          type: "star" as const,
+          url: article.url ?? '#',
+          excerpt: article.summary ?? 'No excerpt available'
+        })),
+        pagination: data.pagination,
+        filter: data.filter
+      };
+    }
   });
 }

@@ -170,8 +170,8 @@ export function registerFeedbinRoutes(router: Router) {
           total_pages: 0
         },
         filter: {
-          month: month !== null ? month : undefined,
-          year: year !== null ? year : undefined
+          month: undefined,
+          year: undefined
         }
       });
     }
@@ -241,7 +241,7 @@ export function registerFeedbinRoutes(router: Router) {
         
         try {
           // Get articles for this page
-          const response = await axios.get<any[]>('https://api.feedbin.com/v2/entries.json', {
+          const apiResponse = await axios.get<any[]>('https://api.feedbin.com/v2/entries.json', {
             params: {
               starred: true,
               per_page: PER_PAGE,
@@ -254,18 +254,18 @@ export function registerFeedbinRoutes(router: Router) {
             }
           });
           
-          if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+          if (!apiResponse.data || !Array.isArray(apiResponse.data) || apiResponse.data.length === 0) {
             console.log(`No more articles found on page ${page}, stopping scan`);
             stop = true;
             continue;
           }
           
-          console.log(`Found ${response.data.length} articles on page ${page}`);
+          console.log(`Found ${apiResponse.data.length} articles on page ${page}`);
           
           // Get the oldest and newest dates on this page for debugging
-          if (response.data.length > 0) {
-            const firstArticleDate = new Date(response.data[0].published as string);
-            const lastArticleDate = new Date(response.data[response.data.length - 1].published as string);
+          if (apiResponse.data.length > 0) {
+            const firstArticleDate = new Date(apiResponse.data[0].published as string);
+            const lastArticleDate = new Date(apiResponse.data[apiResponse.data.length - 1].published as string);
             console.log(`Page ${page} date range: ${firstArticleDate.toISOString()} to ${lastArticleDate.toISOString()}`);
           }
           
@@ -273,7 +273,7 @@ export function registerFeedbinRoutes(router: Router) {
           const pageMonths: Record<string, { month: number; year: number; count: number }> = {};
           
           // Process each article to extract month/year
-          for (const article of response.data) {
+          for (const article of apiResponse.data) {
             if (article.published) {
               const publishDate = new Date(article.published as string);
               const month = publishDate.getMonth() + 1; // Convert 0-indexed to 1-indexed
