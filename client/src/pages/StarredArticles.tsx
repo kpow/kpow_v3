@@ -35,7 +35,13 @@ interface StarredResponse {
 const ARTICLES_PER_PAGE = 9;
 
 // Component for month and year selection
-function MonthYearSelector({ onNavigate }: { onNavigate: (page: number) => void }) {
+function MonthYearSelector({ 
+  onNavigate, 
+  totalArticles 
+}: { 
+  onNavigate: (page: number) => void; 
+  totalArticles: number;
+}) {
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>("");
 
@@ -72,7 +78,21 @@ function MonthYearSelector({ onNavigate }: { onNavigate: (page: number) => void 
       );
       
       if (entry) {
-        onNavigate(entry.startPage);
+        // Calculate page adjustment based on new articles added since index was created
+        // The index was created when there were 6131 total articles
+        // For every 9 new articles, we need to add 1 to the page number
+        const indexTotalArticles = yearMonthIndex.totalArticles; // 6131
+        
+        let adjustedPage = entry.startPage;
+        
+        // If we have more articles now than when the index was created
+        if (totalArticles > indexTotalArticles) {
+          const newArticles = totalArticles - indexTotalArticles;
+          const pageAdjustment = Math.floor(newArticles / ARTICLES_PER_PAGE);
+          adjustedPage += pageAdjustment;
+        }
+        
+        onNavigate(adjustedPage);
       }
     }
   };
@@ -277,7 +297,7 @@ export default function StarredArticles({
         </div>
         
         {/* Month and Year Selector */}
-        <MonthYearSelector onNavigate={handlePageChange} />
+        <MonthYearSelector onNavigate={handlePageChange} totalArticles={totalArticles} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article) => (
