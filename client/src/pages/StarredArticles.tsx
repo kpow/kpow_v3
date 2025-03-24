@@ -75,7 +75,7 @@ export default function StarredArticles({
   };
   
   // Handle month selection
-  const handleMonthSelect = (month: number, year: number) => {
+  const handleMonthSelect = async (month: number, year: number) => {
     // If month and year are both 0, it means "clear selection"
     if (month === 0 && year === 0) {
       setSelectedMonth(null);
@@ -87,10 +87,35 @@ export default function StarredArticles({
       return;
     }
     
-    setSelectedMonth(month);
-    setSelectedYear(year);
-    // When selecting a month, always start at page 1
-    setLocation("/starred-articles");
+    try {
+      // First, fetch the page number for this month/year from the server
+      const response = await fetch(`/api/starred-articles/months?month=${month}&year=${year}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch month page information');
+      }
+      
+      const data = await response.json();
+      const targetPage = data.pageNumber || 1;
+      
+      // Save selected month/year state
+      setSelectedMonth(month);
+      setSelectedYear(year);
+      
+      // Navigate to the correct page
+      if (targetPage === 1) {
+        setLocation("/starred-articles");
+      } else {
+        setLocation(`/starred-articles/page/${targetPage}`);
+      }
+      
+    } catch (error) {
+      console.error("Error navigating to month:", error);
+      toast({
+        title: "Navigation Error",
+        description: "Failed to navigate to the selected month. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   
   // Use our enhanced useStarredArticles hook with month/year filtering

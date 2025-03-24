@@ -180,6 +180,20 @@ export function registerFeedbinRoutes(router: Router) {
   // Add an endpoint to get the available months
   router.get("/api/starred-articles/months", async (req, res) => {
     try {
+      const month = req.query.month ? parseInt(req.query.month as string) : null;
+      const year = req.query.year ? parseInt(req.query.year as string) : null;
+      
+      // If month and year are provided, return the page number for that month/year
+      if (month !== null && year !== null && !isNaN(month) && !isNaN(year)) {
+        const pageNumber = findPageForMonth(month, year);
+        return res.json({
+          pageNumber: pageNumber || 1,
+          month,
+          year
+        });
+      }
+      
+      // Otherwise, return all available months
       const availableMonths = getAvailableMonths();
       
       res.json({
@@ -240,8 +254,17 @@ export function registerFeedbinRoutes(router: Router) {
         console.log(`Scanning page ${page}...`);
         
         try {
+          // Define a type for the API response
+          interface FeedbinArticle {
+            id: number;
+            published: string;
+            title: string;
+            url: string;
+            // Add other fields as needed
+          }
+          
           // Get articles for this page
-          const apiResponse = await axios.get<any[]>('https://api.feedbin.com/v2/entries.json', {
+          const apiResponse = await axios.get<FeedbinArticle[]>('https://api.feedbin.com/v2/entries.json', {
             params: {
               starred: true,
               per_page: PER_PAGE,
@@ -264,8 +287,8 @@ export function registerFeedbinRoutes(router: Router) {
           
           // Get the oldest and newest dates on this page for debugging
           if (apiResponse.data.length > 0) {
-            const firstArticleDate = new Date(apiResponse.data[0].published as string);
-            const lastArticleDate = new Date(apiResponse.data[apiResponse.data.length - 1].published as string);
+            const firstArticleDate = new Date(apiResponse.data[0].published);
+            const lastArticleDate = new Date(apiResponse.data[apiResponse.data.length - 1].published);
             console.log(`Page ${page} date range: ${firstArticleDate.toISOString()} to ${lastArticleDate.toISOString()}`);
           }
           
@@ -275,7 +298,7 @@ export function registerFeedbinRoutes(router: Router) {
           // Process each article to extract month/year
           for (const article of apiResponse.data) {
             if (article.published) {
-              const publishDate = new Date(article.published as string);
+              const publishDate = new Date(article.published);
               const month = publishDate.getMonth() + 1; // Convert 0-indexed to 1-indexed
               const year = publishDate.getFullYear();
               const key = `${month}-${year}`;
