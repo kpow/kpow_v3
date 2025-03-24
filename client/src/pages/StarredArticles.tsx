@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarIcon, Search } from "lucide-react";
 import { useLocation } from "wouter";
 import { ContentSection } from "@/components/home/ContentSection";
 import { StarredArticle } from "@/lib/hooks/use-starred-articles";
@@ -10,6 +10,15 @@ import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { SEO } from "@/components/global/SEO";
 import { getRandomDefaultImage } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import yearMonthIndex from "../data/year-month-starred-article-index.json";
 
 interface PaginationData {
   current_page: number;
@@ -24,6 +33,107 @@ interface StarredResponse {
 }
 
 const ARTICLES_PER_PAGE = 9;
+
+// Component for month and year selection
+function MonthYearSelector({ onNavigate }: { onNavigate: (page: number) => void }) {
+  const [selectedYear, setSelectedYear] = useState<string>("");
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+
+  // Get unique years from the index, sorted in descending order
+  const years = Array.from(
+    new Set(yearMonthIndex.entries.map((entry) => entry.year.toString()))
+  ).sort((a, b) => parseInt(b) - parseInt(a));
+
+  // Get months that have entries for the selected year
+  const availableMonths = selectedYear
+    ? yearMonthIndex.entries
+        .filter((entry) => entry.year.toString() === selectedYear)
+        .map((entry) => entry.month)
+        .sort((a, b) => b - a) // Sort in descending order
+    : [];
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    setSelectedMonth(""); // Reset month when year changes
+  };
+
+  const handleMonthChange = (month: string) => {
+    setSelectedMonth(month);
+  };
+
+  const handleNavigate = () => {
+    if (selectedYear && selectedMonth) {
+      const yearNum = parseInt(selectedYear);
+      const monthNum = parseInt(selectedMonth);
+      
+      // Find the corresponding page in the index
+      const entry = yearMonthIndex.entries.find(
+        (e) => e.year === yearNum && e.month === monthNum
+      );
+      
+      if (entry) {
+        onNavigate(entry.startPage);
+      }
+    }
+  };
+
+  // Get month name from number
+  const getMonthName = (monthNum: number) => {
+    const date = new Date();
+    date.setMonth(monthNum - 1);
+    return date.toLocaleString('default', { month: 'long' });
+  };
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-4 p-4 bg-muted/30 rounded-lg">
+      <div className="flex items-center space-x-2">
+        <CalendarIcon className="h-5 w-5 text-muted-foreground" />
+        <span className="text-sm font-medium">Archive:</span>
+      </div>
+      
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={selectedYear} onValueChange={handleYearChange}>
+          <SelectTrigger className="w-28">
+            <SelectValue placeholder="Year" />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year} value={year}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <Select 
+          value={selectedMonth} 
+          onValueChange={handleMonthChange}
+          disabled={!selectedYear}
+        >
+          <SelectTrigger className="w-36">
+            <SelectValue placeholder="Month" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableMonths.map((month) => (
+              <SelectItem key={month} value={month.toString()}>
+                {getMonthName(month)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <Button 
+          onClick={handleNavigate}
+          disabled={!selectedYear || !selectedMonth}
+          className="flex items-center"
+        >
+          <Search className="h-4 w-4 mr-2" />
+          Go
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default function StarredArticles({
   params,
@@ -165,6 +275,9 @@ export default function StarredArticles({
             className="mb-6"
           />
         </div>
+        
+        {/* Month and Year Selector */}
+        <MonthYearSelector onNavigate={handlePageChange} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article) => (
