@@ -22,22 +22,17 @@ export function registerFeedbinRoutes(router: Router) {
       // Default to requested page
       let page = requestedPage;
       
-      // Check if we need to use a date filter
-      let since = null;
-      let until = null;
-      
+      // If month and year are provided, look up the corresponding page from our index
       if (month !== null && year !== null) {
-        // Create date range for the specified month/year
-        // For the beginning of the month
-        since = new Date(year, month - 1, 1).toISOString();
-        // For the end of the month (first day of next month minus 1 millisecond)
-        const nextMonth = month === 12 ? new Date(year + 1, 0, 1) : new Date(year, month, 1);
-        nextMonth.setMilliseconds(-1);
-        until = nextMonth.toISOString();
+        // Find the page number for this month/year from our index
+        const indexedPage = findPageForMonth(month, year);
         
-        console.log(`Date range for ${getMonthName(month)} ${year}:`);
-        console.log(`  From: ${since}`);
-        console.log(`  To:   ${until}`);
+        if (indexedPage !== null) {
+          console.log(`Found indexed page ${indexedPage} for ${getMonthName(month)} ${year}`);
+          page = indexedPage;
+        } else {
+          console.log(`No indexed page found for ${getMonthName(month)} ${year}, using requested page ${page}`);
+        }
       }
 
       if (!process.env.FEEDBIN_KEY) {
@@ -59,17 +54,14 @@ export function registerFeedbinRoutes(router: Router) {
       // Then get paginated data
       console.log(`Fetching page ${page} of starred articles...`);
       
-      // Build params object with or without date filters
+      // We only use page-based navigation, NOT date filters
+      // The Feedbin API doesn't support proper date filtering for starred entries
       const params: Record<string, any> = {
         starred: true,
         per_page: perPage,
         page: page,
         order: 'desc' // Ensure we're getting newest first
       };
-      
-      // Add date filters if available
-      if (since) params.since = since;
-      if (until) params.until = until;
       
       const response = await axios.get('https://api.feedbin.com/v2/entries.json', {
         params,
