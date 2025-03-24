@@ -213,16 +213,20 @@ export function registerFeedbinRoutes(router: Router) {
       const MAX_PAGES_TO_SCAN = 50; // Adjust based on how many pages you want to scan
       const PER_PAGE = 50; // Get more articles per page to reduce number of requests
       
-      // This will track which months we've seen and on which page we first saw them
+      // This will track the months we've seen and what page each month starts on
       interface MonthPageMapping {
         [key: string]: { month: number; year: number; page: number; articleCount: number };
       }
       
       const monthsFound: MonthPageMapping = {};
       
+      // To track the current leading month/year as we scan through pages
+      let leadingMonth: number | null = null;
+      let leadingYear: number | null = null;
+      
       console.log(`Beginning index build - scanning up to ${MAX_PAGES_TO_SCAN} pages...`);
       
-      // Iterate through pages to find articles from different months
+      // Iterate through pages to find where each month/year starts
       let stop = false;
       for (let page = 1; page <= MAX_PAGES_TO_SCAN && !stop; page++) {
         console.log(`Scanning page ${page}...`);
@@ -250,6 +254,16 @@ export function registerFeedbinRoutes(router: Router) {
           
           console.log(`Found ${response.data.length} articles on page ${page}`);
           
+          // Get the oldest and newest dates on this page for debugging
+          if (response.data.length > 0) {
+            const firstArticleDate = new Date(response.data[0].published as string);
+            const lastArticleDate = new Date(response.data[response.data.length - 1].published as string);
+            console.log(`Page ${page} date range: ${firstArticleDate.toISOString()} to ${lastArticleDate.toISOString()}`);
+          }
+          
+          // Group articles on this page by month/year
+          const pageMonths: Record<string, { month: number; year: number; count: number }> = {};
+          
           // Process each article to extract month/year
           for (const article of response.data) {
             if (article.published) {
@@ -258,16 +272,48 @@ export function registerFeedbinRoutes(router: Router) {
               const year = publishDate.getFullYear();
               const key = `${month}-${year}`;
               
-              // If we haven't seen this month before, record the page number
-              if (!monthsFound[key]) {
-                console.log(`Found articles from ${getMonthName(month)} ${year} on page ${page}`);
-                monthsFound[key] = { month, year, page, articleCount: 1 };
+              // Count articles by month/year on this page
+              if (!pageMonths[key]) {
+                pageMonths[key] = { month, year, count: 1 };
               } else {
-                // Otherwise just increment the count
-                monthsFound[key].articleCount++;
+                pageMonths[key].count++;
+              }
+              
+              // Set the leading month/year if this is the first article we've seen
+              if (leadingMonth === null || leadingYear === null) {
+                leadingMonth = month;
+                leadingYear = year;
+                console.log(`Setting leading month/year to ${getMonthName(month)} ${year}`);
               }
             }
           }
+          
+          // Log all months found on this page
+          console.log(`Months found on page ${page}:`);
+          Object.entries(pageMonths).forEach(([key, { month, year, count }]) => {
+            console.log(`  ${getMonthName(month)} ${year}: ${count} articles`);
+          });
+          
+          // For each month found on this page, record it if it's the first time we've seen it
+          // or if it's a different month than the leading month/year
+          Object.entries(pageMonths).forEach(([key, { month, year, count }]) => {
+            // If we haven't seen this month before, or if it's different from the leading month,
+            // record this page as the starting page for this month/year
+            if (!monthsFound[key]) {
+              // Special case for leading month/year - always record it on page 1
+              if (month === leadingMonth && year === leadingYear) {
+                console.log(`Found leading month ${getMonthName(month)} ${year} on page ${page}`);
+                monthsFound[key] = { month, year, page: 1, articleCount: count };
+              } else {
+                // For other months, record the page where we first find them
+                console.log(`Found new month ${getMonthName(month)} ${year} on page ${page}`);
+                monthsFound[key] = { month, year, page, articleCount: count };
+              }
+            } else {
+              // Just update the article count for months we've already recorded
+              monthsFound[key].articleCount += count;
+            }
+          });
           
           // Add a small delay to prevent rate limiting
           await new Promise(resolve => setTimeout(resolve, 200));
