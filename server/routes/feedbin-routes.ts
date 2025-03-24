@@ -197,22 +197,8 @@ export function registerFeedbinRoutes(router: Router) {
         throw new Error("FEEDBIN_KEY environment variable is required");
       }
       
-      // This will just be a placeholder for now - in a real implementation,
-      // we'd scan through all articles and build a complete index
-      const testMonths = [
-        { month: 3, year: 2025, page: 1 },
-        { month: 2, year: 2025, page: 3 },
-        { month: 1, year: 2025, page: 5 },
-        { month: 12, year: 2024, page: 8 },
-        { month: 11, year: 2024, page: 12 },
-        { month: 10, year: 2024, page: 16 },
-        { month: 9, year: 2024, page: 20 },
-        { month: 8, year: 2024, page: 24 },
-        { month: 7, year: 2024, page: 28 },
-        { month: 6, year: 2024, page: 32 },
-      ];
-      
       // Get total count to store with the index
+      console.log('Getting total count of starred articles...');
       const starredEntriesResponse = await axios.get('https://api.feedbin.com/v2/starred_entries.json', {
         headers: {
           Accept: 'application/json',
@@ -221,17 +207,91 @@ export function registerFeedbinRoutes(router: Router) {
       });
       
       const totalCount = Array.isArray(starredEntriesResponse.data) ? starredEntriesResponse.data.length : 0;
+      console.log(`Total count: ${totalCount} articles`);
       
-      // Add each test month to our index
-      testMonths.forEach(({ month, year, page }) => {
-        // Each month has approximately 50 articles (this is just for testing)
-        updateMonthIndex(month, year, page, 50, totalCount);
+      // Prevent too many network requests
+      const MAX_PAGES_TO_SCAN = 50; // Adjust based on how many pages you want to scan
+      const PER_PAGE = 50; // Get more articles per page to reduce number of requests
+      
+      // This will track which months we've seen and on which page we first saw them
+      interface MonthPageMapping {
+        [key: string]: { month: number; year: number; page: number; articleCount: number };
+      }
+      
+      const monthsFound: MonthPageMapping = {};
+      
+      console.log(`Beginning index build - scanning up to ${MAX_PAGES_TO_SCAN} pages...`);
+      
+      // Iterate through pages to find articles from different months
+      let stop = false;
+      for (let page = 1; page <= MAX_PAGES_TO_SCAN && !stop; page++) {
+        console.log(`Scanning page ${page}...`);
+        
+        try {
+          // Get articles for this page
+          const response = await axios.get<any[]>('https://api.feedbin.com/v2/entries.json', {
+            params: {
+              starred: true,
+              per_page: PER_PAGE,
+              page: page,
+              order: 'desc'
+            },
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Basic ${process.env.FEEDBIN_KEY}`
+            }
+          });
+          
+          if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+            console.log(`No more articles found on page ${page}, stopping scan`);
+            stop = true;
+            continue;
+          }
+          
+          console.log(`Found ${response.data.length} articles on page ${page}`);
+          
+          // Process each article to extract month/year
+          for (const article of response.data) {
+            if (article.published) {
+              const publishDate = new Date(article.published as string);
+              const month = publishDate.getMonth() + 1; // Convert 0-indexed to 1-indexed
+              const year = publishDate.getFullYear();
+              const key = `${month}-${year}`;
+              
+              // If we haven't seen this month before, record the page number
+              if (!monthsFound[key]) {
+                console.log(`Found articles from ${getMonthName(month)} ${year} on page ${page}`);
+                monthsFound[key] = { month, year, page, articleCount: 1 };
+              } else {
+                // Otherwise just increment the count
+                monthsFound[key].articleCount++;
+              }
+            }
+          }
+          
+          // Add a small delay to prevent rate limiting
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+        } catch (error) {
+          console.error(`Error scanning page ${page}:`, error);
+          stop = true;
+        }
+      }
+      
+      console.log('Scan complete. Months found:');
+      
+      // Update our index with the months we found
+      Object.values(monthsFound).forEach(({ month, year, page, articleCount }) => {
+        console.log(`${getMonthName(month)} ${year}: Page ${page} (${articleCount} articles)`);
+        updateMonthIndex(month, year, page, articleCount, totalCount);
       });
       
       const availableMonths = getAvailableMonths();
       
       res.json({
         message: "Index built successfully",
+        monthsScanned: Object.keys(monthsFound).length,
+        pagesScanned: Math.min(MAX_PAGES_TO_SCAN, totalCount / PER_PAGE),
         availableMonths: availableMonths.map(entry => ({
           month: entry.month,
           year: entry.year,
