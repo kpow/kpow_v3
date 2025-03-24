@@ -96,7 +96,8 @@ export function useStarredArticles(
         url: article.url ?? '#',
         excerpt: article.summary ?? 'No excerpt available'
       })),
-      pagination: data.pagination
+      pagination: data.pagination,
+      filter: data.filter
     })
   });
 }
