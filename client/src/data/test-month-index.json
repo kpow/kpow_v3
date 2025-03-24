@@ -1,0 +1,26 @@
+{
+  "entries": [
+    {
+      "month": 2,
+      "year": 2025,
+      "startPage": 2
+    },
+    {
+      "month": 1,
+      "year": 2025,
+      "startPage": 3
+    },
+    {
+      "month": 9,
+      "year": 2024,
+      "startPage": 4
+    },
+    {
+      "month": 7,
+      "year": 2024,
+      "startPage": 5
+    }
+  ],
+  "lastUpdated": "2025-03-24T01:34:16.471Z",
+  "totalArticles": 6131
+}
