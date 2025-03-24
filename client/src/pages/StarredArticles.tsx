@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -10,6 +11,7 @@ import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { SEO } from "@/components/global/SEO";
 import { getRandomDefaultImage } from "@/lib/utils";
+import { MonthSelector } from "@/components/ui/month-selector";
 
 interface PaginationData {
   current_page: number;
@@ -18,9 +20,18 @@ interface PaginationData {
   total_pages: number;
 }
 
+interface MonthIndexData {
+  availableMonths: {
+    month: number;
+    year: number;
+    name: string;
+  }[];
+}
+
 interface StarredResponse {
   articles: StarredArticle[];
   pagination: PaginationData;
+  monthIndex?: MonthIndexData;
 }
 
 const ARTICLES_PER_PAGE = 9;
@@ -33,6 +44,34 @@ export default function StarredArticles({
   const currentPage = params?.page ? parseInt(params.page) : 1;
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // State for selected month/year
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  
+  // Create an effect to initialize the month index
+  useEffect(() => {
+    // We'll call our build-index endpoint only once to initialize the data
+    const initializeMonthIndex = async () => {
+      try {
+        const existingMonths = await fetch('/api/starred-articles/months');
+        const monthsData = await existingMonths.json();
+        
+        // Only build the index if we don't have any months available
+        if (!monthsData.availableMonths || monthsData.availableMonths.length === 0) {
+          await fetch('/api/starred-articles/build-index', { method: 'POST' });
+          toast({
+            title: "Month index initialized",
+            description: "You can now browse articles by month",
+          });
+        }
+      } catch (error) {
+        console.error("Error initializing month index:", error);
+      }
+    };
+    
+    initializeMonthIndex();
+  }, [toast]);
 
   // Handle invalid page numbers
   if (params?.page && (isNaN(currentPage) || currentPage < 1)) {
@@ -40,10 +79,49 @@ export default function StarredArticles({
     return null;
   }
 
+  // Helper function to get month name
+  const getMonthName = (month: number): string => {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1] || 'Unknown';
+  };
+  
+  // Handle month selection
+  const handleMonthSelect = (month: number, year: number) => {
+    // If month and year are both 0, it means "clear selection"
+    if (month === 0 && year === 0) {
+      setSelectedMonth(null);
+      setSelectedYear(null);
+      // Reset to first page
+      if (currentPage !== 1) {
+        setLocation("/starred-articles");
+      }
+      return;
+    }
+    
+    setSelectedMonth(month);
+    setSelectedYear(year);
+    // When selecting a month, always start at page 1
+    setLocation("/starred-articles");
+  };
+  
+  // Build the API query including month/year if selected
+  let apiQuery = `/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`;
+  if (selectedMonth && selectedYear) {
+    apiQuery += `&month=${selectedMonth}&year=${selectedYear}`;
+  }
+
   const { data, isLoading, error } = useQuery<StarredResponse>({
-    queryKey: [
-      `/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`,
-    ],
+    queryKey: [apiQuery],
+    queryFn: async () => {
+      const response = await fetch(apiQuery);
+      if (!response.ok) {
+        throw new Error("Failed to fetch starred articles");
+      }
+      return response.json();
+    }
   });
 
   if (error) {
@@ -165,24 +243,63 @@ export default function StarredArticles({
             className="mb-6"
           />
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article) => (
-            <ContentSection
-              key={article.url}
-              {...article}
-              excerpt={article.excerpt}
-            />
-          ))}
+        
+        {/* Month Selector */}
+        <div className="mb-8">
+          <MonthSelector 
+            onSelectMonth={handleMonthSelect}
+            selectedMonth={selectedMonth || undefined}
+            selectedYear={selectedYear || undefined}
+          />
+          
+          {selectedMonth && selectedYear && (
+            <div className="mt-4 p-3 rounded-md bg-blue-50 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
+              <p className="text-sm font-medium">
+                Viewing articles from {getMonthName(selectedMonth)} {selectedYear}
+              </p>
+            </div>
+          )}
         </div>
 
-        <CustomPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          baseUrl="/starred-articles"
-          onPageChange={handlePageChange}
-          className="mt-6"
-        />
+        {articles.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {articles.map((article) => (
+              <ContentSection
+                key={article.url}
+                {...article}
+                excerpt={article.excerpt}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-xl font-semibold mb-2">No articles found</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {selectedMonth && selectedYear 
+                ? `No articles found for ${getMonthName(selectedMonth)} ${selectedYear}`
+                : "No articles available"}
+            </p>
+            {selectedMonth && selectedYear && (
+              <Button 
+                variant="outline" 
+                className="mt-4" 
+                onClick={() => handleMonthSelect(0, 0)}
+              >
+                Clear Filter
+              </Button>
+            )}
+          </div>
+        )}
+
+        {articles.length > 0 && (
+          <CustomPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            baseUrl="/starred-articles"
+            onPageChange={handlePageChange}
+            className="mt-6"
+          />
+        )}
       </div>
     </>
   );

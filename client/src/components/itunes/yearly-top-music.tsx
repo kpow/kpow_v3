@@ -38,7 +38,7 @@ interface YearlyTopMusicProps {
 
 export function YearlyTopMusic({ onArtistClick }: YearlyTopMusicProps) {
   const [selectedYear, setSelectedYear] = useState<string>("2024");
-  const [contentType, setContentType] = useState<ContentType>("artists");
+  const [contentType, setContentType] = useState<ContentType>("songs");
   const [api, setApi] = useState<CarouselApi>();
 
   // Fetch available years
@@ -326,7 +326,7 @@ export function YearlyTopMusic({ onArtistClick }: YearlyTopMusicProps) {
     <div className="space-y-6">
       {/* Header with Title, Content Type Selector, and Year Selector */}
       <div className="flex items-center flex-wrap gap-4">
-        <h2 className="text-2xl font-bold font-slackey mr-4">top</h2>
+        <h2 className="text-2xl font-bold font-slackey mr-0">top</h2>
         
         {/* Content Type Selector */}
         <Select value={contentType} onValueChange={(value: ContentType) => setContentType(value)}>
@@ -334,12 +334,13 @@ export function YearlyTopMusic({ onArtistClick }: YearlyTopMusicProps) {
             <SelectValue placeholder="Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="artists" className="font-slackey">
-              artists
-            </SelectItem>
             <SelectItem value="songs" className="font-slackey">
               songs
             </SelectItem>
+            <SelectItem value="artists" className="font-slackey">
+              artists
+            </SelectItem>
+           
           </SelectContent>
         </Select>
         
