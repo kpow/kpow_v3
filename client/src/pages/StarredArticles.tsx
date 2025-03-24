@@ -1,11 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { ContentSection } from "@/components/home/ContentSection";
-import { StarredArticle } from "@/lib/hooks/use-starred-articles";
+import { StarredArticle, useStarredArticles } from "@/lib/hooks/use-starred-articles";
 import { useToast } from "@/hooks/use-toast";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
@@ -13,25 +12,12 @@ import { SEO } from "@/components/global/SEO";
 import { getRandomDefaultImage } from "@/lib/utils";
 import { MonthSelector } from "@/components/ui/month-selector";
 
-interface PaginationData {
-  current_page: number;
-  per_page: number;
-  total: number;
-  total_pages: number;
-}
-
 interface MonthIndexData {
   availableMonths: {
     month: number;
     year: number;
     name: string;
   }[];
-}
-
-interface StarredResponse {
-  articles: StarredArticle[];
-  pagination: PaginationData;
-  monthIndex?: MonthIndexData;
 }
 
 const ARTICLES_PER_PAGE = 9;
@@ -107,22 +93,13 @@ export default function StarredArticles({
     setLocation("/starred-articles");
   };
   
-  // Build the API query including month/year if selected
-  let apiQuery = `/api/starred-articles?page=${currentPage}&per_page=${ARTICLES_PER_PAGE}`;
-  if (selectedMonth && selectedYear) {
-    apiQuery += `&month=${selectedMonth}&year=${selectedYear}`;
-  }
-
-  const { data, isLoading, error } = useQuery<StarredResponse>({
-    queryKey: [apiQuery],
-    queryFn: async () => {
-      const response = await fetch(apiQuery);
-      if (!response.ok) {
-        throw new Error("Failed to fetch starred articles");
-      }
-      return response.json();
-    }
-  });
+  // Use our enhanced useStarredArticles hook with month/year filtering
+  const { data, isLoading, error } = useStarredArticles(
+    currentPage,
+    ARTICLES_PER_PAGE,
+    selectedMonth || undefined,
+    selectedYear || undefined
+  );
 
   if (error) {
     toast({
@@ -133,7 +110,8 @@ export default function StarredArticles({
     });
   }
 
-  const totalPages = data?.pagination?.total_pages ?? 1;
+  // Calculate total pages based on total items and page size
+  const totalPages = Math.ceil((data?.pagination?.total ?? 0) / ARTICLES_PER_PAGE);
   const totalArticles = data?.pagination?.total ?? 0;
 
   const handlePageChange = (newPage: number) => {
@@ -147,28 +125,27 @@ export default function StarredArticles({
     }
   };
 
-  const articles =
-    data?.articles.map((article: StarredArticle) => ({
-      title: article.title ?? "Untitled Article",
-      subtitle: `by ${article.author ?? "Unknown Author"}`,
-      author: article.author ?? "Unknown Author",
-      date: new Date(article.published).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
-      type: "star" as const,
-      url: article.url ?? "#",
-      excerpt: article.summary ?? "No excerpt available",
-    })) ?? [];
+  // The transformed articles are already in the format we need from the hook
+  // Define type for the transformed articles
+  type TransformedArticle = {
+    title: string;
+    subtitle: string;
+    author: string;
+    date: string;
+    imageSrc: string;
+    type: 'star';
+    url: string;
+    excerpt: string;
+  };
+  
+  const articles: TransformedArticle[] = data?.articles ?? [];
 
   // Get the first article's image for the SEO preview, if available
   const previewImage = articles[0]?.imageSrc ?? getRandomDefaultImage();
   const pageTitle = `Star Feed ${currentPage > 1 ? `- Page ${currentPage}` : ""}`;
   const pageDescription = `Curated collection of starred articles. ${articles
     .slice(0, 3)
-    .map((a) => a.title)
+    .map((a: { title: string }) => a.title)
     .join(", ")}`;
 
   function PaginationLoader() {
@@ -247,9 +224,13 @@ export default function StarredArticles({
         {/* Month Selector */}
         <div className="mb-8">
           <MonthSelector 
-            onSelectMonth={handleMonthSelect}
-            selectedMonth={selectedMonth || undefined}
-            selectedYear={selectedYear || undefined}
+            onMonthYearSelect={handleMonthSelect}
+            onIndexBuild={() => {
+              // Refresh the data when index is built
+              if (currentPage !== 1) {
+                setLocation("/starred-articles");
+              }
+            }}
           />
           
           {selectedMonth && selectedYear && (
@@ -263,7 +244,7 @@ export default function StarredArticles({
 
         {articles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => (
+            {articles.map((article: TransformedArticle) => (
               <ContentSection
                 key={article.url}
                 {...article}

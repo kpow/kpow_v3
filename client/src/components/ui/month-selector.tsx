@@ -1,200 +1,215 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Check, ArrowRight, RefreshCw } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import axios from 'axios';
 
-interface MonthData {
+interface MonthOption {
+  value: number;
+  label: string;
+}
+
+interface YearOption {
+  value: number;
+  label: string;
+}
+
+interface AvailableMonth {
   month: number;
   year: number;
   name: string;
 }
 
 interface MonthSelectorProps {
-  onSelectMonth: (month: number, year: number) => void;
-  selectedMonth?: number;
-  selectedYear?: number;
+  onMonthYearSelect: (month: number, year: number) => void;
+  onIndexBuild: () => void;
 }
 
-// Get month name
-const getMonthName = (month: number): string => {
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-  return months[month - 1] || 'Unknown';
-};
-
-// Generate an array of years from 2020 to current year
-const getYearsArray = (): number[] => {
-  const currentYear = new Date().getFullYear();
-  const years: number[] = [];
-  for (let year = currentYear; year >= 2020; year--) {
-    years.push(year);
-  }
-  return years;
-};
-
-export function MonthSelector({ 
-  onSelectMonth, 
-  selectedMonth, 
-  selectedYear 
-}: MonthSelectorProps) {
-  const [tempMonth, setTempMonth] = useState<number | null>(selectedMonth || null);
-  const [tempYear, setTempYear] = useState<number | null>(selectedYear || null);
-  const [isBuilding, setIsBuilding] = useState(false);
+export function MonthSelector({ onMonthYearSelect, onIndexBuild }: MonthSelectorProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  // Update temp values when props change
-  useEffect(() => {
-    setTempMonth(selectedMonth || null);
-    setTempYear(selectedYear || null);
-  }, [selectedMonth, selectedYear]);
+  const [months, setMonths] = useState<MonthOption[]>([]);
+  const [years, setYears] = useState<YearOption[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [availableMonths, setAvailableMonths] = useState<AvailableMonth[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBuilding, setIsBuilding] = useState(false);
 
-  // Mutation for building the index
-  const buildIndexMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/starred-articles/build-index', { 
-        method: 'POST'
-      });
-      if (!response.ok) {
-        throw new Error('Failed to build month index');
+  // Fetch available months from the server
+  useEffect(() => {
+    fetchAvailableMonths();
+  }, []);
+
+  // Update months and years dropdowns when available months change
+  useEffect(() => {
+    if (availableMonths.length > 0) {
+      // Extract unique months and years
+      const uniqueMonths = Array.from(
+        new Set(availableMonths.map(m => m.month))
+      ).sort((a, b) => a - b);
+      
+      const uniqueYears = Array.from(
+        new Set(availableMonths.map(m => m.year))
+      ).sort((a, b) => b - a); // Sort years in descending order
+      
+      // Create options for dropdowns
+      const monthOptions = uniqueMonths.map(month => ({
+        value: month,
+        label: getMonthName(month)
+      }));
+      
+      const yearOptions = uniqueYears.map(year => ({
+        value: year,
+        label: year.toString()
+      }));
+      
+      setMonths(monthOptions);
+      setYears(yearOptions);
+      
+      // Set initial values if not already set
+      if (selectedMonth === null && monthOptions.length > 0) {
+        setSelectedMonth(monthOptions[0].value);
       }
-      return response.json();
-    },
-    onMutate: () => {
+      
+      if (selectedYear === null && yearOptions.length > 0) {
+        setSelectedYear(yearOptions[0].value);
+      }
+    }
+  }, [availableMonths, selectedMonth, selectedYear]);
+
+  const fetchAvailableMonths = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get<{ availableMonths: AvailableMonth[] }>('/api/starred-articles/months');
+      setAvailableMonths(response.data.availableMonths);
+    } catch (error) {
+      toast({
+        title: 'Error fetching available months',
+        description: 'Failed to load month index. Try building the index first.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const buildMonthIndex = async () => {
+    try {
       setIsBuilding(true);
-    },
-    onSuccess: (data) => {
+      const response = await axios.post<{ 
+        message: string;
+        monthsScanned: number;
+        pagesScanned: number;
+        availableMonths: AvailableMonth[];
+      }>('/api/starred-articles/build-index');
+      
       toast({
-        title: 'Index Built Successfully',
-        description: `Found ${data.monthsScanned} months across ${data.pagesScanned} pages`,
+        title: 'Index built successfully',
+        description: `Found ${response.data.monthsScanned} months across ${Math.ceil(response.data.pagesScanned)} pages.`
       });
-      // Invalidate queries to reload the month data
-      queryClient.invalidateQueries({ queryKey: ['/api/starred-articles/months'] });
-    },
-    onError: (error) => {
+      
+      // Update available months
+      setAvailableMonths(response.data.availableMonths);
+      
+      // Notify parent
+      onIndexBuild();
+    } catch (error) {
       toast({
-        title: 'Failed to build index',
-        description: error instanceof Error ? error.message : 'Please try again',
-        variant: 'destructive',
+        title: 'Error building index',
+        description: 'Failed to build month index. Please try again.',
+        variant: 'destructive'
       });
-    },
-    onSettled: () => {
+    } finally {
       setIsBuilding(false);
     }
-  });
+  };
 
-  // Handle Go button click
   const handleGoClick = () => {
-    if (tempMonth && tempYear) {
-      onSelectMonth(tempMonth, tempYear);
+    if (selectedMonth !== null && selectedYear !== null) {
+      onMonthYearSelect(selectedMonth, selectedYear);
+    } else {
+      toast({
+        title: 'Selection required',
+        description: 'Please select both a month and year.'
+      });
     }
   };
 
-  // Handle build index button click
-  const handleBuildIndex = () => {
-    buildIndexMutation.mutate();
+  const getMonthName = (month: number): string => {
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return monthNames[month - 1]; // Convert 1-indexed to 0-indexed
   };
-
-  // Handle clear button click
-  const handleClearClick = () => {
-    setTempMonth(null);
-    setTempYear(null);
-    onSelectMonth(0, 0);
-  };
-
-  // Generate month options
-  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
-  const yearOptions = getYearsArray();
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-2 items-center">
-        <span className="text-sm font-medium">Filter by date:</span>
-        
-        <div className="flex flex-wrap gap-2 items-center">
-          <Select 
-            value={tempMonth?.toString() || ""} 
-            onValueChange={(value) => setTempMonth(parseInt(value))}
+    <div className="flex flex-col gap-4 p-4 border rounded-lg bg-card">
+      <h3 className="text-lg font-medium">Browse by Month</h3>
+      <div className="flex flex-wrap gap-2 items-end">
+        <div className="flex flex-col gap-1.5 min-w-[120px]">
+          <label htmlFor="month-select" className="text-sm">Month</label>
+          <Select
+            value={selectedMonth?.toString()}
+            onValueChange={(value) => setSelectedMonth(parseInt(value))}
+            disabled={isLoading || months.length === 0}
           >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Select Month" />
+            <SelectTrigger id="month-select" className="w-full">
+              <SelectValue placeholder="Select month" />
             </SelectTrigger>
             <SelectContent>
-              {monthOptions.map((month) => (
-                <SelectItem key={month} value={month.toString()}>
-                  {getMonthName(month)}
+              {months.map((month) => (
+                <SelectItem key={month.value} value={month.value.toString()}>
+                  {month.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          
-          <Select 
-            value={tempYear?.toString() || ""} 
-            onValueChange={(value) => setTempYear(parseInt(value))}
-          >
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Select Year" />
-            </SelectTrigger>
-            <SelectContent>
-              {yearOptions.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button 
-            onClick={handleGoClick}
-            disabled={!tempMonth || !tempYear}
-            className="px-4"
-          >
-            Go
-          </Button>
-          
-          {selectedMonth && selectedYear && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleClearClick}
-              className="text-xs"
-            >
-              Clear
-            </Button>
-          )}
         </div>
-        
-        <div className="ml-auto mt-2 sm:mt-0">
+
+        <div className="flex flex-col gap-1.5 min-w-[100px]">
+          <label htmlFor="year-select" className="text-sm">Year</label>
+          <Select
+            value={selectedYear?.toString()}
+            onValueChange={(value) => setSelectedYear(parseInt(value))}
+            disabled={isLoading || years.length === 0}
+          >
+            <SelectTrigger id="year-select" className="w-full">
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              {years.map((year) => (
+                <SelectItem key={year.value} value={year.value.toString()}>
+                  {year.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button 
+          onClick={handleGoClick} 
+          disabled={isLoading || selectedMonth === null || selectedYear === null}
+          className="h-10"
+        >
+          Go
+        </Button>
+
+        <div className="ml-auto">
           <Button
             variant="outline"
-            size="sm"
-            onClick={handleBuildIndex}
+            onClick={buildMonthIndex}
             disabled={isBuilding}
-            className="text-xs flex items-center gap-1"
+            className="h-10"
           >
-            <RefreshCw className={`h-3 w-3 ${isBuilding ? 'animate-spin' : ''}`} />
-            {isBuilding ? 'Building Index...' : 'Build Month Index'}
+            {isBuilding ? 'Building...' : 'Build Month Index'}
           </Button>
         </div>
       </div>
-      
-      {isBuilding && (
-        <div className="p-2 bg-blue-50 dark:bg-blue-950 text-blue-800 dark:text-blue-300 text-sm rounded-md">
-          <p>Building index... This will scan your starred articles to create a map of which month/year appears on which page.</p>
-        </div>
+      {availableMonths.length === 0 && !isLoading && (
+        <p className="text-sm text-muted-foreground">
+          No months available. Please build the index first.
+        </p>
       )}
     </div>
   );

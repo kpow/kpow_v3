@@ -42,9 +42,41 @@ interface TransformedResponse {
   pagination: PaginationData;
 }
 
-export function useStarredArticles(page = 1, perPage = 6) {
+export function useStarredArticles(
+  page = 1, 
+  perPage = 6, 
+  month?: number, 
+  year?: number
+) {
+  // Build the query key with optional month/year parameters
+  const queryKey = [
+    '/api/starred-articles', 
+    { page, perPage, month, year }
+  ];
+  
+  // Construct the URL with parameters
+  const buildUrl = () => {
+    const url = new URL('/api/starred-articles', window.location.origin);
+    url.searchParams.append('page', page.toString());
+    url.searchParams.append('per_page', perPage.toString());
+    
+    if (month !== undefined && year !== undefined) {
+      url.searchParams.append('month', month.toString());
+      url.searchParams.append('year', year.toString());
+    }
+    
+    return url.toString();
+  };
+  
   return useQuery<StarredResponse, Error, TransformedResponse>({
-    queryKey: [`/api/starred-articles?page=${page}&per_page=${perPage}`],
+    queryKey,
+    queryFn: async () => {
+      const response = await fetch(buildUrl());
+      if (!response.ok) {
+        throw new Error('Failed to fetch starred articles');
+      }
+      return response.json();
+    },
     select: (data) => ({
       articles: data.articles.map(article => ({
         title: article.title ?? 'Untitled Article',
@@ -52,7 +84,8 @@ export function useStarredArticles(page = 1, perPage = 6) {
         author: article.author ?? 'Unknown Author',
         date: new Date(article.published).toLocaleDateString('en-US', {
           month: 'short',
-          day: 'numeric'
+          day: 'numeric',
+          year: 'numeric'
         }),
         imageSrc: article.lead_image_url ?? getRandomDefaultImage(),
         type: "star" as const,
