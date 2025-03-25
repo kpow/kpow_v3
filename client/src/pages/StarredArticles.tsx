@@ -245,10 +245,28 @@ export default function StarredArticles({
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold mb-3">star feed</h1>
-          <div className="flex justify-center gap-2 items-center mb-6">
-            <PaginationLoader />
+        <div>
+          <PageTitle size="lg" alignment="left">
+            star feed
+          </PageTitle>
+        </div>
+
+        {/* Nav and Date Navigation Skeleton */}
+        <div className="flex justify-between items-center flex-col sm:flex-row mb-4">
+          <CustomPagination
+            currentPage={1}
+            totalPages={1}
+            baseUrl="/starred-articles"
+            onPageChange={() => {}}
+            className="mb-6"
+          />
+
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-4 p-4 bg-muted/30 rounded-lg">
+            <div className="flex flex-wrap items-center gap-2">
+              <Skeleton className="h-10 w-28" /> {/* Year Select */}
+              <Skeleton className="h-10 w-36" /> {/* Month Select */}
+              <Skeleton className="h-10 w-20" /> {/* Go Button */}
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
