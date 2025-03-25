@@ -35,11 +35,11 @@ interface StarredResponse {
 const ARTICLES_PER_PAGE = 9;
 
 // Component for month and year selection
-function MonthYearSelector({ 
-  onNavigate, 
-  totalArticles 
-}: { 
-  onNavigate: (page: number) => void; 
+function MonthYearSelector({
+  onNavigate,
+  totalArticles,
+}: {
+  onNavigate: (page: number) => void;
   totalArticles: number;
 }) {
   const [selectedYear, setSelectedYear] = useState<string>("");
@@ -47,7 +47,7 @@ function MonthYearSelector({
 
   // Get unique years from the index, sorted in descending order
   const years = Array.from(
-    new Set(yearMonthIndex.entries.map((entry) => entry.year.toString()))
+    new Set(yearMonthIndex.entries.map((entry) => entry.year.toString())),
   ).sort((a, b) => parseInt(b) - parseInt(a));
 
   // Get months that have entries for the selected year
@@ -71,27 +71,27 @@ function MonthYearSelector({
     if (selectedYear && selectedMonth) {
       const yearNum = parseInt(selectedYear);
       const monthNum = parseInt(selectedMonth);
-      
+
       // Find the corresponding page in the index
       const entry = yearMonthIndex.entries.find(
-        (e) => e.year === yearNum && e.month === monthNum
+        (e) => e.year === yearNum && e.month === monthNum,
       );
-      
+
       if (entry) {
         // Calculate page adjustment based on new articles added since index was created
         // The index was created when there were 6131 total articles
         // For every 9 new articles, we need to add 1 to the page number
         const indexTotalArticles = yearMonthIndex.totalArticles; // 6131
-        
+
         let adjustedPage = entry.startPage;
-        
+
         // If we have more articles now than when the index was created
         if (totalArticles > indexTotalArticles) {
           const newArticles = totalArticles - indexTotalArticles;
           const pageAdjustment = Math.floor(newArticles / ARTICLES_PER_PAGE);
           adjustedPage += pageAdjustment;
         }
-        
+
         onNavigate(adjustedPage);
       }
     }
@@ -101,16 +101,11 @@ function MonthYearSelector({
   const getMonthName = (monthNum: number) => {
     const date = new Date();
     date.setMonth(monthNum - 1);
-    return date.toLocaleString('default', { month: 'long' });
+    return date.toLocaleString("default", { month: "long" });
   };
 
   return (
     <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-4 p-4 bg-muted/30 rounded-lg">
-      <div className="flex items-center space-x-2">
-        <CalendarIcon className="h-5 w-5 text-muted-foreground" />
-        <span className="text-sm font-medium">Archive:</span>
-      </div>
-      
       <div className="flex flex-wrap items-center gap-2">
         <Select value={selectedYear} onValueChange={handleYearChange}>
           <SelectTrigger className="w-28">
@@ -124,9 +119,9 @@ function MonthYearSelector({
             ))}
           </SelectContent>
         </Select>
-        
-        <Select 
-          value={selectedMonth} 
+
+        <Select
+          value={selectedMonth}
           onValueChange={handleMonthChange}
           disabled={!selectedYear}
         >
@@ -141,11 +136,11 @@ function MonthYearSelector({
             ))}
           </SelectContent>
         </Select>
-        
-        <Button 
+
+        <Button
           onClick={handleNavigate}
           disabled={!selectedYear || !selectedMonth}
-          className="flex items-center"
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-xs text-white hover:text-white font-bold py-1 px-2 rounded"
         >
           <Search className="h-4 w-4 mr-2" />
           Go
@@ -283,10 +278,14 @@ export default function StarredArticles({
         type="article"
       />
       <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center flex-col sm:flex-row">
+        <div>
           <PageTitle size="lg" alignment="left">
             star feed
           </PageTitle>
+        </div>
+
+        {/* Month and Year Selector */}
+        <div className="flex justify-between items-center flex-col sm:flex-row">
           <CustomPagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -294,10 +293,11 @@ export default function StarredArticles({
             onPageChange={handlePageChange}
             className="mb-6"
           />
+          <MonthYearSelector
+            onNavigate={handlePageChange}
+            totalArticles={totalArticles}
+          />
         </div>
-        
-        {/* Month and Year Selector */}
-        <MonthYearSelector onNavigate={handlePageChange} totalArticles={totalArticles} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article) => (
