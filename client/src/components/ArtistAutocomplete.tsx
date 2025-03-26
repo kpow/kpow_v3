@@ -49,25 +49,14 @@ export function ArtistAutocomplete({ onArtistSelect }: ArtistAutocompleteProps) 
       }
       return response.json()
     },
-    staleTime: 60 * 1000, // Cache for 1 minute
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes so refresh button is useful
   })
   
   // Refresh artists without images
   const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
-      // Call backend API to refresh the list
-      const response = await fetch("/api/admin/refresh-artists-without-images", {
-        method: "POST",
-      })
-      
-      if (!response.ok) {
-        const errorData = await response.text()
-        console.error("Refresh API Error:", errorData)
-        throw new Error(`Failed to refresh artists: ${response.statusText}`)
-      }
-      
-      // Invalidate the query cache to force a refetch
+      // Invalidate the query cache and force a refetch
       await queryClient.invalidateQueries({ queryKey: ["artistsWithoutImages"] })
       await refetch()
       
