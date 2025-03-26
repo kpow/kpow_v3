@@ -72,39 +72,38 @@ export function Header() {
       {showCursor && <SplashCursor />}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link key="Home" href="/">
-            <Magnet padding={6} disabled={false} magnetStrength={6}>
-              <div className="flex items-center gap-2 group">
-                <div className="w-[80px] h-[80px] bg-black rounded-full mt-2">
-                  {imageData && (
-                    <MetallicPaint
-                      imageData={imageData}
-                      params={{
-                        edge: 5,
-                        patternBlur: 0.5,
-                        patternScale: 5,
-                        refraction: 0.6,
-                        speed: 0.25,
-                        liquid: 1,
-                      }}
-                    />
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
-                  <button
-                    onClick={() => setShowCursor(!showCursor)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                    aria-label="Toggle cursor effects"
-                  >
-                    <Wand2
-                      className={`animate-pulse w-5 h-5 ${showCursor ? "text-purple-400" : "text-gray-500"}`}
-                    />
-                  </button>
-                </div>
+          <div className="flex items-center gap-2 group">
+            <Link key="Home" href="/">
+              <div className="w-[80px] h-[80px] bg-black rounded-full mt-2">
+                {imageData && (
+                  <MetallicPaint
+                    imageData={imageData}
+                    params={{
+                      edge: 5,
+                      patternBlur: 0.5,
+                      patternScale: 5,
+                      refraction: 0.6,
+                      speed: 0.25,
+                      liquid: 1,
+                    }}
+                  />
+                )}
               </div>
-            </Magnet>
-          </Link>
+            </Link>
+            <div className="flex items-center gap-2">
+              <div className="font-slackey text-2xl sm:text-3xl">kpow</div>
+              <button
+                onClick={() => setShowCursor(!showCursor)}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Toggle cursor effects"
+              >
+                <Wand2
+                  className={`animate-pulse w-5 h-5 ${showCursor ? "text-purple-400" : "text-gray-500"}`}
+                />
+              </button>
+            </div>
+          </div>
+
           <nav className="flex items-center gap-4">
             {user && (
               <span className="hidden sm:block text-xs text-white font-bold">
