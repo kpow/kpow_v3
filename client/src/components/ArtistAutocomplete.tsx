@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react"
+import { Check, ChevronsUpDown, Loader2, RefreshCw } from "lucide-react"
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useToast } from "@/hooks/use-toast"
 
 interface Artist {
@@ -33,10 +33,12 @@ export function ArtistAutocomplete({ onArtistSelect }: ArtistAutocompleteProps) 
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
   const [inputValue, setInputValue] = React.useState("")
+  const [isRefreshing, setIsRefreshing] = React.useState(false)
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   // Fetch artists without images from API
-  const { data: artists, isLoading, error } = useQuery<Artist[]>({
+  const { data: artists, isLoading, error, refetch } = useQuery<Artist[]>({
     queryKey: ["artistsWithoutImages"],
     queryFn: async () => {
       const response = await fetch("/api/admin/artists-without-images")
@@ -49,6 +51,41 @@ export function ArtistAutocomplete({ onArtistSelect }: ArtistAutocompleteProps) 
     },
     staleTime: 60 * 1000, // Cache for 1 minute
   })
+  
+  // Refresh artists without images
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    try {
+      // Call backend API to refresh the list
+      const response = await fetch("/api/admin/refresh-artists-without-images", {
+        method: "POST",
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.text()
+        console.error("Refresh API Error:", errorData)
+        throw new Error(`Failed to refresh artists: ${response.statusText}`)
+      }
+      
+      // Invalidate the query cache to force a refetch
+      await queryClient.invalidateQueries({ queryKey: ["artistsWithoutImages"] })
+      await refetch()
+      
+      toast({
+        title: "Success",
+        description: "Artists without images list has been refreshed",
+        variant: "default",
+      })
+    } catch (error) {
+      toast({
+        title: "Error refreshing artists",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      })
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
 
   // Show error toast if the query fails
   React.useEffect(() => {
@@ -71,6 +108,30 @@ export function ArtistAutocomplete({ onArtistSelect }: ArtistAutocompleteProps) 
 
   return (
     <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm text-muted-foreground">
+          {artists ? `${artists.length} artists without images` : "Loading artists..."}
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleRefresh} 
+          disabled={isRefreshing || isLoading}
+        >
+          {isRefreshing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Refreshing...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh List
+            </>
+          )}
+        </Button>
+      </div>
+      
       <div className="flex gap-2">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
