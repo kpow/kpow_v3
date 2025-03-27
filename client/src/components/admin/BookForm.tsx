@@ -138,7 +138,8 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
   const bookMutation = useMutation({
     mutationFn: async (values: BookFormValues) => {
       setIsSubmitting(true);
-      if (book) {
+      // Check if this is an existing book with a valid ID
+      if (book && book.id) {
         // Update existing book
         return axios.put(`/api/admin/books/${book.id}`, values);
       } else {
@@ -148,8 +149,8 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
     },
     onSuccess: () => {
       toast({
-        title: book ? "Book updated" : "Book created",
-        description: book 
+        title: book && book.id ? "Book updated" : "Book created",
+        description: book && book.id
           ? "The book has been successfully updated." 
           : "The book has been successfully added to your collection.",
       });
@@ -160,7 +161,7 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
       console.error("Error saving book:", error);
       toast({
         title: "Error",
-        description: `Failed to ${book ? "update" : "create"} the book. Please try again.`,
+        description: `Failed to ${book && book.id ? "update" : "create"} the book. Please try again.`,
         variant: "destructive",
       });
     },
