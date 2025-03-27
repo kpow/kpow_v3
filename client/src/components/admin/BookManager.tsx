@@ -28,11 +28,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BookForm } from "./BookForm";
+import { BookImporter } from "./BookImporter";
 import { 
   BookWithRelations,
   PaginatedResponse 
 } from "@/lib/types";
-import { Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
+import { BookUp, Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 
 export function BookManager() {
   const { toast } = useToast();
@@ -42,6 +43,7 @@ export function BookManager() {
   const [booksPerPage, setBooksPerPage] = useState(10);
   const [editingBook, setEditingBook] = useState<BookWithRelations | null>(null);
   const [isAddingBook, setIsAddingBook] = useState(false);
+  const [isImportingBook, setIsImportingBook] = useState(false);
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -116,7 +118,13 @@ export function BookManager() {
   const handleBookSaved = () => {
     setEditingBook(null);
     setIsAddingBook(false);
+    setIsImportingBook(false);
     queryClient.invalidateQueries({ queryKey: ["admin-books"] });
+  };
+  
+  // Handle import book button click
+  const handleImportBook = () => {
+    setIsImportingBook(true);
   };
 
   // Handle change in sort
@@ -136,23 +144,48 @@ export function BookManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Book Management</h2>
-        <Dialog open={isAddingBook} onOpenChange={setIsAddingBook}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAddBook}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Book
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Book</DialogTitle>
-              <DialogDescription>
-                Fill out the form below to add a new book to your collection.
-              </DialogDescription>
-            </DialogHeader>
-            <BookForm onSaved={handleBookSaved} onCancel={() => setIsAddingBook(false)} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex space-x-2">
+          {/* Import Book Button & Dialog */}
+          <Dialog open={isImportingBook} onOpenChange={setIsImportingBook}>
+            <DialogTrigger asChild>
+              <Button onClick={handleImportBook} variant="outline">
+                <BookUp className="mr-2 h-4 w-4" />
+                Import from Goodreads
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Import Book from Goodreads</DialogTitle>
+                <DialogDescription>
+                  Enter a Goodreads URL to import book data automatically.
+                </DialogDescription>
+              </DialogHeader>
+              <BookImporter 
+                onImported={handleBookSaved} 
+                onCancel={() => setIsImportingBook(false)} 
+              />
+            </DialogContent>
+          </Dialog>
+          
+          {/* Add Book Button & Dialog */}
+          <Dialog open={isAddingBook} onOpenChange={setIsAddingBook}>
+            <DialogTrigger asChild>
+              <Button onClick={handleAddBook}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Book
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add New Book</DialogTitle>
+                <DialogDescription>
+                  Fill out the form below to add a new book to your collection.
+                </DialogDescription>
+              </DialogHeader>
+              <BookForm onSaved={handleBookSaved} onCancel={() => setIsAddingBook(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="flex items-center justify-between mb-4">

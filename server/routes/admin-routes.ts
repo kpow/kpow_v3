@@ -944,6 +944,288 @@ export function registerAdminRoutes(router: Router) {
       });
     }
   });
+
+  // Book Importer from Goodreads URL
+  router.post("/api/admin/books/import-from-goodreads", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    if (!req.user?.approved) {
+      return res.status(403).json({ error: "Account not approved" });
+    }
+
+    const { goodreadsUrl } = req.body;
+    
+    if (!goodreadsUrl) {
+      return res.status(400).json({ error: "Goodreads URL is required" });
+    }
+
+    try {
+      console.log(`[Books Admin] Importing book from Goodreads URL: ${goodreadsUrl}`);
+      
+      // Extract Goodreads ID from URL
+      const goodreadsId = extractGoodreadsIdFromUrl(goodreadsUrl);
+      
+      if (!goodreadsId) {
+        return res.status(400).json({ 
+          error: "Invalid Goodreads URL", 
+          message: "Could not extract Goodreads book ID from the provided URL."
+        });
+      }
+      
+      // Build the full URL
+      const fullUrl = `https://www.goodreads.com/book/show/${goodreadsId}`;
+      
+      // Fetch the HTML content from the Goodreads book page
+      const response = await axios.get(fullUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
+      
+      const html = response.data;
+      const $ = cheerio.load(html);
+      
+      // Extract book details
+      const bookData = extractBookDataFromHtml($, goodreadsId, fullUrl);
+      
+      // If no title was found, the scraping failed
+      if (!bookData.title) {
+        return res.status(404).json({ 
+          error: "Book information not found", 
+          message: "Could not extract book details from the Goodreads page."
+        });
+      }
+      
+      // Extract authors
+      const authors = extractAuthorsFromHtml($);
+      
+      // Extract genres/shelves
+      const shelves = extractGenresFromHtml($);
+      
+      console.log(`[Books Admin] Successfully scraped book: "${bookData.title}" with ${authors.length} authors and ${shelves.length} shelves`);
+      
+      // Return the extracted data
+      res.json({
+        success: true,
+        book: bookData,
+        authors,
+        shelves,
+        message: "Successfully extracted book data from Goodreads."
+      });
+      
+    } catch (error) {
+      console.error("Error importing book from Goodreads:", error);
+      res.status(500).json({
+        error: "Failed to import book from Goodreads",
+        details: error instanceof Error ? error.message : "Unknown error",
+        message: "An error occurred while trying to fetch and parse the Goodreads page."
+      });
+    }
+  });
+  
+  // Helper function to extract Goodreads ID from URL
+  function extractGoodreadsIdFromUrl(url: string): string | null {
+    if (!url) return null;
+    
+    // Try to match patterns like:
+    // https://www.goodreads.com/book/show/12345.Book_Title
+    // https://www.goodreads.com/book/show/12345-book-title
+    const matches = url.match(/goodreads\.com\/book\/show\/(\d+)(?:[.-]|$)/);
+    
+    return matches ? matches[1] : null;
+  }
+  
+  // Helper function to extract book data from HTML
+  function extractBookDataFromHtml($: cheerio.CheerioAPI, goodreadsId: string, url: string) {
+    // Initialize book data object
+    const bookData: any = {
+      goodreadsId,
+      link: url
+    };
+    
+    // Extract title - multiple potential selectors
+    const titleElement = $('h1[data-testid="bookTitle"]');
+    if (titleElement.length) {
+      bookData.title = titleElement.text().trim();
+      
+      // Try to extract title without series - this is a bit tricky as it depends on format
+      const fullTitle = bookData.title;
+      const seriesMatch = fullTitle.match(/(.*?)\s*(?:\(|:|#|\[)/);
+      if (seriesMatch) {
+        bookData.titleWithoutSeries = seriesMatch[1].trim();
+      }
+    }
+    
+    // Extract book cover image
+    const bookCoverImage = $('.BookCover__image img');
+    if (bookCoverImage.length) {
+      bookData.imageUrl = bookCoverImage.attr('src');
+    } else {
+      // Fallback to other possible image selectors
+      const altImage = $('#coverImage, .bookCover img, .cover img').first();
+      if (altImage.length) {
+        bookData.imageUrl = altImage.attr('src');
+      }
+    }
+    
+    // Extract description
+    const descriptionElement = $('[data-testid="description"]');
+    if (descriptionElement.length) {
+      bookData.description = descriptionElement.html() || descriptionElement.text().trim();
+    }
+    
+    // Extract average rating
+    const ratingElement = $('[data-testid="averageRating"]');
+    if (ratingElement.length) {
+      bookData.averageRating = ratingElement.text().trim();
+    }
+    
+    // Extract book details section
+    const detailsSection = $('.BookDetails');
+    
+    // Extract ISBN and other book data
+    detailsSection.find('.BookDetails__row').each((i, element) => {
+      const label = $(element).find('.BookDetails__label').text().trim().toLowerCase();
+      const value = $(element).find('.BookDetails__value').text().trim();
+      
+      if (label.includes('isbn')) {
+        if (label.includes('13')) {
+          bookData.isbn13 = value.replace(/[^0-9]/g, '');
+        } else {
+          bookData.isbn = value.replace(/[^0-9X]/g, '');
+        }
+      } else if (label.includes('pages')) {
+        const pagesMatch = value.match(/(\d+)/);
+        if (pagesMatch) {
+          bookData.pages = parseInt(pagesMatch[1], 10);
+        }
+      } else if (label.includes('published') || label.includes('publication')) {
+        const yearMatch = value.match(/(\d{4})/);
+        if (yearMatch) {
+          bookData.publicationYear = parseInt(yearMatch[1], 10);
+        }
+      } else if (label.includes('publisher')) {
+        bookData.publisher = value;
+      } else if (label.includes('language')) {
+        bookData.language = value;
+      }
+    });
+    
+    // Try alternative selectors for key details
+    if (!bookData.isbn || !bookData.isbn13) {
+      $('meta[property="books:isbn"]').each((i, element) => {
+        const isbnValue = $(element).attr('content')?.trim();
+        if (isbnValue) {
+          if (isbnValue.length === 13) {
+            bookData.isbn13 = isbnValue;
+          } else if (isbnValue.length === 10) {
+            bookData.isbn = isbnValue;
+          }
+        }
+      });
+    }
+    
+    return bookData;
+  }
+  
+  // Helper function to extract authors from HTML
+  function extractAuthorsFromHtml($: cheerio.CheerioAPI) {
+    const authors: any[] = [];
+    
+    // Modern GR design author elements
+    $('[data-testid="contributorLink"]').each((i, element) => {
+      const authorElement = $(element);
+      const name = authorElement.text().trim();
+      const authorUrl = authorElement.attr('href');
+      let goodreadsId = null;
+      
+      if (authorUrl) {
+        const authorIdMatch = authorUrl.match(/author\/show\/(\d+)/);
+        if (authorIdMatch) {
+          goodreadsId = authorIdMatch[1];
+        }
+      }
+      
+      if (name && !authors.some(a => a.name === name)) {
+        authors.push({
+          name,
+          goodreadsId,
+          role: 'Author'
+        });
+      }
+    });
+    
+    // Fallback for older design
+    if (authors.length === 0) {
+      $('.authorName[itemprop="name"]').each((i, element) => {
+        const name = $(element).text().trim();
+        const authorUrl = $(element).attr('href');
+        let goodreadsId = null;
+        
+        if (authorUrl) {
+          const authorIdMatch = authorUrl.match(/author\/show\/(\d+)/);
+          if (authorIdMatch) {
+            goodreadsId = authorIdMatch[1];
+          }
+        }
+        
+        if (name && !authors.some(a => a.name === name)) {
+          authors.push({
+            name,
+            goodreadsId,
+            role: 'Author'
+          });
+        }
+      });
+    }
+    
+    return authors;
+  }
+  
+  // Helper function to extract genres/shelves from HTML
+  function extractGenresFromHtml($: cheerio.CheerioAPI) {
+    const genres: any[] = [];
+    
+    // Method 1: Look for Button__labelItem spans within the genre buttons
+    $('.BookPageMetadataSection__genreButton .Button__labelItem').each((i, element) => {
+      const genreText = $(element).text().trim();
+      if (genreText && !genres.some(g => g.name === genreText)) {
+        genres.push({
+          name: genreText
+        });
+      }
+    });
+    
+    // If we didn't find genres with the first method, try method 2
+    if (genres.length === 0) {
+      // Method 2: Find all links in the genres container that point to genre pages
+      $('div[data-testid="genresList"] a[href*="/genres/"]').each((i, element) => {
+        const genreText = $(element).text().trim();
+        if (genreText && !genres.some(g => g.name === genreText)) {
+          genres.push({
+            name: genreText
+          });
+        }
+      });
+    }
+    
+    // If we still didn't find genres, try a more general approach
+    if (genres.length === 0) {
+      // Method 3: Look for any anchors with href containing "/genres/"
+      $('a[href*="/genres/"]').each((i, element) => {
+        const genreText = $(element).text().trim();
+        if (genreText && !genres.some(g => g.name === genreText)) {
+          genres.push({
+            name: genreText
+          });
+        }
+      });
+    }
+    
+    return genres;
+  }
   
   return router;
 }
