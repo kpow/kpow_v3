@@ -455,7 +455,7 @@ export function registerAdminRoutes(router: Router) {
       return res.status(403).json({ error: "Account not approved" });
     }
 
-    const { title, description, imageUrl, authors, shelves, ...bookData } = req.body;
+    const { title, description, imageUrl, authors, shelves, dateRead, dateAdded, ...bookData } = req.body;
 
     if (!title) {
       return res.status(400).json({ error: "Book title is required" });
@@ -466,12 +466,20 @@ export function registerAdminRoutes(router: Router) {
       
       // Start a transaction to ensure data consistency
       return await db.transaction(async (tx) => {
+        // Process date fields
+        const dateReadValue = dateRead ? new Date(dateRead) : null;
+        const dateAddedValue = dateAdded ? new Date(dateAdded) : null;
+        
+        console.log(`[Books Admin] Date values - dateRead: ${dateReadValue}, dateAdded: ${dateAddedValue}`);
+        
         // Insert the book
         const [insertedBook] = await tx.insert(books).values({
           title,
           description,
           imageUrl,
           ...bookData,
+          dateRead: dateReadValue,
+          dateAdded: dateAddedValue,
           dateCreated: new Date(),
           lastUpdated: new Date()
         }).returning();
@@ -601,7 +609,7 @@ export function registerAdminRoutes(router: Router) {
       return res.status(400).json({ error: "Invalid book ID" });
     }
 
-    const { title, description, imageUrl, authors, shelves, ...bookData } = req.body;
+    const { title, description, imageUrl, authors, shelves, dateRead, dateAdded, ...bookData } = req.body;
 
     if (!title) {
       return res.status(400).json({ error: "Book title is required" });
@@ -619,23 +627,18 @@ export function registerAdminRoutes(router: Router) {
         return res.status(404).json({ error: "Book not found" });
       }
       
+      // Process date fields
+      const dateReadValue = dateRead ? new Date(dateRead) : null;
+      const dateAddedValue = dateAdded ? new Date(dateAdded) : null;
+      
+      console.log(`[Books Admin] Date values - dateRead: ${dateReadValue}, dateAdded: ${dateAddedValue}`);
+      
       // Process dates
-      const processedData = { ...bookData };
-      
-      // Handle date fields properly
-      if (processedData.dateRead) {
-        processedData.dateRead = processedData.dateRead ? new Date(processedData.dateRead) : null;
-      } else {
-        // Don't modify the field if it's empty
-        delete processedData.dateRead;
-      }
-      
-      if (processedData.dateAdded) {
-        processedData.dateAdded = processedData.dateAdded ? new Date(processedData.dateAdded) : null;
-      } else {
-        // Don't modify the field if it's empty
-        delete processedData.dateAdded;
-      }
+      const processedData = { 
+        ...bookData,
+        dateRead: dateReadValue,
+        dateAdded: dateAddedValue 
+      };
       
       // Start a transaction to ensure data consistency
       return await db.transaction(async (tx) => {

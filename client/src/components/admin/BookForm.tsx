@@ -138,13 +138,21 @@ export function BookForm({ book, onSaved, onCancel }: BookFormProps) {
   const bookMutation = useMutation({
     mutationFn: async (values: BookFormValues) => {
       setIsSubmitting(true);
+      
+      // Process date fields to ensure they're Date objects or null
+      const processedValues = {
+        ...values,
+        dateRead: values.dateRead ? new Date(values.dateRead) : null,
+        dateAdded: values.dateAdded ? new Date(values.dateAdded) : null
+      };
+      
       // Check if this is an existing book with a valid ID
       if (book && book.id) {
         // Update existing book
-        return axios.put(`/api/admin/books/${book.id}`, values);
+        return axios.put(`/api/admin/books/${book.id}`, processedValues);
       } else {
         // Create new book
-        return axios.post("/api/admin/books", values);
+        return axios.post("/api/admin/books", processedValues);
       }
     },
     onSuccess: () => {
