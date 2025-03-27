@@ -1089,20 +1089,66 @@ export function registerAdminRoutes(router: Router) {
       bookData.description = description;
     }
     
-    // Extract average rating
+    // Extract average rating - first try the data-testid attribute
     const ratingElement = $('[data-testid="averageRating"]');
     if (ratingElement.length) {
-      bookData.averageRating = ratingElement.text().trim();
+      const ratingText = ratingElement.text().trim();
+      const ratingMatch = ratingText.match(/(\d+\.\d+)/);
+      if (ratingMatch && ratingMatch[1]) {
+        bookData.averageRating = parseFloat(ratingMatch[1]);
+      }
+    }
+    
+    // If we still don't have a rating, try additional methods
+    if (!bookData.averageRating) {
+      // Look for star patterns in the text
+      const starPattern = /(\d+\.\d+)\s*out of\s*5/i;
+      const bodyText = $('body').text();
+      const starMatch = bodyText.match(starPattern);
+      
+      if (starMatch && starMatch[1]) {
+        bookData.averageRating = parseFloat(starMatch[1]);
+      } else {
+        // Try meta tags
+        const ratingMeta = $('meta[property="books:rating:value"]');
+        if (ratingMeta.length) {
+          const ratingValue = ratingMeta.attr('content');
+          if (ratingValue) {
+            bookData.averageRating = parseFloat(ratingValue);
+          }
+        }
+      }
     }
     
     // Extract pages and publication date from the main page format (as in screenshot 1)
     const mainPageFormat = $('body').text();
     
     // Look for page count pattern like "385 pages, Kindle Edition"
-    const pagesPattern = /(\d+)\s*pages/;
-    const pagesMatch = mainPageFormat.match(pagesPattern);
-    if (pagesMatch && pagesMatch[1]) {
-      bookData.pages = parseInt(pagesMatch[1], 10);
+    const pagesPatterns = [
+      /(\d+)\s*pages,\s*[^,]+\s*Edition/i,  // "385 pages, Kindle Edition"
+      /Format\s+(\d+)\s+pages/i,             // "Format 385 pages"
+      /(\d+)\s*pages/i                       // Simple "385 pages" pattern
+    ];
+    
+    // Try each pattern in order
+    let pagesFound = false;
+    for (const pattern of pagesPatterns) {
+      if (pagesFound) break;
+      
+      const pagesMatch = mainPageFormat.match(pattern);
+      if (pagesMatch && pagesMatch[1]) {
+        bookData.numPages = parseInt(pagesMatch[1], 10);
+        pagesFound = true;
+      }
+    }
+    
+    // Special case for the format shown in the screenshot
+    if (!pagesFound) {
+      // Text like "385 pages, Kindle Edition" at the start of a line
+      const pageLineMatch = mainPageFormat.match(/\n\s*(\d+)\s*pages/);
+      if (pageLineMatch && pageLineMatch[1]) {
+        bookData.numPages = parseInt(pageLineMatch[1], 10);
+      }
     }
     
     // Look for publication date pattern like "First published January 1, 2019"
@@ -1149,8 +1195,8 @@ export function registerAdminRoutes(router: Router) {
         
         // Look for format/pages pattern
         const formatPagesMatch = text.match(/Format\s+(\d+)\s+pages/i);
-        if (formatPagesMatch && formatPagesMatch[1] && !bookData.pages) {
-          bookData.pages = parseInt(formatPagesMatch[1], 10);
+        if (formatPagesMatch && formatPagesMatch[1] && !bookData.numPages) {
+          bookData.numPages = parseInt(formatPagesMatch[1], 10);
         }
         
         // Look for published by pattern
@@ -1176,10 +1222,10 @@ export function registerAdminRoutes(router: Router) {
         } else {
           bookData.isbn = value.replace(/[^0-9X]/g, '');
         }
-      } else if (label.includes('pages') && !bookData.pages) {
+      } else if (label.includes('pages') && !bookData.numPages) {
         const pagesMatch = value.match(/(\d+)/);
         if (pagesMatch) {
-          bookData.pages = parseInt(pagesMatch[1], 10);
+          bookData.numPages = parseInt(pagesMatch[1], 10);
         }
       } else if ((label.includes('published') || label.includes('publication')) && !bookData.publicationYear) {
         bookData.publicationDate = value;
