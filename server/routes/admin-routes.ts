@@ -1092,33 +1092,25 @@ export function registerAdminRoutes(router: Router) {
       bookData.description = description;
     }
     
-    // Extract average rating - first try the data-testid attribute
-    const ratingElement = $('[data-testid="averageRating"]');
+    // Extract average rating using RatingStatistics__rating class
+    const ratingElement = $('.RatingStatistics__rating');
     if (ratingElement.length) {
       const ratingText = ratingElement.text().trim();
-      const ratingMatch = ratingText.match(/(\d+\.\d+)/);
-      if (ratingMatch && ratingMatch[1]) {
-        bookData.averageRating = parseFloat(ratingMatch[1]);
+      // Rating text should be a number like "4.12"
+      if (ratingText && !isNaN(parseFloat(ratingText))) {
+        bookData.averageRating = parseFloat(ratingText);
+        console.log(`[Books Admin] Found average rating: ${bookData.averageRating} using RatingStatistics__rating class`);
       }
     }
     
-    // If we still don't have a rating, try additional methods
+    // If we don't have a rating from the class, try meta tags as fallback
     if (!bookData.averageRating) {
-      // Look for star patterns in the text
-      const starPattern = /(\d+\.\d+)\s*out of\s*5/i;
-      const bodyText = $('body').text();
-      const starMatch = bodyText.match(starPattern);
-      
-      if (starMatch && starMatch[1]) {
-        bookData.averageRating = parseFloat(starMatch[1]);
-      } else {
-        // Try meta tags
-        const ratingMeta = $('meta[property="books:rating:value"]');
-        if (ratingMeta.length) {
-          const ratingValue = ratingMeta.attr('content');
-          if (ratingValue) {
-            bookData.averageRating = parseFloat(ratingValue);
-          }
+      const ratingMeta = $('meta[property="books:rating:value"]');
+      if (ratingMeta.length) {
+        const ratingValue = ratingMeta.attr('content');
+        if (ratingValue) {
+          bookData.averageRating = parseFloat(ratingValue);
+          console.log(`[Books Admin] Found average rating: ${bookData.averageRating} from meta tag`);
         }
       }
     }
