@@ -72,8 +72,11 @@ export function BookImporter({ onImported, onCancel }: BookImporterProps) {
       return {} as BookWithRelations;
     }
 
+    // Since this is a new book being imported, it doesn't have an ID yet
+    // We're creating a new book, not updating an existing one
     return {
       ...importedData.book,
+      id: undefined, // Explicitly set id to undefined to ensure we create a new book
       authors: importedData.authors || [],
       shelves: importedData.shelves || [],
     } as BookWithRelations;

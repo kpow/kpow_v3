@@ -1281,7 +1281,7 @@ export function registerAdminRoutes(router: Router) {
     
     // Strategy 1: Author div near title (as seen in the screenshot for "Dan Moren")
     // This is a specific pattern where the author's name appears right after the title
-    const bookHeaderAuthors = [];
+    const bookHeaderAuthors: Array<{name: string; role: string; goodreadsId?: string}> = [];
     
     // First try to find the title element
     const titleElement = $('h1');
@@ -1296,7 +1296,8 @@ export function registerAdminRoutes(router: Router) {
         if (authorText && /^[A-Z][a-z]+\s+[A-Z][a-z]+/.test(authorText)) {
           bookHeaderAuthors.push({
             name: authorText,
-            role: 'Author'
+            role: 'Author',
+            goodreadsId: undefined
           });
           
           // Also extract Goodreads ID if there's a link
