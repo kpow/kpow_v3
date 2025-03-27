@@ -1073,7 +1073,20 @@ export function registerAdminRoutes(router: Router) {
     // Extract description
     const descriptionElement = $('[data-testid="description"]');
     if (descriptionElement.length) {
-      bookData.description = descriptionElement.html() || descriptionElement.text().trim();
+      // Get HTML content, then remove all HTML tags to get clean text
+      let description = descriptionElement.html() || descriptionElement.text().trim();
+      
+      // Remove all HTML tags to provide a clean description
+      // This regex removes all HTML tags while preserving the text content
+      description = description.replace(/<\/?[^>]+(>|$)/g, "");
+      // Decode HTML entities
+      description = description.replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&nbsp;/g, ' ');
+      
+      bookData.description = description;
     }
     
     // Extract average rating
@@ -1082,11 +1095,78 @@ export function registerAdminRoutes(router: Router) {
       bookData.averageRating = ratingElement.text().trim();
     }
     
-    // Extract book details section
-    const detailsSection = $('.BookDetails');
+    // Extract pages and publication date from the main page format (as in screenshot 1)
+    const mainPageFormat = $('body').text();
     
-    // Extract ISBN and other book data
-    detailsSection.find('.BookDetails__row').each((i, element) => {
+    // Look for page count pattern like "385 pages, Kindle Edition"
+    const pagesPattern = /(\d+)\s*pages/;
+    const pagesMatch = mainPageFormat.match(pagesPattern);
+    if (pagesMatch && pagesMatch[1]) {
+      bookData.pages = parseInt(pagesMatch[1], 10);
+    }
+    
+    // Look for publication date pattern like "First published January 1, 2019"
+    const publishedDatePattern = /First published\s+([A-Za-z]+\s+\d+,\s+\d{4})/;
+    const publishedMatch = mainPageFormat.match(publishedDatePattern);
+    if (publishedMatch && publishedMatch[1]) {
+      bookData.publicationDate = publishedMatch[1];
+      
+      // Extract just the year for publicationYear field
+      const yearMatch = publishedMatch[1].match(/(\d{4})/);
+      if (yearMatch) {
+        bookData.publicationYear = parseInt(yearMatch[1], 10);
+      }
+    }
+    
+    // Check for "Book details & editions" section
+    const bookDetailsButton = $('button:contains("Book details & editions")');
+    if (bookDetailsButton.length) {
+      // Try to find the details section that would be shown when this button is clicked
+      const detailsSection = $('.BookDetails, [data-testid="bookEditionsPanel"]');
+      
+      // Look for ISBN in book editions section
+      detailsSection.find('div').each((i, element) => {
+        const text = $(element).text().trim();
+        
+        // Look for ISBN patterns
+        if (text.includes('ISBN')) {
+          const isbnMatch = text.match(/ISBN[^0-9]*([\dX]+)/i);
+          const isbn13Match = text.match(/ISBN13[^0-9]*([\d]+)/i) || text.match(/ISBN[^0-9]*(97[\d]+)/i);
+          
+          if (isbn13Match && isbn13Match[1]) {
+            bookData.isbn13 = isbn13Match[1].replace(/[^0-9]/g, '');
+          }
+          
+          if (isbnMatch && isbnMatch[1]) {
+            const isbn = isbnMatch[1].replace(/[^0-9X]/g, '');
+            if (isbn.length === 10) {
+              bookData.isbn = isbn;
+            } else if (isbn.length === 13 && !bookData.isbn13) {
+              bookData.isbn13 = isbn;
+            }
+          }
+        }
+        
+        // Look for format/pages pattern
+        const formatPagesMatch = text.match(/Format\s+(\d+)\s+pages/i);
+        if (formatPagesMatch && formatPagesMatch[1] && !bookData.pages) {
+          bookData.pages = parseInt(formatPagesMatch[1], 10);
+        }
+        
+        // Look for published by pattern
+        const publishedByMatch = text.match(/Published\s+([A-Za-z]+\s+\d+,\s+\d{4})\s+by\s+(.+)$/i);
+        if (publishedByMatch) {
+          if (!bookData.publicationDate) {
+            bookData.publicationDate = publishedByMatch[1];
+          }
+          bookData.publisher = publishedByMatch[2].trim();
+        }
+      });
+    }
+    
+    // Extract ISBN and other book data from BookDetails section (older Goodreads design)
+    const oldDetailsSection = $('.BookDetails');
+    oldDetailsSection.find('.BookDetails__row').each((i, element) => {
       const label = $(element).find('.BookDetails__label').text().trim().toLowerCase();
       const value = $(element).find('.BookDetails__value').text().trim();
       
@@ -1096,24 +1176,25 @@ export function registerAdminRoutes(router: Router) {
         } else {
           bookData.isbn = value.replace(/[^0-9X]/g, '');
         }
-      } else if (label.includes('pages')) {
+      } else if (label.includes('pages') && !bookData.pages) {
         const pagesMatch = value.match(/(\d+)/);
         if (pagesMatch) {
           bookData.pages = parseInt(pagesMatch[1], 10);
         }
-      } else if (label.includes('published') || label.includes('publication')) {
+      } else if ((label.includes('published') || label.includes('publication')) && !bookData.publicationYear) {
+        bookData.publicationDate = value;
         const yearMatch = value.match(/(\d{4})/);
         if (yearMatch) {
           bookData.publicationYear = parseInt(yearMatch[1], 10);
         }
-      } else if (label.includes('publisher')) {
+      } else if (label.includes('publisher') && !bookData.publisher) {
         bookData.publisher = value;
       } else if (label.includes('language')) {
         bookData.language = value;
       }
     });
     
-    // Try alternative selectors for key details
+    // Last resort - try meta tags for ISBN
     if (!bookData.isbn || !bookData.isbn13) {
       $('meta[property="books:isbn"]').each((i, element) => {
         const isbnValue = $(element).attr('content')?.trim();
@@ -1125,6 +1206,24 @@ export function registerAdminRoutes(router: Router) {
           }
         }
       });
+    }
+    
+    // Look for ISBN in any text on the page if we haven't found it yet
+    if (!bookData.isbn || !bookData.isbn13) {
+      const pageText = $('body').text();
+      const isbnPattern = /ISBN(?:10)?:?\s*([\dX]{10})/i;
+      const isbn13Pattern = /ISBN(?:-?13)?:?\s*((?:978|979)[\d]{10})/i;
+      
+      const isbnMatch = pageText.match(isbnPattern);
+      const isbn13Match = pageText.match(isbn13Pattern);
+      
+      if (isbnMatch && !bookData.isbn) {
+        bookData.isbn = isbnMatch[1];
+      }
+      
+      if (isbn13Match && !bookData.isbn13) {
+        bookData.isbn13 = isbn13Match[1];
+      }
     }
     
     return bookData;
@@ -1157,11 +1256,58 @@ export function registerAdminRoutes(router: Router) {
       }
     });
     
+    // Look for Book Series author line
+    $('.BookPageHeader__authorLink').each((i, element) => {
+      const authorElement = $(element);
+      const name = authorElement.text().trim();
+      const authorUrl = authorElement.attr('href');
+      let goodreadsId = null;
+      
+      if (authorUrl) {
+        const authorIdMatch = authorUrl.match(/author\/show\/(\d+)/);
+        if (authorIdMatch) {
+          goodreadsId = authorIdMatch[1];
+        }
+      }
+      
+      if (name && !authors.some(a => a.name === name)) {
+        authors.push({
+          name,
+          goodreadsId,
+          role: 'Author'
+        });
+      }
+    });
+    
+    // Look for authors in the body text (by...)
+    const byAuthorPattern = /by\s+([A-Za-z\s.'-]+)(?:,|\s*$)/;
+    const bodyText = $('body').text();
+    const authorMatch = bodyText.match(byAuthorPattern);
+    
+    if (authorMatch && authorMatch[1] && !authors.some(a => a.name === authorMatch[1].trim())) {
+      authors.push({
+        name: authorMatch[1].trim(),
+        role: 'Author'
+      });
+    }
+    
     // Fallback for older design
     if (authors.length === 0) {
-      $('.authorName[itemprop="name"]').each((i, element) => {
+      // Check for author name in meta tags
+      $('meta[property="books:author"]').each((i, element) => {
+        const name = $(element).attr('content')?.trim();
+        if (name && !authors.some(a => a.name === name)) {
+          authors.push({
+            name,
+            role: 'Author'
+          });
+        }
+      });
+      
+      // Traditional author name selectors
+      $('.authorName[itemprop="name"], .authorName span[itemprop="name"], .bookAuthor a.authorName').each((i, element) => {
         const name = $(element).text().trim();
-        const authorUrl = $(element).attr('href');
+        const authorUrl = $(element).closest('a').attr('href') || $(element).attr('href');
         let goodreadsId = null;
         
         if (authorUrl) {
@@ -1188,19 +1334,37 @@ export function registerAdminRoutes(router: Router) {
   function extractGenresFromHtml($: cheerio.CheerioAPI) {
     const genres: any[] = [];
     
-    // Method 1: Look for Button__labelItem spans within the genre buttons
-    $('.BookPageMetadataSection__genreButton .Button__labelItem').each((i, element) => {
-      const genreText = $(element).text().trim();
-      if (genreText && !genres.some(g => g.name === genreText)) {
-        genres.push({
-          name: genreText
-        });
-      }
-    });
+    // First, look for the Genres section which is shown in the screenshot
+    const genresText = $('body').text();
+    const genresSection = genresText.match(/Genres\s+(.*?)(?=\s+\d+\s*pages|\s*First published|$)/);
     
-    // If we didn't find genres with the first method, try method 2
+    if (genresSection && genresSection[1]) {
+      const genreList = genresSection[1].split(/\s+(?=[A-Z])/).filter(Boolean);
+      
+      for (const genre of genreList) {
+        const cleanGenre = genre.trim();
+        if (cleanGenre && !genres.some(g => g.name === cleanGenre)) {
+          genres.push({
+            name: cleanGenre
+          });
+        }
+      }
+    }
+    
+    // Method 1: Look for Button__labelItem spans within the genre buttons
     if (genres.length === 0) {
-      // Method 2: Find all links in the genres container that point to genre pages
+      $('.BookPageMetadataSection__genreButton .Button__labelItem').each((i, element) => {
+        const genreText = $(element).text().trim();
+        if (genreText && !genres.some(g => g.name === genreText)) {
+          genres.push({
+            name: genreText
+          });
+        }
+      });
+    }
+    
+    // Method 2: Find all links in the genres container that point to genre pages
+    if (genres.length === 0) {
       $('div[data-testid="genresList"] a[href*="/genres/"]').each((i, element) => {
         const genreText = $(element).text().trim();
         if (genreText && !genres.some(g => g.name === genreText)) {
@@ -1211,9 +1375,8 @@ export function registerAdminRoutes(router: Router) {
       });
     }
     
-    // If we still didn't find genres, try a more general approach
+    // Method 3: Look for any anchors with href containing "/genres/"
     if (genres.length === 0) {
-      // Method 3: Look for any anchors with href containing "/genres/"
       $('a[href*="/genres/"]').each((i, element) => {
         const genreText = $(element).text().trim();
         if (genreText && !genres.some(g => g.name === genreText)) {
@@ -1222,6 +1385,19 @@ export function registerAdminRoutes(router: Router) {
           });
         }
       });
+    }
+    
+    // Method 4: Look for shelf assignment text
+    if (genres.length === 0) {
+      const shelfMatch = genresText.match(/Shelved by.+?(?:as|in)\s+([A-Za-z\s]+)/i);
+      if (shelfMatch && shelfMatch[1]) {
+        const shelfName = shelfMatch[1].trim();
+        if (shelfName && !genres.some(g => g.name === shelfName)) {
+          genres.push({
+            name: shelfName
+          });
+        }
+      }
     }
     
     return genres;
