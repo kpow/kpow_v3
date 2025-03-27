@@ -1282,188 +1282,38 @@ export function registerAdminRoutes(router: Router) {
   function extractAuthorsFromHtml($: cheerio.CheerioAPI) {
     const authors: any[] = [];
     
-    // Strategy 1: Author div near title (as seen in the screenshot for "Dan Moren")
-    // This is a specific pattern where the author's name appears right after the title
-    const bookHeaderAuthors: Array<{name: string; role: string; goodreadsId?: string}> = [];
-    
-    // First try to find the title element
-    const titleElement = $('h1');
-    if (titleElement.length) {
-      // Look for any author name in the next element after the title
-      const nextElement = titleElement.next();
-      if (nextElement.length) {
-        // Clean up text to remove any badges or icons
-        const authorText = nextElement.text().trim().replace(/\s*\(\w+\s*\w+\)$/, '').trim();
-        
-        // Quick validation to ensure it looks like a name (2+ words, first char is uppercase)
-        if (authorText && /^[A-Z][a-z]+\s+[A-Z][a-z]+/.test(authorText)) {
-          bookHeaderAuthors.push({
-            name: authorText,
-            role: 'Author',
-            goodreadsId: undefined
-          });
-          
-          // Also extract Goodreads ID if there's a link
-          const authorLink = nextElement.find('a[href*="/author/show/"]');
-          if (authorLink.length) {
-            const href = authorLink.attr('href');
-            if (href) {
-              const authorIdMatch = href.match(/author\/show\/(\d+)/);
-              if (authorIdMatch && authorIdMatch[1]) {
-                bookHeaderAuthors[0].goodreadsId = authorIdMatch[1];
-              }
-            }
+    // Use the ContributorLink__name class to extract author names
+    $('.ContributorLink__name').each((i, element) => {
+      const authorElement = $(element);
+      const name = authorElement.text().trim();
+      
+      // Find the closest link (usually a parent) to extract the Goodreads ID if available
+      const authorLink = authorElement.closest('a[href*="/author/show/"]');
+      let goodreadsId = null;
+      
+      if (authorLink.length) {
+        const href = authorLink.attr('href');
+        if (href) {
+          const authorIdMatch = href.match(/author\/show\/(\d+)/);
+          if (authorIdMatch && authorIdMatch[1]) {
+            goodreadsId = authorIdMatch[1];
           }
         }
       }
-    }
-    
-    // If we found a header author, prioritize it
-    if (bookHeaderAuthors.length > 0) {
-      authors.push(...bookHeaderAuthors);
-    }
-    
-    // Strategy 2: Modern GR design author elements with data-testid
-    if (authors.length === 0) {
-      $('[data-testid="contributorLink"]').each((i, element) => {
-        const authorElement = $(element);
-        const name = authorElement.text().trim();
-        const authorUrl = authorElement.attr('href');
-        let goodreadsId = null;
-        
-        if (authorUrl) {
-          const authorIdMatch = authorUrl.match(/author\/show\/(\d+)/);
-          if (authorIdMatch) {
-            goodreadsId = authorIdMatch[1];
-          }
-        }
-        
-        if (name && !authors.some(a => a.name === name)) {
-          authors.push({
-            name,
-            goodreadsId,
-            role: 'Author'
-          });
-        }
-      });
-    }
-    
-    // Strategy 3: Look for Book Series author line
-    if (authors.length === 0) {
-      $('.BookPageHeader__authorLink').each((i, element) => {
-        const authorElement = $(element);
-        const name = authorElement.text().trim();
-        const authorUrl = authorElement.attr('href');
-        let goodreadsId = null;
-        
-        if (authorUrl) {
-          const authorIdMatch = authorUrl.match(/author\/show\/(\d+)/);
-          if (authorIdMatch) {
-            goodreadsId = authorIdMatch[1];
-          }
-        }
-        
-        if (name && !authors.some(a => a.name === name)) {
-          authors.push({
-            name,
-            goodreadsId,
-            role: 'Author'
-          });
-        }
-      });
-    }
-    
-    // Strategy 4: Look for authors in the body text (by...)
-    // This is a common pattern in book listings: "The Bayern Agenda by Dan Moren"
-    if (authors.length === 0) {
-      // Try several regex patterns for different "by author" formats
-      const byAuthorPatterns = [
-        /([A-Za-z\s.'-]+)\s+\(Author\)/i,  // "Dan Moren (Author)"
-        /by\s+([A-Za-z\s.'-]+)(?:,|\s*$)/i, // "by Dan Moren" or "by Dan Moren,"
-        /By:?\s+([A-Za-z\s.'-]+)/i,  // "By: Dan Moren"
-        /Author:\s+([A-Za-z\s.'-]+)/i  // "Author: Dan Moren"
-      ];
       
-      const bodyText = $('body').text();
-      let authorFound = false;
-      
-      for (const pattern of byAuthorPatterns) {
-        if (authorFound) break;
-        
-        const authorMatch = bodyText.match(pattern);
-        if (authorMatch && authorMatch[1]) {
-          const authorName = authorMatch[1].trim();
-          if (authorName && !authors.some(a => a.name === authorName)) {
-            authors.push({
-              name: authorName,
-              role: 'Author'
-            });
-            authorFound = true;
-          }
-        }
+      // Add the author if not already in the list
+      if (name && !authors.some(a => a.name === name)) {
+        authors.push({
+          name,
+          goodreadsId,
+          role: 'Author'
+        });
       }
-    }
+    });
     
-    // Strategy 5: Check for author name in meta tags
-    if (authors.length === 0) {
-      $('meta[property="books:author"]').each((i, element) => {
-        const name = $(element).attr('content')?.trim();
-        if (name && !authors.some(a => a.name === name)) {
-          authors.push({
-            name,
-            role: 'Author'
-          });
-        }
-      });
-    }
-    
-    // Strategy 6: Traditional author name selectors for older GR design
-    if (authors.length === 0) {
-      $('.authorName[itemprop="name"], .authorName span[itemprop="name"], .bookAuthor a.authorName').each((i, element) => {
-        const name = $(element).text().trim();
-        const authorUrl = $(element).closest('a').attr('href') || $(element).attr('href');
-        let goodreadsId = null;
-        
-        if (authorUrl) {
-          const authorIdMatch = authorUrl.match(/author\/show\/(\d+)/);
-          if (authorIdMatch) {
-            goodreadsId = authorIdMatch[1];
-          }
-        }
-        
-        if (name && !authors.some(a => a.name === name)) {
-          authors.push({
-            name,
-            goodreadsId,
-            role: 'Author'
-          });
-        }
-      });
-    }
-    
-    // Strategy 7: Look for any links to author pages
-    if (authors.length === 0) {
-      $('a[href*="/author/show/"]').each((i, element) => {
-        const name = $(element).text().trim();
-        const authorUrl = $(element).attr('href');
-        let goodreadsId = null;
-        
-        if (authorUrl) {
-          const authorIdMatch = authorUrl.match(/author\/show\/(\d+)/);
-          if (authorIdMatch) {
-            goodreadsId = authorIdMatch[1];
-          }
-        }
-        
-        if (name && !authors.some(a => a.name === name)) {
-          authors.push({
-            name,
-            goodreadsId,
-            role: 'Author'
-          });
-        }
-      });
-    }
+    // Log the authors found for debugging
+    console.log(`[Books Admin] Found ${authors.length} authors using ContributorLink__name:`, 
+      authors.map(a => a.name).join(', '));
     
     return authors;
   }
