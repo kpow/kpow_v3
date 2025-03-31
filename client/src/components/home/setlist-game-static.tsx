@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ShowDetailsModal } from "@/components/phashboard/show-details-modal";
+import { RetroGrid } from "@/components/magicui/retro-grid";
+
 import {
   Form,
   FormField,
@@ -234,7 +236,7 @@ export function SetlistGame() {
 
           <AnimatePresence mode="wait">
             {gameState === "idle" && (
-              <div className="px-4 text-center h-full flex flex-col items-center justify-center space-y-6">
+              <div className="px-4 text-center h-full flex flex-col items-center justify-center space-y-6 relative overflow-hidden">
                 <div className="">
                   <BlurText
                     text="Ready to test your Phish knowledge?"
@@ -267,6 +269,8 @@ export function SetlistGame() {
                     Start Game
                   </Button>
                 </div>
+              
+                 <RetroGrid />
               </div>
             )}
 
@@ -448,6 +452,8 @@ export function SetlistGame() {
               </div>
             )}
           </AnimatePresence>
+          
+         
         </div>
         <div className="justify-center flex flex-col md:flex-row lg:flex-col xl:flex-row bg-black text-white rounded-sm p-1 pl-4 m-0 mt-8">
           <div className="flex justify-between items-center mt-1 mb-1">
@@ -463,6 +469,7 @@ export function SetlistGame() {
             </div>
           </div>
         </div>
+      
       </CardContent>
     </Card>
   );

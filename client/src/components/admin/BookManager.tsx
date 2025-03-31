@@ -40,7 +40,7 @@ export function BookManager() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [booksPerPage, setBooksPerPage] = useState(10);
+  const [booksPerPage, setBooksPerPage] = useState(5);
   const [editingBook, setEditingBook] = useState<BookWithRelations | null>(null);
   const [isAddingBook, setIsAddingBook] = useState(false);
   const [isImportingBook, setIsImportingBook] = useState(false);
