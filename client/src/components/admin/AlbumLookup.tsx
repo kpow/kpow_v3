@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea, ScrollList, ScrollListItem } from "@/components/ui/scroll-area";
-import { ArtistAutocomplete } from "@/components/ArtistAutocomplete";
+import { ArtistAutocomplete } from "@/components/admin/ArtistAutocomplete";
 
 interface Album {
   name: string;

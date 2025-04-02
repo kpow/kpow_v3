@@ -3,16 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
-  ChevronLeft,
-  ChevronRight,
   Search,
   X,
   SlidersHorizontal,
-  ArrowUpDown,
   BookOpen,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { BookCard } from "@/components/BookCard";
+import { BookCard } from "@/components/books/BookCard";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { PageTitle } from "@/components/ui/page-title";
 import { SEO } from "@/components/global/SEO";
@@ -24,23 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+
 import { debounce } from "lodash";
 import { Book, BookResponse, Shelf, ShelvesResponse } from "@/types/books";
 

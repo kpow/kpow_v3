@@ -150,6 +150,7 @@ function MonthYearSelector({
   );
 }
 
+// Component for starred articles
 export default function StarredArticles({
   params,
 }: {

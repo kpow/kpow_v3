@@ -2,7 +2,7 @@ import { ContentSection } from "@/components/home/ContentSection";
 import { RecentPlays } from "@/components/home/RecentPlays";
 import { SetlistGame } from "@/components/home/setlist-game-static";
 import { CubeFrame } from "@/components/home/cube-frame";
-import { BookFeed } from "@/components/BookFeed";
+import { BookFeed } from "@/components/home/BookFeed";
 import { GitHubSection } from "@/components/home/GitHubSection";
 import { InstagramCarousel } from "@/components/instagram/InstagramCarousel";
 import { useQuery } from "@tanstack/react-query";
@@ -13,7 +13,7 @@ import { cities } from "@/data/cities";
 import SectionHeader from "@/components/global/SectionHeader";
 import HorizontalDivider from "@/components/global/HorizontalDivider";
 import { SEO } from "@/components/global/SEO";
-import { StarFeed } from "@/components/StarFeed";
+import { StarFeed } from "@/components/home/StarFeed";
 import { Shop } from "@/types/shop";
 
 interface YelpResponse {

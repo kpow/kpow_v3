@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
-import { BookDetailsModal } from "@/components/BookDetailsModal";
+import { BookDetailsModal } from "@/components/books/BookDetailsModal";
 import { Book as BookIcon } from "lucide-react";
 import { Book } from "@/types/books";
 

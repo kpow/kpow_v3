@@ -215,7 +215,6 @@ export function HeroBattle() {
                       onChange={(e) => setBet(Number(e.target.value))}
                       className="w-24"
                     />
-                    <div className="font-bold text-1xl">Stash: {stash}</div>
                   </div>
                 )}
               </div>
@@ -239,7 +238,9 @@ export function HeroBattle() {
               )}
             </div>
           </div>
-
+          <div className="gap-4 pl-4">
+            <div className="font-bold text-1xl">Stash: {stash}</div>
+          </div>
           <div className="gap-4 pl-4">
             <AnimatePresence mode="wait">
               {!isBattling && !winner && hero1 && hero2 && (
