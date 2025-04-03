@@ -13,13 +13,21 @@ if (!process.env.DATABASE_URL) {
 // Create PostgreSQL pool with optimized settings for Neon serverless
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL?.replace('.us-east-2', '-pooler.us-east-2'),
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
-  maxUses: 7500, // Close connections after 7500 queries
+  max: 5, // Reduce max connections
+  idleTimeoutMillis: 15000, // Shorter idle timeout
+  connectionTimeoutMillis: 10000, // Longer connection timeout
+  maxUses: 1000, // Lower max uses to prevent connection staleness
+  keepAlive: true, // Enable TCP keepalive
+  statement_timeout: 10000, // Statement timeout in ms
+  query_timeout: 10000, // Query timeout in ms
 });
 
-// Create Drizzle client with pooled connection
+// Add event listeners for connection issues
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err);
+});
+
+// Create Drizzle client with optimized connection
 export const db = drizzle({
   connection: process.env.DATABASE_URL?.replace('.us-east-2', '-pooler.us-east-2'),
   schema,

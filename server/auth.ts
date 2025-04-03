@@ -41,9 +41,11 @@ export function setupAuth(app: Express) {
     pool,
     createTableIfMissing: true,
     tableName: 'session',
-    pruneSessionInterval: 60 * 15, // 15 minutes
+    pruneSessionInterval: 60 * 5, // 5 minutes
     errorLog: console.error.bind(console),
-    ttl: 24 * 60 * 60 // 24 hours
+    ttl: 24 * 60 * 60, // 24 hours
+    disableTouch: true, // Reduce session update frequency
+    touchAfter: 24 * 3600 // Touch after 24 hours
   });
 
   const sessionSettings: session.SessionOptions = {
