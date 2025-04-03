@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@db";
-import { checkDatabaseConnectivity } from "../utils/db-helpers";
+import { checkDatabaseConnectivity, getDatabaseInfo } from "../utils/db-helpers";
 
 /**
  * Register health check related routes
@@ -24,18 +24,44 @@ export function registerHealthRoutes(router: Router) {
       const isConnected = await checkDatabaseConnectivity();
       
       if (isConnected) {
-        // Use raw query for simplicity if connection is available
-        const result = await db.execute("SELECT NOW() as current_time");
-        
-        res.status(200).json({ 
-          status: "ok", 
-          timestamp: new Date().toISOString(),
-          database: {
-            connected: true,
-            serverTime: result[0].current_time
+        try {
+          // Use raw query for simplicity if connection is available
+          const result = await db.execute("SELECT NOW() as current_time");
+          
+          if (result && result[0] && result[0].current_time) {
+            res.status(200).json({ 
+              status: "ok", 
+              timestamp: new Date().toISOString(),
+              database: {
+                connected: true,
+                serverTime: result[0].current_time
+              }
+            });
+            console.log("[Health] Database health check successful");
+          } else {
+            // Query worked but returned unexpected format
+            res.status(200).json({ 
+              status: "warning", 
+              timestamp: new Date().toISOString(),
+              message: "Database connected but returned unexpected data format",
+              database: {
+                connected: true
+              }
+            });
+            console.log("[Health] Database health check warning - unexpected data format");
           }
-        });
-        console.log("[Health] Database health check successful");
+        } catch (queryError) {
+          console.error("[Health] Database query error:", queryError);
+          res.status(200).json({ 
+            status: "warning", 
+            timestamp: new Date().toISOString(),
+            message: "Connected to database but query failed",
+            database: {
+              connected: true
+            },
+            error: queryError instanceof Error ? queryError.message : String(queryError)
+          });
+        }
       } else {
         // Connection check failed
         res.status(503).json({ 
@@ -55,6 +81,22 @@ export function registerHealthRoutes(router: Router) {
         timestamp: new Date().toISOString(),
         message: "Error checking database connection",
         error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  // Database connection information (without actually connecting)
+  router.get("/api/health/db-info", (req, res) => {
+    console.log("[Health] Getting database information");
+    try {
+      const dbInfo = getDatabaseInfo();
+      res.json(dbInfo);
+      console.log("[Health] Database information retrieved");
+    } catch (error) {
+      console.error("[Health] Failed to get database information:", error);
+      res.status(500).json({
+        error: "Failed to retrieve database information",
+        message: error instanceof Error ? error.message : String(error)
       });
     }
   });

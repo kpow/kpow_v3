@@ -20,6 +20,7 @@ import NotFound from "@/pages/not-found";
 import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
 import BentoDemo from "@/pages/BentoDemo";
+import HealthDashboard from "@/pages/HealthDashboard";
 import { Route as WouterRoute } from "wouter";
 import { SEO } from "@/components/global/SEO";
 
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
         <Route path="/bento" component={BentoDemo} />
+        <Route path="/system-health" component={HealthDashboard} />
 
         <Route component={NotFound} />
       </Switch>

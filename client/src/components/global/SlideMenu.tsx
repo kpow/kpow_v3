@@ -19,6 +19,7 @@ import {
   Fish,
   Circle,
   Mail,
+  Activity,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -89,6 +90,11 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       icon: <Music className="w-4 h-4" />,
       label: "itunez",
       href: "/itunez",
+    },
+    {
+      icon: <Activity className="w-4 h-4" />,
+      label: "system health",
+      href: "/system-health",
     },
     {
       icon: <Code className="w-4 h-4" />,
