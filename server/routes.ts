@@ -12,7 +12,6 @@ import { registerFeedbinRoutes } from "./routes/feedbin-routes";
 import { registerGithubRoutes } from "./routes/github-routes";
 import { registerMusicRoutes } from "./routes/music-routes";
 import { registerAdminRoutes } from "./routes/admin-routes";
-import { registerHealthRoutes } from "./routes/health-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
@@ -34,7 +33,6 @@ export function registerRoutes(app: Express): Server {
   registerGithubRoutes(router);
   registerMusicRoutes(router);
   registerAdminRoutes(router);
-  registerHealthRoutes(router); // Register health check endpoints
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
