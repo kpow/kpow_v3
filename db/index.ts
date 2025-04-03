@@ -1,3 +1,4 @@
+
 import { drizzle } from "drizzle-orm/neon-serverless";
 import pkg from 'pg';
 const { Pool } = pkg;
@@ -13,29 +14,27 @@ if (!process.env.DATABASE_URL) {
 // Create PostgreSQL pool with optimized settings for Neon serverless
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL?.replace('.us-east-2', '-pooler.us-east-2'),
-  max: 3, // Reduce max connections further
-  idleTimeoutMillis: 30000, // Longer idle timeout
-  connectionTimeoutMillis: 15000, // Increased connection timeout
-  maxUses: 500, // Reduce max uses
-  statement_timeout: 20000,
-  query_timeout: 20000,
-  ssl: {
-    rejectUnauthorized: false // Required for some Neon connections
-  }
+  max: 5, // Reduce max connections
+  idleTimeoutMillis: 15000, // Shorter idle timeout
+  connectionTimeoutMillis: 10000, // Longer connection timeout
+  maxUses: 1000, // Lower max uses to prevent connection staleness
+  keepAlive: true, // Enable TCP keepalive
+  statement_timeout: 10000, // Statement timeout in ms
+  query_timeout: 10000, // Query timeout in ms
 });
 
 // Add event listeners for connection issues
+// Connection monitoring
 pool.on('error', (err, client) => {
-  console.error('Unexpected error on idle client', err);
-  // Attempt to close the client if it exists
-  if (client) {
-    client.release(true); // Force release with error
-  }
+  console.error('Database pool error:', err);
 });
 
-// Add connect listener
-pool.on('connect', (client) => {
-  console.log('New client connected to pool');
+pool.on('connect', () => {
+  console.log('New database connection established');
+});
+
+pool.on('remove', () => {
+  console.log('Database connection removed from pool');
 });
 
 // Create Drizzle client with optimized connection
