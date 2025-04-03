@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import yearMonthIndex from "../data/year-month-starred-article-index.json";
+import { StarredArticleBento } from "@/components/articles/StarredArticleBento";
 
 interface PaginationData {
   current_page: number;
@@ -270,17 +271,10 @@ export default function StarredArticles({
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Array.from({ length: ARTICLES_PER_PAGE }).map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="h-80 w-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <StarredArticleBento 
+          articles={[]} 
+          isLoading={true} 
+        />
         <div className="flex justify-center gap-2 items-center mt-6">
           <PaginationLoader />
         </div>
@@ -318,15 +312,10 @@ export default function StarredArticles({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article) => (
-            <ContentSection
-              key={article.url}
-              {...article}
-              excerpt={article.excerpt}
-            />
-          ))}
-        </div>
+        <StarredArticleBento 
+          articles={articles} 
+          isLoading={false} 
+        />
 
         <CustomPagination
           currentPage={currentPage}
