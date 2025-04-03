@@ -40,12 +40,7 @@ export function setupAuth(app: Express) {
   const store = new PostgresSessionStore({
     pool,
     createTableIfMissing: true,
-    tableName: 'session',
-    pruneSessionInterval: 60 * 5, // 5 minutes
-    errorLog: console.error.bind(console),
-    ttl: 24 * 60 * 60, // 24 hours
-    disableTouch: true, // Reduce session update frequency
-    touchAfter: 24 * 3600 // Touch after 24 hours
+    tableName: 'session'
   });
 
   const sessionSettings: session.SessionOptions = {
