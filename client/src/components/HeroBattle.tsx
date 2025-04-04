@@ -250,6 +250,7 @@ export function HeroBattle() {
                 </div>
               </div>
             </div>
+            </div>
           )}
 
           {mode === "random" && hero1 && hero2 && (
