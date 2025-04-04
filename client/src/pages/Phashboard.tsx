@@ -99,7 +99,7 @@ export default function ShowStats() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <Card>
             <CardContent className="pt-6">
-              <h2 className="text-lg font-slackey mb-4">venues</h2>
+              <h2 className="text-2xl font-slackey mb-4">venues</h2>
               <ScrollArea maxHeight="450px">
                 {venuesLoading ? (
                   <div className="space-y-2 p-3">
@@ -117,9 +117,10 @@ export default function ShowStats() {
                   venuesData.venues &&
                   venuesData.venues.length > 0 ? (
                   <ScrollList>
-                    {venuesData.venues.map((venue) => (
+                    {venuesData.venues.map((venue, index) => (
                       <ScrollListItem
                         key={venue.venue}
+                        className={`flex justify-between items-center p-3 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}
                         onClick={() => {
                           setSelectedVenue(venue.venue);
                           setIsVenueModalOpen(true);
