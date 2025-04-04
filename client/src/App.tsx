@@ -19,7 +19,6 @@ import Videos from "@/pages/Videos";
 import NotFound from "@/pages/not-found";
 import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
-import BentoDemo from "@/pages/BentoDemo";
 import { Route as WouterRoute } from "wouter";
 import { SEO } from "@/components/global/SEO";
 
@@ -47,7 +46,6 @@ function Router() {
         <Route path="/itunez" component={ITunezPage} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
-        <Route path="/bento" component={BentoDemo} />
 
         <Route component={NotFound} />
       </Switch>
