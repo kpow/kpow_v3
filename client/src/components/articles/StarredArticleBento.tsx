@@ -47,22 +47,20 @@ export function StarredArticleBento({ articles, isLoading = false }: StarredArti
           title={article.title}
           description={article.excerpt}
           header={
-            <a 
-              href={article.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block w-full h-full overflow-hidden rounded-xl"
-            >
-              <div className="relative w-full h-full min-h-[12rem] overflow-hidden group">
-                <img
-                  src={article.imageSrc}
-                  alt={article.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-50 group-hover:opacity-70 transition-opacity"></div>
-              </div>
-            </a>
+            <div className="relative w-full h-full min-h-[12rem] overflow-hidden group">
+              <img
+                src={article.imageSrc}
+                alt={article.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-50 group-hover:opacity-70 transition-opacity"></div>
+            </div>
           }
+          className={cn(
+            i === 3 || i === 6 || i === 10 || i === 13 ? "md:col-span-2" : "",
+            "cursor-pointer hover:scale-[1.02] transition-transform"
+          )}
+          href={article.url}
           icon={
             <div className="flex items-center gap-2">
               <div className="text-sm text-neutral-500 flex items-center">

@@ -25,15 +25,22 @@ export const BentoGridItem = ({
   description,
   header,
   icon,
+  href, // Added href prop for the link
+  wrapperProps = {}, // Added wrapperProps for customization
 }: {
   className?: string;
   title?: string | React.ReactNode;
   description?: string | React.ReactNode;
   header?: React.ReactNode;
   icon?: React.ReactNode;
+  href?: string; // Added href prop type
+  wrapperProps?: any; // Added wrapperProps type
 }) => {
+  const Wrapper = href ? 'a' : 'div'; //Conditional rendering of the wrapper
   return (
-    <div
+    <Wrapper
+      href={href} //Added href to the Wrapper
+      {...wrapperProps}
       className={cn(
         "group/bento shadow-input row-span-1 flex flex-col justify-between space-y-4 rounded-xl border border-neutral-200 bg-white p-4 transition duration-200 hover:shadow-xl dark:border-white/[0.2] dark:bg-black dark:shadow-none",
         className,
@@ -49,6 +56,6 @@ export const BentoGridItem = ({
           {description}
         </div>
       </div>
-    </div>
+    </Wrapper>
   );
 };
