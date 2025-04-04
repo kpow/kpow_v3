@@ -240,7 +240,7 @@ export function HeroBattle() {
             </div>
           </div>
           <div className="gap-4 pl-4">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="pop"> {/* Changed mode to 'pop' for better animation */}
               {!isBattling && !winner && hero1 && hero2 && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.5 }}
@@ -274,7 +274,7 @@ export function HeroBattle() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex items-center justify-center w-full h-32 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl p-4 text-center min-w-[300px]"
                 >
-                  {winner.name} Wins!
+                  <div className="winner-message">{winner.name} Wins!</div> {/* Added a div for message modification */}
                 </motion.div>
               )}
             </AnimatePresence>
