@@ -157,8 +157,8 @@ export function HeroBattle() {
 
         <div className="flex flex-col items-center gap-6">
           {mode === "manual" && (
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div>
+            <div className="grid grid-cols-2 gap-8 w-full max-w-4xl mx-auto mb-6">
+              <div className="flex flex-col items-center gap-4">
                 <Select onValueChange={(value) => handleHeroSelect(value, 1)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select hero 1" />
@@ -172,7 +172,7 @@ export function HeroBattle() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
+              <div className="flex flex-col items-center gap-4">
                 <Select onValueChange={(value) => handleHeroSelect(value, 2)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select hero 2" />
@@ -185,6 +185,24 @@ export function HeroBattle() {
                     ))}
                   </SelectContent>
                 </Select>
+                <div className="w-full flex justify-center mt-4 font-slackey">
+                  {hero1 && hero2 && !winner && (
+                    <Button
+                      className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                      onClick={handleBattle}
+                    >
+                      Fight!
+                    </Button>
+                  )}
+                  {winner && (
+                    <Button
+                      className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                      onClick={handleReset}
+                    >
+                      Reset
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           )}
