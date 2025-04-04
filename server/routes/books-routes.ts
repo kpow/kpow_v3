@@ -138,7 +138,8 @@ export function registerBooksRoutes(router: Router) {
                 {
                   author: book.bookAuthors.map(ba => ({
                     id: [ba.author.goodreadsId],
-                    name: [ba.author.name]
+                    name: [ba.author.name],
+                    image_url: [ba.author.imageUrl]
                   }))
                 }
               ]

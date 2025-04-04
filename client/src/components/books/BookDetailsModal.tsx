@@ -95,6 +95,11 @@ export function BookDetailsModal({
   const authorName =
     currentBook?.book[0]?.authors?.[0]?.author?.[0]?.name?.[0] ??
     "Unknown Author";
+  const authorId =
+    currentBook?.book[0]?.authors?.[0]?.author?.[0]?.id?.[0] ?? null;
+  const authorImageUrl =
+    currentBook?.book[0]?.authors?.[0]?.author?.[0]?.image_url?.[0] ??
+    "https://s.gr-assets.com/assets/nophoto/user/u_200x266-e183445fd1a1b5cc7075bb1cf7043306.png";
   const description =
     currentBook?.book[0]?.description?.[0]?.replace(/<[^>]*>/g, "") ??
     "No description available";
@@ -200,6 +205,27 @@ export function BookDetailsModal({
                   View on Goodreads
                 </span>
               </a>
+
+              {/* Author Image and Info Section */}
+              <div className="flex items-center space-x-3 bg-muted/50 p-3 rounded-lg">
+                <div className="relative overflow-hidden rounded-full w-12 h-12 border-2 border-primary/30 flex-shrink-0">
+                  <motion.img 
+                    src={authorImageUrl} 
+                    alt={authorName}
+                    className="w-full h-full object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-sm font-bold font-slackey">Author</span>
+                  </div>
+                  <span className="text-sm">{authorName}</span>
+                </div>
+              </div>
 
               <div className="flex justify-between items-center mt-4">
                 <Button
