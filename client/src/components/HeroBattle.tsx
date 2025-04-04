@@ -37,6 +37,7 @@ export function HeroBattle() {
   const [hero1, setHero1] = useState<Hero | null>(null);
   const [hero2, setHero2] = useState<Hero | null>(null);
   const [winner, setWinner] = useState<Hero | null>(null);
+  const [isMiracleWin, setIsMiracleWin] = useState(false);
   const [stash, setStash] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? Number(saved) : 100;
@@ -70,6 +71,7 @@ export function HeroBattle() {
       hero2,
     );
     setWinner(battleWinner);
+    setIsMiracleWin(isMiracleWin);
     setIsBattling(false);
     setBattleStep(-1);
 
