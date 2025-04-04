@@ -137,7 +137,9 @@ export function HeroBattle() {
               battle
             </PageTitle>
             <div className="flex items-center gap-2">
-              <span className={mode === "manual" ? "font-bold" : ""}>Manual</span>
+              <span className={mode === "manual" ? "font-bold" : ""}>
+                Manual
+              </span>
               <Switch
                 checked={mode === "random"}
                 onCheckedChange={(checked) => {
@@ -146,11 +148,15 @@ export function HeroBattle() {
                   if (checked) handleRandom();
                 }}
               />
-              <span className={mode === "random" ? "font-bold" : ""}>Random</span>
+              <span className={mode === "random" ? "font-bold" : ""}>
+                Random
+              </span>
             </div>
           </div>
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 rounded-lg">
-            <div className="text-white text-2xl font-slackey">Stash: {stash}</div>
+            <div className="text-white text-2xl font-slackey">
+              Stash: {stash}
+            </div>
           </div>
         </div>
 
@@ -187,64 +193,64 @@ export function HeroBattle() {
               </div>
               <div className="flex items-stretch justify-center h-full w-full font-slackey mb-4">
                 <AnimatePresence mode="popLayout">
-                {!isBattling && !winner && hero1 && hero2 && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-center justify-center p-4 w-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl text-center"
-                  >
-                    {hero1.name}
-                    <br />
-                    vs.
-                    <br />
-                    {hero2.name}
-                  </motion.div>
-                )}
-                {isBattling && battleStep >= 0 && (
-                  <motion.div
-                    key={battleStep}
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl"
-                  >
-                    {BATTLE_STEPS[battleStep]}
-                  </motion.div>
-                )}
-                {winner && !isBattling && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl text-center"
-                  >
-                    <div className="winner-message">{winner.name} Wins!</div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                  {!isBattling && !winner && hero1 && hero2 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center justify-center p-4 w-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl text-center"
+                    >
+                      {hero1.name}
+                      <br />
+                      vs.
+                      <br />
+                      {hero2.name}
+                    </motion.div>
+                  )}
+                  {isBattling && battleStep >= 0 && (
+                    <motion.div
+                      key={battleStep}
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl"
+                    >
+                      {BATTLE_STEPS[battleStep]}
+                    </motion.div>
+                  )}
+                  {winner && !isBattling && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl text-center"
+                    >
+                      <div className="winner-message">{winner.name} Wins!</div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-            <div className="w-full flex justify-center mt-4 font-slackey">
-              {hero1 && hero2 && !winner && (
-                <Button
-                  className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                  onClick={handleBattle}
-                >
-                  Fight!
-                </Button>
-              )}
-              {winner && (
-                <Button
-                  className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                  onClick={handleReset}
-                >
-                  Reset
-                </Button>
-              )}
+              <div className="w-full flex justify-center mt-4 font-slackey">
+                {hero1 && hero2 && !winner && (
+                  <Button
+                    className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                    onClick={handleBattle}
+                  >
+                    Fight!
+                  </Button>
+                )}
+                {winner && (
+                  <Button
+                    className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                    onClick={handleReset}
+                  >
+                    Reset
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
           )}
 
           {mode === "random" && hero1 && hero2 && (
@@ -252,20 +258,28 @@ export function HeroBattle() {
               <div className="flex flex-col items-center gap-4">
                 <div className="bg-gray-100 p-6 rounded-lg w-full">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-xl font-semibold font-slackey mb-2">Place Your Bet</div>
+                    <div className="text-xl font-semibold font-slackey mb-2">
+                      Place Your Bet
+                    </div>
                     <RadioGroup
                       onValueChange={(value) => setSelectedHero(Number(value))}
                       value={selectedHero?.toString()}
                       className="space-y-2"
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value={hero1.id.toString()} id="hero1" />
+                        <RadioGroupItem
+                          value={hero1.id.toString()}
+                          id="hero1"
+                        />
                         <Label htmlFor="hero1" className="text-lg">
                           {hero1.name}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value={hero2.id.toString()} id="hero2" />
+                        <RadioGroupItem
+                          value={hero2.id.toString()}
+                          id="hero2"
+                        />
                         <Label htmlFor="hero2" className="text-lg">
                           {hero2.name}
                         </Label>
@@ -300,7 +314,6 @@ export function HeroBattle() {
                     )}
                   </div>
                 </div>
-
               </div>
 
               <div className="flex items-stretch justify-center h-full w-full font-slackey">
@@ -379,7 +392,10 @@ export function HeroBattle() {
                             <CollapsibleContent className="p-2">
                               {Object.entries(hero.powerstats).map(
                                 ([stat, value]) => (
-                                  <div key={stat} className="flex justify-between">
+                                  <div
+                                    key={stat}
+                                    className="flex justify-between"
+                                  >
                                     <span className="capitalize">{stat}</span>
                                     <span>{value}</span>
                                   </div>
@@ -405,7 +421,9 @@ export function HeroBattle() {
                                     </div>
                                   ))
                                 ) : (
-                                  <div className="text-gray-500">No powers listed</div>
+                                  <div className="text-gray-500">
+                                    No powers listed
+                                  </div>
                                 )}
                               </div>
                             </CollapsibleContent>
@@ -419,8 +437,12 @@ export function HeroBattle() {
                             <CollapsibleContent className="p-2">
                               <div className="space-y-3">
                                 <div className="space-y-1">
-                                  <div className="font-bold text-sm">Full Name</div>
-                                  <div>{hero.biography.fullName || "Unknown"}</div>
+                                  <div className="font-bold text-sm">
+                                    Full Name
+                                  </div>
+                                  <div>
+                                    {hero.biography.fullName || "Unknown"}
+                                  </div>
                                 </div>
                                 <div className="space-y-1">
                                   <div className="font-bold text-sm text-gray-600">
@@ -443,14 +465,17 @@ export function HeroBattle() {
                                     First Appearance
                                   </div>
                                   <div>
-                                    {hero.biography.firstAppearance || "Unknown"}
+                                    {hero.biography.firstAppearance ||
+                                      "Unknown"}
                                   </div>
                                 </div>
                                 <div className="space-y-1">
                                   <div className="font-bold text-sm text-gray-600">
                                     Publisher
                                   </div>
-                                  <div>{hero.biography.publisher || "Unknown"}</div>
+                                  <div>
+                                    {hero.biography.publisher || "Unknown"}
+                                  </div>
                                 </div>
                               </div>
                             </CollapsibleContent>
@@ -465,7 +490,9 @@ export function HeroBattle() {
                               <div className="space-y-1">
                                 <div className="flex justify-between">
                                   <span>Race</span>
-                                  <span>{hero.appearance.race || "Unknown"}</span>
+                                  <span>
+                                    {hero.appearance.race || "Unknown"}
+                                  </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span>Height</span>
@@ -518,7 +545,8 @@ export function HeroBattle() {
                                     Group Affiliation
                                   </div>
                                   <div>
-                                    {hero.connections.groupAffiliation || "Unknown"}
+                                    {hero.connections.groupAffiliation ||
+                                      "Unknown"}
                                   </div>
                                 </div>
                               </div>
