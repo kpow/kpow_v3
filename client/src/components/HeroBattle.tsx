@@ -61,6 +61,21 @@ export function HeroBattle() {
 
   const handleBattle = async () => {
     if (!hero1 || !hero2) return;
+    
+    // In random mode, validate that a hero is selected and the bet is at least 10
+    if (mode === "random") {
+      if (!selectedHero) {
+        alert("Please select a hero to bet on!");
+        return;
+      }
+      
+      if (bet < 10) {
+        alert("Minimum bet is 10 coins!");
+        setBet(10);
+        return;
+      }
+    }
+    
     setIsBattling(true);
     setBattleStep(0);
 
@@ -102,7 +117,7 @@ export function HeroBattle() {
     setHero2(randomHero2);
     setWinner(null);
     setSelectedHero(null);
-    setBet(0);
+    setBet(10);
   };
 
   const handleHeroSelect = (value: string, heroNumber: number) => {
@@ -122,7 +137,7 @@ export function HeroBattle() {
     setHero2(null);
     setWinner(null);
     setSelectedHero(null);
-    setBet(0);
+    setBet(10);
     handleRandom();
   };
 
