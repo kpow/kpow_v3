@@ -80,14 +80,6 @@ export function HeroBattle() {
           : stash - bet;
       setStash(newStash);
     }
-
-    // Show miracle win message
-    if (isMiracleWin) {
-      const winnerDiv = document.querySelector(".winner-message");
-      if (winnerDiv) {
-        winnerDiv.textContent = `${battleWinner.name} Wins! (MIRACLE WIN!)`;
-      }
-    }
   };
 
   const handleRandom = () => {
@@ -224,9 +216,18 @@ export function HeroBattle() {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl text-center"
+                      className={`flex items-center justify-center w-full p-4 bg-gradient-to-br ${
+                        isMiracleWin ? 'from-purple-600 to-pink-600' : 'from-green-600 to-emerald-600'
+                      } rounded-lg text-white font-bold text-2xl text-center`}
                     >
-                      <div className="winner-message">{winner.name} Wins!</div>
+                      <div className="winner-message">
+                        {winner.name} Wins!
+                        {isMiracleWin && (
+                          <div className="text-yellow-300 mt-2 text-lg animate-pulse">
+                            ⚡ MIRACLE VICTORY! ⚡
+                          </div>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -349,9 +350,18 @@ export function HeroBattle() {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl text-center"
+                      className={`flex items-center justify-center w-full p-4 bg-gradient-to-br ${
+                        isMiracleWin ? 'from-purple-600 to-pink-600' : 'from-green-600 to-emerald-600'
+                      } rounded-lg text-white font-bold text-2xl text-center`}
                     >
-                      <div className="winner-message">{winner.name} Wins!</div>
+                      <div className="winner-message">
+                        {winner.name} Wins!
+                        {isMiracleWin && (
+                          <div className="text-yellow-300 mt-2 text-lg animate-pulse">
+                            ⚡ MIRACLE VICTORY! ⚡
+                          </div>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
