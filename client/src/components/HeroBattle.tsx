@@ -286,9 +286,7 @@ export function HeroBattle() {
               </div>
             </div>
           )}
-        </div>
-
-      {(hero1 || hero2) && (
+          {(hero1 || hero2) && (
         <div className="grid grid-cols-2 gap-4">
           {[hero1, hero2].map(
             (hero, index) =>
@@ -473,7 +471,9 @@ export function HeroBattle() {
               ),
           )}
         </div>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 }
