@@ -131,26 +131,31 @@ export function HeroBattle() {
 
   return (
     <div className="container mx-auto space-y-6">
-      <div className="flex justify-left items-center gap-4">
-        <PageTitle size="lg" alignment="left">
-          battle
-        </PageTitle>
-        <div className="flex items-center gap-2 mb-2">
-          <span className={mode === "manual" ? "font-bold" : ""}>Manual</span>
-          <Switch
-            checked={mode === "random"}
-            onCheckedChange={(checked) => {
-              setMode(checked ? "random" : "manual");
-              handleReset();
-              if (checked) handleRandom();
-            }}
-          />
-          <span className={mode === "random" ? "font-bold" : ""}>Random</span>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center px-4">
+          <div className="flex items-center gap-4">
+            <PageTitle size="lg" alignment="left">
+              battle
+            </PageTitle>
+            <div className="flex items-center gap-2">
+              <span className={mode === "manual" ? "font-bold" : ""}>Manual</span>
+              <Switch
+                checked={mode === "random"}
+                onCheckedChange={(checked) => {
+                  setMode(checked ? "random" : "manual");
+                  handleReset();
+                  if (checked) handleRandom();
+                }}
+              />
+              <span className={mode === "random" ? "font-bold" : ""}>Random</span>
+            </div>
+          </div>
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 rounded-lg">
+            <div className="text-white text-2xl font-bold">Stash: {stash}</div>
+          </div>
         </div>
-      </div>
-      <div className="grid grid-cols-4 gap-4">
-        <div className="col-span-4 flex justify-center flex-col md:flex-row">
-          <div className="mt-4">
+
+        <div className="flex flex-col items-center gap-6">
             {mode === "manual" && (
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
@@ -184,45 +189,41 @@ export function HeroBattle() {
               </div>
             )}
 
-            {mode === "random" && (
-              <div className="flex justify-center gap-4 mb-6">
-                {hero1 && hero2 && (
-                  <div className="flex items-center gap-4">
-                    <RadioGroup
-                      onValueChange={(value) => setSelectedHero(Number(value))}
-                      value={selectedHero?.toString()}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value={hero1.id.toString()}
-                          id="hero1"
-                        />
-                        <Label htmlFor="hero1">{hero1.name}</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value={hero2.id.toString()}
-                          id="hero2"
-                        />
-                        <Label htmlFor="hero2">{hero2.name}</Label>
-                      </div>
-                    </RadioGroup>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={stash}
-                      value={bet}
-                      onChange={(e) => setBet(Number(e.target.value))}
-                      className="w-24"
-                    />
-                  </div>
-                )}
+            {mode === "random" && hero1 && hero2 && (
+              <div className="bg-gray-100 p-6 rounded-lg w-full max-w-2xl">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="text-lg font-semibold mb-2">Place Your Bet</div>
+                  <RadioGroup
+                    onValueChange={(value) => setSelectedHero(Number(value))}
+                    value={selectedHero?.toString()}
+                    className="space-y-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value={hero1.id.toString()} id="hero1" />
+                      <Label htmlFor="hero1" className="text-lg">{hero1.name}</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value={hero2.id.toString()} id="hero2" />
+                      <Label htmlFor="hero2" className="text-lg">{hero2.name}</Label>
+                    </div>
+                  </RadioGroup>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={stash}
+                    value={bet}
+                    onChange={(e) => setBet(Number(e.target.value))}
+                    className="w-32 text-center mt-2"
+                    placeholder="Bet amount"
+                  />
+                </div>
               </div>
             )}
-            <div className="flex justify-center gap-4 mb-6">
+
+            <div className="w-full max-w-2xl flex justify-center">
               {hero1 && hero2 && !winner && (
                 <Button
-                  className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded"
+                  className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
                   onClick={handleBattle}
                 >
                   Fight!
@@ -230,16 +231,13 @@ export function HeroBattle() {
               )}
               {winner && (
                 <Button
-                  className="w-3/4 bg-blue-600 hover:bg-blue-700 text-xs text-white font-bold rounded"
+                  className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
                   onClick={handleReset}
                 >
                   Reset
                 </Button>
               )}
             </div>
-          </div>
-          <div className="gap-4 pl-4">
-            <div className="font-bold text-1xl">Stash: {stash}</div>
           </div>
           <div className="gap-4 pl-4">
             <AnimatePresence mode="wait">
