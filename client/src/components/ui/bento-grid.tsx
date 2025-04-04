@@ -36,7 +36,7 @@ export const BentoGridItem = ({
   href?: string; // Added href prop type
   wrapperProps?: any; // Added wrapperProps type
 }) => {
-  const Wrapper = href ? 'a' : 'div'; //Conditional rendering of the wrapper
+  const Wrapper = href ? "a" : "div"; //Conditional rendering of the wrapper
   return (
     <Wrapper
       href={href} //Added href to the Wrapper

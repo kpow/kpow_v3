@@ -33,7 +33,7 @@ interface StarredResponse {
   pagination: PaginationData;
 }
 
-const ARTICLES_PER_PAGE = 9;
+const ARTICLES_PER_PAGE = 10;
 
 // Component for month and year selection
 function MonthYearSelector({
@@ -271,10 +271,7 @@ export default function StarredArticles({
             </div>
           </div>
         </div>
-        <StarredArticleBento 
-          articles={[]} 
-          isLoading={true} 
-        />
+        <StarredArticleBento articles={[]} isLoading={true} />
         <div className="flex justify-center gap-2 items-center mt-6">
           <PaginationLoader />
         </div>
@@ -312,10 +309,7 @@ export default function StarredArticles({
           />
         </div>
 
-        <StarredArticleBento 
-          articles={articles} 
-          isLoading={false} 
-        />
+        <StarredArticleBento articles={articles} isLoading={false} />
 
         <CustomPagination
           currentPage={currentPage}
