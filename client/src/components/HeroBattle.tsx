@@ -151,7 +151,7 @@ export function HeroBattle() {
             </div>
           </div>
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 rounded-lg">
-            <div className="text-white text-2xl font-bold">Stash: {stash}</div>
+            <div className="text-white text-2xl font-slackey">Stash: {stash}</div>
           </div>
         </div>
 
@@ -194,7 +194,7 @@ export function HeroBattle() {
               <div className="flex flex-col items-center gap-4">
                 <div className="bg-gray-100 p-6 rounded-lg w-full">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="text-lg font-semibold mb-2">Place Your Bet</div>
+                    <div className="text-xl font-semibold font-slackey mb-2">Place Your Bet</div>
                     <RadioGroup
                       onValueChange={(value) => setSelectedHero(Number(value))}
                       value={selectedHero?.toString()}
@@ -223,28 +223,29 @@ export function HeroBattle() {
                       placeholder="Bet amount"
                     />
                   </div>
+                  <div className="w-full flex justify-center mt-4 font-slackey">
+                    {hero1 && hero2 && !winner && (
+                      <Button
+                        className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                        onClick={handleBattle}
+                      >
+                        Fight!
+                      </Button>
+                    )}
+                    {winner && (
+                      <Button
+                        className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                        onClick={handleReset}
+                      >
+                        Reset
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="w-full flex justify-center">
-                  {hero1 && hero2 && !winner && (
-                    <Button
-                      className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                      onClick={handleBattle}
-                    >
-                      Fight!
-                    </Button>
-                  )}
-                  {winner && (
-                    <Button
-                      className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                      onClick={handleReset}
-                    >
-                      Reset
-                    </Button>
-                  )}
-                </div>
+               
               </div>
               
-              <div className="flex items-stretch justify-center h-full w-full">
+              <div className="flex items-stretch justify-center h-full w-full font-slackey">
           <AnimatePresence mode="popLayout">
             {!isBattling && !winner && hero1 && hero2 && (
               <motion.div
