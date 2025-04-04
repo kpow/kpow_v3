@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,7 +25,6 @@ import {
   getRandomHero,
   getHeroPowers,
   type Hero,
-  type Bet,
 } from "@/lib/battle-service";
 import { PageTitle } from "@/components/ui/page-title";
 import heroes from "../data/superheros-prod.js";
@@ -156,129 +156,133 @@ export function HeroBattle() {
         </div>
 
         <div className="flex flex-col items-center gap-6">
-            {mode === "manual" && (
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                  <Select onValueChange={(value) => handleHeroSelect(value, 1)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select hero 1" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {heroes.map((hero) => (
-                        <SelectItem key={hero.id} value={hero.id.toString()}>
-                          {hero.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Select onValueChange={(value) => handleHeroSelect(value, 2)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select hero 2" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {heroes.map((hero) => (
-                        <SelectItem key={hero.id} value={hero.id.toString()}>
-                          {hero.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          {mode === "manual" && (
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <Select onValueChange={(value) => handleHeroSelect(value, 1)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select hero 1" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {heroes.map((hero) => (
+                      <SelectItem key={hero.id} value={hero.id.toString()}>
+                        {hero.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-
-            {mode === "random" && hero1 && hero2 && (
-              <div className="bg-gray-100 p-6 rounded-lg w-full max-w-2xl">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="text-lg font-semibold mb-2">Place Your Bet</div>
-                  <RadioGroup
-                    onValueChange={(value) => setSelectedHero(Number(value))}
-                    value={selectedHero?.toString()}
-                    className="space-y-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value={hero1.id.toString()} id="hero1" />
-                      <Label htmlFor="hero1" className="text-lg">{hero1.name}</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value={hero2.id.toString()} id="hero2" />
-                      <Label htmlFor="hero2" className="text-lg">{hero2.name}</Label>
-                    </div>
-                  </RadioGroup>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={stash}
-                    value={bet}
-                    onChange={(e) => setBet(Number(e.target.value))}
-                    className="w-32 text-center mt-2"
-                    placeholder="Bet amount"
-                  />
-                </div>
+              <div>
+                <Select onValueChange={(value) => handleHeroSelect(value, 2)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select hero 2" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {heroes.map((hero) => (
+                      <SelectItem key={hero.id} value={hero.id.toString()}>
+                        {hero.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-
-            <div className="w-full max-w-2xl flex justify-center">
-              {hero1 && hero2 && !winner && (
-                <Button
-                  className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                  onClick={handleBattle}
-                >
-                  Fight!
-                </Button>
-              )}
-              {winner && (
-                <Button
-                  className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                  onClick={handleReset}
-                >
-                  Reset
-                </Button>
-              )}
             </div>
+          )}
+
+          {mode === "random" && hero1 && hero2 && (
+            <div className="bg-gray-100 p-6 rounded-lg w-full max-w-2xl">
+              <div className="flex flex-col items-center gap-4">
+                <div className="text-lg font-semibold mb-2">Place Your Bet</div>
+                <RadioGroup
+                  onValueChange={(value) => setSelectedHero(Number(value))}
+                  value={selectedHero?.toString()}
+                  className="space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value={hero1.id.toString()} id="hero1" />
+                    <Label htmlFor="hero1" className="text-lg">
+                      {hero1.name}
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value={hero2.id.toString()} id="hero2" />
+                    <Label htmlFor="hero2" className="text-lg">
+                      {hero2.name}
+                    </Label>
+                  </div>
+                </RadioGroup>
+                <Input
+                  type="number"
+                  min={1}
+                  max={stash}
+                  value={bet}
+                  onChange={(e) => setBet(Number(e.target.value))}
+                  className="w-32 text-center mt-2"
+                  placeholder="Bet amount"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="w-full max-w-2xl flex justify-center">
+            {hero1 && hero2 && !winner && (
+              <Button
+                className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                onClick={handleBattle}
+              >
+                Fight!
+              </Button>
+            )}
+            {winner && (
+              <Button
+                className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                onClick={handleReset}
+              >
+                Reset
+              </Button>
+            )}
           </div>
-          <div className="gap-4 pl-4">
-            <AnimatePresence mode="wait">
-              {!isBattling && !winner && hero1 && hero2 && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-center justify-center p-2 h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl m-2 text-center min-w-[300px]"
-                >
-                  {hero1.name}
-                  <br />
-                  vs.
-                  <br />
-                  {hero2.name}
-                </motion.div>
-              )}
-              {isBattling && battleStep >= 0 && (
-                <motion.div
-                  key={battleStep}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl min-w-[300px]"
-                >
-                  {BATTLE_STEPS[battleStep]}
-                </motion.div>
-              )}
-              {winner && !isBattling && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center justify-center w-full h-32 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl p-4 text-center min-w-[300px]"
-                >
-                  {winner.name} Wins!
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+        </div>
+
+        <div className="gap-4 pl-4">
+          <AnimatePresence mode="popLayout">
+            {!isBattling && !winner && hero1 && hero2 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center justify-center p-2 h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl m-2 text-center min-w-[300px]"
+              >
+                {hero1.name}
+                <br />
+                vs.
+                <br />
+                {hero2.name}
+              </motion.div>
+            )}
+            {isBattling && battleStep >= 0 && (
+              <motion.div
+                key={battleStep}
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl min-w-[300px]"
+              >
+                {BATTLE_STEPS[battleStep]}
+              </motion.div>
+            )}
+            {winner && !isBattling && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center justify-center w-full h-32 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl p-4 text-center min-w-[300px]"
+              >
+                <div className="winner-message">{winner.name} Wins!</div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -342,13 +346,12 @@ export function HeroBattle() {
                                 </div>
                               ))
                             ) : (
-                              <div className="text-gray-500">
-                                No powers listed
-                              </div>
+                              <div className="text-gray-500">No powers listed</div>
                             )}
                           </div>
                         </CollapsibleContent>
                       </Collapsible>
+
                       <Collapsible>
                         <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-100 rounded-lg">
                           <span className="font-bold">Biography</span>
