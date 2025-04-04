@@ -42,7 +42,7 @@ export function HeroBattle() {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? Number(saved) : 100;
   });
-  const [bet, setBet] = useState<number>(0);
+  const [bet, setBet] = useState<number>(10);
   const [selectedHero, setSelectedHero] = useState<number | null>(null);
   const [battleStep, setBattleStep] = useState<number>(-1);
   const [isBattling, setIsBattling] = useState(false);
@@ -288,15 +288,20 @@ export function HeroBattle() {
                         </Label>
                       </div>
                     </RadioGroup>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={stash}
-                      value={bet}
-                      onChange={(e) => setBet(Number(e.target.value))}
-                      className="w-32 text-center mt-2"
-                      placeholder="Bet amount"
-                    />
+                    <div className="space-y-2">
+                      <Input
+                        type="number"
+                        min={10}
+                        max={stash}
+                        value={bet}
+                        onChange={(e) => setBet(Math.max(10, Number(e.target.value)))}
+                        className="w-32 text-center"
+                        placeholder="Bet amount"
+                      />
+                      <div className="text-sm text-gray-500">
+                        Minimum bet: 10 coins
+                      </div>
+                    </div>
                   </div>
                   <div className="w-full flex justify-center mt-4 font-slackey">
                     {hero1 && hero2 && !winner && (
