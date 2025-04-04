@@ -43,6 +43,10 @@ export function HeroBattle() {
     return saved ? Number(saved) : 100;
   });
   const [bet, setBet] = useState<number>(10);
+  useEffect(() => {
+    // Set initial bet to 10
+    setBet(10);
+  }, []);
   const [selectedHero, setSelectedHero] = useState<number | null>(null);
   const [battleStep, setBattleStep] = useState<number>(-1);
   const [isBattling, setIsBattling] = useState(false);
