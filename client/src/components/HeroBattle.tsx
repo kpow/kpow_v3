@@ -185,6 +185,51 @@ export function HeroBattle() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+            
+            <div className="flex items-stretch justify-center h-full w-full font-slackey mb-4">
+              <AnimatePresence mode="popLayout">
+                {!isBattling && !winner && hero1 && hero2 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center justify-center p-4 w-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl text-center"
+                  >
+                    {hero1.name}
+                    <br />
+                    vs.
+                    <br />
+                    {hero2.name}
+                  </motion.div>
+                )}
+                {isBattling && battleStep >= 0 && (
+                  <motion.div
+                    key={battleStep}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl"
+                  >
+                    {BATTLE_STEPS[battleStep]}
+                  </motion.div>
+                )}
+                {winner && !isBattling && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl text-center"
+                  >
+                    <div className="winner-message">{winner.name} Wins!</div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            <div className="flex justify-center mt-4 font-slackey">
                 <div className="w-full flex justify-center mt-4 font-slackey">
                   {hero1 && hero2 && !winner && (
                     <Button
