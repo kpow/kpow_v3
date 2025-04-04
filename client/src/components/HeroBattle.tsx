@@ -244,7 +244,7 @@ export function HeroBattle() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-center">
+              <div className="flex items-stretch justify-center h-full w-full">
           <AnimatePresence mode="popLayout">
             {!isBattling && !winner && hero1 && hero2 && (
               <motion.div
@@ -252,7 +252,7 @@ export function HeroBattle() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.5 }}
                 transition={{ duration: 0.3 }}
-                className="flex items-center justify-center p-2 h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl m-2 text-center min-w-[300px]"
+                className="flex items-center justify-center p-4 w-full bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-2xl text-center"
               >
                 {hero1.name}
                 <br />
@@ -268,7 +268,7 @@ export function HeroBattle() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.5 }}
                 transition={{ duration: 0.3 }}
-                className="flex items-center justify-center h-32 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl min-w-[300px]"
+                className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg text-white font-bold text-4xl"
               >
                 {BATTLE_STEPS[battleStep]}
               </motion.div>
@@ -277,7 +277,7 @@ export function HeroBattle() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center justify-center w-full h-32 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl p-4 text-center min-w-[300px]"
+                className="flex items-center justify-center w-full p-4 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg text-white font-bold text-2xl text-center"
               >
                 <div className="winner-message">{winner.name} Wins!</div>
               </motion.div>
