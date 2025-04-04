@@ -190,61 +190,61 @@ export function HeroBattle() {
           )}
 
           {mode === "random" && hero1 && hero2 && (
-            <div className="bg-gray-100 p-6 rounded-lg w-full max-w-2xl">
+            <div className="grid grid-cols-2 gap-8 w-full max-w-4xl mx-auto">
               <div className="flex flex-col items-center gap-4">
-                <div className="text-lg font-semibold mb-2">Place Your Bet</div>
-                <RadioGroup
-                  onValueChange={(value) => setSelectedHero(Number(value))}
-                  value={selectedHero?.toString()}
-                  className="space-y-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value={hero1.id.toString()} id="hero1" />
-                    <Label htmlFor="hero1" className="text-lg">
-                      {hero1.name}
-                    </Label>
+                <div className="bg-gray-100 p-6 rounded-lg w-full">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="text-lg font-semibold mb-2">Place Your Bet</div>
+                    <RadioGroup
+                      onValueChange={(value) => setSelectedHero(Number(value))}
+                      value={selectedHero?.toString()}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value={hero1.id.toString()} id="hero1" />
+                        <Label htmlFor="hero1" className="text-lg">
+                          {hero1.name}
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value={hero2.id.toString()} id="hero2" />
+                        <Label htmlFor="hero2" className="text-lg">
+                          {hero2.name}
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={stash}
+                      value={bet}
+                      onChange={(e) => setBet(Number(e.target.value))}
+                      className="w-32 text-center mt-2"
+                      placeholder="Bet amount"
+                    />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value={hero2.id.toString()} id="hero2" />
-                    <Label htmlFor="hero2" className="text-lg">
-                      {hero2.name}
-                    </Label>
-                  </div>
-                </RadioGroup>
-                <Input
-                  type="number"
-                  min={1}
-                  max={stash}
-                  value={bet}
-                  onChange={(e) => setBet(Number(e.target.value))}
-                  className="w-32 text-center mt-2"
-                  placeholder="Bet amount"
-                />
+                </div>
+                <div className="w-full flex justify-center">
+                  {hero1 && hero2 && !winner && (
+                    <Button
+                      className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                      onClick={handleBattle}
+                    >
+                      Fight!
+                    </Button>
+                  )}
+                  {winner && (
+                    <Button
+                      className="w-3/4 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                      onClick={handleReset}
+                    >
+                      Reset
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-
-          <div className="w-full max-w-2xl flex justify-center">
-            {hero1 && hero2 && !winner && (
-              <Button
-                className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                onClick={handleBattle}
-              >
-                Fight!
-              </Button>
-            )}
-            {winner && (
-              <Button
-                className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                onClick={handleReset}
-              >
-                Reset
-              </Button>
-            )}
-          </div>
-        </div>
-
-        <div className="gap-4 pl-4">
+              
+              <div className="flex items-center justify-center">
           <AnimatePresence mode="popLayout">
             {!isBattling && !winner && hero1 && hero2 && (
               <motion.div
@@ -283,8 +283,10 @@ export function HeroBattle() {
               </motion.div>
             )}
           </AnimatePresence>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
 
       {(hero1 || hero2) && (
         <div className="grid grid-cols-2 gap-4">
