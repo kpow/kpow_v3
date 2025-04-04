@@ -224,27 +224,27 @@ export function HeroBattle() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4 w-full max-w-4xl mx-auto mb-6">
-            <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4">
-              {hero1 && hero2 && !winner && (
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                  onClick={handleBattle}
-                >
-                  Fight!
-                </Button>
-              )}
-              {winner && (
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
-                  onClick={handleReset}
-                >
-                  Reset
-                </Button>
-              )}
-            </div>
-            
-            <div className="flex items-center justify-center">
+          <div className="w-full max-w-2xl flex justify-center">
+            {hero1 && hero2 && !winner && (
+              <Button
+                className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                onClick={handleBattle}
+              >
+                Fight!
+              </Button>
+            )}
+            {winner && (
+              <Button
+                className="w-1/2 bg-blue-600 hover:bg-blue-700 text-lg text-white font-bold rounded-lg py-6"
+                onClick={handleReset}
+              >
+                Reset
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="gap-4 pl-4">
           <AnimatePresence mode="popLayout">
             {!isBattling && !winner && hero1 && hero2 && (
               <motion.div
@@ -283,8 +283,6 @@ export function HeroBattle() {
               </motion.div>
             )}
           </AnimatePresence>
-            </div>
-          </div>
         </div>
       </div>
 
