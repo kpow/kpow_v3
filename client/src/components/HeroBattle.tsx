@@ -185,10 +185,8 @@ export function HeroBattle() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            <div className="flex items-stretch justify-center h-full w-full font-slackey mb-4">
-              <AnimatePresence mode="popLayout">
+              <div className="flex items-stretch justify-center h-full w-full font-slackey mb-4">
+                <AnimatePresence mode="popLayout">
                 {!isBattling && !winner && hero1 && hero2 && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
@@ -246,6 +244,7 @@ export function HeroBattle() {
                 </Button>
               )}
             </div>
+          </div>
           )}
 
           {mode === "random" && hero1 && hero2 && (
