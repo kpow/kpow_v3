@@ -1,7 +1,7 @@
 import React from "react";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { cn } from "@/lib/utils";
-import { StarredArticle } from "@/lib/hooks/use-starred-articles";
+import { StarredArticle } from "@/hooks/use-starred-articles";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface StarredArticleBentoProps {
@@ -22,7 +22,10 @@ const ArticleSkeleton = () => (
   <div className="flex flex-1 w-full h-full min-h-[12rem] rounded-xl bg-gradient-to-br from-neutral-200 dark:from-neutral-900 dark:to-neutral-800 to-neutral-100"></div>
 );
 
-export function StarredArticleBento({ articles, isLoading = false }: StarredArticleBentoProps) {
+export function StarredArticleBento({
+  articles,
+  isLoading = false,
+}: StarredArticleBentoProps) {
   if (isLoading) {
     return (
       <BentoGrid className="mx-auto">
@@ -58,7 +61,7 @@ export function StarredArticleBento({ articles, isLoading = false }: StarredArti
           }
           className={cn(
             i === 3 || i === 6 || i === 10 || i === 13 ? "md:col-span-2" : "",
-            "cursor-pointer hover:scale-[1.02] transition-transform"
+            "cursor-pointer hover:scale-[1.02] transition-transform",
           )}
           href={article.url}
           icon={
@@ -70,7 +73,6 @@ export function StarredArticleBento({ articles, isLoading = false }: StarredArti
               </div>
             </div>
           }
-          className={i === 3 || i === 6 || i === 10 || i === 13 ? "md:col-span-2" : ""}
         />
       ))}
     </BentoGrid>

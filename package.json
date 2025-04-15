@@ -95,6 +95,7 @@
     "react-resizable-panels": "^2.1.4",
     "react-slick": "^0.30.3",
     "recharts": "^2.13.0",
+    "simplex-noise": "^4.0.3",
     "slick-carousel": "^1.8.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",

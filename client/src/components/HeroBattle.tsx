@@ -61,21 +61,21 @@ export function HeroBattle() {
 
   const handleBattle = async () => {
     if (!hero1 || !hero2) return;
-    
+
     // In random mode, validate that a hero is selected and the bet is at least 10
     if (mode === "random") {
       if (!selectedHero) {
         alert("Please select a hero to bet on!");
         return;
       }
-      
+
       if (bet < 10) {
         alert("Minimum bet is 10 coins!");
         setBet(10);
         return;
       }
     }
-    
+
     setIsBattling(true);
     setBattleStep(0);
 
@@ -238,7 +238,9 @@ export function HeroBattle() {
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className={`flex items-center justify-center w-full p-4 bg-gradient-to-br ${
-                        isMiracleWin ? 'from-purple-600 to-pink-600' : 'from-green-600 to-emerald-600'
+                        isMiracleWin
+                          ? "from-purple-600 to-pink-600"
+                          : "from-green-600 to-emerald-600"
                       } rounded-lg text-white font-bold text-2xl text-center`}
                     >
                       <div className="winner-message">
@@ -313,7 +315,9 @@ export function HeroBattle() {
                         min={10}
                         max={stash}
                         value={bet}
-                        onChange={(e) => setBet(Math.max(10, Number(e.target.value)))}
+                        onChange={(e) =>
+                          setBet(Math.max(10, Number(e.target.value)))
+                        }
                         className="w-32 text-center"
                         placeholder="Bet amount"
                       />
@@ -377,7 +381,9 @@ export function HeroBattle() {
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className={`flex items-center justify-center w-full p-4 bg-gradient-to-br ${
-                        isMiracleWin ? 'from-purple-600 to-pink-600' : 'from-green-600 to-emerald-600'
+                        isMiracleWin
+                          ? "from-purple-600 to-pink-600"
+                          : "from-green-600 to-emerald-600"
                       } rounded-lg text-white font-bold text-2xl text-center`}
                     >
                       <div className="winner-message">
