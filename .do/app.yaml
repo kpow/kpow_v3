@@ -20,7 +20,8 @@ services:
   - key: PORT
     value: "8080"
   - key: DATABASE_URL
-    value: ${db.DATABASE_URL}
+    scope: RUN_TIME
+    type: SECRET
   - key: SESSION_SECRET
     scope: RUN_TIME
     type: SECRET
@@ -59,12 +60,7 @@ services:
   - key: FRONTEND_URL
     value: ${_self.PUBLIC_URL}
 
-databases:
-- engine: PG
-  name: db
-  num_nodes: 1
-  size: basic-xs
-  version: "14"
+# No database component needed - using external Neon database
 
 alerts:
 - rule: DEPLOYMENT_FAILED
