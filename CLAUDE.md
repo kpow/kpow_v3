@@ -47,7 +47,7 @@ This is a full-stack personal digital footprint platform that aggregates data fr
 ### Database Schema (`/db/schema.ts`)
 Main tables:
 - `users` - Authentication with approval system
-- `artists`, `songs`, `plays` - Music tracking from Last.fm
+- `artists`, `songs`, `plays` - Music tracking itunes
 - `books`, `authors`, `shelves` - Book tracking from Goodreads
 - Many-to-many: `bookAuthors`, `bookShelves`
 
