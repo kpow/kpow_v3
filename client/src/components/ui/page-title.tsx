@@ -14,11 +14,16 @@ const pageTitleVariants = cva(
         left: "text-left",
         center: "text-center",
         right: "text-right",
+      },
+      theme: {
+        default: "",
+        dark: "text-white",
       }
     },
     defaultVariants: {
       size: "default",
-      alignment: "left"
+      alignment: "left",
+      theme: "default"
     }
   }
 )
@@ -32,13 +37,14 @@ export function PageTitle({
   className, 
   size, 
   alignment,
+  theme,
   subtitle,
   children,
   ...props 
 }: PageTitleProps) {
   return (
     <div className={cn("space-y-1", className)} {...props}>
-      <h1 className={pageTitleVariants({ size, alignment })}>
+      <h1 className={pageTitleVariants({ size, alignment, theme })}>
         {children}
       </h1>
       {subtitle && (

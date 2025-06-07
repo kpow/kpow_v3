@@ -142,16 +142,16 @@ export function HeroBattle() {
   };
 
   return (
-    <div className="container mx-auto space-y-6">
+    <div className="container mx-auto space-y-6 bg-gray-300 min-h-screen p-6">
       <div className="space-y-6">
         {/* Header - Mobile Optimized */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4 bg-gray-800 rounded-lg">
           <div className="flex items-center gap-4">
-            <PageTitle size="lg" alignment="left">
+            <PageTitle size="lg" alignment="left" theme="dark">
               battle
             </PageTitle>
             <div className="flex items-center gap-2">
-              <span className={mode === "manual" ? "font-bold" : ""}>
+              <span className={mode === "manual" ? "font-bold text-white" : "text-gray-300"}>
                 Manual
               </span>
               <Switch
@@ -162,7 +162,7 @@ export function HeroBattle() {
                   if (checked) handleRandom();
                 }}
               />
-              <span className={mode === "random" ? "font-bold" : ""}>
+              <span className={mode === "random" ? "font-bold text-white" : "text-gray-300"}>
                 Random
               </span>
             </div>
@@ -228,7 +228,7 @@ export function HeroBattle() {
                       <motion.div
                         initial={{ opacity: 0, scale: 0.5 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className={`px-8 py-4 rounded-lg text-white font-bold text-xl text-center ${
+                        className={`px-8 py-4 rounded-lg text-white font-bold text-xl text-center font-slackey ${
                           isMiracleWin
                             ? "bg-gradient-to-r from-purple-600 to-pink-600"
                             : "bg-gradient-to-r from-green-600 to-emerald-600"
@@ -305,15 +305,16 @@ export function HeroBattle() {
                   className="space-y-4"
                 >
                   {/* Hero 1 Card */}
-                  <motion.div
-                    className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                      selectedHero === hero1.id
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 border-blue-400 shadow-lg shadow-blue-400/30"
-                        : "bg-gray-900 border-gray-600 hover:border-gray-500"
-                    }`}
-                    onClick={() => setSelectedHero(hero1.id)}
-                    whileTap={{ scale: 0.98 }}
-                  >
+                  <div className={`${selectedHero === hero1.id ? "bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-500 animate-gradient p-[8px] rounded-lg shadow-lg shadow-orange-400/30" : ""}`}>
+                    <motion.div
+                      className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
+                        selectedHero === hero1.id
+                          ? "bg-gray-900 border-transparent"
+                          : "bg-gray-900 border-gray-600 hover:border-gray-500"
+                      }`}
+                      onClick={() => setSelectedHero(hero1.id)}
+                      whileTap={{ scale: 0.98 }}
+                    >
                     {/* Selected Indicator */}
                     {selectedHero === hero1.id && (
                       <div className="absolute top-2 right-2 bg-white rounded-full p-1 z-10">
@@ -377,7 +378,8 @@ export function HeroBattle() {
                       id="hero1-mobile"
                       className="sr-only"
                     />
-                  </motion.div>
+                    </motion.div>
+                  </div>
 
                   {/* Smart Battle Control Element */}
                   <div className="flex items-center justify-center py-2">
@@ -389,15 +391,15 @@ export function HeroBattle() {
                           exit={{ opacity: 0, scale: 0.5 }}
                           onClick={handleBattle}
                           disabled={!selectedHero || bet < 10}
-                          className={`px-8 py-4 rounded-full text-white font-bold text-lg transition-all ${
+                          className={`px-8 py-4 rounded-full text-white font-bold text-lg transition-all font-slackey ${
                             selectedHero && bet >= 10
                               ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 cursor-pointer shadow-lg"
-                              : "bg-gray-400 cursor-not-allowed"
+                              : "bg-purple-700 cursor-not-allowed"
                           }`}
                           whileHover={selectedHero && bet >= 10 ? { scale: 1.05 } : {}}
                           whileTap={selectedHero && bet >= 10 ? { scale: 0.95 } : {}}
                         >
-                          {selectedHero ? `FIGHT! (${bet} on ${selectedHero === hero1.id ? hero1.name : hero2.name})` : "SELECT HERO"}
+                          {selectedHero ? `FIGHT! (${bet} on ${selectedHero === hero1.id ? hero1.name : hero2.name})` : "pick your winner!"}
                         </motion.button>
                       )}
                       {isBattling && battleStep >= 0 && (
@@ -426,7 +428,7 @@ export function HeroBattle() {
                           whileTap={{ scale: 0.95 }}
                         >
                           <div className="text-center">
-                            <div>{winner.name} WINS!</div>
+                            <div className="font-slackey">{winner.name} WINS!</div>
                             {isMiracleWin && <div className="text-yellow-300 text-sm">⚡ MIRACLE! ⚡</div>}
                             <div className="text-sm mt-1">NEW BATTLE</div>
                           </div>
@@ -436,15 +438,16 @@ export function HeroBattle() {
                   </div>
 
                   {/* Hero 2 Card */}
-                  <motion.div
-                    className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                      selectedHero === hero2.id
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 border-blue-400 shadow-lg shadow-blue-400/30"
-                        : "bg-gray-900 border-gray-600 hover:border-gray-500"
-                    }`}
-                    onClick={() => setSelectedHero(hero2.id)}
-                    whileTap={{ scale: 0.98 }}
-                  >
+                  <div className={`${selectedHero === hero2.id ? "bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-500 animate-gradient p-[8px] rounded-lg shadow-lg shadow-orange-400/30" : ""}`}>
+                    <motion.div
+                      className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all ${
+                        selectedHero === hero2.id
+                          ? "bg-gray-900 border-transparent"
+                          : "bg-gray-900 border-gray-600 hover:border-gray-500"
+                      }`}
+                      onClick={() => setSelectedHero(hero2.id)}
+                      whileTap={{ scale: 0.98 }}
+                    >
                     {/* Selected Indicator */}
                     {selectedHero === hero2.id && (
                       <div className="absolute top-2 right-2 bg-white rounded-full p-1 z-10">
@@ -508,7 +511,8 @@ export function HeroBattle() {
                       id="hero2-mobile"
                       className="sr-only"
                     />
-                  </motion.div>
+                    </motion.div>
+                  </div>
                 </RadioGroup>
 
                 {/* Betting Controls */}
@@ -568,7 +572,7 @@ export function HeroBattle() {
                     >
                       <div className="flex flex-col items-center">
                         <div 
-                          className="w-28 h-28 rounded-xl overflow-hidden mb-3 border-2 border-gray-600 cursor-pointer hover:border-blue-400 transition-colors"
+                          className="relative w-34 h-34 rounded-xl overflow-hidden mb-3 border-2 border-gray-600 cursor-pointer hover:border-blue-400 transition-colors"
                           onClick={() => setSelectedHero(hero1.id)}
                         >
                           <img
@@ -576,6 +580,19 @@ export function HeroBattle() {
                             alt={hero1.name}
                             className="w-full h-full object-cover"
                           />
+                          {winner && winner.id !== hero1.id && (
+                            <div className="absolute -inset-2 flex items-center justify-center z-20 pointer-events-none">
+                              <svg
+                                className="w-40 h-40"
+                                viewBox="0 0 100 100"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <circle cx="50" cy="50" r="45" stroke="rgb(239 68 68)" strokeWidth="8" opacity="0.9"/>
+                                <path d="M30 30 L70 70 M70 30 L30 70" stroke="rgb(239 68 68)" strokeWidth="8" strokeLinecap="round"/>
+                              </svg>
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center space-x-2 mb-2">
                           <RadioGroupItem 
@@ -583,16 +600,17 @@ export function HeroBattle() {
                             id="desktop-hero1" 
                             className="border-gray-400 text-blue-400"
                           />
-                          <label htmlFor="desktop-hero1" className="cursor-pointer font-bold text-white">{hero1.name}</label>
+                          <label htmlFor="desktop-hero1" className="cursor-pointer font-bold font-slackey text-white text-xl">{hero1.name}</label>
+                           
                         </div>
-                        <div className="text-sm text-gray-300">
+                        {/* <div className="text-sm text-gray-300">
                           ⚡ {Object.values(hero1.powerstats).reduce((a, b) => a + b, 0)}
-                        </div>
+                        </div> */}
                       </div>
                       
                       <div className="flex flex-col items-center">
                         <div 
-                          className="w-28 h-28 rounded-xl overflow-hidden mb-3 border-2 border-gray-600 cursor-pointer hover:border-blue-400 transition-colors"
+                          className="relative w-34 h-34 rounded-xl overflow-hidden mb-3 border-2 border-gray-600 cursor-pointer hover:border-blue-400 transition-colors"
                           onClick={() => setSelectedHero(hero2.id)}
                         >
                           <img
@@ -600,6 +618,19 @@ export function HeroBattle() {
                             alt={hero2.name}
                             className="w-full h-full object-cover"
                           />
+                          {winner && winner.id !== hero2.id && (
+                            <div className="absolute -inset-2 flex items-center justify-center z-20 pointer-events-none">
+                              <svg
+                                className="w-40 h-40"
+                                viewBox="0 0 100 100"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <circle cx="50" cy="50" r="45" stroke="rgb(239 68 68)" strokeWidth="8" opacity="0.9"/>
+                                <path d="M30 30 L70 70 M70 30 L30 70" stroke="rgb(239 68 68)" strokeWidth="8" strokeLinecap="round"/>
+                              </svg>
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center space-x-2 mb-2">
                           <RadioGroupItem 
@@ -607,11 +638,11 @@ export function HeroBattle() {
                             id="desktop-hero2" 
                             className="border-gray-400 text-blue-400"
                           />
-                          <label htmlFor="desktop-hero2" className="cursor-pointer font-bold text-white">{hero2.name}</label>
+                          <label htmlFor="desktop-hero2" className="cursor-pointer font-bold font-slackey text-white text-xl">{hero2.name}</label>
                         </div>
-                        <div className="text-sm text-gray-300">
+                        {/* <div className="text-sm text-gray-300">
                           ⚡ {Object.values(hero2.powerstats).reduce((a, b) => a + b, 0)}
-                        </div>
+                        </div> */}
                       </div>
                     </RadioGroup>
                     
@@ -672,11 +703,11 @@ export function HeroBattle() {
                           exit={{ opacity: 0, scale: 0.5 }}
                           className="w-full"
                         >
-                          <div className="text-3xl lg:text-4xl xl:text-5xl font-black mb-4">
+                          <div className="text-3xl lg:text-4xl xl:text-5xl font-black mb-4 font-slackey">
                             {hero1.name}
                           </div>
-                          <div className="text-5xl lg:text-6xl xl:text-7xl font-black my-6 drop-shadow-lg">VS</div>
-                          <div className="text-3xl lg:text-4xl xl:text-5xl font-black">
+                          <div className="text-5xl lg:text-6xl xl:text-4xl font-black my-6 drop-shadow-lg">VS</div>
+                          <div className="text-3xl lg:text-4xl xl:text-5xl font-black font-slackey">
                             {hero2.name}
                           </div>
                         </motion.div>
@@ -699,7 +730,7 @@ export function HeroBattle() {
                           animate={{ opacity: 1, scale: 1 }}
                           className="text-center w-full"
                         >
-                          <div className="text-3xl lg:text-4xl xl:text-5xl font-black">{winner.name}</div>
+                          <div className="text-3xl lg:text-4xl xl:text-5xl font-black font-slackey">{winner.name}</div>
                           <div className="text-2xl lg:text-3xl xl:text-4xl font-bold mt-2">WINS!</div>
                           {isMiracleWin && (
                             <div className="text-yellow-300 mt-4 text-xl lg:text-2xl xl:text-3xl animate-pulse font-bold">
@@ -729,16 +760,11 @@ export function HeroBattle() {
                     <div key={index} className="relative">
                       <Card className="p-4 bg-gray-900 border-gray-600">
                         <div className="relative">
-                          <img
+                          {/* <img
                             src={hero.images.lg}
                             alt={hero.name}
                             className="w-full object-cover rounded-lg"
-                          />
-                          {winner && winner.id !== hero.id && (
-                            <div className="absolute -inset-2 flex items-center justify-center z-20">
-                              <div className="text-red-500 font-black text-9xl drop-shadow-lg transform -rotate-12">✕</div>
-                            </div>
-                          )}
+                          /> */}
                         </div>
                         <h3 className="text-xl font-bold mt-2 text-white">{hero.name}</h3>
 
