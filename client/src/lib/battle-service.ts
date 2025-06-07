@@ -18,22 +18,32 @@ export interface Hero {
   biography: {
     fullName: string;
     alignment: string;
+    placeOfBirth?: string;
+    firstAppearance?: string;
+    publisher?: string;
+  };
+  appearance?: {
+    race: string;
+    height: string[];
+    weight: string[];
+  };
+  work?: {
+    occupation: string;
+    base: string;
+  };
+  connections?: {
+    groupAffiliation: string;
+    relatives: string;
   };
   powers?: string[];
 }
 
 // Get hero powers from powers data
 export function getHeroPowers(heroName: string): string[] {
-  console.log("Getting powers for hero:", heroName);
-  console.log("Powers data available:", Object.keys(heroPowers));
-
   const powers: string[] = [];
   const heroIndex = heroPowers.Name.indexOf(heroName);
 
-  console.log("Hero index in powers data:", heroIndex);
-
   if (heroIndex === -1) {
-    console.log("Hero not found in powers data");
     return powers;
   }
 
@@ -45,7 +55,6 @@ export function getHeroPowers(heroName: string): string[] {
     }
   });
 
-  console.log("Found powers:", powers);
   return powers;
 }
 
