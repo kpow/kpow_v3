@@ -706,6 +706,12 @@ export function HeroBattle() {
                               ⚡ MIRACLE VICTORY! ⚡
                             </div>
                           )}
+                          <Button
+                            className="mt-6 bg-white text-purple-600 hover:bg-gray-100 font-bold px-6 py-3 text-lg"
+                            onClick={handleRandom}
+                          >
+                            🎲 NEW BATTLE
+                          </Button>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -788,26 +794,100 @@ export function HeroBattle() {
                               <ChevronDown className="h-4 w-4 text-gray-300" />
                             </CollapsibleTrigger>
                             <CollapsibleContent className="p-2">
-                              <div className="space-y-3">
-                                <div className="space-y-1">
-                                  <div className="font-bold text-sm text-gray-300">
-                                    Full Name
-                                  </div>
-                                  <div className="text-white">
-                                    {hero.biography.fullName || "Unknown"}
-                                  </div>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                  <span className="text-gray-300">Full Name:</span>
+                                  <span className="text-white">{hero.biography.fullName || "-"}</span>
                                 </div>
-                                <div className="space-y-1">
-                                  <div className="font-bold text-sm text-gray-300">
-                                    Alignment
-                                  </div>
-                                  <div className="capitalize text-white">
-                                    {hero.biography.alignment}
-                                  </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-300">Alignment:</span>
+                                  <span className="text-white capitalize">{hero.biography.alignment || "-"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-300">Place of Birth:</span>
+                                  <span className="text-white">{hero.biography.placeOfBirth || "-"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-300">First Appearance:</span>
+                                  <span className="text-white">{hero.biography.firstAppearance || "-"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-300">Publisher:</span>
+                                  <span className="text-white">{hero.biography.publisher || "-"}</span>
                                 </div>
                               </div>
                             </CollapsibleContent>
                           </Collapsible>
+
+                          {/* Appearance */}
+                          {hero.appearance && (
+                            <Collapsible>
+                              <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-800 rounded-lg">
+                                <span className="font-semibold text-white">Appearance</span>
+                                <ChevronDown className="h-4 w-4 text-gray-300" />
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="p-2">
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-300">Race:</span>
+                                    <span className="text-white">{hero.appearance.race || "Unknown"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-300">Height:</span>
+                                    <span className="text-white">{hero.appearance.height?.[1] || "0 cm"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-300">Weight:</span>
+                                    <span className="text-white">{hero.appearance.weight?.[1] || "0 kg"}</span>
+                                  </div>
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
+
+                          {/* Work */}
+                          {hero.work && (
+                            <Collapsible>
+                              <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-800 rounded-lg">
+                                <span className="font-semibold text-white">Work</span>
+                                <ChevronDown className="h-4 w-4 text-gray-300" />
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="p-2">
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-300">Occupation:</span>
+                                    <span className="text-white">{hero.work.occupation || "-"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-300">Base:</span>
+                                    <span className="text-white">{hero.work.base || "-"}</span>
+                                  </div>
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
+
+                          {/* Connections */}
+                          {hero.connections && (
+                            <Collapsible>
+                              <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-800 rounded-lg">
+                                <span className="font-semibold text-white">Connections</span>
+                                <ChevronDown className="h-4 w-4 text-gray-300" />
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="p-2">
+                                <div className="space-y-2 text-sm">
+                                  <div>
+                                    <div className="text-gray-300 mb-1">Group Affiliation:</div>
+                                    <div className="text-white text-xs">{hero.connections.groupAffiliation || "-"}</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-gray-300 mb-1">Relatives:</div>
+                                    <div className="text-white text-xs">{hero.connections.relatives || "-"}</div>
+                                  </div>
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
                         </div>
                       </Card>
                     </div>
