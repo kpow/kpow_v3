@@ -21,6 +21,15 @@ import tableRoutes from "./routes/table";
 export function registerRoutes(app: Express): Server {
   const router = Router();
 
+  // Health check endpoint for Digital Ocean
+  router.get('/api/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'healthy', 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  });
+
   // Set up authentication routes and middleware
   setupAuth(app);
 

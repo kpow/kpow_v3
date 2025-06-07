@@ -61,8 +61,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Always use port 5000 as required by the workflow
-  const PORT = 5000;
+  // Use PORT from environment variable (Digital Ocean) or default to 5000 for local development
+  const PORT = parseInt(process.env.PORT || "5000", 10);
   console.log(`[Server] Attempting to start server on port ${PORT}...`);
 
   server.listen(PORT, "0.0.0.0", () => {

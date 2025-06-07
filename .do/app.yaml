@@ -1,0 +1,71 @@
+name: book-metadata-platform
+services:
+- name: web
+  source_dir: /
+  github:
+    branch: main
+    deploy_on_push: true
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  routes:
+  - path: /
+  health_check:
+    http_path: /api/health
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "8080"
+  - key: DATABASE_URL
+    value: ${db.DATABASE_URL}
+  - key: SESSION_SECRET
+    scope: RUN_TIME
+    type: SECRET
+  - key: OPENAI_API_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: GOODREADS_API_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: GOOGLE_API_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: LASTFM_API_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: YOUTUBE_API_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: INSTAGRAM_ACCESS_TOKEN
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_HOST
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_PORT
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_USER
+    scope: RUN_TIME
+    type: SECRET
+  - key: SMTP_PASS
+    scope: RUN_TIME
+    type: SECRET
+  - key: APP_URL
+    value: ${_self.PUBLIC_URL}
+  - key: FRONTEND_URL
+    value: ${_self.PUBLIC_URL}
+
+databases:
+- engine: PG
+  name: db
+  num_nodes: 1
+  size: basic-xs
+  version: "14"
+
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
