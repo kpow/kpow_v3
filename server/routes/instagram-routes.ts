@@ -27,7 +27,7 @@ router.get("/feed", async (req, res) => {
   try {
     // const accessToken = 'process.env.INSTAGRAM_ACCESS_TOKEN';
     const accessToken =
-      "IGAAM8gJ7ZB7gRBZAE9LU1FEc1k0WkZA3a1B5M2xjb2JiTjZAuTWR4MmxmbTNVWnZAaVGc0dXBnb0VGSDNUSWZAKMkRHSGdBQi1ZAcE1TeW00cWhLNmNJTmtzSnhQMTF3NDQ1WnQ2U05CWk5VZAUFhQTk1bmlPaC1UOVNnS1NnTWJhZA19nQQZDZD";
+      "IGAAM8gJ7ZB7gRBZAE5vaFB3bkhKcTNPM2otQTROR0V6ZAkRuWEp3TmhnUmF0M1BtSm9FTFN6QXg3RFhtcWtCQjlsb3BlM0sxOEhUQ3l2dXZAIOXUzWGN3ZAUU0QTJmWnFQQWpiM3lwRklJUm5YTmxXbFJNeVM4V3pzb1FCRGh4M0xLMAZDZD";
 
     if (!accessToken) {
       throw new Error("Instagram access token not found");
