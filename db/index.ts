@@ -1,8 +1,10 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
+import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from 'pg';
 const { Pool } = pkg;
-import ws from "ws";
 import * as schema from "@db/schema";
+
+// Digital Ocean managed databases use self-signed certificates
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -10,15 +12,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Create PostgreSQL pool for session management
+// Create PostgreSQL pool for session management and Drizzle
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: 20 // Maximum number of clients in the pool
+  max: 20, // Maximum number of clients in the pool
+  ssl: { rejectUnauthorized: false } // Required for Digital Ocean managed databases
 });
 
-// Create Drizzle client
-export const db = drizzle({
-  connection: process.env.DATABASE_URL,
-  schema,
-  ws: ws,
-});
+// Create Drizzle client using the pool
+export const db = drizzle(pool, { schema });
