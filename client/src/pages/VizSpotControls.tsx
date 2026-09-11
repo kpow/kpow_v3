@@ -37,6 +37,47 @@ const PALETTES = [
   "Party", "Aurora", "Aurora 2", "Splash", "Light Pink", "Tiamat", "Aqua Flash",
 ];
 
+// Section screenshots in client/public/vizspot/controls/, taken from the real page
+// (web_page.h) served against a mocked API, so every value shown is made up.
+// Regenerate with vizSpot tools/control-page-shots/ when the control page changes.
+// Width and height are the 2x image size, set to avoid layout shift.
+const SHOTS: Record<string, { w: number; h: number }> = {
+  header: { w: 1196, h: 188 },   // shot 600 px wide so the header stays on one line
+  "now-playing": { w: 876, h: 494 },
+  search: { w: 876, h: 1002 },
+  mode: { w: 876, h: 520 },
+  visualizer: { w: 876, h: 1634 },
+  microphone: { w: 876, h: 636 },
+  modes: { w: 876, h: 566 },
+  ambient: { w: 876, h: 1288 },
+  spotify: { w: 876, h: 1060 },
+  settings: { w: 876, h: 838 },
+  footer: { w: 880, h: 332 },
+};
+
+function Shot({ id, title }: { id: string; title: string }) {
+  const s = SHOTS[id];
+  if (!s) return null;
+  const wide = s.w > 900;
+  return (
+    <figure className={`mx-auto w-full ${wide ? "max-w-[600px]" : "max-w-[440px] lg:sticky lg:top-24"}`}>
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-[#f2efe6] shadow-sm">
+        <img
+          src={`/vizspot/controls/${id}.png`}
+          width={s.w}
+          height={s.h}
+          loading="lazy"
+          alt={`The ${title} section of the vizSpot control page`}
+          className="block h-auto w-full"
+        />
+      </div>
+      <figcaption className="mt-2 text-center font-mono text-[11px] uppercase tracking-wider text-gray-500">
+        {title} on vizspot.local
+      </figcaption>
+    </figure>
+  );
+}
+
 const cards: Card[] = [
   {
     id: "now-playing",
@@ -516,7 +557,7 @@ export default function VizSpotControls() {
         description="A section-by-section guide to the vizSpot control page: modes, effects, microphone, Spotify, power and WiFi settings."
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-4">
+      <div className="mx-auto max-w-5xl px-4 py-4">
         {/* HERO */}
         <section className="grid items-center gap-8 border-b border-gray-200 pb-10 md:grid-cols-2">
           <div>
@@ -548,6 +589,9 @@ export default function VizSpotControls() {
         {/* BASICS */}
         <section className="mt-12 scroll-mt-20" id="basics">
           <SectionHeading>how the page works</SectionHeading>
+          <div className="mt-5">
+            <Shot id="header" title="header" />
+          </div>
           <div className="mt-5 grid gap-3.5 sm:grid-cols-2">
             <div className="rounded-xl border border-gray-200 bg-white p-4">
               <h3 className="mb-1 font-slackey text-[15px] uppercase tracking-wide">Sections fold</h3>
@@ -607,11 +651,14 @@ export default function VizSpotControls() {
           <section key={card.id} id={card.id} className="mt-12 scroll-mt-20">
             <SectionHeading>{card.title}</SectionHeading>
             <Lead>{card.intro}</Lead>
+            <div className="grid items-start gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+            <Shot id={card.id} title={card.title} />
+            <div className="min-w-0">
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
               {card.rows.map((row, i) => (
                 <div
                   key={i}
-                  className={`grid grid-cols-1 gap-1.5 px-5 py-4 sm:grid-cols-[190px_1fr] sm:gap-4 sm:px-6 ${
+                  className={`grid grid-cols-1 gap-1.5 px-5 py-4 sm:grid-cols-[170px_1fr] sm:gap-4 sm:px-6 ${
                     i < card.rows.length - 1 ? "border-b border-gray-200" : ""
                   }`}
                 >
@@ -656,6 +703,8 @@ export default function VizSpotControls() {
                 <div>{card.tip}</div>
               </div>
             )}
+            </div>
+            </div>
           </section>
         ))}
 
