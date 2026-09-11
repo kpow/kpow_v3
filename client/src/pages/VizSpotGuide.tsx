@@ -145,7 +145,7 @@ export default function VizSpotGuide() {
     <>
       <SEO
         title="vizspot"
-        image="/images/vizspot-on.jpg"
+        image="/images/vizspot-hero-poster.jpg"
         description="vizSpot: a 64x64 LED board that shows what you're playing on Spotify, reacts to the music, and sets up from your phone."
       />
 
@@ -190,41 +190,6 @@ export default function VizSpotGuide() {
           </div>
         </section>
 
-        {/* OFF AND ON */}
-        <section className="mt-12">
-          <SectionHeading>off and on</SectionHeading>
-          <div className="mt-5 grid gap-3.5 sm:grid-cols-2">
-            <figure className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-              <img
-                src="/images/vizspot-off.jpg"
-                width={1400}
-                height={1388}
-                loading="lazy"
-                alt="A vizSpot board switched off: a frosted grey panel in a black frame with two skull logos, on a black stand"
-                className="block h-auto w-full"
-              />
-              <figcaption className="px-4 py-3 text-sm text-muted-foreground">
-                <b className="text-gray-900">Off.</b> A frosted panel in a black
-                frame, quiet on a shelf.
-              </figcaption>
-            </figure>
-            <figure className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-              <img
-                src="/images/vizspot-on.jpg"
-                width={1400}
-                height={1285}
-                loading="lazy"
-                alt="The same board switched on, showing De La Soul's The Magic Number cover with the artist along the top and the song along the bottom"
-                className="block h-auto w-full"
-              />
-              <figcaption className="px-4 py-3 text-sm text-muted-foreground">
-                <b className="text-gray-900">On.</b> The diffuser blends 4,096
-                LEDs into the cover of whatever's playing, with the artist on top
-                and the song along the bottom.
-              </figcaption>
-            </figure>
-          </div>
-        </section>
 
         {/* WHAT IT DOES */}
         <section className="mt-12">

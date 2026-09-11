@@ -62,7 +62,8 @@ const PALETTES = [
   "Party", "Aurora", "Aurora 2", "Splash", "Light Pink", "Tiamat", "Aqua Flash",
 ];
 
-// Section screenshots in client/public/vizspot/controls/, taken from the real page
+// Section screenshots in client/public/images/vizspot-controls/ (not under public/vizspot/:
+// a folder named like the page makes the /vizspot static route 301 /vizspot/controls), taken from the real page
 // (web_page.h) served against a mocked API, so every value shown is made up.
 // Regenerate with vizSpot tools/control-page-shots/ when the control page changes.
 // Width and height are the 2x image size, set to avoid layout shift.
@@ -614,7 +615,7 @@ function Shot({ id, title, className = "" }: { id: string; title: string; classN
     <figure className={`mx-auto w-full ${className}`}>
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-[#f2efe6] shadow-sm">
         <img
-          src={`/vizspot/controls/${id}.png`}
+          src={`/images/vizspot-controls/${id}.png`}
           width={s.w}
           height={s.h}
           loading="lazy"
@@ -846,7 +847,7 @@ export default function VizSpotControls() {
     <>
       <SEO
         title="vizspot controls"
-        image="/images/vizspot-on.jpg"
+        image="/images/vizspot-hero-poster.jpg"
         description="A section-by-section guide to the vizSpot control page: modes, effects, microphone, Spotify, power and WiFi settings."
       />
 
