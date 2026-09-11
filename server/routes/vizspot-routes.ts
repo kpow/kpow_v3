@@ -79,10 +79,12 @@ function stateOf(r: Row): "done" | "failed" | "checking" | "sent" | "waiting" {
 
 type Bucket = { tokens: number; at: number };
 const buckets = new Map<string, Bucket>();
-function allow(key: string, perMinute: number): boolean {
+// Token bucket: holds up to `capacity`, refills at `perMinute`. Capacity and rate
+// are separate so a slow rate (20 per hour) still allows its first request.
+function allow(key: string, capacity: number, perMinute: number): boolean {
   const now = Date.now();
-  const b = buckets.get(key) ?? { tokens: perMinute, at: now };
-  b.tokens = Math.min(perMinute, b.tokens + ((now - b.at) / 60_000) * perMinute);
+  const b = buckets.get(key) ?? { tokens: capacity, at: now };
+  b.tokens = Math.min(capacity, b.tokens + ((now - b.at) / 60_000) * perMinute);
   b.at = now;
   const ok = b.tokens >= 1;
   if (ok) b.tokens -= 1;
@@ -136,7 +138,7 @@ export function registerVizspotRoutes(router: Router) {
     const id = guard(req, res);
     if (!id) return;
     const ip = clientIp(req);
-    if (!allow(`post:${ip}`, 40)) return res.status(429).json({ error: "slow down" });
+    if (!allow(`post:${ip}`, 40, 40)) return res.status(429).json({ error: "slow down" });
     const hint = req.body?.hint;
     const ack = req.body?.ack;
     if (hint !== undefined && (typeof hint !== "string" || hint.length < 40 || hint.length > 256 || !B64_RE.test(hint)))
@@ -152,7 +154,7 @@ export function registerVizspotRoutes(router: Router) {
         await client.query("BEGIN");
         const live = await client.query("SELECT 1 FROM vizspot_pairings WHERE id = $1 AND expires_at > now()", [id]);
         if (live.rowCount === 0) {
-          if (!allow(`new:${ip}`, 20 / 60)) {
+          if (!allow(`new:${ip}`, 20, 20 / 60)) {
             await client.query("ROLLBACK");
             return res.status(429).json({ error: "too many new codes" });
           }
@@ -200,7 +202,7 @@ export function registerVizspotRoutes(router: Router) {
   router.get("/api/vizspot/pair/:id", (req, res) => {
     const id = guard(req, res);
     if (!id) return;
-    if (!allow(`get:${clientIp(req)}`, 40)) return res.status(429).json({ error: "slow down" });
+    if (!allow(`get:${clientIp(req)}`, 40, 40)) return res.status(429).json({ error: "slow down" });
     (async () => {
       await ensureTable();
       maybeCleanup();
@@ -226,7 +228,7 @@ export function registerVizspotRoutes(router: Router) {
   router.put("/api/vizspot/pair/:id", (req, res) => {
     const id = guard(req, res);
     if (!id) return;
-    if (!allow(`put:${clientIp(req)}`, 10)) return res.status(429).json({ error: "slow down" });
+    if (!allow(`put:${clientIp(req)}`, 10, 10)) return res.status(429).json({ error: "slow down" });
     const payload = req.body?.payload;
     if (typeof payload !== "string" || payload.length < 40 || payload.length > 1024 || !B64_RE.test(payload))
       return res.status(400).json({ error: "bad payload" });
