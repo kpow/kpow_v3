@@ -220,12 +220,10 @@ export default function VizSpotGuide() {
                 . The controls guide walks through it section by section, with a
                 picture of each.
               </p>
-              <ul className="mt-5 grid gap-2 text-[15px] text-gray-200 sm:grid-cols-2">
+              <ul className="mt-5 grid gap-2 text-[15px] text-gray-200">
                 {[
                   "Pick a mode: cover, visualizer, ambient, cycle",
                   "Choose effects, colors and speed",
-                  "Search Spotify and play from the page",
-                  "Match brightness to your power supply",
                 ].map((t) => (
                   <li key={t} className="flex gap-2.5">
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" />
@@ -245,14 +243,6 @@ export default function VizSpotGuide() {
                 src="/images/vizspot-controls/now-playing.png"
                 width={876}
                 height={494}
-                loading="lazy"
-                alt=""
-                className="block h-auto w-full rounded-lg"
-              />
-              <img
-                src="/images/vizspot-controls/mode.png"
-                width={876}
-                height={520}
                 loading="lazy"
                 alt=""
                 className="block h-auto w-full rounded-lg"
