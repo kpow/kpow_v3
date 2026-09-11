@@ -14,7 +14,8 @@ const post = (id, body) => fetch(api(id), { method: 'POST', headers: { 'Content-
 const get = (id) => fetch(api(id)).then(j);
 const put = (id, body) => fetch(api(id), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(j);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const randomSecret = () => Buffer.from(crypto.getRandomValues(new Uint8Array(12))).toString('base64url');
+const ALPHA = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';   // Crockford base32, same as the board
+const randomSecret = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => ALPHA[b & 31]).join('');
 
 if (mode === 'contract') {
   let failed = 0;

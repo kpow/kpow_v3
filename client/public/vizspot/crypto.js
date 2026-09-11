@@ -1,7 +1,8 @@
 // vizSpot pairing crypto. Shared by the phone wizard (browser) and the Node test
 // scripts. Must stay byte-compatible with src/net/pair_crypto.cpp on the board.
 //
-//   S         16-char base64url secret shown in the board's QR (https://kpow.xyz/vizspot/#S)
+//   S         16-char Crockford base32 secret (80 bits: digits + A-Z without I L O U).
+//             Shown in the board's QR (https://kpow.xyz/vizspot/#S) and as a typable code.
 //   key       SHA-256("vizspot1/key/" + S)                  AES-256-GCM key
 //   id        hex(SHA-256("vizspot1/id/" + S)).slice(0, 24)  relay row id; the only thing the server sees
 //   envelope  base64( 0x01 | IV[12] | ciphertext | tag[16] )
@@ -11,7 +12,12 @@ const te = new TextEncoder();
 const td = new TextDecoder();
 const subtle = globalThis.crypto.subtle;
 
-export const SECRET_RE = /^[A-Za-z0-9_-]{16}$/;
+export const SECRET_RE = /^[0-9A-HJKMNP-TV-Z]{16}$/;
+
+// Normalise a code typed from the panel: case, spaces and dashes, look-alikes.
+export function normalizeSecret(input) {
+  return String(input).toUpperCase().replace(/[\s-]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+}
 
 const sha256 = async (s) => new Uint8Array(await subtle.digest('SHA-256', te.encode(s)));
 const hex = (u8) => Array.from(u8, (b) => b.toString(16).padStart(2, '0')).join('');
