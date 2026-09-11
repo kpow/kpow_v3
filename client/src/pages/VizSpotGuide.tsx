@@ -257,6 +257,12 @@ export default function VizSpotGuide() {
               choose modes and effects, change colors and speed, search Spotify,
               and play or pause.
             </p>
+            <p className="mt-3">
+              <a href="/vizspot/controls" className="font-medium text-blue-600 underline">
+                Control page guide →
+              </a>{" "}
+              every section and setting, explained.
+            </p>
           </div>
         </section>
 

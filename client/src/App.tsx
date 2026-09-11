@@ -21,6 +21,7 @@ import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
 import LedArt from "@/pages/LedArt";
 import VizSpotGuide from "@/pages/VizSpotGuide";
+import VizSpotControls from "@/pages/VizSpotControls";
 import { Route as WouterRoute } from "wouter";
 import { SEO } from "@/components/global/SEO";
 
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/itunez" component={ITunezPage} />
         <Route path="/led" component={LedArt} />
         <Route path="/vizspot/guide" component={VizSpotGuide} />
+        <Route path="/vizspot/controls" component={VizSpotControls} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
 
