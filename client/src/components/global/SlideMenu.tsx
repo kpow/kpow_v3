@@ -20,6 +20,7 @@ import {
   Circle,
   Mail,
   Lightbulb,
+  AudioLines,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -95,6 +96,11 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       icon: <Lightbulb className="w-4 h-4" />,
       label: "led art",
       href: "/led",
+    },
+    {
+      icon: <AudioLines className="w-4 h-4" />,
+      label: "vizspot",
+      href: "/vizspot/guide",
     },
     {
       icon: <Code className="w-4 h-4" />,
