@@ -876,14 +876,21 @@ export default function VizSpotControls() {
             </div>
           </div>
           <div className="grid place-items-center rounded-xl bg-[#0e1014] p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,.05),0_18px_50px_rgba(0,0,0,.28)] sm:p-7">
-            <PageSketch />
+            <img
+              src="/images/vizspot-off.jpg"
+              width={1000}
+              height={991}
+              alt="A vizSpot board switched off: a frosted panel in a black frame with two skull logos, on a black stand"
+              className="block h-auto w-full max-w-[420px] rounded-lg"
+            />
           </div>
         </section>
 
-        {/* BASICS */}
+        {/* BASICS: the three rules beside a sketch of the control page */}
         <section className="mt-12 scroll-mt-20" id="basics">
           <SectionHeading>how the page works</SectionHeading>
-          <div className="mt-5 overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <div className="mt-5 grid items-start gap-6 md:grid-cols-2">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
             <ul className="divide-y divide-gray-200 text-[15px] text-gray-700">
               <li className="px-4 py-3 sm:px-5">On the control page, tap a black bar to open its section.</li>
               <li className="px-4 py-3 sm:px-5">
@@ -913,6 +920,10 @@ export default function VizSpotControls() {
                 </ul>
               </div>
             </details>
+          </div>
+          <div className="grid place-items-center rounded-xl bg-[#0e1014] p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,.05),0_18px_50px_rgba(0,0,0,.28)] sm:p-7">
+            <PageSketch />
+          </div>
           </div>
         </section>
 
