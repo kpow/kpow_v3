@@ -54,8 +54,7 @@ const EFFECTS = [
   "Distrt", "ZVortx", "Snakes", "Sine", "Puzzle", "GEQ2D", "Xorcry", "Hiphtc",
   "Fuzzy", "PSGlxy", "Impact", "Sonic", "Vortex", "GEQBar",
 ];
-const VIZ_DEFAULT = ["Plasma", "Ripple", "Perlin", "Hiphtc", "GEQ2D", "Impact", "Vortex", "GEQBar"];
-const AMB_DEFAULT = ["Plasma", "Galaxy", "Perlin"];
+// Every effect is in both rotations on a new board (vizSpot settings.cpp).
 const PALETTES = [
   "Rainbow", "Analogous", "Electric", "Sunset", "Heat", "Red Tide", "Ember", "Tertiary",
   "Garnet", "Retro", "Temperature", "Clown", "Drywet", "Toxy Reaf", "Hult", "Yelblu Hot",
@@ -259,14 +258,14 @@ const cards: Card[] = [
         c: "Effect checkboxes",
         show: true,
         d: "Checked effects take turns. Tap a name to jump straight to it, checked or not.",
-        v: "8 of 22 checked",
+        v: "all 22 checked when new",
         how: "live",
         extra: {
           label: "see all 22 effects",
           body: (
             <>
               <p className="mb-2 text-xs text-muted-foreground">Green = checked when new.</p>
-              <Chips items={EFFECTS} marked={VIZ_DEFAULT} />
+              <Chips items={EFFECTS} marked={EFFECTS} />
             </>
           ),
         },
@@ -307,7 +306,7 @@ const cards: Card[] = [
         c: "Kaleidoscope",
         s: "Mirror or rotate the picture",
         d: "off, mirror left/right, mirror top/bottom, mirror 4-way, 6-fold rotation, 8-fold rotation.",
-        v: "default off",
+        v: "default mirror 4-way",
         how: "live",
       },
       { c: "Blend", s: "How strong the mirror is", d: "How strongly the mirrored image covers the original. 0% is the same as off.", v: "0–100% · default 100%", how: "live" },
@@ -391,9 +390,9 @@ const cards: Card[] = [
         c: "Effect checkboxes",
         s: "Checked effects take turns",
         d: "Checked effects take turns in ambient. Tap a name to jump to it.",
-        v: "3 of 22 checked",
+        v: "all 22 checked when new",
         how: "live",
-        extra: { label: "Checked when new (any of the 22 can join)", body: <Chips items={AMB_DEFAULT} marked={AMB_DEFAULT} /> },
+        extra: { label: "All 22 are checked when new", body: <Chips items={EFFECTS} marked={EFFECTS} /> },
       },
       { c: "Speed", s: "How fast patterns move", d: "How fast ambient patterns move. Slow is the point.", v: "1–20 · default 3", how: "live" },
       {
