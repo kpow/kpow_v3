@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, unique, jsonb, primaryKey, date } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, unique, jsonb, primaryKey, date, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { z } from "zod";
 import { Artist, ArtistInsert, Song, SongInsert, Play, PlayInsert, Book, BookInsert, Author, AuthorInsert, Shelf, ShelfInsert, BookAuthorInsert, BookShelfInsert } from '@types/database';
@@ -198,3 +198,20 @@ export type {
   InsertUser,
   SelectUser
 };
+
+// vizSpot phone pairing relay (server/routes/vizspot-routes.ts). The route creates
+// this table itself with CREATE TABLE IF NOT EXISTS; it is declared here so a
+// future drizzle-kit push knows about it instead of offering to drop it.
+export const vizspotPairings = pgTable("vizspot_pairings", {
+  id: varchar("id", { length: 24 }).primaryKey(),
+  hint: text("hint"),
+  payload: text("payload"),
+  ack: varchar("ack", { length: 80 }),
+  boardSeenAt: timestamp("board_seen_at", { withTimezone: true }).notNull().defaultNow(),
+  phoneSeenAt: timestamp("phone_seen_at", { withTimezone: true }),
+  claimedAt: timestamp("claimed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+}, (t) => ({
+  expiresIdx: index("vizspot_pairings_expires_idx").on(t.expiresAt),
+}));

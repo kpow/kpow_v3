@@ -26,7 +26,8 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
+    // vizSpot boards poll every few seconds; keep them (and their ciphertext) out of the log.
+    if (path.startsWith("/api") && !path.startsWith("/api/vizspot")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
