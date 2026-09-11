@@ -256,10 +256,14 @@ async function pollBoard(started) {
   if (r.status === 404) return fail('The code expired before the board picked it up. Scan the board again.', 'enter');
   if (r.state === 'done') { tokens = null; store.del(LS.pair); step('board', 'done'); return show('done'); }
   if (r.state === 'failed') return fail(`Your board couldn't connect: ${r.error || 'unknown error'}.`, 'connect-again', tokens?.cid);
+  // The board stops checking in once it has connected. If its final "ok" got lost,
+  // "checking" plus a board that has been silent longer than its worst case (60 s
+  // verify + ~15 s of ack retries) almost always means it worked. Say so instead of hanging.
+  if (r.state === 'checking' && r.board_age_s > 75) return show('likely-done');
   if (Date.now() - started > 15 * 60e3) return fail("Still waiting after 15 minutes. Check the board is on and showing the code, then tap Try again.", 'retry-send');
   msg('progress-msg',
-    r.board_age_s > 60 ? 'Your board checks in less often after it has waited a while. Unplug it and plug it back in to hurry it up.'
-      : r.state === 'checking' ? 'Your board has the sign-in and is contacting Spotify…'
+    r.state === 'checking' ? 'Your board has the sign-in and is contacting Spotify…'
+      : r.board_age_s > 60 ? 'Your board checks in less often after it has waited a while. Unplug it and plug it back in to hurry it up.'
         : 'Waiting for your board to pick it up…');
   timer = setTimeout(() => pollBoard(started), 2000);
 }
