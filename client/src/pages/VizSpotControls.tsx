@@ -799,7 +799,13 @@ function PageSketch() {
 }
 
 export default function VizSpotControls() {
-  const [open, setOpen] = useState<string[]>([]);
+  // The first section starts open so the page has a place to begin, unless a
+  // #hash link points at a section, which then opens on its own.
+  const [open, setOpen] = useState<string[]>(() => {
+    const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+    const linked = cards.some((c) => id === c.id || id.startsWith(`${c.id}-`));
+    return linked ? [] : [cards[0].id];
+  });
   const [rowsOpen, setRowsOpen] = useState(false);
   const allOpen = open.length === cards.length;
 
