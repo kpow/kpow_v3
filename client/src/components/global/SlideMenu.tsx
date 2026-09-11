@@ -99,8 +99,14 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
     },
     {
       icon: <AudioLines className="w-4 h-4" />,
-      label: "vizspot",
+      label: "vizSpot",
       href: "/vizspot/guide",
+      // /vizspot/ is the static phone wizard served by Express, not a SPA route: native link.
+      children: [
+        { label: "setup guide", href: "/vizspot/guide", native: false },
+        { label: "controls page", href: "/vizspot/controls", native: false },
+        { label: "spotify connect", href: "/vizspot/", native: true },
+      ],
     },
     {
       icon: <Code className="w-4 h-4" />,
@@ -173,18 +179,36 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
                 <span className="text-[13px]">{item.label}</span>
               </a>
             ) : (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors",
-                  item.className,
+              <div key={item.label}>
+                <Link
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-sm transition-colors",
+                    item.className,
+                  )}
+                >
+                  {item.icon}
+                  <span className="text-[13px]">{item.label}</span>
+                </Link>
+                {item.children && (
+                  <div className="mb-1 ml-[1.35rem] border-l border-gray-200 pl-3">
+                    {item.children.map((child) => {
+                      const cls =
+                        "block py-1.5 px-3 text-[12.5px] text-gray-500 hover:bg-gray-50 hover:text-gray-900 rounded-sm transition-colors";
+                      return child.native ? (
+                        <a key={child.label} href={child.href} onClick={onClose} className={cls}>
+                          {child.label}
+                        </a>
+                      ) : (
+                        <Link key={child.label} href={child.href} onClick={onClose} className={cls}>
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                {item.icon}
-                <span className="text-[13px]">{item.label}</span>
-              </Link>
+              </div>
             ),
           )}
           {user && (

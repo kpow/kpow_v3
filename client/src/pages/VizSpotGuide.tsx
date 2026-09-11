@@ -144,7 +144,7 @@ export default function VizSpotGuide() {
   return (
     <>
       <SEO
-        title="vizspot"
+        title="vizSpot"
         image="/images/vizspot-hero-poster.jpg"
         description="vizSpot: a 64x64 LED board that shows what you're playing on Spotify, reacts to the music, and sets up from your phone."
       />
@@ -190,7 +190,6 @@ export default function VizSpotGuide() {
           </div>
         </section>
 
-
         {/* WHAT IT DOES */}
         <section className="mt-12">
           <SectionHeading>what it does</SectionHeading>
@@ -201,6 +200,64 @@ export default function VizSpotGuide() {
                 <p className="text-sm text-muted-foreground">{f.body}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* CONTROLS CALLOUT */}
+        <section className="mt-12">
+          <div className="grid items-center gap-8 overflow-hidden rounded-2xl bg-[#0e1014] p-6 text-white shadow-[0_18px_50px_rgba(0,0,0,.28)] sm:p-8 md:grid-cols-[minmax(0,1fr)_300px]">
+            <div>
+              <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[1.5px] text-green-400">
+                the control page
+              </p>
+              <h2 className="font-slackey text-3xl tracking-tight sm:text-4xl">Make it yours.</h2>
+              <p className="mt-3 max-w-[52ch] text-[16px] text-gray-300">
+                The wheel covers the basics. Everything else lives on the board's
+                own web page,{" "}
+                <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.92em] text-white">
+                  vizspot.local
+                </code>
+                . The controls guide walks through it section by section, with a
+                picture of each.
+              </p>
+              <ul className="mt-5 grid gap-2 text-[15px] text-gray-200 sm:grid-cols-2">
+                {[
+                  "Pick a mode: cover, visualizer, ambient, cycle",
+                  "Choose effects, colors and speed",
+                  "Search Spotify and play from the page",
+                  "Match brightness to your power supply",
+                ].map((t) => (
+                  <li key={t} className="flex gap-2.5">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="/vizspot/controls"
+                className="mt-6 inline-flex items-center gap-2 rounded-md bg-green-600 px-4 py-2.5 text-[15px] font-semibold text-white hover:bg-green-500"
+              >
+                See every control →
+              </a>
+            </div>
+            <div className="grid gap-3" aria-hidden="true">
+              <img
+                src="/images/vizspot-controls/now-playing.png"
+                width={876}
+                height={494}
+                loading="lazy"
+                alt=""
+                className="block h-auto w-full rounded-lg"
+              />
+              <img
+                src="/images/vizspot-controls/mode.png"
+                width={876}
+                height={520}
+                loading="lazy"
+                alt=""
+                className="block h-auto w-full rounded-lg"
+              />
+            </div>
           </div>
         </section>
 

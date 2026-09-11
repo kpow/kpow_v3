@@ -852,7 +852,7 @@ export default function VizSpotControls() {
   return (
     <>
       <SEO
-        title="vizspot controls"
+        title="vizSpot controls"
         image="/images/vizspot-hero-poster.jpg"
         description="A section-by-section guide to the vizSpot control page: modes, effects, microphone, Spotify, power and WiFi settings."
       />
@@ -862,7 +862,7 @@ export default function VizSpotControls() {
         <section className="grid items-center gap-8 border-b border-gray-200 pb-10 md:grid-cols-2">
           <div>
             <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[1.5px] text-green-700">
-              vizspot · control page guide
+              vizSpot · control page guide
             </p>
             <PageTitle size="lg" className="mb-4">
               Every control on vizspot.local.
