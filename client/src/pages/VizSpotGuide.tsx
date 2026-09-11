@@ -212,13 +212,13 @@ export default function VizSpotGuide() {
               </p>
               <h2 className="font-slackey text-3xl tracking-tight sm:text-4xl">Make it yours.</h2>
               <p className="mt-3 max-w-[52ch] text-[16px] text-gray-300">
-                The wheel covers the basics. Everything else lives on the board's
-                own web page,{" "}
+                Your board has its own web page at{" "}
                 <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.92em] text-white">
                   vizspot.local
                 </code>
-                . The controls guide walks through it section by section, with a
-                picture of each.
+                . Open it on any phone or computer on your WiFi to change what the
+                panel shows and how it looks. The controls guide explains every
+                setting, with a picture of each section.
               </p>
               <ul className="mt-5 grid gap-2 text-[15px] text-gray-200">
                 {[
