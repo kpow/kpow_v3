@@ -140,19 +140,12 @@ function Step({ index, children }: { index: number; children: React.ReactNode })
   );
 }
 
-// Decorative 8x8 "pixel cover" for the hero; deterministic so it doesn't flicker on render.
-const pixels = Array.from({ length: 64 }, (_, i) => {
-  const x = i % 8, y = Math.floor(i / 8);
-  const hue = (200 + x * 18 + y * 9) % 360;
-  const light = 34 + ((x * 7 + y * 11) % 5) * 7;
-  return `hsl(${hue} 72% ${light}%)`;
-});
-
 export default function VizSpotGuide() {
   return (
     <>
       <SEO
         title="vizspot"
+        image="/images/vizspot-on.jpg"
         description="vizSpot: a 64x64 LED board that shows what you're playing on Spotify, reacts to the music, and sets up from your phone."
       />
 
@@ -181,12 +174,55 @@ export default function VizSpotGuide() {
             </div>
           </div>
           <div className="grid place-items-center rounded-xl bg-[#0e1014] p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,.05),0_18px_50px_rgba(0,0,0,.28)] sm:p-7">
-            <div className="grid w-full max-w-[280px] grid-cols-8 gap-[3px]" aria-hidden="true">
-              {pixels.map((c, i) => (
-                <span key={i} className="aspect-square rounded-[2px]" style={{ backgroundColor: c }} />
-              ))}
-            </div>
-            <p className="mt-4 font-slackey text-2xl text-white">vizSpot</p>
+            <video
+              src="/images/vizspot-hero.mp4"
+              poster="/images/vizspot-hero-poster.jpg"
+              width={900}
+              height={792}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-label="A vizSpot board on a desk, its LED panel showing music"
+              className="block h-auto w-full max-w-[420px] rounded-lg"
+            />
+          </div>
+        </section>
+
+        {/* OFF AND ON */}
+        <section className="mt-12">
+          <SectionHeading>off and on</SectionHeading>
+          <div className="mt-5 grid gap-3.5 sm:grid-cols-2">
+            <figure className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+              <img
+                src="/images/vizspot-off.jpg"
+                width={1400}
+                height={1388}
+                loading="lazy"
+                alt="A vizSpot board switched off: a frosted grey panel in a black frame with two skull logos, on a black stand"
+                className="block h-auto w-full"
+              />
+              <figcaption className="px-4 py-3 text-sm text-muted-foreground">
+                <b className="text-gray-900">Off.</b> A frosted panel in a black
+                frame, quiet on a shelf.
+              </figcaption>
+            </figure>
+            <figure className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+              <img
+                src="/images/vizspot-on.jpg"
+                width={1400}
+                height={1285}
+                loading="lazy"
+                alt="The same board switched on, showing De La Soul's The Magic Number cover with the artist along the top and the song along the bottom"
+                className="block h-auto w-full"
+              />
+              <figcaption className="px-4 py-3 text-sm text-muted-foreground">
+                <b className="text-gray-900">On.</b> The diffuser blends 4,096
+                LEDs into the cover of whatever's playing, with the artist on top
+                and the song along the bottom.
+              </figcaption>
+            </figure>
           </div>
         </section>
 

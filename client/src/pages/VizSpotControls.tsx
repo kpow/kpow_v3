@@ -554,6 +554,7 @@ export default function VizSpotControls() {
     <>
       <SEO
         title="vizspot controls"
+        image="/images/vizspot-on.jpg"
         description="A section-by-section guide to the vizSpot control page: modes, effects, microphone, Spotify, power and WiFi settings."
       />
 
