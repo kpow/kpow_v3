@@ -26,7 +26,8 @@ const ROW_CAP = 2000;
 const WIZARD_DIR = path.join(process.cwd(), "client", "public", "vizspot");
 const WIZARD_CSP =
   "default-src 'self'; connect-src 'self' https://accounts.spotify.com https://api.spotify.com; " +
-  "img-src 'self' data: https://i.scdn.co; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'";
+  "img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+  "font-src https://fonts.gstatic.com; frame-ancestors 'none'";
 
 // --- storage -----------------------------------------------------------------
 

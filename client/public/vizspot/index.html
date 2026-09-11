@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Connect your vizSpot</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--paper:#f2efe6;--card:#fff;--yellow:#ffd23f;--green:#1db954;--muted:#555;--red:#c0003c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.45 "Helvetica Neue",Arial,sans-serif}
+main{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;align-items:baseline;justify-content:space-between;border-bottom:4px solid var(--ink);padding-bottom:8px;margin-bottom:18px}
+.wordmark{font-family:Slackey,"Helvetica Neue",Arial,sans-serif;font-size:36px;line-height:1}
+header small{font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+section{background:var(--card);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:18px 16px;margin-bottom:18px}
+section.hero{background:var(--yellow)}
+h1{font-size:24px;line-height:1.15;margin:0 0 10px;text-transform:uppercase;letter-spacing:-.01em;font-weight:900}
+p{margin:8px 0}
+ol{padding-left:22px;margin:10px 0}
+ol li{margin:12px 0}
+a{color:var(--ink)}
+.btn{display:block;width:100%;background:var(--green);color:var(--ink);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:14px 16px;font:900 17px/1.2 inherit;font-family:inherit;text-transform:uppercase;letter-spacing:.03em;text-align:center;cursor:pointer;margin-top:14px;border-radius:0}
+.btn:active{transform:translate(4px,4px);box-shadow:none}
+.btn.secondary{background:var(--card)}
+.link{background:none;border:0;padding:8px 0;margin-top:8px;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;cursor:pointer}
+input[type=text]{width:100%;font:800 20px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.06em;padding:12px;border:3px solid var(--ink);border-radius:0;background:var(--card)}
+.row{display:flex;gap:8px;align-items:stretch}
+.row input{flex:1;min-width:0}
+.row .btn{width:auto;margin-top:0;padding:10px 12px;font-size:14px;box-shadow:3px 3px 0 var(--ink)}
+code.big{display:block;font:800 15px/1.3 ui-monospace,Menlo,monospace;background:var(--ink);color:var(--yellow);padding:10px;word-break:break-all;margin:8px 0}
+.boardcode{font:900 24px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.06em;background:var(--ink);color:var(--green);padding:10px 12px;display:inline-block;margin:6px 0}
+.msg{min-height:1.2em;font-weight:700}
+.msg.err{color:var(--red)}
+.muted{color:var(--muted);font-size:15px}
+.steps{list-style:none;padding:0;margin:10px 0}
+.steps li{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:2px solid var(--ink);font-weight:800}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:"";width:18px;height:18px;border:3px solid var(--ink);flex:none;background:var(--card)}
+.steps li.doing::before{background:var(--yellow);animation:blink 1s steps(2) infinite}
+.steps li.done::before{background:var(--green)}
+@keyframes blink{50%{background:var(--card)}}
+footer{font-size:13px;color:var(--muted);text-align:center;margin-top:24px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header><span class="wordmark">vizSpot</span><small>Connect Spotify</small></header>
+
+<div data-screen="loading"><section><p>Loading…</p></section></div>
+
+<div data-screen="enter" hidden>
+<section class="hero">
+<h1>Connect your board</h1>
+<p>Point your phone camera at the square code on your vizSpot and tap the link.</p>
+<p>Or type the 16-character code the board shows:</p>
+<input type="text" id="enter-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD EFGH JKMN PQRS" maxlength="24">
+<p class="msg" id="enter-msg"></p>
+<button class="btn" id="enter-go">Continue</button>
+</section>
+</div>
+
+<div data-screen="landing" hidden>
+<section class="hero">
+<h1>Finding your board</h1>
+<div class="boardcode" id="code-shown"></div>
+<p class="msg" id="landing-msg">Checking…</p>
+</section>
+</div>
+
+<div data-screen="welcome" hidden>
+<section class="hero">
+<h1>Welcome back</h1>
+<p>Your board remembers your Spotify app. One tap to sign in again.</p>
+<button class="btn" id="welcome-go">Reconnect Spotify</button>
+<button class="link" id="welcome-other">Use a different Spotify app</button>
+</section>
+</div>
+
+<div data-screen="premium" hidden>
+<section class="hero">
+<h1>Before you start</h1>
+<p>You'll need <b>Spotify Premium</b> and about <b>5 minutes</b>, all on this phone.</p>
+<p>Your board talks to Spotify through a small personal app that you create. Spotify only lets Premium accounts create one.</p>
+<button class="btn" id="premium-go">I have Premium</button>
+</section>
+</div>
+
+<div data-screen="create" hidden>
+<section>
+<h1>Create your Spotify app</h1>
+<ol>
+<li><a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener"><b>Open Spotify for Developers</b></a> and sign in with the Spotify account you listen on. Accept the terms, and confirm your email if it asks.</li>
+<li>Tap <b>Create app</b>.</li>
+<li>App name: <b>vizSpot</b>. App description: <b>My vizSpot board</b>.</li>
+<li>Redirect URI: copy this exactly, paste it in, then tap <b>Add</b>.
+<code class="big" id="redirect-uri"></code>
+<button class="btn secondary" id="copy-redirect">Copy</button></li>
+<li>Tick <b>Web API</b>, tick the terms box, and tap <b>Save</b>.</li>
+</ol>
+<button class="btn" id="create-go">I've created it</button>
+</section>
+</div>
+
+<div data-screen="cid" hidden>
+<section>
+<h1>Copy your Client ID</h1>
+<p>In your new app, open <b>Settings</b> and copy the <b>Client ID</b>: 32 letters and numbers.</p>
+<p class="muted">Not the Client secret. You'll never need that.</p>
+<div class="row"><input type="text" id="cid-input" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Client ID" maxlength="40"><button class="btn secondary" id="cid-paste">Paste</button></div>
+<p class="msg" id="cid-msg"></p>
+<button class="btn" id="cid-go">Continue</button>
+</section>
+</div>
+
+<div data-screen="connect" hidden>
+<section class="hero">
+<h1>Sign in to Spotify</h1>
+<p>Tap Connect, then <b>Agree</b> on Spotify's page. You'll come straight back here.</p>
+<button class="btn" id="connect-go">Connect with Spotify</button>
+<p class="muted">If Spotify shows <b>Invalid redirect URI</b>, recheck step 4 of the setup. If it says <b>Invalid client</b>, recheck the Client ID.</p>
+<button class="link" id="connect-back">Change the Client ID</button>
+</section>
+</div>
+
+<div data-screen="progress" hidden>
+<section class="hero">
+<h1>Connecting</h1>
+<ul class="steps">
+<li id="step-signin">Signed in to Spotify</li>
+<li id="step-check">Checking your account</li>
+<li id="step-send">Sending to your board</li>
+<li id="step-board">Board is connecting</li>
+</ul>
+<p class="msg" id="progress-msg"></p>
+</section>
+</div>
+
+<div data-screen="done" hidden>
+<section class="hero">
+<h1>You're connected</h1>
+<p>Play something on Spotify and it'll show up on your board in a few seconds.</p>
+<p class="muted">Spotify asks for a fresh sign-in every 6 months. When the board shows a code again, scan it. It takes about 30 seconds.</p>
+</section>
+</div>
+
+<div data-screen="already" hidden>
+<section class="hero">
+<h1>Already connected</h1>
+<p>This board is already signed in to Spotify. Nothing more to do.</p>
+</section>
+</div>
+
+<div data-screen="error" hidden>
+<section>
+<h1>Something needs fixing</h1>
+<p class="msg err" id="error-msg"></p>
+<button class="btn" id="error-action"></button>
+</section>
+</div>
+
+<footer>Your Spotify sign-in is encrypted for your board before it leaves this page.</footer>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
