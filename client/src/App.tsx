@@ -20,6 +20,9 @@ import NotFound from "@/pages/not-found";
 import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
 import LedArt from "@/pages/LedArt";
+import Builds from "@/pages/Builds";
+import BuildDetail from "@/pages/BuildDetail";
+import Recently from "@/pages/Recently";
 import VizSpotGuide from "@/pages/VizSpotGuide";
 import VizSpotControls from "@/pages/VizSpotControls";
 import { Route as WouterRoute } from "wouter";
@@ -48,6 +51,10 @@ function Router() {
         <Route path="/donut-tour/:city/:state" component={DonutShops} />
         <Route path="/itunez" component={ITunezPage} />
         <Route path="/led" component={LedArt} />
+        {/* /builds/recently must precede /builds/:slug — first match wins in wouter */}
+        <Route path="/builds/recently" component={Recently} />
+        <Route path="/builds/:slug" component={BuildDetail} />
+        <Route path="/builds" component={Builds} />
         <Route path="/vizspot/guide" component={VizSpotGuide} />
         <Route path="/vizspot/controls" component={VizSpotControls} />
         <Route path="/auth" component={AuthPage} />

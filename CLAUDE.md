@@ -64,3 +64,26 @@ Main tables:
 - All API routes proxy external services to protect keys
 - Frontend routes defined in `/client/src/App.tsx`
 - Shared TypeScript types in `/types` directory
+## Build Log (`/builds`)
+
+The only section with **no database behind it**. Content lives as markdown +
+committed images in a separate repo, https://github.com/kpow/kpow-buildlog, and is
+baked in at build time.
+
+```
+kpow-buildlog (markdown + jpgs)
+  -> scripts/sync-buildlog.mjs      (runs first in `npm run build`)
+  -> client/public/builds.json      + client/public/buildlog/<slug>/media/
+  -> React reads /builds.json
+```
+
+- `npm run buildlog` runs the sync on its own. It prefers `BUILDLOG_PATH`, then a
+  local checkout beside this repo, then a shallow clone of `BUILDLOG_URL` — so
+  production always takes the latest push and a content push republishes the site.
+- Both outputs are generated and gitignored. Never hand-edit `builds.json`.
+- Routes: `/builds`, `/builds/recently`, `/builds/:slug` (recently must stay
+  ordered before `:slug` in `App.tsx` — wouter takes the first match).
+- Styling is in `client/src/components/buildlog/buildlog.css`. The section's
+  gemtone purple is **scoped** — every rule sits under `.buildlog`, so the rest of
+  the site keeps its blue accent. Keep it that way.
+- Design source of truth: `comps/design-b-light-photos.html` in the content repo.

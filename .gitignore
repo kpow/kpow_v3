@@ -18,3 +18,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+# build log — generated at build time by scripts/sync-buildlog.mjs
+.buildlog-cache/
+client/public/builds.json
+client/public/buildlog/

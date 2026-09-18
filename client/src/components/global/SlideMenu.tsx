@@ -21,6 +21,7 @@ import {
   Mail,
   Lightbulb,
   AudioLines,
+  Hammer,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -96,6 +97,15 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       icon: <Lightbulb className="w-4 h-4" />,
       label: "led art",
       href: "/led",
+    },
+    {
+      icon: <Hammer className="w-4 h-4" />,
+      label: "build log",
+      href: "/builds",
+      children: [
+        { label: "all builds", href: "/builds", native: false },
+        { label: "recently", href: "/builds/recently", native: false },
+      ],
     },
     {
       icon: <AudioLines className="w-4 h-4" />,
