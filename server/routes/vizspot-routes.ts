@@ -114,9 +114,23 @@ function guard(req: Request, res: Response): string | null {
   return id;
 }
 
+// A coarse category in the 500 body lets a relay failure be diagnosed from outside
+// (no app logs needed) without exposing hosts, addresses or error text.
+function failKind(e: unknown): string {
+  const err = e as { code?: string; message?: string };
+  const m = (err?.message || "").toLowerCase();
+  if (m.includes("timeout") || err?.code === "ETIMEDOUT") return "db-timeout";
+  if (m.includes("pg_hba") || m.includes("no encryption")) return "db-access-denied";
+  if (err?.code === "28P01" || m.includes("password")) return "db-auth";
+  if (err?.code === "ECONNREFUSED" || err?.code === "ENOTFOUND" || err?.code === "EAI_AGAIN") return "db-unreachable";
+  if (err?.code === "53300" || m.includes("too many")) return "db-too-many-connections";
+  if (m.includes("terminated") || m.includes("econnreset")) return "db-connection-dropped";
+  return err?.code ? `db-${err.code}` : "other";
+}
+
 const fail500 = (res: Response, where: string) => (e: unknown) => {
   console.error(`[vizspot] ${where}`, e);
-  if (!res.headersSent) res.status(500).json({ error: "server error" });
+  if (!res.headersSent) res.status(500).json({ error: "server error", kind: failKind(e) });
 };
 
 // --- routes --------------------------------------------------------------------
