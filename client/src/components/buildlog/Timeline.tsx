@@ -41,7 +41,7 @@ export function Timeline({ entries }: { entries: Entry[] }) {
           </div>
           {entry.media?.map((shot) => (
             <figure className="entry-fig" key={shot.src}>
-              <Zoomable src={shot.src} caption={shot.caption} />
+              <Zoomable src={shot.src} poster={shot.poster} caption={shot.caption} />
               {shot.caption && <figcaption>{shot.caption}</figcaption>}
             </figure>
           ))}

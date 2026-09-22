@@ -9,6 +9,7 @@ export type BuildStatus = "active" | "shipped" | "shelved" | "live";
 export interface BuildMedia {
   src: string;
   caption: string;
+  poster?: string;
 }
 
 export interface BuildEntry {
@@ -44,7 +45,7 @@ export interface Build {
   body: string;
   stats: BuildStats;
   git: unknown | null;
-  picturesOverTime: { date: string; src: string; caption: string }[];
+  picturesOverTime: { date: string; src: string; caption: string; poster?: string }[];
   lastEntry: string | null;
   entries: BuildEntry[];
 }
