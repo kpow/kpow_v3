@@ -271,24 +271,8 @@
 .buildlog .build-body { max-width: var(--measure); margin: 24px 0 8px; }
 .buildlog .build-body p { color: var(--gray-1); margin: 0 0 14px; }
 .buildlog .build-body strong { color: var(--ink); font-weight: 700; }
-.buildlog .build-body h2 {
-  font-family: "Slackey", cursive;
-  font-size: 16px;
-  color: var(--ink);
-  margin: 24px 0 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-}
-.buildlog .build-body h3 {
-  font-family: "Slackey", cursive;
-  font-size: 14px;
-  color: var(--ink);
-  margin: 18px 0 8px;
-}
-.buildlog .build-body ul,
-.buildlog .build-body ol { margin: 0 0 14px; padding-left: 18px; }
-.buildlog .build-body li { color: var(--gray-1); margin-bottom: 7px; }
-.buildlog .build-body ul li strong { color: var(--amethyst-deep); }
+/* headings, lists, callouts and tables are shared by both markdown scopes —
+   see "Markdown structure" below */
 
 /* inline code inside any markdown body */
 .buildlog .md code {
@@ -470,6 +454,134 @@
   font-family: var(--mono);
 }
 
+/* ---------- Markdown structure — shared by .build-body and .entry-body ----------
+   Tailwind's preflight strips list markers, heading sizes and block margins
+   site-wide, so everything here re-establishes them inside .md only. Sizes are
+   in em so the 15px build body and the 14px entry body both scale. Rules that
+   override p or li use > so they beat .entry-body p / .build-body p, which sit
+   on either side of this block at the same specificity. */
+
+.buildlog .md ul,
+.buildlog .md ol { margin: 0 0 14px; padding-left: 22px; }
+.buildlog .md ul { list-style: disc outside; }
+.buildlog .md ol { list-style: decimal outside; }
+.buildlog .md ul ul { list-style: circle outside; }
+.buildlog .md ul ul ul { list-style: square outside; }
+.buildlog .md li { margin: 0 0 6px; }
+.buildlog .md li::marker { color: var(--amethyst); }
+.buildlog .md ol > li::marker { font-family: var(--mono); font-size: .88em; }
+.buildlog .md li > ul,
+.buildlog .md li > ol { margin: 6px 0 0; }
+.buildlog .md li > p { margin: 0 0 6px; }
+.buildlog .md li > :last-child { margin-bottom: 0; }
+/* a bolded lead-in on a bullet reads as that item's label */
+.buildlog .md li > strong:first-child { color: var(--amethyst-deep); }
+
+/* GFM task lists carry their own classes from mdast-util-to-hast */
+.buildlog .md .contains-task-list { list-style: none; padding-left: 2px; }
+.buildlog .md .task-list-item input { margin-right: 7px; accent-color: var(--amethyst); }
+
+.buildlog .md h2,
+.buildlog .md h3,
+.buildlog .md h4 { font-family: "Slackey", cursive; color: var(--ink); line-height: 1.25; }
+.buildlog .md h2 {
+  font-size: 1.06em;
+  margin: 22px 0 9px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.buildlog .md h3 { font-size: .98em; margin: 16px 0 7px; }
+.buildlog .md h4 {
+  font-family: var(--mono);
+  font-size: .8em;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--amethyst-deep);
+  margin: 14px 0 6px;
+}
+.buildlog .md > :is(h2, h3, h4):first-child { margin-top: 0; }
+
+/* callout: "> **Trap:** motor and logic on one ground rail." */
+.buildlog .md blockquote {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  background: var(--tint);
+  border: 1px solid var(--tint-border);
+  border-left: 3px solid var(--amethyst);
+  border-radius: 0 10px 10px 0;
+  color: var(--gray-1);
+}
+.buildlog .md blockquote > p { margin: 0 0 8px; }
+.buildlog .md blockquote > :last-child { margin-bottom: 0; }
+.buildlog .md blockquote > p:first-child > strong:first-child {
+  font-family: var(--mono);
+  font-size: .8em;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--amethyst-deep);
+  margin-right: 5px;
+}
+
+.buildlog .md hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--tint-border), transparent);
+  margin: 20px 0;
+}
+
+/* tables — the wrapper div comes from Markdown.tsx so a wide table scrolls
+   inside its own box instead of widening the page */
+.buildlog .md-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 0 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tint-border) transparent;
+}
+.buildlog .md-table-wrap::-webkit-scrollbar { height: 8px; }
+.buildlog .md-table-wrap::-webkit-scrollbar-thumb { background: var(--tint-border); border-radius: 8px; }
+.buildlog .md table { border-collapse: collapse; width: 100%; font-size: .92em; }
+.buildlog .md thead th {
+  font-family: var(--mono);
+  font-size: .8em;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--amethyst-deep);
+  background: var(--tint);
+  padding: 7px 11px;
+  border-bottom: 1px solid var(--tint-border);
+}
+.buildlog .md td {
+  padding: 7px 11px;
+  border-top: 1px solid var(--border);
+  color: var(--gray-1);
+  vertical-align: top;
+}
+.buildlog .md tbody tr:first-child td { border-top: none; }
+.buildlog .md td:first-child { white-space: nowrap; color: var(--ink); font-weight: 600; }
+.buildlog .md :is(th, td)[align="right"] { text-align: right; }
+.buildlog .md :is(th, td)[align="center"] { text-align: center; }
+
+/* an inline image in a body, as opposed to an .entry-fig / .hero-band figure */
+.buildlog .md img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 4px 0 14px;
+  border: 1px solid var(--tint-border);
+  border-radius: 10px;
+}
+
+/* a long path or URL must not push the page wide */
+.buildlog .md code,
+.buildlog .md a { overflow-wrap: anywhere; }
+
 /* ---------- Index grid ---------- */
 .buildlog .index-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .buildlog .card {
@@ -627,4 +739,9 @@
 @media (max-width: 460px) {
   .buildlog .index-grid { grid-template-columns: 1fr; }
   .buildlog .stat-strip { grid-template-columns: repeat(2, 1fr); }
+  .buildlog .md table { font-size: .86em; }
+  .buildlog .md thead th,
+  .buildlog .md td { padding: 6px 8px; }
+  .buildlog .md ul,
+  .buildlog .md ol { padding-left: 18px; }
 }
