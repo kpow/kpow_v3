@@ -4,7 +4,7 @@ import { SetlistGame } from "@/components/home/setlist-game-static";
 import { CubeFrame } from "@/components/home/cube-frame";
 import { BookFeed } from "@/components/home/BookFeed";
 import { GitHubSection } from "@/components/home/GitHubSection";
-import { InstagramCarousel } from "@/components/instagram/InstagramCarousel";
+import { BuildsSection } from "@/components/home/BuildsSection";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
@@ -119,10 +119,14 @@ export default function Home() {
         </div>
         <HorizontalDivider />
 
-        {/* {instagram} */}
+        {/* {builds} */}
         <div>
-          <SectionHeader title="k-shows" />
-          <InstagramCarousel />
+          <SectionHeader
+            title="builds"
+            buttonText="more builds"
+            linkHref="builds"
+          />
+          <BuildsSection />
         </div>
         <HorizontalDivider />
 
