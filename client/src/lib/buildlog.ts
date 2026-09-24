@@ -6,10 +6,15 @@ import { useQuery } from "@tanstack/react-query";
 
 export type BuildStatus = "active" | "shipped" | "shelved" | "live";
 
+/** A still can declare what it is; video badges itself off the .mp4. */
+export type MediaKind = "render" | "screenshot" | "diagram";
+
 export interface BuildMedia {
   src: string;
-  caption: string;
+  /** Optional on purpose: a caption carries a fact the photo can't, or it isn't there. */
+  caption?: string;
   poster?: string;
+  kind?: MediaKind;
 }
 
 export interface BuildEntry {
@@ -45,7 +50,7 @@ export interface Build {
   body: string;
   stats: BuildStats;
   git: unknown | null;
-  picturesOverTime: { date: string; src: string; caption: string; poster?: string }[];
+  picturesOverTime: (BuildMedia & { date: string })[];
   lastEntry: string | null;
   entries: BuildEntry[];
 }

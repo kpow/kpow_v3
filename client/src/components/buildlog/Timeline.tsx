@@ -39,9 +39,15 @@ export function Timeline({ entries }: { entries: Entry[] }) {
           <div className="entry-body">
             <Markdown>{entry.body || ""}</Markdown>
           </div>
-          {entry.media?.map((shot) => (
+          {entry.media?.map((shot, i, all) => (
             <figure className="entry-fig" key={shot.src}>
-              <Zoomable src={shot.src} poster={shot.poster} caption={shot.caption} />
+              <Zoomable
+                src={shot.src}
+                alt={all.length > 1 ? `${entry.title} (${i + 1} of ${all.length})` : entry.title}
+                poster={shot.poster}
+                caption={shot.caption}
+                kind={shot.kind}
+              />
               {shot.caption && <figcaption>{shot.caption}</figcaption>}
             </figure>
           ))}

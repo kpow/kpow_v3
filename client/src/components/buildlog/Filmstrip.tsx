@@ -4,7 +4,7 @@
 import type { Build } from "@/lib/buildlog";
 import { Zoomable } from "./Lightbox";
 
-export function Filmstrip({ shots }: { shots: Build["picturesOverTime"] }) {
+export function Filmstrip({ shots, buildTitle }: { shots: Build["picturesOverTime"]; buildTitle: string }) {
   if (!shots.length) return null;
 
   return (
@@ -18,10 +18,16 @@ export function Filmstrip({ shots }: { shots: Build["picturesOverTime"] }) {
       <div className="filmstrip">
         {shots.map((shot) => (
           <figure className="frame" key={`${shot.date}-${shot.src}`}>
-            <Zoomable src={shot.src} poster={shot.poster} caption={shot.caption} />
+            <Zoomable
+              src={shot.src}
+              alt={`${buildTitle} — ${shot.date}`}
+              poster={shot.poster}
+              caption={shot.caption}
+              kind={shot.kind}
+            />
             <figcaption className="frame-meta">
               <div className="frame-date">{shot.date}</div>
-              <div className="frame-cap">{shot.caption}</div>
+              {shot.caption && <div className="frame-cap">{shot.caption}</div>}
             </figcaption>
           </figure>
         ))}

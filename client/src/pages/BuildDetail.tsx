@@ -85,7 +85,9 @@ export default function BuildDetail() {
     );
   }
 
-  const heroCaption = build.picturesOverTime.find((p) => p.src === build.hero)?.caption || build.title;
+  // The hero file is usually also attached to an entry; borrow that caption when
+  // it has one. No caption means no bar, rather than a bar repeating the title.
+  const heroShot = build.picturesOverTime.find((p) => p.src === build.hero);
 
   return (
     <BuildLogShell>
@@ -148,10 +150,17 @@ export default function BuildDetail() {
       {/* hero */}
       {build.hero && (
         <figure className="hero-band">
-          <Zoomable src={build.hero} caption={heroCaption} />
-          <figcaption className="hero-cap">
-            <span className="dotmk">◆</span> {heroCaption}
-          </figcaption>
+          <Zoomable
+            src={build.hero}
+            alt={build.title}
+            caption={heroShot?.caption}
+            kind={heroShot?.kind}
+          />
+          {heroShot?.caption && (
+            <figcaption className="hero-cap">
+              <span className="dotmk">◆</span> {heroShot.caption}
+            </figcaption>
+          )}
         </figure>
       )}
 
@@ -159,7 +168,7 @@ export default function BuildDetail() {
       {build.body && <Markdown className="build-body">{build.body}</Markdown>}
 
       {/* WIP pix */}
-      <Filmstrip shots={build.picturesOverTime} />
+      <Filmstrip shots={build.picturesOverTime} buildTitle={build.title} />
 
       {/* devlog */}
       {!!build.entries.length && (

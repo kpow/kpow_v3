@@ -2,17 +2,30 @@
 // open the same overlay. Closes on backdrop click, the X, or Escape.
 // .mp4/.webm media plays as a looping muted <video> (same attributes as the
 // LED Art hero), with the poster still shown until it loads.
+//
+// A caption is optional — it exists only when it carries something the photo
+// can't. `alt` is required and never visible: it keeps every image named for
+// screen readers whether or not there's a caption. Media that needs to say what
+// it is gets a badge instead of caption text: video off the extension, stills
+// off `kind`.
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import type { MediaKind } from "@/lib/buildlog";
 
 interface Shot {
   src: string;
-  caption: string;
+  alt: string;
+  caption?: string;
   poster?: string;
+  kind?: MediaKind;
 }
 
 const isVideo = (src: string) => /\.(mp4|webm)$/i.test(src);
+
+function badgeFor(src: string, kind?: MediaKind) {
+  return isVideo(src) ? "video" : kind;
+}
 
 const LightboxContext = createContext<(shot: Shot) => void>(() => {});
 
@@ -61,10 +74,10 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
                   loop
                   muted
                   playsInline
-                  aria-label={shot.caption}
+                  aria-label={shot.alt}
                 />
               ) : (
-                <img src={shot.src} alt={shot.caption} />
+                <img src={shot.src} alt={shot.alt} />
               )}
               {shot.caption && (
                 <div className="lightbox-cap">
@@ -82,39 +95,44 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
 /** A photo or video that opens the lightbox when clicked. */
 export function Zoomable({
   src,
+  alt,
   caption,
   poster,
+  kind,
   className,
 }: {
   src: string;
-  caption: string;
+  /** Never rendered on screen. Required so no call site can drop the accessible name. */
+  alt: string;
+  caption?: string;
   poster?: string;
+  kind?: MediaKind;
   className?: string;
 }) {
   const open = useLightbox();
-  if (isVideo(src)) {
-    return (
-      <video
-        src={src}
-        poster={poster}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
-        aria-label={caption}
-        className={className}
-        onClick={() => open({ src, caption, poster })}
-      />
-    );
-  }
+  const label = caption || alt;
+  const badge = badgeFor(src, kind);
+  const zoom = () => open({ src, alt: label, caption, poster, kind });
+
   return (
-    <img
-      src={src}
-      alt={caption}
-      loading="lazy"
-      className={className}
-      onClick={() => open({ src, caption })}
-    />
+    <span className="media-wrap">
+      {isVideo(src) ? (
+        <video
+          src={src}
+          poster={poster}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          aria-label={label}
+          className={className}
+          onClick={zoom}
+        />
+      ) : (
+        <img src={src} alt={label} loading="lazy" className={className} onClick={zoom} />
+      )}
+      {badge && <span className="media-badge">{badge}</span>}
+    </span>
   );
 }
