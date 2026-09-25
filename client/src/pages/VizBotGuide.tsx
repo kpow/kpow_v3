@@ -247,9 +247,9 @@ function JumpBar({ active }: { active: string }) {
 
 function Hero() {
   const quick = [
-    { t: "New bot?", d: "Start with getting it online.", href: "setup", n: 1 },
-    { t: "Updating?", d: "Four steps, about two minutes.", href: "update", n: 4 },
-    { t: "Stuck?", d: "The usual snags and fixes.", href: "help", n: 6 },
+    { t: "New bot?", d: "Get it on your WiFi.", href: "setup", n: 1 },
+    { t: "Updating?", d: "Four steps, two minutes.", href: "update", n: 4 },
+    { t: "Stuck?", d: "Common problems and fixes.", href: "help", n: 6 },
   ];
   return (
     <section className="border-b border-gray-200 pb-7 md:pb-9 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end lg:gap-12">
@@ -257,7 +257,7 @@ function Hero() {
         <Eyebrow>user guide · firmware {DOC_VERSION}</Eyebrow>
         <h1 className="mb-3.5 font-slackey text-[34px] font-normal leading-[1.08] md:text-[46px]">Getting along with vizBot.</h1>
         <p className="max-w-[52ch] text-base leading-relaxed text-gray-700 md:text-[17px]">
-          Everything after unboxing: get it on your WiFi, learn the gestures, find its web panel, and keep it up to date.
+          How to get it online, use the touch screen and the web panel, and keep it updated.
         </p>
       </div>
       <div className="mt-[22px] grid gap-2 lg:mt-0">
@@ -299,7 +299,7 @@ function Setup() {
   return (
     <section id="setup" className={cn("mt-9 lg:mt-10", sectionCls)}>
       <SectionHeading num={1}>get it online</SectionHeading>
-      <Lead>You need the bot, a phone and your home WiFi. About 5 minutes.</Lead>
+      <Lead>You need the bot, a phone and your WiFi. Takes about 5 minutes.</Lead>
       <div className="grid items-start gap-9 lg:grid-cols-[minmax(0,1fr)_250px]">
         <div>
           <div className="grid gap-2.5">
@@ -310,19 +310,19 @@ function Setup() {
             ))}
           </div>
           <Callout kind="warn" className="mt-4">
-            <b className="font-bold text-gray-900">2.4 GHz WiFi only.</b> The bot has no 5 GHz radio. If your router has
-            separate 2.4 and 5 GHz names, pick the 2.4 one.
+            <b className="font-bold text-gray-900">2.4 GHz only.</b> The ESP32-S3 has no 5 GHz radio. If your router
+            splits the bands into two names, pick the 2.4 one.
           </Callout>
           <Callout className="mt-2.5">
-            <b className="font-bold text-gray-900">Give it a name.</b> In the web panel under WiFi › Device Name, type
-            something like <Code>desk</Code>. After a restart it answers at <Code>vizbot-desk.local</Code>.
+            <b className="font-bold text-gray-900">Name it.</b> In the web panel, set the device name to something like{" "}
+            <Code>desk</Code>. After a restart it's at <Code>vizbot-desk.local</Code>.
           </Callout>
         </div>
         <div className="hidden flex-col items-center lg:flex">
           <DinoFrame src={SCREENS.connect} alt="Settings › Connect showing network, address and IP" className="[--sw:176px]" />
           <p className="mt-3.5 max-w-[30ch] text-center text-[13px] leading-normal text-muted-foreground">
             <b className="font-bold text-gray-900">Settings › Connect</b> shows the address and IP once it's online.
-            Offline, it shows the hotspot steps.
+            Offline it shows the hotspot steps.
           </p>
         </div>
       </div>
@@ -336,8 +336,8 @@ function Touch({ filter }: { filter: Filter }) {
       <section id="touch" className={cn("mt-12 md:mt-14", sectionCls)}>
         <SectionHeading num={2}>the touch screen</SectionHeading>
         <Callout className="mt-5">
-          The Waveshare 1.3 has no touch screen, so the <a href="#web" className={linkCls}>web panel</a> does everything.
-          Pick <b>All boards</b> in “Show notes for” to see the touch section anyway.
+          The 1.3 has no touch screen. Use the <a href="#web" className={linkCls}>web panel</a>. Switch “Show notes
+          for” to <b>All boards</b> if you want to read this section anyway.
         </Callout>
       </section>
     );
@@ -348,7 +348,7 @@ function Touch({ filter }: { filter: Filter }) {
     <section id="touch" className={cn("mt-12 md:mt-14", sectionCls)}>
       <SectionHeading num={2}>the touch screen</SectionHeading>
       <Lead className="mb-1.5">
-        The face owns the screen and everything else is one gesture away. The 1.3 has no touch screen; see{" "}
+        The face gets the whole screen. Everything else is one gesture away. Got a 1.3? It has no touch, see{" "}
         <a href="#boards" className={linkCls}>
           board notes
         </a>
@@ -391,8 +391,8 @@ function Touch({ filter }: { filter: Filter }) {
       <div className="grid items-center gap-7 lg:grid-cols-[minmax(0,1fr)_250px]">
         <div>
           <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-            Swipe up (or press and hold) and the face shrinks to the top while six tiles slide up. The pill at the top
-            shows the bot's address, handy when you've forgotten it.
+            Swipe up or press and hold. The face shrinks to the top and six tiles come up. The pill at the top shows the
+            bot's address for when you forget it.
           </p>
           <div className="grid grid-cols-2 gap-1.5 rounded-xl bg-[#12171D] p-2.5">
             {DOCK_TILES.map((t) => (
@@ -412,7 +412,7 @@ function Touch({ filter }: { filter: Filter }) {
       {/* sheets */}
       <SubHead id="touch-2">scene, mood, light</SubHead>
       <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-        Three dock tiles open a sheet over the bottom of the screen, with the face still live above it.
+        Scene, Mood and Light open a sheet over the bottom half. The face stays live above it so you can see the change.
       </p>
       <div className="-mx-4 flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-4 pb-2.5 pt-1 md:mx-0 md:grid md:grid-cols-3 md:gap-[18px] md:overflow-visible md:p-0">
         {SHEETS.map((s) => (
@@ -429,8 +429,7 @@ function Touch({ filter }: { filter: Filter }) {
       {/* settings */}
       <SubHead id="touch-3">settings</SubHead>
       <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-        Tap <b className="font-bold text-gray-900">More</b> in the dock. Six pages, color-coded the same as the dock
-        tiles.
+        Tap <b className="font-bold text-gray-900">More</b> in the dock. Six pages, same colors as the dock tiles.
       </p>
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_410px]">
         <div className="order-2 overflow-hidden rounded-xl border border-gray-200 bg-white lg:order-1">
@@ -461,10 +460,10 @@ function Touch({ filter }: { filter: Filter }) {
         <>
           <SubHead id="touch-4">CoreS3 and Stackchan</SubHead>
           <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-            Same gestures, sideways. The face stays full size; the dock becomes two rails and adds{" "}
+            Same gestures, turned sideways. The face stays full size and the dock becomes two rails. It adds{" "}
             <b className="font-bold text-gray-900">Sound</b>, plus <b className="font-bold text-gray-900">Head</b> on a
-            Stackchan or <b className="font-bold text-gray-900">Connect</b> on a plain CoreS3. Settings open as a list on
-            the left with the page on the right.
+            Stackchan or <b className="font-bold text-gray-900">Connect</b> on a plain CoreS3. Settings get a category
+            list on the left.
           </p>
           <div className="-mx-4 flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-4 pb-2.5 pt-1 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:p-0 xl:grid-cols-3">
             {shots.map((s) => (
@@ -488,8 +487,8 @@ function WebPanel({ filter }: { filter: Filter }) {
     <section id="web" className={cn("mt-14 md:mt-16", sectionCls)}>
       <SectionHeading num={3}>the web panel</SectionHeading>
       <Lead>
-        Open <Code>http://vizbot-xxxx.local</Code> on any phone or computer on the same WiFi. It has everything the touch
-        screen has, plus a few things it doesn't.
+        Open <Code>http://vizbot-xxxx.local</Code> from anything on the same WiFi. It does everything the touch screen
+        does, plus the stuff that needs typing.
       </Lead>
       <div className="grid gap-2 md:grid-cols-2">
         {items.map((p) => {
@@ -515,7 +514,7 @@ function Update({ filter }: { filter: Filter }) {
   return (
     <section id="update" className={cn("mt-14 md:mt-16", sectionCls)}>
       <SectionHeading num={4}>updating firmware</SectionHeading>
-      <Lead>Updates go over WiFi and take about two minutes. Your WiFi and settings stay put.</Lead>
+      <Lead>Over WiFi, about two minutes. Your WiFi and settings survive it.</Lead>
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_330px]">
         <div>
           <div className="grid gap-2.5">
@@ -526,8 +525,8 @@ function Update({ filter }: { filter: Filter }) {
             ))}
           </div>
           <Callout className="mt-3.5">
-            <b className="font-bold text-gray-900">Never run vizBot on this board before?</b> The first install needs a USB
-            cable, once, and uses the <Code>-factory.bin</Code>. See{" "}
+            <b className="font-bold text-gray-900">First time on this board?</b> The first install is over USB with the{" "}
+            <Code>-factory.bin</Code>. See{" "}
             <VbLink href="/vizbot/releases#usb" className={linkCls}>
               First install over USB
             </VbLink>{" "}
@@ -548,7 +547,7 @@ function BoardNotes({ filter, setFilter }: { filter: Filter; setFilter: (f: Filt
   return (
     <section id="boards" className={cn("mt-14 md:mt-16", sectionCls)}>
       <SectionHeading num={5}>board notes</SectionHeading>
-      <Lead>What's different on each board, and how to tell which one you have.</Lead>
+      <Lead>What's different on each board, and how to tell which one you've got.</Lead>
       <div className="mb-3 flex items-center gap-2.5 lg:hidden">
         <label htmlFor="vb-board-notes" className="flex-none text-[13px] font-medium text-gray-700">
           Your board
@@ -572,7 +571,7 @@ function BoardNotes({ filter, setFilter }: { filter: Filter; setFilter: (f: Filt
                 </li>
               ))}
               <li className="mb-1.5">
-                Update file: the one with <Code>{b.token}</Code> in its name.
+                Update file: the one with <Code>{b.token}</Code> in the name.
               </li>
             </ul>
           </article>
@@ -630,7 +629,7 @@ export default function VizBotGuide() {
     <>
       <SEO
         title="vizBot user guide"
-        description="Get vizBot on your WiFi, learn the touch gestures, find its web panel, update the firmware over WiFi, and fix the usual snags."
+        description="Get vizBot on your WiFi, use the touch screen and web panel, update the firmware, fix common problems."
         image={SCREENS.dock}
         keywords="vizBot, user guide, ESP32, Stackchan, CoreS3, firmware update"
       />

@@ -39,8 +39,8 @@ export function FilenameAnatomy({ board = "lcd169", version }: { board?: BoardId
         <Seg text=".bin" />
       </div>
       <p className="mt-4 text-[13.5px] leading-relaxed text-gray-300">
-        The update page only takes a file whose name contains its own board. Anything else is refused with “Wrong
-        board type” and nothing changes.
+        The update page only takes a file with its own board in the name. Anything else gets “Wrong board type” and
+        nothing changes.
       </p>
       <div className="mt-4 flex items-start gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5">
         <CircleX className="mt-0.5 h-4 w-4 flex-none text-red-400" aria-hidden="true" />
@@ -49,8 +49,8 @@ export function FilenameAnatomy({ board = "lcd169", version }: { board?: BoardId
             {factoryFileName(b, version)}
           </span>
           <br />
-          <b className="text-white">Never the -factory.bin.</b> It has your board's name in it too, but it's for a
-          first install over USB only.
+          <b className="text-white">Never the -factory.bin.</b> It has your board's name in it too, but it's only for a
+          first install over USB.
         </p>
       </div>
     </Stage>

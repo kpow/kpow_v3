@@ -63,9 +63,8 @@ function Hero() {
           Hi. I live on your desk.
         </h1>
         <p className="mb-6 max-w-[46ch] text-base leading-relaxed text-gray-700 md:text-lg">
-          vizBot is firmware that gives a small ESP32 screen a face and a personality. It pulls faces, mutters in
-          speech bubbles, keeps the time and the weather, and paints slow light shows behind its eyes. Poke it and it
-          pokes back.
+          vizBot is firmware that gives a little ESP32 screen a face and a personality. It makes faces, mutters in
+          speech bubbles and keeps an eye on the time and weather. Poke it and it pokes back.
         </p>
         <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
           <Btn href="/vizbot/releases" icon={<Download className="h-[17px] w-[17px]" />}>
@@ -107,7 +106,7 @@ function Features() {
     <section className="mt-12 md:mt-16">
       <SectionHeading>what it's like</SectionHeading>
       <Lead>
-        Part pet, part desk clock, part lava lamp. Everything below is from real screens running {DOC_VERSION}.
+        Part pet, part desk clock, part lava lamp. These are real screens running {DOC_VERSION}.
       </Lead>
       <div className="grid gap-4 md:grid-cols-2">
         {FEATURES.map((f) => (
@@ -139,8 +138,7 @@ function TouchBand() {
           <Eyebrow className="text-[#FFD23F]">touch it</Eyebrow>
           <h2 className="font-slackey text-[28px] font-normal leading-tight text-white md:text-4xl">One swipe away.</h2>
           <p className="mt-3 max-w-[50ch] text-[15px] leading-relaxed text-gray-300 md:text-base">
-            The face owns the screen. Everything else sits under a gesture: moods, scenes, brightness, and a full
-            settings menu on the bot itself.
+            The face gets the whole screen. Moods, scenes, brightness and all the settings are one gesture away.
           </p>
           <ul className="mt-5 grid gap-2.5">
             {GESTURES_SHORT.map((g) => (
@@ -155,7 +153,7 @@ function TouchBand() {
             ))}
           </ul>
           <p className="mt-5 max-w-[50ch] text-sm leading-relaxed text-gray-400">
-            No touch screen? Everything is also on the bot's own web page at <Code dark>vizbot-xxxx.local</Code>.
+            No touch screen? It all works from the bot's web page too, at <Code dark>vizbot-xxxx.local</Code>.
           </p>
           <div className="mt-[22px]">
             <Btn href="/vizbot/guide#touch" kind="ondark" iconRight={<ArrowRight className="h-4 w-4" />}>
@@ -182,8 +180,7 @@ function Boards() {
     <section className="mt-12 md:mt-16">
       <SectionHeading>pick your bot</SectionHeading>
       <Lead>
-        vizBot runs on four boards. Same face, same moods. They differ in screen shape, touch and what else is
-        attached.
+        Four boards. Same face on all of them. What changes is the screen shape, touch, and what's bolted on.
       </Lead>
       <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
         {BOARDS.map((b) => (
@@ -251,7 +248,7 @@ export default function VizBot() {
     <>
       <SEO
         title="vizBot · a tiny desk robot"
-        description="vizBot is open-source firmware that gives a small ESP32 screen a face and a personality: moods, speech bubbles, clock, weather and light shows. Runs on four boards."
+        description="vizBot is open-source firmware that gives a little ESP32 screen a face and a personality. Moods, speech bubbles, clock, weather and light shows on four boards."
         image={HERO_POSTER}
         keywords="vizBot, ESP32, desk robot, Stackchan, M5Stack CoreS3, Waveshare, firmware"
       />
@@ -268,7 +265,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              A face-first touch UI: swipe-up dock, scene switcher and full settings on the bot.
+              New touch UI. Swipe up for the dock, sideways for scenes, and every setting on the bot itself.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
@@ -281,14 +278,14 @@ export default function VizBot() {
             href="/vizbot/guide"
             icon={<BookOpen className="h-[22px] w-[22px]" strokeWidth={1.9} />}
             title="User guide"
-            body="Get it on your WiFi, learn the gestures, find the web panel, keep it updated, fix the usual snags."
+            body="WiFi setup, gestures, the web panel, updates, and fixes for when something's off."
             cta="Open the guide"
           />
           <BigCard
             href="/vizbot/releases"
             icon={<Download className="h-[22px] w-[22px]" strokeWidth={1.9} />}
             title="Downloads"
-            body={`Firmware ${DOC_VERSION} for all four boards, with the three steps to install it over WiFi.`}
+            body={`Firmware ${DOC_VERSION} for all four boards. Three steps to install over WiFi.`}
             cta="Get the firmware"
           />
         </section>

@@ -113,7 +113,7 @@ function BoardPicker({ value, onChange }: { value: BoardId; onChange: (b: BoardI
         })}
       </div>
       <p className="mt-3 text-[13px] leading-normal text-muted-foreground">
-        Not sure? Open <Code>your-bot.local/update</Code>: it names its board and the file it wants.
+        Not sure? Open <Code>your-bot.local/update</Code>. It tells you its board and the file it wants.
       </p>
     </div>
   );
@@ -136,7 +136,7 @@ function InstallSteps({ fileName }: { fileName: string }) {
         ))}
       </ol>
       <p className="mt-3 text-[13px] leading-normal text-muted-foreground">
-        The bot checks the file name and refuses files for other boards.{" "}
+        The bot checks the name and refuses files for other boards.{" "}
         <VbLink href="/vizbot/guide#update" className={linkCls}>
           Full update guide
         </VbLink>
@@ -198,9 +198,9 @@ function ComingSoonPanel({ board }: { board: Board }) {
       <StepLabel n="2">download</StepLabel>
       <div className="rounded-[10px] border border-dashed border-gray-300 bg-white px-4 py-5 text-center">
         <Clock className="mx-auto h-6 w-6 text-yellow-800" aria-hidden="true" />
-        <p className="mt-2 font-slackey text-lg leading-tight">v{DOC_VERSION} is on its way.</p>
+        <p className="mt-2 font-slackey text-lg leading-tight">v{DOC_VERSION} isn't up yet.</p>
         <p className="mt-1.5 text-[14px] leading-normal text-muted-foreground">
-          Check back soon. When it lands, the file for your {board.short} will be{" "}
+          Check back soon. The file for your {board.short} will be{" "}
           <Code>{otaFileName(board, DOC_VERSION)}</Code>.
         </p>
       </div>
@@ -263,7 +263,7 @@ function Latest({
       <div>
         <StepLabel n="2">download</StepLabel>
         <Callout kind="warn">
-          Couldn't reach GitHub just now. The files are also on{" "}
+          Couldn't reach GitHub. The files are on{" "}
           <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className={linkCls}>
             the GitHub releases page
           </a>
@@ -299,8 +299,8 @@ function Latest({
           <div className="text-[13.5px] leading-relaxed text-muted-foreground">
             <p className="vb-mono mb-1.5 text-[11px] font-medium uppercase tracking-[1.3px] text-gray-600">also in this release</p>
             <p>
-              A <Code>-factory.bin</Code> per board for a first install over USB. They're{" "}
-              <b className="text-gray-900">not</b> for the update page.{" "}
+              A <Code>-factory.bin</Code> per board, for a first install over USB.{" "}
+              <b className="text-gray-900">Not</b> for the update page.{" "}
               <a href="#usb" className={linkCls}>
                 First install over USB
               </a>
@@ -319,8 +319,8 @@ function FilesTable({ release, board }: { release: VizbotRelease; board: BoardId
   const note = (
     <p className="border-t border-gray-200 bg-gray-50 px-3.5 py-2.5 text-[13px] leading-normal text-gray-600">
       <AlertTriangle className="-mt-0.5 mr-1.5 inline h-3.5 w-3.5 text-amber-700" aria-hidden="true" />
-      The <Code>-factory.bin</Code> files are <b className="text-gray-900">USB first install only — don't use them on the
-      update page</b>. They're in{" "}
+      The <Code>-factory.bin</Code> files are <b className="text-gray-900">USB first install only</b>. Don't use them
+      on the update page. They're in{" "}
       <a href="#usb" className={linkCls}>
         First install over USB
       </a>
@@ -330,7 +330,7 @@ function FilesTable({ release, board }: { release: VizbotRelease; board: BoardId
   return (
     <section className="mt-12 md:mt-14">
       <SectionHeading>all files in {versionOf(release)}</SectionHeading>
-      <Lead>One WiFi update file per board. Sizes come straight from GitHub.</Lead>
+      <Lead>One update file per board.</Lead>
       {/* phones */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white md:hidden">
         {rows.map(({ b, ota }, i) => (
@@ -415,22 +415,22 @@ function UsbDisclosure({ release, board }: { release: VizbotRelease | null; boar
           <span className="block flex-1">
             <span className="block text-[15.5px] font-bold text-gray-900">First install over USB</span>
             <span className="block text-[13px] text-muted-foreground">
-              Advanced. Only for a board that has never run vizBot, or to start from scratch.
+              For a board that's never run vizBot, or a clean start.
             </span>
           </span>
           <ChevronDown className="vb-chev h-[18px] w-[18px] flex-none text-gray-600" />
         </summary>
         <div className="px-3.5 pb-4 md:pb-5 md:pl-[66px] md:pr-5">
           <p className="mb-3.5 max-w-[70ch] text-[14.5px] leading-relaxed text-gray-700">
-            Use the file ending in <Code>-factory.bin</Code>. It includes the bootloader, so it goes on over a USB cable,{" "}
-            <b className="text-gray-900">not the update page</b>, and it{" "}
+            Use the <Code>-factory.bin</Code>. It has the bootloader in it, so it goes on over USB,{" "}
+            <b className="text-gray-900">not the update page</b>. It{" "}
             <b className="text-gray-900">wipes saved WiFi and settings</b>.
           </p>
 
           <div className="mb-4 overflow-hidden rounded-xl border border-amber-200">
             <p className="vb-mono flex items-center gap-1.5 border-b border-amber-200 bg-amber-50 px-3.5 py-2 text-[11px] font-medium uppercase tracking-[1px] text-amber-900">
               <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
-              USB first install only — don't use on the update page
+              USB first install only. Not for the update page.
             </p>
             {release ? (
               factories.map(({ b, f }, i) => (
@@ -508,8 +508,8 @@ function Older({ releases }: { releases: VizbotRelease[] }) {
     <section className="mt-12 md:mt-14">
       <SectionHeading>older releases</SectionHeading>
       <Lead>
-        {anyLegacy && "The 2.x builds (legacy) were test targets for the old auto-updater and came before the touch UI. "}
-        Most people want the latest.
+        {anyLegacy && "The 2.x builds are from before the touch UI. "}
+        You want the latest.
       </Lead>
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         {shown.map((r, i) => {
@@ -593,7 +593,7 @@ export default function VizBotReleases() {
     <>
       <SEO
         title="vizBot downloads"
-        description="vizBot firmware for the Waveshare 1.69, Waveshare 1.3, M5Stack CoreS3 and Stackchan. Pick your board, download one file, update over WiFi."
+        description="vizBot firmware for the Waveshare 1.69, Waveshare 1.3, M5Stack CoreS3 and Stackchan. Pick your board, grab one file, update over WiFi."
         image={SCREENS.home}
         keywords="vizBot, firmware, download, OTA, ESP32-S3, Stackchan, CoreS3, Waveshare"
       />
@@ -602,7 +602,7 @@ export default function VizBotReleases() {
           <Eyebrow>downloads · firmware</Eyebrow>
           <h1 className="mb-3 font-slackey text-[34px] font-normal leading-[1.08] md:text-[46px]">Fresh firmware.</h1>
           <p className="max-w-[56ch] text-base leading-relaxed text-gray-700 md:text-[17px]">
-            Pick your board, download one file, and send it to your bot over WiFi. Your WiFi and settings stay put.
+            Pick your board, grab one file, send it to your bot over WiFi. Settings stay put.
           </p>
         </section>
 
@@ -613,7 +613,7 @@ export default function VizBotReleases() {
 
         <section className="mt-5">
           <p className="text-sm text-muted-foreground">
-            New versions show up here as soon as they're published on{" "}
+            New versions show up here as soon as they're on{" "}
             <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className={linkCls}>
               GitHub
             </a>

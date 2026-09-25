@@ -38,12 +38,12 @@ export const BOARDS: Board[] = [
     short: "Waveshare 1.69″",
     sub: "ESP32-S3-Touch-LCD-1.69",
     token: "esp32s3-lcd169",
-    hint: "Small portrait touch screen, living in the lime-green dino case.",
+    hint: "Small portrait touch screen. Mine lives in a lime-green dino case.",
     feats: ["Touch", "Portrait 240×280", "Motion sensor"],
     touch: true,
     notes: [
-      "Everything in this guide applies. The dock and sheets rise from the bottom of the portrait screen.",
-      "Give it a quick shake and it gets dizzy.",
+      "Everything in the guide applies. Sheets come up from the bottom.",
+      "Shake it and it gets dizzy.",
     ],
   },
   {
@@ -52,13 +52,13 @@ export const BOARDS: Board[] = [
     short: "Waveshare 1.3″",
     sub: "ESP32-S3-LCD-1.3",
     token: "esp32s3-lcd13",
-    hint: "Square 240×240 screen with no touch. Built-in battery charger.",
+    hint: "Square 240×240 screen, no touch, battery charger on board.",
     feats: ["No touch", "Square 240×240", "Battery"],
     touch: false,
     notes: [
-      "No touch screen, so the web panel does everything.",
-      "Shake it for a reaction. Keep shaking for about half a second to flip to the weather view; do it again to come back.",
-      "It has a battery charger built in, so it runs off a battery and charges over USB-C.",
+      "No touch, so you drive it from the web panel.",
+      "Shake it for a reaction. Shake for half a second to flip to weather. Do it again to flip back.",
+      "Runs on a battery and charges over USB-C.",
     ],
   },
   {
@@ -67,12 +67,12 @@ export const BOARDS: Board[] = [
     short: "M5Stack CoreS3",
     sub: "M5Stack CoreS3",
     token: "m5cores3",
-    hint: "The little M5Stack cube with a 2″ landscape touch screen.",
+    hint: "The M5Stack cube with a 2″ landscape touch screen.",
     feats: ["Touch", "Landscape 320×240", "Speaker + mics"],
     touch: true,
     notes: [
-      "Landscape screen: the dock sits on two side rails and settings open as a list with the page beside it.",
-      "It has a speaker and microphones. Turn on **Audio FX** in Settings › Light & sound and the scenes move to music; Reactivity sets how much.",
+      "Landscape, so the dock is two side rails and settings get a category list on the left.",
+      "Has a speaker and mics. Turn on **Audio FX** in Settings › Light & sound and the scenes react to music. **Reactivity** sets how much.",
     ],
   },
   {
@@ -81,14 +81,14 @@ export const BOARDS: Board[] = [
     short: "Stackchan",
     sub: "CoreS3 + robot base",
     token: "stackchan",
-    hint: "A CoreS3 sitting on the robot base, with a head that moves.",
+    hint: "A CoreS3 on the robot base. The head moves.",
     feats: ["Moving head", "12-LED ring", "Head touch", "Battery"],
     touch: true,
     notes: [
-      "The head moves on its own when it's idle and reacts when you touch the top of it.",
-      "Head in the dock: nod, shake, look up or down, center, Chill mode.",
-      "Base LEDs and LED mode live in Settings › Light & sound; battery level in System.",
-      "It takes the `stackchan` file, not the `m5cores3` one, even though it's a CoreS3 inside.",
+      "The head drifts around on its own and reacts when you touch the top of it.",
+      "**Head** in the dock: nod, shake, look up, look down, center, Chill mode.",
+      "Base LEDs and LED mode are in Settings › Light & sound. Battery is in System.",
+      "Use the `stackchan` file, not `m5cores3`. It's a CoreS3 inside, but the firmware is different.",
       "Head stopped moving after an update? Power it fully off (hold the bottom button about 6 seconds) and back on.",
     ],
   },
@@ -146,28 +146,28 @@ export const FEATURES: Feature[] = [
     screen: "mood",
     frame: "dino",
     title: "A face with moods",
-    body: "25 expressions and three personalities: Chill, Hyper and Grumpy. Left alone it looks around, blinks and talks to itself in speech bubbles. Tap it and it reacts.",
+    body: "25 expressions and three personalities: Chill, Hyper and Grumpy. Left alone it looks around, blinks and mutters in speech bubbles. Poke it and it reacts.",
     caption: "mood sheet · 1.69",
   },
   {
     screen: "s3scene",
     frame: "landscape",
     title: "Light shows behind the eyes",
-    body: "16 animated scenes with color palettes and a kaleidoscope, drawn behind the face. Swipe sideways to change it, or let it cycle. On a CoreS3 they can move to the music.",
+    body: "16 animated scenes behind the face, with 15 palettes and a kaleidoscope. Swipe sideways to change it or let it cycle. On a CoreS3 they react to music.",
     caption: "scene switcher · CoreS3",
   },
   {
     screen: "dock",
     frame: "dino",
     title: "Clock and weather",
-    body: "On your WiFi it keeps the time and shows the local weather with a 3-day forecast. The quick dock puts both one swipe away.",
+    body: "On WiFi it keeps time and shows local weather with a 3-day forecast. Both are one swipe away in the dock.",
     caption: "quick dock · 1.69",
   },
   {
     screen: "connect",
     frame: "dino",
     title: "Friends and LEDs",
-    body: "It can send its speech bubbles and weather to a WLED light matrix, and it notices other vizBots nearby.",
+    body: "It can push its speech bubbles and weather to a WLED matrix. It finds other vizBots nearby over ESP-NOW, so two of them don't fight over the same matrix.",
     caption: "settings › connect · 1.69",
   },
 ];
@@ -198,19 +198,19 @@ export const TOC: { id: string; name: string; subs: string[]; boards?: BoardId[]
 ];
 
 export const SETUP_STEPS: string[] = [
-  "**Plug it in.** It runs a quick self-check, then shows its face. A new bot has no WiFi yet, so it starts its own hotspot named `vizBot-XXXX`. The four characters are unique to your bot.",
-  "On your phone, join `vizBot-XXXX`. The password is `12345678`. A setup page opens by itself; if it doesn't, go to `192.168.4.1`.",
-  "Tap **Scan Networks**, pick your home WiFi, type its password and tap **Connect**.",
-  "When it's connected, the hotspot stays up for about 30 seconds, then switches off. Your phone goes back to your home WiFi.",
-  "Open `http://vizbot-xxxx.local` with the same four characters. That's your bot's web panel. Bookmark it.",
+  "**Plug it in.** It runs a self-check and shows its face. With no WiFi saved it starts its own hotspot, `vizBot-XXXX`. The four characters are unique to your bot.",
+  "On your phone, join `vizBot-XXXX`. Password `12345678`. The setup page should pop up. If it doesn't, go to `192.168.4.1`.",
+  "Tap **Scan Networks**, pick your WiFi, enter the password, tap **Connect**.",
+  "Put your phone back on your home WiFi. The bot's hotspot stays on so it can talk to other bots. Ignore it.",
+  "Open `http://vizbot-xxxx.local` (same four characters). That's the web panel. Bookmark it.",
 ];
 
 export const GESTURES: { icon: GestureIcon; k: string; v: string }[] = [
-  { icon: "tap", k: "Tap the face", v: "Poke it. It reacts." },
-  { icon: "up", k: "Swipe up, or long-press", v: "Open the quick dock." },
-  { icon: "side", k: "Swipe left or right", v: "Step to the previous or next scene." },
-  { icon: "down", k: "Swipe down", v: "Close whatever is open. A tap on the face does too." },
-  { icon: "wait", k: "Leave it", v: "Sheets close by themselves after about 10 seconds untouched, settings pages after 30." },
+  { icon: "tap", k: "Tap the face", v: "Poke it." },
+  { icon: "up", k: "Swipe up or long-press", v: "Open the dock." },
+  { icon: "side", k: "Swipe left or right", v: "Previous or next scene." },
+  { icon: "down", k: "Swipe down", v: "Close. Tapping the face works too." },
+  { icon: "wait", k: "Leave it", v: "Sheets close after 10 seconds. Settings pages after 30." },
 ];
 
 /** Category hues from touch_ui.h. Only used where the page mirrors the bot's own UI. */
@@ -237,23 +237,23 @@ export const SHEETS: { screen: ScreenKey; name: string; body: string }[] = [
   {
     screen: "scene",
     name: "Scene",
-    body: "Arrows step through 16 scenes and plain black. Pick a palette, switch Pixel or Hi-res, or turn Auto on to cycle. Choosing a scene by hand turns Auto off.",
+    body: "Arrows step through 16 scenes plus plain black. Set the palette, Pixel or Hi-res, and Auto. Picking a scene by hand turns Auto off so it sticks.",
   },
-  { screen: "mood", name: "Mood", body: "Choose Chill, Hyper or Grumpy, then tap any of the 25 expressions to wear it." },
+  { screen: "mood", name: "Mood", body: "Pick Chill, Hyper or Grumpy. Tap any of the 25 faces to wear it." },
   {
     screen: "light",
     name: "Light",
-    body: "Drag the slider or tap − and + for screen brightness. Night, Day and Max jump straight there.",
+    body: "Drag the slider or tap − and +. Night, Day and Max are presets.",
   },
 ];
 
 export const SETTINGS: { name: string; cat: Cat; desc: string }[] = [
-  { name: "Look", cat: "look", desc: "Scene, palette, kaleidoscope, face color" },
-  { name: "Mood", cat: "mood", desc: "Personality, how often it rotates, expression" },
+  { name: "Look", cat: "look", desc: "Scene, palette, hi-res, kaleidoscope, face color, auto-cycle" },
+  { name: "Mood", cat: "mood", desc: "Personality, rotation, expression" },
   { name: "Info", cat: "info", desc: "Weather, clock, time zone" },
-  { name: "Light", cat: "light", desc: "Screen brightness. Volume and Audio FX on CoreS3; base LEDs on Stackchan" },
-  { name: "Connect", cat: "connect", desc: "Network, address, IP, signal, nearby bots. Offline, the hotspot steps" },
-  { name: "System", cat: "system", desc: "Firmware version, name, uptime, memory, battery. Restart and Power off need a 1.5 s hold" },
+  { name: "Light", cat: "light", desc: "Screen brightness. Volume and Audio FX on CoreS3. Base LEDs on Stackchan" },
+  { name: "Connect", cat: "connect", desc: "Network, .local address, IP, signal, nearby bots. Hotspot steps when offline" },
+  { name: "System", cat: "system", desc: "Version, name, uptime, memory, battery. Hold 1.5 s to Restart or Power off" },
 ];
 
 export const LANDSCAPE_SHOTS: { screen: ScreenKey; caption: string; boards: BoardId[] }[] = [
@@ -268,50 +268,50 @@ export type PanelIcon =
   | "smile" | "chat" | "robot" | "palette" | "chip" | "cloud" | "wifi" | "grid" | "speaker" | "led";
 
 export const PANEL: { icon: PanelIcon; name: string; desc: string; boards?: BoardId[] }[] = [
-  { icon: "smile", name: "Expressions", desc: "Tap any of the 25 faces." },
-  { icon: "chat", name: "Say something", desc: "Type a message; it shows up in a speech bubble." },
-  { icon: "robot", name: "Personality", desc: "Pick one, or rotate every few minutes." },
+  { icon: "smile", name: "Expressions", desc: "All 25 faces." },
+  { icon: "chat", name: "Say something", desc: "Type it and it shows up in a speech bubble." },
+  { icon: "robot", name: "Personality", desc: "Pick one or let it rotate." },
   { icon: "palette", name: "Appearance", desc: "Face color, background, scene, kaleidoscope, audio reactivity." },
-  { icon: "chip", name: "Device", desc: "Brightness, time zone, hi-res, firmware version and Update." },
-  { icon: "cloud", name: "Weather & Info", desc: "Set your location by zip code or city." },
-  { icon: "wifi", name: "WiFi", desc: "Scan, connect, forget a network, set the device name." },
-  { icon: "grid", name: "WLED", desc: "Send speech, weather and sprites to a WLED LED matrix." },
-  { icon: "speaker", name: "Sounds", desc: "CoreS3 and Stackchan only.", boards: ["cores3", "stackchan"] },
-  { icon: "led", name: "StackChan", desc: "Move the head, base LEDs, power off. Stackchan only.", boards: ["stackchan"] },
+  { icon: "chip", name: "Device", desc: "Brightness, time zone, hi-res, firmware and Update." },
+  { icon: "cloud", name: "Weather & Info", desc: "Set your location by zip or city." },
+  { icon: "wifi", name: "WiFi", desc: "Scan, connect, forget, rename the bot." },
+  { icon: "grid", name: "WLED", desc: "Send speech, weather and sprites to a WLED matrix." },
+  { icon: "speaker", name: "Sounds", desc: "CoreS3 and Stackchan.", boards: ["cores3", "stackchan"] },
+  { icon: "led", name: "StackChan", desc: "Head, base LEDs, power off.", boards: ["stackchan"] },
 ];
 
 /** Update steps; `{ota}` becomes the example OTA file name. */
 export const UPDATE_STEPS: string[] = [
-  "Download the update file for your board from [Downloads](/vizbot/releases). It's the one named {ota}: your board's name in the middle, **no** `-factory` on the end.",
-  "Open `http://vizbot-xxxx.local/update`, or tap **Update** next to Firmware in the web panel's Device section.",
-  "Choose that `.bin` file and tap **Upload**. Keep the page open until it finishes.",
-  "The bot restarts by itself. Check the new version in **Settings › System** or in the web panel.",
+  "Grab your board's file from [Downloads](/vizbot/releases). It looks like {ota}: board name in the middle, **no** `-factory` on the end.",
+  "Open `http://vizbot-xxxx.local/update`, or hit **Update** next to Firmware in the web panel.",
+  "Choose the `.bin` and tap **Upload**. Leave the page open until it's done.",
+  "It restarts on its own. The new version shows in **Settings › System** and in the web panel.",
 ];
 
 export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
   {
     title: "I can't open vizbot-xxxx.local",
-    body: "Swipe up on the face: the dock shows the address at the top. **Settings › Connect** shows the IP too; type that instead, like `http://10.0.0.142`. Some Android phones and older Windows PCs don't understand .local names. The 1.3 shows its address on its start-up screen.",
+    body: "Swipe up. The address is at the top of the dock, and **Settings › Connect** has the IP. Use the IP instead, like `http://10.0.0.142`. Some Android phones and older Windows PCs can't do .local names. The 1.3 shows its address when it boots.",
   },
   {
     title: "It started its own hotspot again",
-    body: "It couldn't join your WiFi: a new password, a 5 GHz-only network, or it's too far from the router. Join `vizBot-XXXX` and set up WiFi again.",
+    body: "It couldn't join your WiFi. Usually a changed password, a 5 GHz-only network, or it's too far from the router. Join `vizBot-XXXX` and set it up again.",
   },
   {
     title: "The update says “Wrong board type”",
-    body: "The file is for a different board. The name has to contain your board's token, like `esp32s3-lcd169`; the update page shows which one it expects. A Stackchan needs the `stackchan` file, not `m5cores3`.",
+    body: "Wrong file for this board. The name has to contain your board's token, like `esp32s3-lcd169`. The update page tells you which one it wants. Stackchan takes `stackchan`, not `m5cores3`.",
   },
   {
     title: "The update stopped partway",
-    body: "Nothing changes until the whole file arrives, so the bot keeps the version it had. Reload the update page and try again.",
+    body: "Nothing changes until the whole file lands, so it keeps the old version. Reload and try again.",
   },
   {
     title: "It's too bright at night",
-    body: "Swipe up, tap **Light**, then **Night**. On the 1.3, use Brightness in the web panel.",
+    body: "Swipe up, **Light**, **Night**. On the 1.3 use Brightness in the web panel.",
   },
   {
     title: "The Stackchan head stopped moving after an update",
-    body: "Power it fully off: hold the bottom button about 6 seconds (or hold **Power off** in Settings › System). Then switch it back on.",
+    body: "Power it fully off. Hold the bottom button about 6 seconds, or hold **Power off** in Settings › System. Then turn it back on. A plain restart isn't enough for the servos.",
     boards: ["stackchan"],
   },
 ];
@@ -319,13 +319,13 @@ export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
 // ------------------------------------------------------------------ releases
 
 export const INSTALL_STEPS: string[] = [
-  "Open `http://your-bot.local/update` on the same WiFi.",
-  "Choose {ota} and tap **Upload**. Not a `-factory.bin`.",
-  "Wait for it to restart, about a minute.",
+  "On the same WiFi, open `http://your-bot.local/update`.",
+  "Choose {ota} and tap **Upload**. Not the `-factory.bin`.",
+  "It restarts in about a minute.",
 ];
 
 export const USB_STEPS: string[] = [
-  "**Put the board in download mode.** CoreS3 and Stackchan: hold the bottom button about 2 seconds until the green light comes on. Waveshare boards: hold **BOOT** while you plug in the USB cable.",
-  "In Chrome or Edge, open [Espressif's web flasher](https://espressif.github.io/esptool-js/). Connect, set the flash address to `0x0`, choose the `-factory.bin` for your board and tap **Program**.",
-  "Unplug it and plug it back in. It starts the `vizBot-XXXX` hotspot; carry on with [Get it online](/vizbot/guide#setup).",
+  "**Download mode.** CoreS3 and Stackchan: hold the bottom button about 2 seconds until the green light comes on. Waveshare: hold **BOOT** while you plug in USB.",
+  "In Chrome or Edge, open [Espressif's web flasher](https://espressif.github.io/esptool-js/). Connect, set the address to `0x0`, pick your board's `-factory.bin`, hit **Program**.",
+  "Unplug it and plug it back in. It starts the `vizBot-XXXX` hotspot. Carry on from [Get it online](/vizbot/guide#setup).",
 ];
