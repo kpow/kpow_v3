@@ -3,10 +3,56 @@ import { SEO } from "@/components/global/SEO";
 import { VizBotShell } from "@/components/vizbot/VizBotShell";
 import { DinoFrame, LandscapeFrame } from "@/components/vizbot/frames";
 import { BoardIcon, GestureGlyph } from "@/components/vizbot/icons";
-import { Btn, Caption, Chip, Code, Eyebrow, Lead, SectionHeading, Stage, VbLink, linkCls } from "@/components/vizbot/bits";
+import { Btn, Caption, Chip, Code, Eyebrow, Lead, SectionHeading, VbLink, linkCls } from "@/components/vizbot/bits";
 import { BOARDS, DOC_VERSION, FEATURES, GESTURES_SHORT, REPO_URL, SCREENS } from "@/content/vizbot";
 
 // vizBot overview. Copy and layout from the approved comps (Main / IntroMobile).
+
+const MEDIA = "/images/vizbot/media";
+const HERO_VIDEO = `${MEDIA}/hero.mp4`;
+const HERO_POSTER = `${MEDIA}/hero-poster.jpg`;
+
+// One real photo per supported board (sources: the vizBot build log).
+const BOARD_PHOTOS: Record<string, { src: string; alt: string }> = {
+  lcd169: { src: `${MEDIA}/board-lcd169.jpg`, alt: "Waveshare 1.69 in the lime-green dino case" },
+  lcd13: { src: `${MEDIA}/board-lcd13.jpg`, alt: "Waveshare 1.3, a small square screen on a desk" },
+  cores3: { src: `${MEDIA}/board-cores3.jpg`, alt: "M5Stack CoreS3 in a seated spaceman body" },
+  stackchan: { src: `${MEDIA}/board-stackchan.jpg`, alt: "Stackchan: a CoreS3 on the robot base, head turning" },
+};
+
+function BoardPhotos() {
+  return (
+    <section className="mt-10 md:mt-12" aria-labelledby="vb-family">
+      <h2 id="vb-family" className="sr-only">
+        The four vizBot boards
+      </h2>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        {BOARDS.map((b) => {
+          const photo = BOARD_PHOTOS[b.id];
+          if (!photo) return null;
+          return (
+            <VbLink
+              key={b.id}
+              href={`/vizbot/releases?board=${b.id}`}
+              className="vb-focus group block overflow-hidden rounded-xl border border-gray-200 bg-white text-[#0a0a0a] no-underline transition-colors hover:border-gray-300"
+            >
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                className="block aspect-[4/5] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+              <span className="block px-3.5 py-3">
+                <span className="block text-[15px] font-bold leading-snug">{b.short}</span>
+                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{b.sub}</span>
+              </span>
+            </VbLink>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 function Hero() {
   return (
@@ -36,15 +82,22 @@ function Hero() {
           </a>
         </p>
       </div>
-      <Stage className="px-4 pb-[18px] pt-5 md:px-7 md:pb-[22px] md:pt-7">
-        <div className="relative flex flex-col items-center pt-6 md:pt-9">
-          <DinoFrame src={SCREENS.home} alt="vizBot's home screen: a big-eyed face" eager className="[--sw:200px] md:[--sw:240px]" />
-          <div className="absolute right-0 top-0 whitespace-nowrap rounded-[14px] bg-white px-3.5 py-2 font-slackey text-base leading-tight text-[#0a0a0a] shadow-[0_8px_20px_rgba(0,0,0,.35)] md:right-1.5 md:top-2.5">
-            hi! poke me.
-          </div>
-          <Caption className="mt-4">real screen · waveshare 1.69 · v{DOC_VERSION}</Caption>
-        </div>
-      </Stage>
+      <figure className="m-0">
+        <video
+          className="block aspect-[4/5] w-full rounded-2xl bg-[#0e1014] object-cover shadow-[0_18px_50px_rgba(0,0,0,.28)]"
+          src={HERO_VIDEO}
+          poster={HERO_POSTER}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label="vizBot in its lime-green dino case, saying hi on a desk"
+        />
+        <figcaption className="vb-mono mt-3 text-center text-xs text-muted-foreground">
+          waveshare 1.69 in the dino case · v{DOC_VERSION}
+        </figcaption>
+      </figure>
     </section>
   );
 }
@@ -199,11 +252,12 @@ export default function VizBot() {
       <SEO
         title="vizBot · a tiny desk robot"
         description="vizBot is open-source firmware that gives a small ESP32 screen a face and a personality: moods, speech bubbles, clock, weather and light shows. Runs on four boards."
-        image={SCREENS.home}
+        image={HERO_POSTER}
         keywords="vizBot, ESP32, desk robot, Stackchan, M5Stack CoreS3, Waveshare, firmware"
       />
       <VizBotShell>
         <Hero />
+        <BoardPhotos />
         <Features />
         <TouchBand />
         <Boards />
