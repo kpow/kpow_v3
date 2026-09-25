@@ -89,7 +89,9 @@ function Hero() {
       </div>
       <figure className="m-0">
         <video
-          className="block aspect-[4/5] w-full rounded-2xl bg-[#0e1014] object-cover shadow-[0_18px_50px_rgba(0,0,0,.28)]"
+          width={720}
+          height={1280}
+          className="mx-auto block aspect-[9/16] h-auto max-h-[640px] w-auto max-w-full rounded-2xl bg-[#0e1014] shadow-[0_18px_50px_rgba(0,0,0,.28)]"
           src={HERO_VIDEO}
           poster={HERO_POSTER}
           autoPlay
