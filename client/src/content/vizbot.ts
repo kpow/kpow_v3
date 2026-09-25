@@ -288,7 +288,7 @@ export const UPDATE_STEPS: string[] = [
 export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
   {
     title: "I can't open vizbot-xxxx.local",
-    body: "Swipe up. The address is at the top of the dock, and **Settings › Connect** has the IP. Use the IP instead, like `http://10.0.0.142`. Some Android phones and older Windows PCs can't do .local names. The 1.3 shows its address when it boots.",
+    body: "Swipe up. The address is at the top of the dock, and **Settings › Connect** has the IP. Use the IP instead, like `http://192.168.1.42`. Some Android phones and older Windows PCs can't do .local names. The 1.3 shows its address when it boots.",
   },
   {
     title: "It started its own hotspot again",
