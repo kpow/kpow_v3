@@ -15,7 +15,7 @@ const HERO_POSTER = `${MEDIA}/hero-poster.jpg`;
 // One real photo per supported board (sources: the vizBot build log).
 const BOARD_PHOTOS: Record<string, { src: string; alt: string }> = {
   lcd169: { src: `${MEDIA}/board-lcd169.jpg`, alt: "Waveshare 1.69 in the lime-green dino case" },
-  lcd13: { src: `${MEDIA}/board-lcd13.jpg`, alt: "Waveshare 1.3, a small square screen on a desk" },
+  lcd13: { src: `${MEDIA}/board-lcd13.jpg`, alt: "Two Waveshare 1.3 bots as holograms, faces floating in beamsplitter cubes" },
   cores3: { src: `${MEDIA}/board-cores3.jpg`, alt: "M5Stack CoreS3 in a seated spaceman body" },
   stackchan: { src: `${MEDIA}/board-stackchan.jpg`, alt: "Stackchan: a CoreS3 on the robot base, head turning" },
 };
@@ -73,6 +73,12 @@ function Hero() {
           <Btn href="/vizbot/guide" kind="outline" icon={<BookOpen className="h-[17px] w-[17px]" />}>
             Read the guide
           </Btn>
+          <VbLink
+            href="/builds/vizbot"
+            className="inline-flex items-center gap-1.5 px-1 py-2 text-sm font-medium text-blue-600 no-underline hover:text-blue-700 sm:self-center"
+          >
+            How it got built <ArrowRight className="h-[15px] w-[15px]" />
+          </VbLink>
         </div>
         <p className="vb-mono mt-4 text-xs text-muted-foreground">
           v{DOC_VERSION} · 4 boards · MIT licensed ·{" "}
