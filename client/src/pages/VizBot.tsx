@@ -164,7 +164,7 @@ function TouchBand() {
             No touch screen? It all works from the bot's web page too, at <Code dark>vizbot-xxxx.local</Code>.
           </p>
           <div className="mt-[22px]">
-            <Btn href="/vizbot/guide#touch" kind="ondark" iconRight={<ArrowRight className="h-4 w-4" />}>
+            <Btn href="/vizbot/touch" kind="ondark" iconRight={<ArrowRight className="h-4 w-4" />}>
               How to use it
             </Btn>
           </div>

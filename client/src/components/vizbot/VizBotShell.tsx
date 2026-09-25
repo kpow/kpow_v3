@@ -11,10 +11,13 @@ import { DOC_VERSION } from "@/content/vizbot";
 import { DinoGlyph } from "./icons";
 import "./vizbot.css";
 
+// `short` is the phone label: five tabs have to fit a 360px screen.
 const TABS = [
-  { name: "overview", href: "/vizbot" },
-  { name: "user guide", href: "/vizbot/guide" },
-  { name: "downloads", href: "/vizbot/releases" },
+  { name: "overview", short: "overview", href: "/vizbot" },
+  { name: "user guide", short: "guide", href: "/vizbot/guide" },
+  { name: "touch screen", short: "touch", href: "/vizbot/touch" },
+  { name: "web panel", short: "web", href: "/vizbot/web" },
+  { name: "downloads", short: "downloads", href: "/vizbot/releases" },
 ];
 
 function VersionChip() {
@@ -75,18 +78,18 @@ function SubNav() {
           <Brand />
           <VersionChip />
         </div>
-        <nav aria-label="vizBot" className="grid grid-cols-3 gap-[3px] rounded-[9px] bg-gray-100 p-[3px]">
+        <nav aria-label="vizBot" className="flex gap-[3px] rounded-[9px] bg-gray-100 p-[3px]">
           {tabs.map((t) => (
             <Link
               key={t.href}
               href={t.href}
               aria-current={t.on ? "page" : undefined}
               className={cn(
-                "vb-focus rounded-md py-[7px] text-center text-[13.5px] font-medium no-underline",
+                "vb-focus flex-auto whitespace-nowrap rounded-md px-1.5 py-[7px] text-center text-[13px] font-medium no-underline",
                 t.on ? "bg-[#0a0a0a] text-white" : "text-gray-600",
               )}
             >
-              {t.name}
+              {t.short}
             </Link>
           ))}
         </nav>

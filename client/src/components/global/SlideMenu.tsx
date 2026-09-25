@@ -126,6 +126,8 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
       children: [
         { label: "overview", href: "/vizbot", native: false },
         { label: "user guide", href: "/vizbot/guide", native: false },
+        { label: "touch screen", href: "/vizbot/touch", native: false },
+        { label: "web panel", href: "/vizbot/web", native: false },
         { label: "downloads", href: "/vizbot/releases", native: false },
       ],
     },

@@ -1,299 +1,54 @@
-import { useEffect, useState } from "react";
-import {
-  Bot,
-  ChevronDown,
-  ChevronRight,
-  Cloud,
-  Code2,
-  Cpu,
-  Download,
-  LayoutGrid,
-  MessageSquare,
-  Palette,
-  Smile,
-  CircleDot,
-  Volume2,
-  Wifi,
-  type LucideIcon,
-} from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { ArrowRight, Code2, ChevronDown } from "lucide-react";
 import { SEO } from "@/components/global/SEO";
 import { VizBotShell, useHashScroll } from "@/components/vizbot/VizBotShell";
 import { DinoFrame, LandscapeFrame } from "@/components/vizbot/frames";
-import { BoardIcon, GestureGlyph } from "@/components/vizbot/icons";
+import { BoardIcon } from "@/components/vizbot/icons";
 import { FilenameAnatomy, TokenList } from "@/components/vizbot/files";
 import {
   Btn,
   Callout,
-  Caption,
-  Chip,
   Code,
-  Eyebrow,
   Lead,
-  NumBadge,
   Rich,
   SectionHeading,
   Step,
-  SubHead,
   VbLink,
   linkCls,
 } from "@/components/vizbot/bits";
 import {
+  BoardSelect,
+  DocHero,
+  FilterBanner,
+  FilterBox,
+  JumpBar,
+  Toc,
+  sectionCls,
+  useActiveSection,
+  type Filter,
+} from "@/components/vizbot/docs";
+import {
   BOARDS,
   BOARD_BY_ID,
-  CAT,
-  DOCK_TILES,
   DOC_VERSION,
   FIXES,
-  GESTURES,
   ISSUES_URL,
-  LANDSCAPE_SHOTS,
-  PANEL,
   SCREENS,
-  SETTINGS,
   SETUP_STEPS,
-  SHEETS,
   TOC,
   UPDATE_STEPS,
-  isBoardId,
+  WEB_FULL,
   otaFileName,
   type BoardId,
-  type PanelIcon,
 } from "@/content/vizbot";
 import { cn } from "@/lib/utils";
 
 // vizBot user guide. Copy and layout from the comps (GuideDesktop / GuideMobile).
 // Desktop: sticky TOC with the section in view highlighted. Phones: a sticky
 // "Jump to" select under the site header. "Show notes for" hides what doesn't
-// apply to one board.
-
-type Filter = "all" | BoardId;
-
-const PANEL_ICONS: Record<PanelIcon, LucideIcon> = {
-  smile: Smile,
-  chat: MessageSquare,
-  robot: Bot,
-  palette: Palette,
-  chip: Cpu,
-  cloud: Cloud,
-  wifi: Wifi,
-  grid: LayoutGrid,
-  speaker: Volume2,
-  led: CircleDot,
-};
-
-const sectionCls = "scroll-mt-32 lg:scroll-mt-24";
-
-function useActiveSection(deps: unknown) {
-  const [active, setActive] = useState(TOC[0].id);
-  useEffect(() => {
-    const vis = new Map<string, boolean>();
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => vis.set(e.target.id, e.isIntersecting));
-        const first = TOC.find((t) => vis.get(t.id));
-        if (first) setActive(first.id);
-      },
-      { rootMargin: "-96px 0px -55% 0px" },
-    );
-    TOC.forEach((t) => {
-      const el = document.getElementById(t.id);
-      if (el) io.observe(el);
-    });
-    return () => io.disconnect();
-  }, [deps]);
-  return active;
-}
-
-function goTo(id: string) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-  history.replaceState(history.state, "", `#${id}`);
-}
-
-const BOARD_OPTIONS: { value: Filter; label: string }[] = [
-  { value: "all", label: "All boards" },
-  ...BOARDS.map((b) => ({ value: b.id as Filter, label: b.short })),
-];
-
-function BoardSelect({ id, value, onChange, className }: { id: string; value: Filter; onChange: (f: Filter) => void; className?: string }) {
-  return (
-    <select
-      id={id}
-      value={value}
-      onChange={(e) => onChange(e.target.value === "all" || !isBoardId(e.target.value) ? "all" : e.target.value)}
-      className={cn(
-        "vb-focus h-9 w-full rounded-md border border-gray-200 bg-white px-2 text-sm text-[#0a0a0a]",
-        className,
-      )}
-    >
-      {BOARD_OPTIONS.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
-  );
-}
-
-function Toc({ active, filter, setFilter }: { active: string; filter: Filter; setFilter: (f: Filter) => void }) {
-  return (
-    <aside className="sticky top-24 hidden self-start lg:block">
-      <p className="vb-mono mb-2 ml-2 text-[11px] font-medium uppercase tracking-[1.4px] text-muted-foreground">
-        on this page
-      </p>
-      <nav aria-label="Guide sections">
-        <ol className="grid gap-0.5">
-          {TOC.map((t, i) => {
-            const on = t.id === active;
-            const hideSubs = filter === "lcd13" && t.id === "touch";
-            return (
-              <li key={t.id}>
-                <a
-                  href={`#${t.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goTo(t.id);
-                  }}
-                  aria-current={on ? "location" : undefined}
-                  className={cn(
-                    "vb-focus flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm no-underline",
-                    on ? "bg-yellow-50 font-medium text-[#0a0a0a]" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "grid h-[22px] w-[22px] flex-none place-items-center rounded-md font-slackey text-[11px]",
-                      on ? "border-[1.5px] border-[#0a0a0a] bg-[#FFD23F] text-[#0a0a0a]" : "bg-gray-100 text-gray-600",
-                    )}
-                  >
-                    {i + 1}
-                  </span>
-                  {t.name}
-                </a>
-                {t.subs.length > 0 && !hideSubs && (
-                  <ul className="mb-1.5 mt-0.5">
-                    {t.subs.map((s, j) => {
-                      if (j === 4 && filter === "lcd169") return null;
-                      return (
-                        <li key={s}>
-                          <a
-                            href={`#${t.id}-${j}`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              goTo(`${t.id}-${j}`);
-                            }}
-                            className="block py-[3px] pl-10 pr-2 text-[13px] text-gray-600 no-underline hover:text-gray-900"
-                          >
-                            {s}
-                          </a>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      </nav>
-      <div className="mt-[22px] rounded-[10px] border border-gray-200 p-3.5">
-        <label htmlFor="vb-board-filter" className="mb-1.5 block text-xs font-medium text-gray-700">
-          Show notes for
-        </label>
-        <BoardSelect id="vb-board-filter" value={filter} onChange={setFilter} />
-        <p className="mt-2 text-xs leading-normal text-muted-foreground">Hides the bits that don't apply to your board.</p>
-      </div>
-      <VbLink
-        href="/vizbot/releases"
-        className="vb-focus mt-3 flex items-center justify-between gap-2 rounded-[10px] bg-[#0a0a0a] px-3.5 py-3 text-sm font-medium text-white no-underline hover:bg-[#262626]"
-      >
-        <span>Firmware downloads</span>
-        <Download className="h-4 w-4 text-[#FFD23F]" />
-      </VbLink>
-      <a
-        href={ISSUES_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2.5 flex items-center gap-2 px-2 py-1 text-[13px] text-gray-600 no-underline hover:text-gray-900"
-      >
-        <Code2 className="h-[15px] w-[15px]" /> Report a problem
-      </a>
-    </aside>
-  );
-}
-
-function JumpBar({ active }: { active: string }) {
-  return (
-    <div className="sticky top-16 z-20 -mx-4 mt-5 flex items-center gap-2.5 border-y border-gray-200 bg-white/95 px-4 py-2.5 shadow-[0_6px_12px_-10px_rgba(0,0,0,.25)] backdrop-blur lg:hidden">
-      <label htmlFor="vb-jump" className="vb-mono flex-none text-[11px] font-medium uppercase tracking-[1.2px] text-muted-foreground">
-        Jump to
-      </label>
-      <select
-        id="vb-jump"
-        value={active}
-        onChange={(e) => goTo(e.target.value)}
-        className="vb-focus h-[38px] min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-2.5 text-[15px] font-medium text-[#0a0a0a]"
-      >
-        {TOC.map((t, i) => (
-          <option key={t.id} value={t.id}>
-            {i + 1} · {t.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function Hero() {
-  const quick = [
-    { t: "New bot?", d: "Get it on your WiFi.", href: "setup", n: 1 },
-    { t: "Updating?", d: "Four steps, two minutes.", href: "update", n: 4 },
-    { t: "Stuck?", d: "Common problems and fixes.", href: "help", n: 6 },
-  ];
-  return (
-    <section className="border-b border-gray-200 pb-7 md:pb-9 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end lg:gap-12">
-      <div>
-        <Eyebrow>user guide · firmware {DOC_VERSION}</Eyebrow>
-        <h1 className="mb-3.5 font-slackey text-[34px] font-normal leading-[1.08] md:text-[46px]">Getting along with vizBot.</h1>
-        <p className="max-w-[52ch] text-base leading-relaxed text-gray-700 md:text-[17px]">
-          How to get it online, use the touch screen and the web panel, and keep it updated.
-        </p>
-      </div>
-      <div className="mt-[22px] grid gap-2 lg:mt-0">
-        {quick.map((q) => (
-          <a
-            key={q.t}
-            href={`#${q.href}`}
-            onClick={(e) => {
-              e.preventDefault();
-              goTo(q.href);
-            }}
-            className="vb-focus flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3.5 no-underline hover:border-gray-300 hover:bg-gray-50"
-          >
-            <NumBadge n={q.n} size={28} />
-            <span className="block">
-              <span className="block text-[15px] font-bold text-gray-900">{q.t}</span>
-              <span className="block text-[13.5px] text-muted-foreground">{q.d}</span>
-            </span>
-            <ChevronRight className="ml-auto h-4 w-4 text-gray-400" />
-          </a>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Applies({ boards }: { boards: string[] }) {
-  return (
-    <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-      <span className="text-xs text-muted-foreground">Applies to</span>
-      {boards.map((b) => (
-        <Chip key={b}>{b}</Chip>
-      ))}
-    </div>
-  );
-}
+// apply to one board. The touch screen and the web panel have their own pages
+// (/vizbot/touch, /vizbot/web); here they are pointer cards that keep the old
+// #touch and #web anchors alive.
 
 function Setup() {
   return (
@@ -314,8 +69,12 @@ function Setup() {
             splits the bands into two names, pick the 2.4 one.
           </Callout>
           <Callout className="mt-2.5">
-            <b className="font-bold text-gray-900">Name it.</b> In the web panel, set the device name to something like{" "}
-            <Code>desk</Code>. After a restart it's at <Code>vizbot-desk.local</Code>.
+            <b className="font-bold text-gray-900">Name it.</b> In the{" "}
+            <VbLink href="/vizbot/web#wifi" className={linkCls}>
+              web panel
+            </VbLink>
+            , set the device name to something like <Code>vizbot-desk</Code>. After a restart it's at{" "}
+            <Code>vizbot-desk.local</Code>.
           </Callout>
         </div>
         <div className="hidden flex-col items-center lg:flex">
@@ -330,159 +89,68 @@ function Setup() {
   );
 }
 
+function Pointer({
+  href,
+  title,
+  body,
+  cta,
+  art,
+}: {
+  href: string;
+  title: string;
+  body: string;
+  cta: string;
+  art: ReactNode;
+}) {
+  return (
+    <VbLink
+      href={href}
+      className="vb-focus group mt-5 flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white no-underline hover:border-gray-300 sm:flex-row"
+    >
+      <div className="flex flex-none items-center justify-center bg-[#0e1014] px-4 py-5 sm:w-[240px]">{art}</div>
+      <div className="flex flex-col justify-center gap-2 px-5 py-4">
+        <p className="text-[16px] font-bold text-gray-900">{title}</p>
+        <p className="text-sm leading-relaxed text-gray-700">{body}</p>
+        <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 group-hover:text-blue-700">
+          {cta} <ArrowRight className="h-4 w-4" />
+        </span>
+      </div>
+    </VbLink>
+  );
+}
+
 function Touch({ filter }: { filter: Filter }) {
-  if (filter === "lcd13") {
-    return (
-      <section id="touch" className={cn("mt-12 md:mt-14", sectionCls)}>
-        <SectionHeading num={2}>the touch screen</SectionHeading>
-        <Callout className="mt-5">
-          The 1.3 has no touch screen. Use the <a href="#web" className={linkCls}>web panel</a>. Switch “Show notes
-          for” to <b>All boards</b> if you want to read this section anyway.
-        </Callout>
-      </section>
-    );
-  }
-  const landscape = filter === "all" || filter === "cores3" || filter === "stackchan";
-  const shots = LANDSCAPE_SHOTS.filter((s) => filter === "all" || s.boards.includes(filter as BoardId));
   return (
     <section id="touch" className={cn("mt-12 md:mt-14", sectionCls)}>
       <SectionHeading num={2}>the touch screen</SectionHeading>
-      <Lead className="mb-1.5">
-        The face gets the whole screen. Everything else is one gesture away. Got a 1.3? It has no touch, see{" "}
-        <a href="#boards" className={linkCls}>
-          board notes
-        </a>
-        .
-      </Lead>
-      <Applies boards={["1.69", "CoreS3", "Stackchan"]} />
-
-      {/* gestures */}
-      <SubHead id="touch-0">gestures</SubHead>
-      <div className="grid items-center gap-7 lg:grid-cols-[250px_minmax(0,1fr)]">
-        <div className="hidden justify-center lg:flex">
-          <DinoFrame src={SCREENS.home} alt="The home face" className="[--sw:176px]" />
-        </div>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          {GESTURES.map((g, i) => (
-            <div
-              key={g.k}
-              className={cn(
-                "flex items-start gap-3 px-3.5 py-3 md:grid md:grid-cols-[230px_1fr] md:items-center md:gap-4 md:px-[18px]",
-                i < GESTURES.length - 1 && "border-b border-gray-200",
-              )}
-            >
-              <span className="flex items-center gap-3 text-sm font-bold text-gray-900">
-                <span className="grid h-[34px] w-[34px] flex-none place-items-center rounded-[9px] border border-yellow-200 bg-yellow-50 text-yellow-800">
-                  <GestureGlyph name={g.icon} size={19} />
-                </span>
-                <span className="hidden md:inline">{g.k}</span>
-              </span>
-              <span className="block">
-                <span className="block text-sm font-bold text-gray-900 md:hidden">{g.k}</span>
-                <span className="mt-0.5 block text-sm leading-normal text-gray-700 md:mt-0 md:text-[14.5px]">{g.v}</span>
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* dock */}
-      <SubHead id="touch-1">the quick dock</SubHead>
-      <div className="grid items-center gap-7 lg:grid-cols-[minmax(0,1fr)_250px]">
-        <div>
-          <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-            Swipe up or press and hold. The face shrinks to the top and six tiles come up. The pill at the top shows the
-            bot's address for when you forget it.
-          </p>
-          <div className="grid grid-cols-2 gap-1.5 rounded-xl bg-[#12171D] p-2.5">
-            {DOCK_TILES.map((t) => (
-              <div key={t.name} className="flex items-center gap-2.5 rounded-[10px] bg-[#1E252E] px-3 py-2.5">
-                <span className="h-2.5 w-2.5 flex-none rounded-[3px]" style={{ background: CAT[t.cat] }} />
-                <span className="text-sm font-medium text-white">{t.name}</span>
-                <span className="ml-auto hidden text-right text-[13px] text-[#8C99A8] sm:inline">{t.desc}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex justify-center">
-          <DinoFrame src={SCREENS.dock} alt="The quick dock on the 1.69" className="[--sw:160px] lg:[--sw:176px]" />
-        </div>
-      </div>
-
-      {/* sheets */}
-      <SubHead id="touch-2">scene, mood, light</SubHead>
-      <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-        Scene, Mood and Light open a sheet over the bottom half. The face stays live above it so you can see the change.
-      </p>
-      <div className="-mx-4 flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-4 pb-2.5 pt-1 md:mx-0 md:grid md:grid-cols-3 md:gap-[18px] md:overflow-visible md:p-0">
-        {SHEETS.map((s) => (
-          <div key={s.name} className="w-[236px] flex-none snap-start md:w-auto">
-            <div className="flex justify-center rounded-[10px] bg-[#0e1014] pb-3.5 pt-4">
-              <DinoFrame src={SCREENS[s.screen]} alt={`The ${s.name} sheet`} className="[--sw:136px] md:[--sw:150px]" />
-            </div>
-            <p className="mb-1 mt-3 text-[15px] font-bold text-gray-900">{s.name}</p>
-            <p className="text-sm leading-normal text-gray-700">{s.body}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* settings */}
-      <SubHead id="touch-3">settings</SubHead>
-      <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-        Tap <b className="font-bold text-gray-900">More</b> in the dock. Six pages, same colors as the dock tiles.
-      </p>
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_410px]">
-        <div className="order-2 overflow-hidden rounded-xl border border-gray-200 bg-white lg:order-1">
-          {SETTINGS.map((s, i) => (
-            <div
-              key={s.name}
-              className={cn(
-                "px-3.5 py-[11px] md:grid md:grid-cols-[120px_1fr] md:gap-3 md:px-4",
-                i < SETTINGS.length - 1 && "border-b border-gray-200",
-              )}
-            >
-              <span className="inline-flex items-center gap-[7px] whitespace-nowrap text-[13px] font-medium text-gray-900">
-                <span className="h-[9px] w-[9px] flex-none rounded-[3px]" style={{ background: CAT[s.cat] }} />
-                {s.name}
-              </span>
-              <p className="ml-4 mt-[3px] text-[13.5px] leading-normal text-gray-700 md:ml-0 md:mt-0 md:text-sm">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-        <div className="order-1 flex justify-center gap-2 overflow-hidden rounded-xl bg-[#0e1014] px-1 py-[18px] sm:gap-3.5 md:px-3 md:py-[22px] lg:order-2">
-          <DinoFrame src={SCREENS.settings} alt="The settings page" className="[--sw:112px] sm:[--sw:140px] md:[--sw:150px]" />
-          <DinoFrame src={SCREENS.look} alt="Settings › Look" className="[--sw:112px] sm:[--sw:140px] md:[--sw:150px]" />
-        </div>
-      </div>
-
-      {/* landscape */}
-      {landscape && (
-        <>
-          <SubHead id="touch-4">CoreS3 and Stackchan</SubHead>
-          <p className="mb-3.5 text-[15px] leading-relaxed text-gray-700">
-            Same gestures, turned sideways. The face stays full size and the dock becomes two rails. It adds{" "}
-            <b className="font-bold text-gray-900">Sound</b>, plus <b className="font-bold text-gray-900">Head</b> on a
-            Stackchan or <b className="font-bold text-gray-900">Connect</b> on a plain CoreS3. Settings get a category
-            list on the left.
-          </p>
-          <div className="-mx-4 flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-4 pb-2.5 pt-1 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:p-0 xl:grid-cols-3">
-            {shots.map((s) => (
-              <div key={s.screen} className="w-[262px] flex-none snap-start md:w-auto">
-                <div className="flex flex-col items-center rounded-[10px] bg-[#0e1014] px-2 pb-3 pt-4">
-                  <LandscapeFrame src={SCREENS[s.screen]} alt={s.caption} className="[--sw:226px]" />
-                  <Caption className="mt-2.5">{s.caption}</Caption>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+      {filter === "lcd13" ? (
+        <Callout className="mt-5">
+          The 1.3 has no touch screen. Use the{" "}
+          <VbLink href="/vizbot/web" className={linkCls}>
+            web panel
+          </VbLink>
+          .
+        </Callout>
+      ) : (
+        <Pointer
+          href="/vizbot/touch"
+          title="It has its own page now."
+          body="Gestures, the quick dock, the scene, mood and light sheets, all six settings pages, and the sideways layout on CoreS3 and Stackchan."
+          cta="Open the touch screen page"
+          art={
+            filter === "cores3" || filter === "stackchan" ? (
+              <LandscapeFrame src={SCREENS.s3dock} alt="The quick dock on a Stackchan" className="[--sw:180px]" />
+            ) : (
+              <DinoFrame src={SCREENS.dock} alt="The quick dock on the 1.69" className="[--sw:104px]" />
+            )
+          }
+        />
       )}
     </section>
   );
 }
 
-function WebPanel({ filter }: { filter: Filter }) {
-  const items = PANEL.filter((p) => filter === "all" || !p.boards || p.boards.includes(filter as BoardId));
+function WebPanel() {
   return (
     <section id="web" className={cn("mt-14 md:mt-16", sectionCls)}>
       <SectionHeading num={3}>the web panel</SectionHeading>
@@ -490,20 +158,22 @@ function WebPanel({ filter }: { filter: Filter }) {
         Open <Code>http://vizbot-xxxx.local</Code> from anything on the same WiFi. It does everything the touch screen
         does, plus the stuff that needs typing.
       </Lead>
-      <div className="grid gap-2 md:grid-cols-2">
-        {items.map((p) => {
-          const Icon = PANEL_ICONS[p.icon];
-          return (
-            <div key={p.name} className="flex items-start gap-3 rounded-[10px] border border-gray-200 bg-white px-3.5 py-3">
-              <Icon className="mt-0.5 h-[18px] w-[18px] flex-none text-gray-700" strokeWidth={1.8} aria-hidden="true" />
-              <div>
-                <p className="text-sm font-bold text-gray-900">{p.name}</p>
-                <p className="mt-0.5 text-[13.5px] leading-normal text-muted-foreground">{p.desc}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <Pointer
+        href="/vizbot/web"
+        title="Every card, with screenshots."
+        body="Expressions, personality, appearance, WLED sprites, device, sounds, weather, WiFi, the WLED display and Stackchan head control. What each control does and which boards have it."
+        cta="Open the web panel page"
+        art={
+          <img
+            src={WEB_FULL.src}
+            width={170}
+            height={224}
+            alt="The vizBot web panel"
+            loading="lazy"
+            className="block h-auto w-[150px] rounded-md bg-[#e8e4dc] sm:w-[170px]"
+          />
+        }
+      />
     </section>
   );
 }
@@ -622,34 +292,38 @@ function Help({ filter }: { filter: Filter }) {
 
 export default function VizBotGuide() {
   const [filter, setFilter] = useState<Filter>("all");
-  const active = useActiveSection(filter);
+  const active = useActiveSection(TOC, filter);
   useHashScroll();
 
   return (
     <>
       <SEO
         title="vizBot user guide"
-        description="Get vizBot on your WiFi, use the touch screen and web panel, update the firmware, fix common problems."
+        description="Get vizBot on your WiFi, update the firmware, read the notes for your board, fix common problems."
         image={SCREENS.dock}
         keywords="vizBot, user guide, ESP32, Stackchan, CoreS3, firmware update"
       />
       <VizBotShell>
-        <Hero />
-        <JumpBar active={active} />
+        <DocHero
+          eyebrow={`user guide · firmware ${DOC_VERSION}`}
+          title="Getting along with vizBot."
+          lead="How to get it online, keep it updated, and fix it when something's off. The touch screen and the web panel have their own pages."
+          quick={[
+            { t: "New bot?", d: "Get it on your WiFi.", href: "setup", n: 1 },
+            { t: "Updating?", d: "Four steps, two minutes.", href: "update", n: 4 },
+            { t: "Stuck?", d: "Common problems and fixes.", href: "help", n: 6 },
+          ]}
+        />
+        <JumpBar items={TOC} active={active} />
         <div className="mt-2 grid gap-14 lg:grid-cols-[220px_minmax(0,1fr)]">
-          <Toc active={active} filter={filter} setFilter={setFilter} />
+          <Toc items={TOC} active={active} label="Guide sections">
+            <FilterBox value={filter} onChange={setFilter} />
+          </Toc>
           <div className="min-w-0">
-            {filter !== "all" && (
-              <div className="mt-6 flex flex-wrap items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-3.5 py-2 text-sm text-gray-700 lg:mt-9">
-                Showing notes for <b className="text-gray-900">{BOARD_BY_ID[filter].short}</b>.
-                <button type="button" onClick={() => setFilter("all")} className={cn(linkCls, "vb-focus")}>
-                  Show all boards
-                </button>
-              </div>
-            )}
+            <FilterBanner filter={filter} setFilter={setFilter} name={filter === "all" ? "" : BOARD_BY_ID[filter].short} />
             <Setup />
             <Touch filter={filter} />
-            <WebPanel filter={filter} />
+            <WebPanel />
             <Update filter={filter} />
             <BoardNotes filter={filter} setFilter={setFilter} />
             <Help filter={filter} />

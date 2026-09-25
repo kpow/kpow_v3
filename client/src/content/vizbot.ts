@@ -1,7 +1,7 @@
-// Every vizBot fact the three pages share: boards, gestures, dock tiles,
-// settings, the guide's steps and fixes. Keep it in step with the firmware
-// (github kpow/vizpow, vizbot/): BOARD_TYPE tokens in config.h, the touch UI in
-// touch_ui.h, the OTA filename check in ota_update.h.
+// Every vizBot fact the five pages share: boards, gestures, dock tiles,
+// settings, the web panel's cards, the guide's steps and fixes. Keep it in step
+// with the firmware (github kpow/vizpow, vizbot/): BOARD_TYPE tokens in config.h, the touch UI in
+// touch_ui.h, the web panel in web_server.h, the OTA filename check in ota_update.h.
 //
 // Rich strings use a tiny inline markup rendered by <Rich> in
 // components/vizbot/bits.tsx: **bold**, `code`, [text](href).
@@ -56,8 +56,8 @@ export const BOARDS: Board[] = [
     feats: ["No touch", "Square 240×240", "Hologram", "Battery"],
     touch: false,
     notes: [
-      "No touch, so you drive it from the web panel.",
-      "It fits a 20 mm beamsplitter cube. Turn on **Hologram Mode** in the web panel (WLED Display section) to mirror the screen, and the face floats in the cube. Silly trick, looks great.",
+      "No touch, so you drive it from the [web panel](/vizbot/web).",
+      "It fits a 20 mm beamsplitter cube. Turn on **Hologram Mode** in the [web panel](/vizbot/web#wled) (WLED Display card) to flip the screen, and the face floats in the cube. Silly trick, looks great.",
       "Shake it for a reaction. Shake for half a second to flip to weather. Do it again to flip back.",
       "Runs on a battery and charges over USB-C.",
     ],
@@ -184,18 +184,30 @@ export const GESTURES_SHORT: { icon: GestureIcon; k: string; v: string }[] = [
 
 // ------------------------------------------------------------------ guide
 
-export const TOC: { id: string; name: string; subs: string[]; boards?: BoardId[] }[] = [
-  { id: "setup", name: "get it online", subs: [] },
-  {
-    id: "touch",
-    name: "the touch screen",
-    subs: ["gestures", "the quick dock", "scene, mood, light", "settings", "CoreS3 and Stackchan"],
-    boards: ["lcd169", "cores3", "stackchan"],
-  },
-  { id: "web", name: "the web panel", subs: [] },
-  { id: "update", name: "updating firmware", subs: [] },
-  { id: "boards", name: "board notes", subs: [] },
-  { id: "help", name: "if something's off", subs: [] },
+export interface TocItem {
+  id: string;
+  name: string;
+  /** Only these boards. Hidden when the page's board filter excludes them. */
+  boards?: BoardId[];
+}
+
+/** The guide. Touch and web panel are pointer cards to their own pages. */
+export const TOC: TocItem[] = [
+  { id: "setup", name: "get it online" },
+  { id: "touch", name: "the touch screen" },
+  { id: "web", name: "the web panel" },
+  { id: "update", name: "updating firmware" },
+  { id: "boards", name: "board notes" },
+  { id: "help", name: "if something's off" },
+];
+
+/** /vizbot/touch */
+export const TOUCH_TOC: TocItem[] = [
+  { id: "gestures", name: "gestures" },
+  { id: "dock", name: "the quick dock" },
+  { id: "sheets", name: "scene, mood, light" },
+  { id: "settings", name: "settings" },
+  { id: "landscape", name: "CoreS3 and Stackchan", boards: ["cores3", "stackchan"] },
 ];
 
 export const SETUP_STEPS: string[] = [
@@ -203,7 +215,7 @@ export const SETUP_STEPS: string[] = [
   "On your phone, join `vizBot-XXXX`. Password `12345678`. The setup page should pop up. If it doesn't, go to `192.168.4.1`.",
   "Tap **Scan Networks**, pick your WiFi, enter the password, tap **Connect**.",
   "Put your phone back on your home WiFi. The bot's hotspot stays on so it can talk to other bots. Ignore it.",
-  "Open `http://vizbot-xxxx.local` (same four characters). That's the web panel. Bookmark it.",
+  "Open `http://vizbot-xxxx.local` (same four characters). That's the [web panel](/vizbot/web). Bookmark it.",
 ];
 
 export const GESTURES: { icon: GestureIcon; k: string; v: string }[] = [
@@ -265,22 +277,6 @@ export const LANDSCAPE_SHOTS: { screen: ScreenKey; caption: string; boards: Boar
   { screen: "s3head", caption: "settings › head (stackchan)", boards: ["stackchan"] },
 ];
 
-export type PanelIcon =
-  | "smile" | "chat" | "robot" | "palette" | "chip" | "cloud" | "wifi" | "grid" | "speaker" | "led";
-
-export const PANEL: { icon: PanelIcon; name: string; desc: string; boards?: BoardId[] }[] = [
-  { icon: "smile", name: "Expressions", desc: "All 25 faces." },
-  { icon: "chat", name: "Say something", desc: "Type it and it shows up in a speech bubble." },
-  { icon: "robot", name: "Personality", desc: "Pick one or let it rotate." },
-  { icon: "palette", name: "Appearance", desc: "Face color, background, scene, kaleidoscope, audio reactivity." },
-  { icon: "chip", name: "Device", desc: "Brightness, time zone, hi-res, firmware and Update." },
-  { icon: "cloud", name: "Weather & Info", desc: "Set your location by zip or city." },
-  { icon: "wifi", name: "WiFi", desc: "Scan, connect, forget, rename the bot." },
-  { icon: "grid", name: "WLED", desc: "Send speech, weather and sprites to a WLED matrix." },
-  { icon: "speaker", name: "Sounds", desc: "CoreS3 and Stackchan.", boards: ["cores3", "stackchan"] },
-  { icon: "led", name: "StackChan", desc: "Head, base LEDs, power off.", boards: ["stackchan"] },
-];
-
 /** Update steps; `{ota}` becomes the example OTA file name. */
 export const UPDATE_STEPS: string[] = [
   "Grab your board's file from [Downloads](/vizbot/releases). It looks like {ota}: board name in the middle, **no** `-factory` on the end.",
@@ -314,6 +310,319 @@ export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
     title: "The Stackchan head stopped moving after an update",
     body: "Power it fully off. Hold the bottom button about 6 seconds, or hold **Power off** in Settings › System. Then turn it back on. A plain restart isn't enough for the servos.",
     boards: ["stackchan"],
+  },
+];
+
+// ------------------------------------------------------------------ web panel
+// /vizbot/web. One section per card, in the panel's own order. Facts come from
+// the firmware's web_server.h (the page and its handlers) plus the headers the
+// handlers call. Screenshots: a Stackchan on 3.4.0, captured at 2x.
+
+const W = "/images/vizbot/web/";
+
+export const WEB_FULL = { src: W + "web-full.jpg", w: 1400, h: 1842 };
+
+export const WEB_OPEN_STEPS: string[] = [
+  "On anything on the same WiFi, open `http://vizbot-xxxx.local`. The four characters are unique to your bot. Named it? Use the name, like `http://vizbot-desk.local`.",
+  "No luck? Use the IP instead. It's in **Settings › Connect** and on the pill at the top of the dock. The 1.3 shows it when it boots.",
+  "Bookmark it. It works the same on a phone or a desktop.",
+];
+
+/** What's on the page before the cards. */
+export const WEB_LAYOUT: string[] = [
+  "**The yellow bar** shows the firmware version and the bot's name. Two dots on the right: **Connected** and **WLED**.",
+  "**The cards** sit in two columns on a wide screen and stack in one on a phone. This page follows their order.",
+  "**Fold a card** by tapping its title. The ▾ turns sideways. Expressions and Say Something don't fold. The panel remembers what you folded, in that browser.",
+  "**The bar at the bottom** names the bot you're talking to and its .local address.",
+];
+
+export interface WebControl {
+  /** The label as the panel shows it */
+  k: string;
+  v: string;
+  boards?: BoardId[];
+}
+
+export interface WebSection {
+  id: string;
+  /** Heading on this page */
+  name: string;
+  /** The card's title in the panel */
+  card: string;
+  shot: string;
+  /** Screenshot size in pixels (2x) */
+  w: number;
+  h: number;
+  boards?: BoardId[];
+  lead: string;
+  controls: WebControl[];
+  note?: string;
+}
+
+const MIC_BOARDS: BoardId[] = ["cores3", "stackchan"];
+
+export const WEB_SECTIONS: WebSection[] = [
+  {
+    id: "expressions",
+    name: "expressions",
+    card: "Expressions",
+    shot: W + "web-expressions.png",
+    w: 1100,
+    h: 382,
+    lead: "All 25 faces, Neutral to Sassy. Tap one and the bot wears it. The last one you tapped turns yellow.",
+    controls: [],
+  },
+  {
+    id: "say",
+    name: "say something",
+    card: "Say Something",
+    shot: W + "web-say.png",
+    w: 1100,
+    h: 146,
+    lead: "Type up to 60 characters and hit **Send**. It shows up in a speech bubble on the bot for about 4 seconds.",
+    controls: [],
+    note: "With **Forward Speech** on in [WLED display](#wled), the words go to the matrix too, one word at a time.",
+  },
+  {
+    id: "personality",
+    name: "personality",
+    card: "Personality",
+    shot: W + "web-personality.png",
+    w: 1100,
+    h: 202,
+    lead: "Chill, Hyper or Grumpy. The personality also picks which scenes and palettes Auto cycles through.",
+    controls: [
+      { k: "Personality", v: "Pick one. Picking one by hand stops the rotation." },
+      {
+        k: "Rotate · every N min",
+        v: "Tick it and every N minutes it switches to a random personality from the list. 1 to 60, default 5. Set the minutes first, then tick the box. Untick it to stay on the one showing.",
+      },
+    ],
+  },
+  {
+    id: "appearance",
+    name: "appearance",
+    card: "Appearance",
+    shot: W + "web-appearance.png",
+    w: 1100,
+    h: 1132,
+    lead: "The face color and everything behind the face. Pick **Ambient** to see the rest of the card.",
+    controls: [
+      { k: "Face Color", v: "White, Cyan, Green, Pink or Yellow." },
+      {
+        k: "Background",
+        v: "**Black** is a plain black screen behind the face. **Ambient** runs a scene back there and opens the controls below.",
+      },
+      {
+        k: "Ambient Effect",
+        v: "16 scenes, Plasma to Hiphotic. Tap one and it stays: picking a scene turns Auto off.",
+      },
+      {
+        k: "Stop Auto / Auto",
+        v: "Auto moves to a new scene every 20 seconds and a new palette every 5. The button reads **Stop Auto** while it cycles and **Auto** when it's stopped.",
+      },
+      {
+        k: "Audio FX",
+        v: "The scenes react to the mic. The row only shows on boards with a mic.",
+        boards: MIC_BOARDS,
+      },
+      {
+        k: "Reactivity",
+        v: "How hard they react. 0 to 200, default 100. 0 is off and 200 doubles it. The marks under it read Off, Tasteful, Dramatic.",
+        boards: MIC_BOARDS,
+      },
+      {
+        k: "Kaleidoscope",
+        v: "Folds the scene into a mirror pattern. Six stops: Off, Vertical, Horizontal, H+V, 6-Slice, 8-Slice.",
+      },
+      {
+        k: "Spin",
+        v: "Turns the pattern on 6-Slice and 8-Slice. 128 is about one turn every 5 seconds. 0 holds it still. The mirror modes ignore it.",
+      },
+      { k: "Blend", v: "Mixes the pattern with the plain scene. 255 is all kaleidoscope. 0 is the plain scene." },
+      { k: "Slice Offset", v: "Pans the mirror modes. On 6-Slice and 8-Slice it turns the wedge instead." },
+    ],
+  },
+  {
+    id: "sprites",
+    name: "WLED sprites",
+    card: "WLED Sprites",
+    shot: W + "web-sprites.png",
+    w: 1100,
+    h: 632,
+    lead: "A slideshow of 8×8 sprites on a 32×8 WLED matrix, three at a time. Set up the matrix in [WLED display](#wled) first.",
+    controls: [
+      {
+        k: "Sprite grid",
+        v: "28 sprites: Heart, Skull, Pacman, Invader, Dragon and the rest. Tap one to add it to the queue. It turns yellow.",
+      },
+      { k: "Queue", v: "The yellow tags under the grid, in play order. Tap one to take it out." },
+      { k: "Start / Stop", v: "Plays the queue on the matrix and fades between groups of three. An empty queue won't start." },
+      { k: "Clear", v: "Empties the queue and stops the show." },
+      { k: "Cycle Time", v: "How long each group stays up. 1 to 10 seconds, default 4." },
+    ],
+    note: "When the show stops, the matrix goes back to whatever WLED was playing before.",
+  },
+  {
+    id: "device",
+    name: "device",
+    card: "Device",
+    shot: W + "web-device.png",
+    w: 1070,
+    h: 722,
+    lead: "Brightness, the clock and the firmware.",
+    controls: [
+      { k: "Brightness", v: "Screen brightness, 1 to 255. Default 15." },
+      { k: "Volume", v: "Speaker volume, 0 to 255. The Waveshare boards have no speaker.", boards: MIC_BOARDS },
+      { k: "Time Overlay", v: "Puts the clock on the face. Same as **Clock** in the dock." },
+      {
+        k: "Time Zone",
+        v: "Ten presets: the four US zones, Arizona, Alaska, Hawaii, UTC, UK and Central Europe. Daylight saving is built in. Default Eastern.",
+      },
+      {
+        k: "Hi-Res Background",
+        v: "Draws the scene at the screen's full resolution. Off, it's chunky pixels. Same as Pixel / Hi-res in the Scene sheet.",
+      },
+      {
+        k: "Firmware · Update",
+        v: "The version it's running. **Update** opens the update page at `/update`. The steps are in [updating firmware](/vizbot/guide#update).",
+      },
+    ],
+  },
+  {
+    id: "sounds",
+    name: "sounds",
+    card: "Sounds",
+    shot: W + "web-sounds.png",
+    w: 1070,
+    h: 1108,
+    boards: MIC_BOARDS,
+    lead: "Every sound the bot makes, on buttons. The card only fills in on a CoreS3 or Stackchan.",
+    controls: [
+      {
+        k: "MIDI Synth",
+        v: "Where sound goes. **MIDI Active**: a SAM2695 MIDI synth unit on a Grove port plays it. **Speaker**: the built-in speaker. **Off**: no sound.",
+      },
+      {
+        k: "Synth Port",
+        v: "Which Grove port the synth is on: **Port C** (default) or **Port A**. It switches live, no restart. Port A is the I2C port too, so the synth and an I2C unit can't share it.",
+      },
+      {
+        k: "Sound buttons",
+        v: "37 of them: Boot Chime, Tap Boop, Level Up, Funky Bot, Retro Quest and the rest. These are the sounds it plays on its own. Tap one to hear it.",
+      },
+    ],
+  },
+  {
+    id: "weather",
+    name: "weather & info",
+    card: "Weather & Info",
+    shot: W + "web-weather.png",
+    w: 1070,
+    h: 544,
+    lead: "Weather on the bot's screen, and a timed weather and sprite show for the WLED matrix.",
+    controls: [
+      {
+        k: "Show Weather",
+        v: "Swaps the face for the weather view: now plus 3 days. Toggle it off to get the face back.",
+      },
+      {
+        k: "Location",
+        v: "Type a zip code or a city and hit **Set**. It looks it up on Open-Meteo and saves the spot. **Location not found** means the lookup came back empty.",
+      },
+      {
+        k: "Scheduled Content",
+        v: "Every N minutes it takes over the WLED matrix: 2 minutes of weather, then 4 minutes of 20 random sprites. Speech pauses it. The first run starts about a minute after you turn it on.",
+      },
+      { k: "Cycle every · min", v: "Minutes between runs. 1 to 120, default 30." },
+      {
+        k: "Status line",
+        v: "Only one bot per matrix runs the show. That one reads **Owner** and the current phase. The others read **Deferred to another bot**.",
+      },
+    ],
+  },
+  {
+    id: "wifi",
+    name: "WiFi",
+    card: "WiFi",
+    shot: W + "web-wifi.png",
+    w: 1070,
+    h: 528,
+    lead: "The bot's name and the network it's on.",
+    controls: [
+      {
+        k: "Device Name",
+        v: "Becomes the address and the hotspot name, as typed. Enter `vizbot-desk`, hit **Set**, restart the bot, and it's at `vizbot-desk.local`. Spaces turn into hyphens. Up to 23 characters.",
+      },
+      { k: "Connected to", v: "The network it's on and its IP." },
+      {
+        k: "Scan Networks",
+        v: "Lists the networks it can hear, with signal bars. Open ones say OPEN. Tap one, type the password, hit **Connect**. The new IP shows once it's on.",
+      },
+      {
+        k: "Forget Network",
+        v: "Clears the saved WiFi. The bot goes back to its own hotspot, like a new one. Start over at [get it online](/vizbot/guide#setup).",
+      },
+    ],
+  },
+  {
+    id: "wled",
+    name: "WLED display",
+    card: "WLED Display",
+    shot: W + "web-wled.png",
+    w: 1070,
+    h: 604,
+    lead: "Point the bot at a WLED matrix and it sends its speech there. It's built for a 32×8 matrix.",
+    controls: [
+      {
+        k: "Status line",
+        v: "Shows once there's an IP and Forward Speech is on. **Reachable** in green or **Unreachable** in red. The WLED dot in the header matches. Grey means it's off.",
+      },
+      {
+        k: "Forward Speech",
+        v: "Every speech bubble goes to the matrix too. Off, speech stays on the bot and Test Connection sends nothing.",
+      },
+      {
+        k: "Hologram Mode",
+        v: "Flips the bot's own screen top to bottom. It lives in this card but doesn't touch the matrix. It's for a beamsplitter cube: the reflection comes out the right way up and the face floats in the glass. Silly trick, looks great.",
+      },
+      { k: "Flip Text (H)", v: "For a matrix wired the other way. Text on the matrix reads backwards? Turn this on." },
+      { k: "WLED IP · Set", v: "The matrix's IP address. Type it and hit **Set**." },
+      { k: "Test Connection", v: "Sends **Hello** to the matrix for 5 seconds." },
+    ],
+    note: "When a message ends, WLED goes back to whatever it was playing. Two bots on one matrix find each other over ESP-NOW and take turns.",
+  },
+  {
+    id: "stackchan",
+    name: "Stackchan",
+    card: "StackChan",
+    shot: W + "web-stackchan.png",
+    w: 1070,
+    h: 1364,
+    boards: ["stackchan"],
+    lead: "Head, base LEDs, chill and power. The card only shows up on a Stackchan.",
+    controls: [
+      {
+        k: "Head Control",
+        v: "**Left** and **Right** turn the head. **Up** and **Down** tilt it. **Center** brings it home. **Nod** and **Shake** are the moves it makes when you tap the top of its head.",
+      },
+      { k: "Yaw", v: "Turn, −90° to 90°. The head moves when you let go of the slider." },
+      { k: "Pitch", v: "Tilt, 25° to 85°. The 25° floor keeps the head off the base." },
+      {
+        k: "Base LEDs",
+        v: "The 12-LED ring. Ten modes: Off, Breathing, Rainbow, Chase, Fire, Twinkle, Pulse, Aurora, Mood and Audio. **Mood** takes its color from the face's expression. **Audio** reacts to the mic.",
+      },
+      { k: "Brightness · Speed", v: "For the ring. 10 to 255 each, defaults 80 and 128." },
+      {
+        k: "Chill Mode (10 min)",
+        v: "The head goes home and stops moving for 10 minutes. The face goes Chill, it says Zzz and the ring breathes slowly. Tap it again to wake it up. Holding the top of its head for 2 seconds does the same.",
+      },
+      { k: "Battery", v: "Battery voltage and current draw." },
+      {
+        k: "Power Off",
+        v: "Asks first. Then it turns off the servos, the ring and the screen and shuts down. It's the full power-off a stuck head needs after an update.",
+      },
+    ],
   },
 ];
 
