@@ -22,6 +22,7 @@ import {
   Lightbulb,
   AudioLines,
   Hammer,
+  Bot,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -116,6 +117,16 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
         { label: "setup guide", href: "/vizspot/guide", native: false },
         { label: "controls page", href: "/vizspot/controls", native: false },
         { label: "spotify connect", href: "/vizspot/", native: true },
+      ],
+    },
+    {
+      icon: <Bot className="w-4 h-4" />,
+      label: "vizBot",
+      href: "/vizbot",
+      children: [
+        { label: "overview", href: "/vizbot", native: false },
+        { label: "user guide", href: "/vizbot/guide", native: false },
+        { label: "downloads", href: "/vizbot/releases", native: false },
       ],
     },
     {

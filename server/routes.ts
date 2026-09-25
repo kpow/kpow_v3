@@ -13,6 +13,7 @@ import { registerGithubRoutes } from "./routes/github-routes";
 import { registerMusicRoutes } from "./routes/music-routes";
 import { registerAdminRoutes } from "./routes/admin-routes";
 import { registerVizspotRoutes } from "./routes/vizspot-routes";
+import { registerVizbotRoutes } from "./routes/vizbot-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import instagramRoutes from "./routes/instagram-routes";
@@ -44,6 +45,7 @@ export function registerRoutes(app: Express): Server {
   registerMusicRoutes(router);
   registerAdminRoutes(router);
   registerVizspotRoutes(router);   // vizSpot LED board phone pairing
+  registerVizbotRoutes(router);    // vizBot firmware releases (GitHub, cached)
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);

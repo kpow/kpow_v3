@@ -25,6 +25,9 @@ import BuildDetail from "@/pages/BuildDetail";
 import Recently from "@/pages/Recently";
 import VizSpotGuide from "@/pages/VizSpotGuide";
 import VizSpotControls from "@/pages/VizSpotControls";
+import VizBot from "@/pages/VizBot";
+import VizBotGuide from "@/pages/VizBotGuide";
+import VizBotReleases from "@/pages/VizBotReleases";
 import { Route as WouterRoute } from "wouter";
 import { SEO } from "@/components/global/SEO";
 
@@ -57,6 +60,10 @@ function Router() {
         <Route path="/builds" component={Builds} />
         <Route path="/vizspot/guide" component={VizSpotGuide} />
         <Route path="/vizspot/controls" component={VizSpotControls} />
+        {/* specific /vizbot/* routes before /vizbot — first match wins in wouter */}
+        <Route path="/vizbot/guide" component={VizBotGuide} />
+        <Route path="/vizbot/releases" component={VizBotReleases} />
+        <Route path="/vizbot" component={VizBot} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
 
