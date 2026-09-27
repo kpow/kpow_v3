@@ -30,6 +30,9 @@ import VizBotGuide from "@/pages/VizBotGuide";
 import VizBotReleases from "@/pages/VizBotReleases";
 import VizBotTouch from "@/pages/VizBotTouch";
 import VizBotWeb from "@/pages/VizBotWeb";
+import VizMac from "@/pages/VizMac";
+import VizMacGuide from "@/pages/VizMacGuide";
+import VizMacController from "@/pages/VizMacController";
 import { Route as WouterRoute } from "wouter";
 import { SEO } from "@/components/global/SEO";
 
@@ -70,6 +73,10 @@ function Router() {
         <Route path="/vizbot/web" component={VizBotWeb} />
         <Route path="/vizbot/releases" component={VizBotReleases} />
         <Route path="/vizbot" component={VizBot} />
+        {/* specific /vizmac/* routes before /vizmac, as above */}
+        <Route path="/vizmac/guide" component={VizMacGuide} />
+        <Route path="/vizmac/controller" component={VizMacController} />
+        <Route path="/vizmac" component={VizMac} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
 

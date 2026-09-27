@@ -108,12 +108,15 @@ export function Toc({
   active,
   label,
   children,
+  footer,
 }: {
   items: TocItem[];
   active: string;
   label: string;
   /** Extras under the list, e.g. the board filter */
   children?: ReactNode;
+  /** Links under the extras. Defaults to vizBot's downloads and issues links. */
+  footer?: ReactNode;
 }) {
   return (
     <aside className="sticky top-24 hidden self-start lg:block">
@@ -135,13 +138,13 @@ export function Toc({
                   aria-current={on ? "location" : undefined}
                   className={cn(
                     "vb-focus flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm no-underline",
-                    on ? "bg-yellow-50 font-medium text-[#0a0a0a]" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                    on ? "bg-[var(--vb-tint)] font-medium text-[#0a0a0a]" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                   )}
                 >
                   <span
                     className={cn(
                       "grid h-[22px] w-[22px] flex-none place-items-center rounded-md font-slackey text-[11px]",
-                      on ? "border-[1.5px] border-[#0a0a0a] bg-[#FFD23F] text-[#0a0a0a]" : "bg-gray-100 text-gray-600",
+                      on ? "border-[1.5px] border-[#0a0a0a] bg-[var(--vb-yellow)] text-[#0a0a0a]" : "bg-gray-100 text-gray-600",
                     )}
                   >
                     {i + 1}
@@ -154,21 +157,25 @@ export function Toc({
         </ol>
       </nav>
       {children}
-      <VbLink
-        href="/vizbot/releases"
-        className="vb-focus mt-3 flex items-center justify-between gap-2 rounded-[10px] bg-[#0a0a0a] px-3.5 py-3 text-sm font-medium text-white no-underline hover:bg-[#262626]"
-      >
-        <span>Firmware downloads</span>
-        <Download className="h-4 w-4 text-[#FFD23F]" />
-      </VbLink>
-      <a
-        href={ISSUES_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2.5 flex items-center gap-2 px-2 py-1 text-[13px] text-gray-600 no-underline hover:text-gray-900"
-      >
-        <Code2 className="h-[15px] w-[15px]" /> Report a problem
-      </a>
+      {footer ?? (
+        <>
+          <VbLink
+            href="/vizbot/releases"
+            className="vb-focus mt-3 flex items-center justify-between gap-2 rounded-[10px] bg-[#0a0a0a] px-3.5 py-3 text-sm font-medium text-white no-underline hover:bg-[#262626]"
+          >
+            <span>Firmware downloads</span>
+            <Download className="h-4 w-4 text-[#FFD23F]" />
+          </VbLink>
+          <a
+            href={ISSUES_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2.5 flex items-center gap-2 px-2 py-1 text-[13px] text-gray-600 no-underline hover:text-gray-900"
+          >
+            <Code2 className="h-[15px] w-[15px]" /> Report a problem
+          </a>
+        </>
+      )}
     </aside>
   );
 }
@@ -260,7 +267,7 @@ export function Applies({ boards, className }: { boards: string[]; className?: s
 export function FilterBanner({ filter, setFilter, name }: { filter: Filter; setFilter: (f: Filter) => void; name: string }) {
   if (filter === "all") return null;
   return (
-    <div className="mt-6 flex flex-wrap items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-3.5 py-2 text-sm text-gray-700 lg:mt-9">
+    <div className="mt-6 flex flex-wrap items-center gap-2 rounded-lg border border-[var(--vb-tint-border)] bg-[var(--vb-tint)] px-3.5 py-2 text-sm text-gray-700 lg:mt-9">
       Showing notes for <b className="text-gray-900">{name}</b>.
       <button
         type="button"

@@ -1,10 +1,15 @@
 /* vizBot section (/vizbot, /vizbot/guide, /vizbot/releases).
    Every rule is scoped under .vizbot, the same way .buildlog scopes its purple:
    the yellow accent and the device frames stay inside this section and the rest
-   of kpow.xyz keeps its blue. Design source: the vizBot comps (gen.py). */
+   of kpow.xyz keeps its blue. Design source: the vizBot comps (gen.py).
+
+   The shared building blocks (buttons, badges, disclosures, markdown) are also
+   scoped to .vizmac, which sets the same --vb-* variables to its own accent in
+   components/vizmac/vizmac.css. The dino and landscape frames stay vizBot only. */
 
 .vizbot {
   --vb-yellow: #FFD23F;      /* fills only, always with ink text on it */
+  --vb-accent-hi: #FFDB66;   /* primary button hover */
   --vb-yellow-ink: #854D0E;  /* yellow-800: accent text on white */
   --vb-tint: #FEFCE8;        /* yellow-50 */
   --vb-tint-border: #FEF08A; /* yellow-200 */
@@ -24,13 +29,13 @@
   color: var(--vb-ink);
 }
 
-.vizbot .vb-mono { font-family: var(--vb-mono); }
+:is(.vizbot, .vizmac) .vb-mono { font-family: var(--vb-mono); }
 
 /* h1-h3 are Slackey site-wide; these opt back into body text. */
-.vizbot .vb-plain { font-family: Roboto, system-ui, sans-serif; }
+:is(.vizbot, .vizmac) .vb-plain { font-family: Roboto, system-ui, sans-serif; }
 
 /* ---------- buttons ---------- */
-.vizbot .vb-btn {
+:is(.vizbot, .vizmac) .vb-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -44,30 +49,30 @@
   text-decoration: none;
   transition: transform .08s ease, box-shadow .08s ease, background-color .12s ease;
 }
-.vizbot .vb-btn-primary {
+:is(.vizbot, .vizmac) .vb-btn-primary {
   background: var(--vb-yellow);
   color: var(--vb-ink);
   border: 1.5px solid var(--vb-ink);
   box-shadow: 2px 2px 0 var(--vb-ink);
 }
-.vizbot .vb-btn-primary:hover { background: #FFDB66; }
-.vizbot .vb-btn-primary:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--vb-ink); }
-.vizbot .vb-btn-outline {
+:is(.vizbot, .vizmac) .vb-btn-primary:hover { background: var(--vb-accent-hi); }
+:is(.vizbot, .vizmac) .vb-btn-primary:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--vb-ink); }
+:is(.vizbot, .vizmac) .vb-btn-outline {
   background: #fff;
   color: var(--vb-ink);
   border: 1px solid #E5E7EB;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
 }
-.vizbot .vb-btn-outline:hover { background: #F9FAFB; }
-.vizbot .vb-btn-dark { background: var(--vb-ink); color: #fff; border: 1.5px solid var(--vb-ink); }
-.vizbot .vb-btn-dark:hover { background: #262626; }
-.vizbot .vb-btn-ondark { background: var(--vb-yellow); color: var(--vb-ink); border: 1.5px solid var(--vb-yellow); }
-.vizbot .vb-btn-ondark:hover { background: #FFDB66; }
-.vizbot .vb-btn:focus-visible,
-.vizbot .vb-focus:focus-visible { outline: 2px solid var(--vb-ink); outline-offset: 2px; }
+:is(.vizbot, .vizmac) .vb-btn-outline:hover { background: #F9FAFB; }
+:is(.vizbot, .vizmac) .vb-btn-dark { background: var(--vb-ink); color: #fff; border: 1.5px solid var(--vb-ink); }
+:is(.vizbot, .vizmac) .vb-btn-dark:hover { background: #262626; }
+:is(.vizbot, .vizmac) .vb-btn-ondark { background: var(--vb-yellow); color: var(--vb-ink); border: 1.5px solid var(--vb-yellow); }
+:is(.vizbot, .vizmac) .vb-btn-ondark:hover { background: var(--vb-accent-hi); }
+:is(.vizbot, .vizmac) .vb-btn:focus-visible,
+:is(.vizbot, .vizmac) .vb-focus:focus-visible { outline: 2px solid var(--vb-ink); outline-offset: 2px; }
 
 /* the big download button */
-.vizbot .vb-btn-big {
+:is(.vizbot, .vizmac) .vb-btn-big {
   width: 100%;
   padding: 16px 20px;
   border-radius: 10px;
@@ -77,10 +82,10 @@
   white-space: normal;
   text-align: center;
 }
-.vizbot .vb-btn-big:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--vb-ink); }
+:is(.vizbot, .vizmac) .vb-btn-big:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--vb-ink); }
 
 /* step number badge */
-.vizbot .vb-badge {
+:is(.vizbot, .vizmac) .vb-badge {
   flex: none;
   display: grid;
   place-items: center;
@@ -93,7 +98,7 @@
 }
 
 /* ---------- screenshots ---------- */
-.vizbot .vb-shot { display: block; image-rendering: pixelated; }
+:is(.vizbot, .vizmac) .vb-shot { display: block; image-rendering: pixelated; }
 
 /* ---------- device frame: the 1.69 in its lime-green dino case ----------
    Sized from --sw, the on-screen width of the 240×280 screen. The shell is the
@@ -229,15 +234,15 @@
 }
 
 /* ---------- disclosures ---------- */
-.vizbot summary { list-style: none; }
-.vizbot summary::-webkit-details-marker { display: none; }
-.vizbot details[open] > summary .vb-chev { transform: rotate(180deg); }
-.vizbot details[open] > summary .vb-chev-r { transform: rotate(90deg); }
-.vizbot .vb-chev,
-.vizbot .vb-chev-r { transition: transform .15s ease; }
+:is(.vizbot, .vizmac) summary { list-style: none; }
+:is(.vizbot, .vizmac) summary::-webkit-details-marker { display: none; }
+:is(.vizbot, .vizmac) details[open] > summary .vb-chev { transform: rotate(180deg); }
+:is(.vizbot, .vizmac) details[open] > summary .vb-chev-r { transform: rotate(90deg); }
+:is(.vizbot, .vizmac) .vb-chev,
+:is(.vizbot, .vizmac) .vb-chev-r { transition: transform .15s ease; }
 
 /* horizontal snap rows on phones */
-.vizbot .vb-scroller {
+:is(.vizbot, .vizmac) .vb-scroller {
   display: flex;
   gap: 14px;
   overflow-x: auto;
@@ -247,27 +252,27 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
-.vizbot .vb-scroller > * { flex: none; scroll-snap-align: start; }
+:is(.vizbot, .vizmac) .vb-scroller > * { flex: none; scroll-snap-align: start; }
 
 /* ---------- release notes (buildlog's <Markdown>, restyled for this scope) ---------- */
-.vizbot .md { font-size: 15px; line-height: 1.6; color: #374151; }
-.vizbot .md > :last-child { margin-bottom: 0; }
-.vizbot .md.md-sm { font-size: 14px; }
-.vizbot .md p { margin: 0 0 12px; }
-.vizbot .md strong { color: #111827; font-weight: 700; }
-.vizbot .md a { color: #2563EB; font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
-.vizbot .md ul,
-.vizbot .md ol { margin: 0 0 16px; padding-left: 20px; }
-.vizbot .md ul { list-style: disc outside; }
-.vizbot .md ol { list-style: decimal outside; }
-.vizbot .md li { margin: 0 0 7px; }
-.vizbot .md li::marker { color: var(--vb-yellow-ink); }
-.vizbot .md li > ul,
-.vizbot .md li > ol { margin: 6px 0 0; }
-.vizbot .md h1,
-.vizbot .md h2,
-.vizbot .md h3,
-.vizbot .md h4 {
+:is(.vizbot, .vizmac) .md { font-size: 15px; line-height: 1.6; color: #374151; }
+:is(.vizbot, .vizmac) .md > :last-child { margin-bottom: 0; }
+:is(.vizbot, .vizmac) .md.md-sm { font-size: 14px; }
+:is(.vizbot, .vizmac) .md p { margin: 0 0 12px; }
+:is(.vizbot, .vizmac) .md strong { color: #111827; font-weight: 700; }
+:is(.vizbot, .vizmac) .md a { color: #2563EB; font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+:is(.vizbot, .vizmac) .md ul,
+:is(.vizbot, .vizmac) .md ol { margin: 0 0 16px; padding-left: 20px; }
+:is(.vizbot, .vizmac) .md ul { list-style: disc outside; }
+:is(.vizbot, .vizmac) .md ol { list-style: decimal outside; }
+:is(.vizbot, .vizmac) .md li { margin: 0 0 7px; }
+:is(.vizbot, .vizmac) .md li::marker { color: var(--vb-yellow-ink); }
+:is(.vizbot, .vizmac) .md li > ul,
+:is(.vizbot, .vizmac) .md li > ol { margin: 6px 0 0; }
+:is(.vizbot, .vizmac) .md h1,
+:is(.vizbot, .vizmac) .md h2,
+:is(.vizbot, .vizmac) .md h3,
+:is(.vizbot, .vizmac) .md h4 {
   font-family: "Slackey", cursive;
   font-weight: 400;
   font-size: 16px;
@@ -277,8 +282,8 @@
   padding-bottom: 6px;
   border-bottom: 1px solid #E5E7EB;
 }
-.vizbot .md > :is(h1, h2, h3, h4):first-child { margin-top: 0; }
-.vizbot .md code {
+:is(.vizbot, .vizmac) .md > :is(h1, h2, h3, h4):first-child { margin-top: 0; }
+:is(.vizbot, .vizmac) .md code {
   font-family: var(--vb-mono);
   font-size: .88em;
   color: #111827;
@@ -288,7 +293,7 @@
   padding: 1px 5px;
   overflow-wrap: anywhere;
 }
-.vizbot .md pre {
+:is(.vizbot, .vizmac) .md pre {
   margin: 0 0 14px;
   padding: 10px 12px;
   overflow-x: auto;
@@ -296,8 +301,8 @@
   border: 1px solid #E5E7EB;
   border-radius: 8px;
 }
-.vizbot .md pre code { border: 0; background: none; padding: 0; }
-.vizbot .md blockquote {
+:is(.vizbot, .vizmac) .md pre code { border: 0; background: none; padding: 0; }
+:is(.vizbot, .vizmac) .md blockquote {
   margin: 0 0 14px;
   padding: 10px 14px;
   background: var(--vb-tint);
@@ -305,8 +310,8 @@
   border-left: 3px solid var(--vb-yellow);
   border-radius: 0 10px 10px 0;
 }
-.vizbot .md hr { border: 0; height: 1px; background: #E5E7EB; margin: 18px 0; }
-.vizbot .md-table-wrap { max-width: 100%; overflow-x: auto; margin: 0 0 14px; border: 1px solid #E5E7EB; border-radius: 10px; }
-.vizbot .md table { border-collapse: collapse; width: 100%; font-size: .92em; }
-.vizbot .md th { text-align: left; padding: 7px 11px; background: var(--vb-tint); border-bottom: 1px solid var(--vb-tint-border); }
-.vizbot .md td { padding: 7px 11px; border-top: 1px solid #E5E7EB; vertical-align: top; }
+:is(.vizbot, .vizmac) .md hr { border: 0; height: 1px; background: #E5E7EB; margin: 18px 0; }
+:is(.vizbot, .vizmac) .md-table-wrap { max-width: 100%; overflow-x: auto; margin: 0 0 14px; border: 1px solid #E5E7EB; border-radius: 10px; }
+:is(.vizbot, .vizmac) .md table { border-collapse: collapse; width: 100%; font-size: .92em; }
+:is(.vizbot, .vizmac) .md th { text-align: left; padding: 7px 11px; background: var(--vb-tint); border-bottom: 1px solid var(--vb-tint-border); }
+:is(.vizbot, .vizmac) .md td { padding: 7px 11px; border-top: 1px solid #E5E7EB; vertical-align: top; }

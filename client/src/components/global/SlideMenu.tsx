@@ -26,6 +26,7 @@ import {
   Rss,
   History,
   ChevronDown,
+  Keyboard,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -55,7 +56,7 @@ const TOP: NavLink[] = [
   { icon: <Info className="w-4 h-4" />, label: "about kpow", href: "/about" },
 ];
 
-// Sections with their own sub-nav (build log, vizBot, vizSpot) link to their
+// Sections with their own sub-nav (build log, vizBot, vizSpot, vizMac) link to their
 // landing page only. The menu stays short and the section menus do the rest.
 const GROUPS: NavGroup[] = [
   {
@@ -66,6 +67,7 @@ const GROUPS: NavGroup[] = [
       { icon: <Hammer className="w-4 h-4" />, label: "build log", href: "/builds", match: ["/builds"] },
       { icon: <Bot className="w-4 h-4" />, label: "vizBot", href: "/vizbot", match: ["/vizbot"] },
       { icon: <AudioLines className="w-4 h-4" />, label: "vizSpot", href: "/vizspot/guide", match: ["/vizspot"] },
+      { icon: <Keyboard className="w-4 h-4" />, label: "vizMac", href: "/vizmac", match: ["/vizmac"] },
       { icon: <Lightbulb className="w-4 h-4" />, label: "led art", href: "/led", match: ["/led"] },
     ],
   },

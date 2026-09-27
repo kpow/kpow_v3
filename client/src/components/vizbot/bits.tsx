@@ -94,7 +94,7 @@ export function Code({ children, dark = false, className }: { children: ReactNod
 
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <p className={cn("vb-mono mb-3 text-xs font-medium uppercase tracking-[1.5px] text-yellow-800", className)}>
+    <p className={cn("vb-mono mb-3 text-xs font-medium uppercase tracking-[1.5px] text-[var(--vb-yellow-ink)]", className)}>
       {children}
     </p>
   );

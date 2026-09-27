@@ -1,0 +1,121 @@
+/* vizMac section (/vizmac, /vizmac/guide, /vizmac/controller).
+   The shared building blocks come from ../vizbot/vizbot.css, scoped to
+   :is(.vizbot, .vizmac). This file sets the same --vb-* variables to vizMac's
+   accent, the controller's own ACCENT periwinkle (firmware ui_gfx.h 0x7AA2FF),
+   and adds the controller frame. Everything stays under .vizmac, so the rest of
+   kpow.xyz keeps its blue. */
+
+.vizmac {
+  --vb-yellow: #7AA2FF;      /* the accent: fills only, always with ink text on it */
+  --vb-accent-hi: #9AB8FF;   /* primary button hover */
+  --vb-yellow-ink: #3730A3;  /* indigo-800: accent text on white */
+  --vb-tint: #EEF2FF;        /* indigo-50 */
+  --vb-tint-border: #C7D2FE; /* indigo-200 */
+  --vb-ink: #0A0A0A;
+  --vb-stage: #0E1014;
+  --vb-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  color: var(--vb-ink);
+}
+
+/* ---------- device frame: the vizMac controller in its printed case ----------
+   Sized from --sw, the on-page width of the 240×320 screen. Silver shell on a
+   black base plate like the real case: the skull, the 16×8 LED window, the
+   screen, then the raised block with the KO button and the knob. */
+:where(.vizmac .vm-ctl) { --sw: 180px; }
+.vizmac .vm-ctl {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--sw) * .07);
+  width: calc(var(--sw) * 1.2);
+  padding: calc(var(--sw) * .17) calc(var(--sw) * .1) calc(var(--sw) * .1);
+  border-radius: calc(var(--sw) * .09);
+  background: linear-gradient(160deg, #E4E6EA 0%, #C8CCD2 55%, #B9BEC5 100%);
+  box-shadow:
+    0 0 0 calc(var(--sw) * .035) #16181B,
+    0 0 0 calc(var(--sw) * .035 + 1px) #2A2D32,
+    0 22px 34px -18px rgba(0, 0, 0, .6);
+}
+.vizmac .vm-ctl-skull {
+  position: absolute;
+  left: calc(var(--sw) * .08);
+  top: calc(var(--sw) * .035);
+  width: calc(var(--sw) * .1);
+  height: calc(var(--sw) * .1);
+  color: #1D1F23;
+}
+.vizmac .vm-ctl-leds {
+  display: block;
+  overflow: hidden;
+  border-radius: calc(var(--sw) * .025);
+  background: #08090B;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .5), 0 0 calc(var(--sw) * .08) rgba(255, 255, 255, .18);
+}
+.vizmac .vm-ctl-leds img { display: block; width: var(--sw); height: calc(var(--sw) * 248 / 480); }
+.vizmac .vm-ctl-bezel { padding: calc(var(--sw) * .025); background: #0B0C0E; border-radius: calc(var(--sw) * .035); }
+.vizmac .vm-ctl-bezel img {
+  display: block;
+  width: calc(var(--sw) * .95);
+  height: calc(var(--sw) * .95 * 4 / 3);
+  border-radius: 2px;
+}
+.vizmac .vm-ctl-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--sw) * .06) calc(var(--sw) * .09);
+  border-radius: calc(var(--sw) * .05);
+  background: linear-gradient(180deg, #EEF0F3, #CBCFD5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), 0 2px 0 #A9AEB6;
+}
+.vizmac .vm-ctl-ko {
+  width: calc(var(--sw) * .17);
+  height: calc(var(--sw) * .17);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3A3D42, #0E0F11 70%);
+  box-shadow: 0 0 0 calc(var(--sw) * .02) #B4B9C0;
+}
+.vizmac .vm-ctl-knob {
+  position: relative;
+  width: calc(var(--sw) * .3);
+  height: calc(var(--sw) * .3);
+  border-radius: 50%;
+  background: repeating-conic-gradient(#1A1B1E 0 6deg, #2B2D31 6deg 12deg);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, .45);
+}
+.vizmac .vm-ctl-knob::after {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #5B5F66, #15161A 70%);
+}
+.vizmac .vm-ctl-knob::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 18%;
+  width: 2px;
+  height: 22%;
+  border-radius: 1px;
+  background: #fff;
+  transform: translateX(-50%) rotate(35deg);
+  transform-origin: 50% 145%;
+}
+
+/* where a screenshot still has to go */
+.vizmac .vm-placeholder {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  padding: 18px;
+  text-align: center;
+  border: 1.5px dashed var(--vb-tint-border);
+  border-radius: 12px;
+  background: repeating-linear-gradient(135deg, var(--vb-tint) 0 12px, #F5F7FF 12px 24px);
+  color: var(--vb-yellow-ink);
+}
