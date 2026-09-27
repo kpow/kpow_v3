@@ -20,8 +20,17 @@ import instagramRoutes from "./routes/instagram-routes";
 import yelpRoutes from "./routes/yelp";
 import tableRoutes from "./routes/table";
 
+// Builds that were renamed: old build-log URLs keep working (permanent redirect).
+const RENAMED_BUILDS: Record<string, string> = { vizkeys: "vizmac" };
+
 export function registerRoutes(app: Express): Server {
   const router = Router();
+
+  app.get("/builds/:slug", (req, res, next) => {
+    const to = RENAMED_BUILDS[req.params.slug];
+    if (to) return res.redirect(301, `/builds/${to}`);
+    next();
+  });
 
   // Health check endpoint for Digital Ocean
   router.get('/api/health', (req, res) => {

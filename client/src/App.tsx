@@ -3,7 +3,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import AdminPage from "@/pages/AdminPage";
 import AuthPage from "@/pages/AuthPage";
 import ITunezPage from "@/pages/itunez";
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -58,6 +58,8 @@ function Router() {
         <Route path="/led" component={LedArt} />
         {/* /builds/recently must precede /builds/:slug — first match wins in wouter */}
         <Route path="/builds/recently" component={Recently} />
+        {/* renamed builds: old URLs keep working (the server also 301s these) */}
+        <Route path="/builds/vizkeys">{() => <Redirect to="/builds/vizmac" />}</Route>
         <Route path="/builds/:slug" component={BuildDetail} />
         <Route path="/builds" component={Builds} />
         <Route path="/vizspot/guide" component={VizSpotGuide} />
