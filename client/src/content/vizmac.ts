@@ -130,7 +130,7 @@ export interface Part {
 
 export const APP_PART: Part = {
   eyebrow: "part 1",
-  title: "The menu bar app",
+  title: "The macOS app",
   bullets: [
     { k: "Keyboard", v: "drives the Vulcan Pro TKL over USB, every key, 30 times a second." },
     { k: "Effects", v: "25 of them (keys, audio, ambient, Noodle 2K) and 23 palettes." },
@@ -146,11 +146,8 @@ export const CONTROLLER_PART: Part = {
   bullets: [
     { k: "Hardware", v: "an ESP32-S3 with a 2.4\" screen, a knob, a KO button and a 16 × 8 LED matrix, in a printed case." },
     { k: "Four modes", v: "Keys, Now Playing, Clock with a focus timer, and WLED. They keep running; turn at the top to flip between them." },
-    { k: "Buttons", v: "push the knob to go back, KO to choose. Hold KO for the mode's shortcut, hold the knob to sleep." },
     { k: "LEDs that change with the mode", v: "the keyboard's effect, a palette EQ of the music, the time, your lights' colours." },
-    { k: "Renders locally", v: "draws the keyboard's effects itself at 40 fps, so nothing stutters over Wi-Fi." },
     { k: "WLED direct", v: "talks to your lights itself, so they still work while the Mac sleeps." },
-    { k: "Setup and updates", v: "Wi-Fi from your phone by QR code, updates from the web UI, and it sleeps when the Mac does." },
   ],
 };
 
