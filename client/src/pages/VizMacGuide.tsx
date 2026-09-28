@@ -122,7 +122,7 @@ function Controller() {
         className="mt-5"
         href="/vizmac/controller"
         title="It has its own page."
-        body="The buttons, the mode picker and shortcuts, Keyboard LEDs, sleep, all four modes, Wi-Fi setup from your phone, and updates."
+        body="Buttons and shortcuts, the four modes, sleep, Wi-Fi setup and updates."
         cta="Open the controller page"
         art={
           <ControllerFrame
@@ -190,8 +190,8 @@ export default function VizMacGuide() {
           title="Getting going with vizMac."
           lead={
             <>
-              The menu bar app, the web UI, and fixes for when something's off. The controller has its own page. Setting
-              it up from source? See <span className="vb-mono text-[.92em]">docs/getting-started.md</span> in the repo.
+              The menu bar app, the web UI and fixes. The controller has its own page. To set it up from source, see{" "}
+              <span className="vb-mono text-[.92em]">docs/getting-started.md</span> in the repo.
             </>
           }
           quick={[

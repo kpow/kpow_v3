@@ -31,9 +31,9 @@ function Hero() {
           One knob for the whole desk.
         </h1>
         <p className="mb-6 max-w-[46ch] text-base leading-relaxed text-gray-700 md:text-lg">
-          vizMac is a desk macropad that does all the things. One knob and one button next to the keyboard run the
-          per-key lighting, skip through whatever Spotify or Music is playing, time a focus session and switch your WLED
-          lights. A menu bar app on the Mac does the work. The controller's screen and 16×8 LEDs show what's going on.
+          vizMac is a desk macropad that does all the things. One knob and one button next to the keyboard control the
+          per-key lighting, Spotify or Music, a focus timer and your WLED lights. A menu bar app on the Mac does the work.
+          The controller's screen and 16×8 LEDs show what's going on.
         </p>
         <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
           <Btn href="/vizmac/guide" icon={<BookOpen className="h-[17px] w-[17px]" />}>
@@ -131,7 +131,7 @@ function Parts() {
   return (
     <section className="mt-12 md:mt-16">
       <SectionHeading>two parts</SectionHeading>
-      <Lead>The Mac app does the work. The controller is the remote, and a little screen of its own.</Lead>
+      <Lead>The controller is the remote. It finds the Mac app over Wi-Fi.</Lead>
       <div className="grid gap-4 md:grid-cols-2">
         <PartCard
           part={APP_PART}
@@ -168,8 +168,8 @@ function Modes() {
     <section className="mt-12 md:mt-16">
       <SectionHeading>four modes</SectionHeading>
       <Lead>
-        Turn the knob at the top to flip between them. They all keep running in the background. These are the
-        controller's own screens, with its LEDs on top.
+        Turn the knob in the mode picker to flip between them. They all keep running in the background. The screens
+        are the controller's own.
       </Lead>
       <div className="grid gap-4 md:grid-cols-2">
         {MODES.map((m) => (
@@ -218,9 +218,6 @@ function ControlsBand() {
               </li>
             ))}
           </ul>
-          <p className="mt-5 max-w-[50ch] text-sm leading-relaxed text-gray-400">
-            It also sleeps when the Mac's screen sleeps or locks, and wakes with it.
-          </p>
           <div className="mt-[22px]">
             <Btn href="/vizmac/controller#buttons" kind="ondark" iconRight={<ArrowRight className="h-4 w-4" />}>
               How the buttons work
@@ -254,7 +251,7 @@ function Highlights() {
   return (
     <section className="mt-12 md:mt-16">
       <SectionHeading>the small stuff</SectionHeading>
-      <Lead>The bits that make it feel finished.</Lead>
+      <Lead>Six details from the Mac app and the controller.</Lead>
       <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
         {HIGHLIGHTS.map((h) => {
           const Icon = HIGHLIGHT_ICON[h.icon];
@@ -305,7 +302,7 @@ export default function VizMac() {
     <>
       <SEO
         title="vizMac · one knob for the whole desk"
-        description="vizMac is a desk macropad for the Mac: per-key lighting on a ROCCAT Vulcan Pro TKL, Now Playing for Spotify and Music, a clock with a focus timer, and your WLED lights, on one knob and one button."
+        description="A desk macropad for the Mac. One knob and one button run per-key lighting on a ROCCAT Vulcan Pro TKL, Spotify and Music, a focus timer and your WLED lights."
         image={PHOTOS.hero.src}
         keywords="vizMac, macropad, ROCCAT Vulcan Pro TKL, per-key RGB, macOS, ESP32-S3, WLED, focus timer, Spotify"
       />
@@ -321,7 +318,7 @@ export default function VizMac() {
           <div className="flex flex-col items-start gap-3.5 rounded-xl border border-indigo-200 bg-indigo-50 p-4 md:flex-row md:items-center md:justify-between md:px-5">
             <p className="text-[15px] leading-relaxed text-gray-700">
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-indigo-800">renamed</span>
-              vizKeys is now vizMac. Same app, now with a controller that does four things.
+              vizKeys is now vizMac. Same app, plus a controller with four modes.
             </p>
             <VbLink href={BUILDLOG_URL} className={`${linkCls} whitespace-nowrap`}>
               Build log →
@@ -348,7 +345,7 @@ export default function VizMac() {
             href={BUILDLOG_URL}
             icon={<Hammer className="h-[22px] w-[22px]" strokeWidth={1.9} />}
             title="Build log"
-            body="How it got built, day by day: the USB protocol, the case, the four modes. With photos."
+            body="Day by day, with photos: the USB protocol, the case and the four modes."
             cta="Read the build log"
           />
         </section>

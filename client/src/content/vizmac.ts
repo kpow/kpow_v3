@@ -98,7 +98,7 @@ export const MODES: Mode[] = [
     screen: "m-np-main",
     leds: "np-eq-leds",
     caption: "now playing · rainbow eq",
-    body: "Spotify or Music: the art, the song, how far in. Turn to skip, KO to pause. The LEDs are an EQ of the Mac's audio, in a palette you pick.",
+    body: "Spotify or Music: album art, song and progress. Turn to skip, KO to pause. The LEDs are an EQ of the Mac's audio, in a palette you pick.",
   },
   {
     id: "clock",
@@ -118,7 +118,7 @@ export const MODES: Mode[] = [
     screen: "m-wled-list",
     leds: "m-wled-list-leds",
     caption: "wled · the light list",
-    body: "Your WLED lights, the ones you pick in the web UI. On, off, brightness, presets and effects. It talks to the lights directly, so it works with the Mac asleep.",
+    body: "Your WLED lights, the ones you pick in the web UI. On, off, brightness, presets and effects.",
   },
 ];
 
@@ -132,7 +132,7 @@ export const APP_PART: Part = {
   eyebrow: "part 1",
   title: "The macOS app",
   bullets: [
-    { k: "Keyboard", v: "drives the Vulcan Pro TKL over USB, every key, 30 times a second." },
+    { k: "Keyboard", v: "drives every key of the Vulcan Pro TKL over USB, 30 times a second." },
     { k: "Effects", v: "25 of them (keys, audio, ambient, Noodle 2K) and 23 palettes." },
     { k: "Talks to", v: "Spotify, Music, the Mac's audio and your WLED lights." },
     { k: "Controller hub", v: "pairing, effect sync, the clock and its firmware updates." },
@@ -145,7 +145,7 @@ export const CONTROLLER_PART: Part = {
   title: "The controller",
   bullets: [
     { k: "Hardware", v: "an ESP32-S3 with a 2.4\" screen, a knob, a KO button and a 16 × 8 LED matrix, in a printed case." },
-    { k: "Four modes", v: "Keys, Now Playing, Clock with a focus timer, and WLED. They keep running; turn at the top to flip between them." },
+    { k: "Four modes", v: "Keys, Now Playing, Clock with a focus timer, and WLED." },
     { k: "LEDs that change with the mode", v: "the keyboard's effect, a palette EQ of the music, the time, your lights' colours." },
     { k: "WLED direct", v: "talks to your lights itself, so they still work while the Mac sleeps." },
   ],
@@ -185,13 +185,13 @@ export const HIGHLIGHTS: { icon: "keyboard" | "sparkles" | "timer" | "moon" | "q
   {
     icon: "qr",
     title: "Wi-Fi setup from your phone",
-    body: "Scan the QR code on its screen, pick your Wi-Fi on the phone. No passwords baked into the firmware.",
+    body: "Scan the QR code on its screen. Pick your Wi-Fi on the phone. No Wi-Fi passwords in the firmware.",
     chips: ["Controller"],
   },
   {
     icon: "download",
     title: "Updates from the web UI",
-    body: "vizMac carries the controller's firmware. One click, about a minute, over Wi-Fi.",
+    body: "vizMac carries the controller's firmware. One click installs it over Wi-Fi in about a minute.",
     chips: ["Web UI", "Controller"],
   },
 ];
@@ -305,7 +305,7 @@ export const FIXES: { title: string; body: string }[] = [
   },
   {
     title: "The controller says Finding vizMac",
-    body: "Is vizMac running, with **Allow controller on Wi-Fi** on? Is the controller on the same Wi-Fi as the Mac? KO searches again.",
+    body: "Open vizMac and turn on **Allow controller on Wi-Fi**. Put the controller on the same Wi-Fi as the Mac. KO searches again.",
   },
   {
     title: "The controller says Code rejected",
@@ -374,8 +374,8 @@ export const SLEEP: string[] = [
   "**Hold the knob 2 s.** Screen and LEDs go dark. The push goes back one level first.",
   "**Wake it:** any turn or press. That first input only wakes it.",
   "**With the Mac:** it sleeps when the Mac's screens sleep, lock or start the screen saver. It wakes with the Mac.",
-  "Woke it by hand while the Mac sleeps? It stays awake until the Mac changes again.",
-  "It also wakes for a firmware update, or when the focus timer ends.",
+  "**Woken by hand** while the Mac sleeps, it stays awake until the Mac changes again.",
+  "**Other wake-ups:** a firmware update, or the focus timer ending.",
 ];
 
 export type GlyphRow = { glyph: Glyph; k: string; v: string };
@@ -413,7 +413,7 @@ export const NP_CONTROLS: GlyphRow[] = [
 ];
 
 export const NP_NOTES: string[] = [
-  "\"The song before\" really is the one before, even mid-song.",
+  "\"The song before\" is the previous song, even mid-song.",
   "No volume here. The keyboard has its own volume knob.",
   "**The LEDs:** a 16-band EQ of the Mac's audio, bass on the left. Rainbow unless you pick a palette.",
 ];

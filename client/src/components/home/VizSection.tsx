@@ -52,7 +52,7 @@ const VIZ_APPS: VizApp[] = [
     eyebrow: "desk macropad · macOS",
     line: "One knob for the whole desk: key lighting, music, a focus timer and WLED.",
     pitch:
-      "One knob next to the keyboard. It runs the per-key lighting, skips through Spotify or Music, times a focus session and switches your WLED lights.",
+      "One knob next to the keyboard runs the per-key lighting, Spotify or Music, a focus timer and your WLED lights.",
     facts: ["25 effects", "23 palettes", "4 modes"],
     cta: "SPIN IT",
     href: "/vizmac",
@@ -77,7 +77,7 @@ const VIZ_APPS: VizApp[] = [
     eyebrow: "tiny desk robot",
     line: "An ESP32 screen with a face. Poke it and it pokes back.",
     pitch:
-      "Firmware that gives a little ESP32 screen a face. It makes faces, mutters in speech bubbles and keeps an eye on the time and weather. Poke it and it pokes back.",
+      "Firmware that gives a little ESP32 screen a face. It makes faces and mutters in speech bubbles. It keeps an eye on the time and weather. Poke it and it pokes back.",
     facts: ["25 expressions", "16 scenes", "4 boards"],
     cta: "SAY HI",
     href: "/vizbot",
@@ -102,7 +102,7 @@ const VIZ_APPS: VizApp[] = [
     eyebrow: "spotify on a led panel",
     line: "The cover of what's playing on Spotify, in 64×64 LEDs.",
     pitch:
-      "A 64×64 LED board that shows the cover of whatever you're playing on Spotify, dances to the music, and drifts into ambient patterns when nothing's on.",
+      "A 64×64 LED board that shows the cover of what's playing on Spotify and dances to the music. When nothing's on, it drifts into ambient patterns.",
     facts: ["64×64 panel", "22 effects", "23 palettes"],
     cta: "TUNE IN",
     href: "/vizspot/guide",

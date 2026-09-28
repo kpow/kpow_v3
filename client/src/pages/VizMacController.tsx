@@ -118,7 +118,7 @@ function Modes() {
   return (
     <section id="modes" className={cn("mt-14 md:mt-16", sectionCls)}>
       <SectionHeading num={2}>the mode picker</SectionHeading>
-      <Lead>The top level. Four cards, one per mode. The modes keep running while you're elsewhere.</Lead>
+      <Lead>The top level. The modes keep running while you're elsewhere.</Lead>
       <Bullets items={MODE_PICKER} />
       <p className="mt-2.5 text-sm text-muted-foreground">It starts up in the mode you used last.</p>
       <ScreenRow shots={PICKER_SHOTS} className="mt-4" />
@@ -151,7 +151,7 @@ function Sleep() {
   return (
     <section id="sleep" className={cn("mt-14 md:mt-16", sectionCls)}>
       <SectionHeading num={4}>sleep</SectionHeading>
-      <Lead>It goes dark on its own when the Mac does, and wakes with it.</Lead>
+      <Lead>By hand, or with the Mac.</Lead>
       <Bullets items={SLEEP} />
     </section>
   );
@@ -187,7 +187,7 @@ function Keys() {
       <Callout className="mt-3.5">
         <b className="font-bold text-gray-900">LEDs upside down?</b> Status ›{" "}
         <b className="font-bold text-gray-900">LED panels</b>. Turn each panel until the test pattern is the right way up.
-        It also sets which panel the data enters, and the LED brightness.
+        The same page sets which panel the data enters and the LED brightness.
       </Callout>
     </section>
   );
@@ -304,7 +304,7 @@ function Wled() {
         </div>
       </div>
       <Callout className="mt-4">
-        <b className="font-bold text-gray-900">Need more?</b> Segments, playlists and settings stay in WLED. Use{" "}
+        <b className="font-bold text-gray-900">Segments, playlists and settings stay in WLED.</b> Use{" "}
         <b className="font-bold text-gray-900">Open</b> in the{" "}
         <VbLink href="/vizmac/guide#lights" className={linkCls}>
           Lights card
@@ -418,7 +418,7 @@ export default function VizMacController() {
         <DocHero
           eyebrow={`the controller · firmware ${FW_LABEL}`}
           title="One knob, four modes."
-          lead="Every button and every mode, setting it up on your Wi-Fi from your phone, and keeping it updated. The Mac side is in the user guide."
+          lead="Buttons, modes, Wi-Fi setup and updates. The Mac side is in the user guide."
           quick={[
             { t: "Which button?", d: "The controller in one table.", href: "buttons", n: 1 },
             { t: "New controller?", d: "Wi-Fi setup from your phone.", href: "wifi", n: 9 },
