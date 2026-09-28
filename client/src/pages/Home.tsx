@@ -5,6 +5,7 @@ import { CubeFrame } from "@/components/home/cube-frame";
 import { BookFeed } from "@/components/home/BookFeed";
 import { GitHubSection } from "@/components/home/GitHubSection";
 import { BuildsSection } from "@/components/home/BuildsSection";
+import { VizSection } from "@/components/home/VizSection";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
@@ -101,6 +102,10 @@ export default function Home() {
         image="/phash.jpg"
       />
       <div className="space-y-8 mt-4">
+        {/* viz family */}
+        <VizSection />
+        <HorizontalDivider />
+
         {/* main cards and setlist game */}
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
