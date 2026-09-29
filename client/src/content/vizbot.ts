@@ -599,7 +599,7 @@ export const WEB_SECTIONS: WebSection[] = [
     card: "StackChan",
     shot: W + "web-stackchan.png",
     w: 1070,
-    h: 1364,
+    h: 1474,
     boards: ["stackchan"],
     lead: "Head, base LEDs, chill and power. The card only shows up on a Stackchan.",
     controls: [
