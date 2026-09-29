@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.4.1";
+export const DOC_VERSION = "3.4.2";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -87,7 +87,8 @@ export const BOARDS: Board[] = [
     touch: true,
     notes: [
       "The head drifts around on its own and reacts when you touch the top of it.",
-      "**Head** in the dock: nod, shake, look up, look down, center, Chill mode.",
+      "**Head** in the dock: Chill mode, Chill time, nod, shake, look up, look down, center.",
+      "**Chill mode** parks the head and stops it moving. Hold the top of its head for 2 seconds, or use **Head › Chill mode**. **Chill time** sets how long: 10 min, 30 min, 1 hour or 2 hours. It remembers your pick.",
       "Base LEDs and LED mode are in Settings › Light & sound. Battery is in System.",
       "Use the `stackchan` file, not `m5cores3`. It's a CoreS3 inside, but the firmware is different.",
       "Head stopped moving after an update? Power it fully off (hold the bottom button about 6 seconds) and back on.",
@@ -614,8 +615,12 @@ export const WEB_SECTIONS: WebSection[] = [
       },
       { k: "Brightness · Speed", v: "For the ring. 10 to 255 each, defaults 80 and 128." },
       {
-        k: "Chill Mode (10 min)",
-        v: "The head goes home and stops moving for 10 minutes. The face goes Chill, it says Zzz and the ring breathes slowly. Tap it again to wake it up. Holding the top of its head for 2 seconds does the same.",
+        k: "Chill Mode",
+        v: "The head goes home and stops moving for the time set below. The face goes Chill, it says Zzz and the ring breathes slowly. Tap it again to wake it up. Holding the top of its head for 2 seconds does the same.",
+      },
+      {
+        k: "Chill for",
+        v: "10 min, 30 min, 1 hour or 2 hours. It remembers your pick, and the head-hold uses it too. Change it mid-chill and the timer restarts at the new length. While chilling, it shows the minutes left.",
       },
       { k: "Battery", v: "Battery voltage and current draw." },
       {

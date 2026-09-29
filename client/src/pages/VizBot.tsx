@@ -273,7 +273,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              New touch UI. Swipe up for the dock, sideways for scenes, and every setting on the bot itself.
+              Pick how long Stackchan chills: 10 min, 30 min, 1 hour or 2 hours. Plus the touch UI from 3.4: swipe up for the dock, sideways for scenes.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
