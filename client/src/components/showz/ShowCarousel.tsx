@@ -72,7 +72,7 @@ export function ShowCarousel() {
           <CarouselContent>
             {shuffledPosts.map((post) => (
               <CarouselItem key={post.id} className="md:basis-1/3 lg:basis-1/4">
-                <div onClick={() => handlePostClick(post)}>
+                <div>
                   <ShowCard
                     id={post.id}
                     media_url={post.media_url}

@@ -17,7 +17,14 @@ export function ShowCard({
   onClick,
 }: ShowCardProps) {
   return (
-    <div className="group relative aspect-[4/3] cursor-pointer">
+    <div
+      className="group relative aspect-[4/3] cursor-pointer"
+      role="button"
+      tabIndex={0}
+      aria-label={caption}
+      onClick={onClick}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onClick())}
+    >
       <div className="absolute inset-0 overflow-hidden rounded-lg">
         {media_type === "VIDEO" ? (
           <img

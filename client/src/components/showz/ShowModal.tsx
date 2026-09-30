@@ -100,7 +100,7 @@ export const ShowModal: React.FC<ShowModalProps> = ({
       isOpen={isOpen}
       onRequestClose={onClose}
       className="w-full max-w-6xl mx-auto mt-10 bg-black rounded-lg overflow-hidden"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4"
+      overlayClassName="fixed inset-0 z-[100] bg-black bg-opacity-90 flex items-center justify-center p-4"
     >
       {currentPost && currentMedia && (
         <div className="relative flex flex-col">
