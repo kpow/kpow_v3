@@ -4,7 +4,6 @@ import { SetlistGame } from "@/components/home/setlist-game-static";
 import { CubeFrame } from "@/components/home/cube-frame";
 import { BookFeed } from "@/components/home/BookFeed";
 import { GitHubSection } from "@/components/home/GitHubSection";
-import { BuildsSection } from "@/components/home/BuildsSection";
 import { ShowCarousel } from "@/components/showz/ShowCarousel";
 import { VizSection } from "@/components/home/VizSection";
 import { useQuery } from "@tanstack/react-query";
@@ -122,17 +121,6 @@ export default function Home() {
               <CubeFrame />
             </div>
           </div>
-        </div>
-        <HorizontalDivider />
-
-        {/* {builds} */}
-        <div>
-          <SectionHeader
-            title="builds"
-            buttonText="more builds"
-            linkHref="builds"
-          />
-          <BuildsSection />
         </div>
         <HorizontalDivider />
 
