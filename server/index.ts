@@ -9,7 +9,10 @@ import { setupVite, serveStatic, log } from "./vite";
 const app = express();
 console.log("[Server] Starting application initialization...");
 
-app.use(express.json());
+// the showz namer syncs every night in one request (~200 KB); everything else keeps the 100 KB default
+const json = express.json();
+const bigJson = express.json({ limit: "5mb" });
+app.use((req, res, next) => (req.path === "/api/showz/sync" ? bigJson : json)(req, res, next));
 app.use(express.urlencoded({ extended: false }));
 
 // Request logging middleware

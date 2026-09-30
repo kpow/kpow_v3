@@ -40,6 +40,9 @@ services:
   - key: YOUTUBE_API_KEY
     scope: RUN_TIME
     type: SECRET
+  - key: SHOWZ_SYNC_TOKEN
+    scope: RUN_TIME
+    type: SECRET
   - key: SMTP_HOST
     scope: RUN_TIME
     type: SECRET
