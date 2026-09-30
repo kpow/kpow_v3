@@ -82,6 +82,7 @@ function Router() {
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
         <ProtectedRoute path="/admin/:section" component={AdminPage} />
+        <ProtectedRoute path="/admin/shows/:date" component={AdminPage} />
 
         <Route component={NotFound} />
       </Switch>
