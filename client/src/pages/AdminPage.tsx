@@ -1,129 +1,65 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+// One admin for the site: a side menu of sections, each at /admin/<section>.
+// Add a section by adding an entry to SECTIONS.
+
+import { Link, useRoute } from "wouter";
+import { Book, Disc3, Video } from "lucide-react";
 import { AlbumLookup } from "@/components/admin/AlbumLookup";
 import { ITunesSearch } from "@/components/admin/iTunesSearch";
-import { SongsManager } from "@/components/admin/SongsManager";
 import { BookManager } from "@/components/admin/BookManager";
+import { ShowsAdmin } from "@/components/admin/shows/ShowsAdmin";
 
-interface PendingUser {
-  id: number;
-  username: string;
-  createdAt: string;
+function Music() {
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="space-y-4">
+        <AlbumLookup />
+      </div>
+      <div className="space-y-4">
+        <ITunesSearch />
+      </div>
+    </div>
+  );
 }
 
+const SECTIONS = [
+  { id: "shows", label: "Shows", icon: Video, blurb: "k-shows nights, bands and venues", Component: ShowsAdmin },
+  { id: "books", label: "Books", icon: Book, blurb: "Goodreads shelves and book entries", Component: BookManager },
+  { id: "music", label: "Music", icon: Disc3, blurb: "Last.fm album lookup and iTunes search", Component: Music },
+];
+
 export default function AdminPage() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: pendingUsers, isLoading } = useQuery<PendingUser[]>({
-    queryKey: ["/api/admin/pending-users"],
-    queryFn: async () => {
-      const res = await fetch("/api/admin/pending-users");
-      if (!res.ok) throw new Error("Failed to fetch pending users");
-      return res.json();
-    },
-  });
-
-  const approveMutation = useMutation({
-    mutationFn: async (userId: number) => {
-      const res = await fetch("/api/admin/approve-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
-      });
-      if (!res.ok) throw new Error("Failed to approve user");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-users"] });
-      toast({
-        title: "User approved",
-        description: "The user can now log in to their account.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Failed to approve user",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
+  const [, params] = useRoute("/admin/:section");
+  const current = SECTIONS.find((s) => s.id === params?.section) ?? SECTIONS[0];
+  const { Component } = current;
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-
-      {/* User Approval Section */}
-      {/* <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Pending Users</h2>
-        {pendingUsers?.length === 0 ? (
-          <p className="text-muted-foreground">No pending users to approve.</p>
-        ) : (
-          <div className="grid gap-4">
-            {pendingUsers?.map((user) => (
-              <Card key={user.id}>
-                <CardContent className="flex items-center justify-between p-4">
-                  <div>
-                    <p className="font-medium">{user.username}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Registered on: {new Date(user.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => approveMutation.mutate(user.id)}
-                    disabled={approveMutation.isPending}
-                  >
-                    {approveMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Approving...
-                      </>
-                    ) : (
-                      "Approve"
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div> */}
-
-      {/* Songs Without Plays Section */}
-      {/* <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Songs Without Plays</h2>
-        <SongsManager />
-      </div> */}
-
-      {/* Book Management Section */}
-      <div className="space-y-4 mb-8">
-        <BookManager />
-      </div>
-      
-      {/* Two Column Layout for Last.fm and iTunes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Last.fm Album Lookup Column */}
-        <div className="space-y-4">
-          <AlbumLookup />
-        </div>
-
-        {/* iTunes Search Column */}
-        <div className="space-y-4">
-          <ITunesSearch />
-        </div>
-      </div>
+    <div className="mt-4 flex flex-col gap-6 md:flex-row">
+      <nav className="shrink-0 md:w-48">
+        <h1 className="mb-3 px-2 font-slackey text-2xl">admin</h1>
+        <ul className="flex gap-1 overflow-x-auto md:flex-col">
+          {SECTIONS.map((s) => {
+            const on = s.id === current.id;
+            return (
+              <li key={s.id}>
+                <Link
+                  href={`/admin/${s.id}`}
+                  className={`flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm ${
+                    on ? "bg-blue-600 font-semibold text-white" : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                  aria-current={on ? "page" : undefined}
+                >
+                  <s.icon className="h-4 w-4" />
+                  {s.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      <section className="min-w-0 flex-1">
+        <p className="mb-4 text-sm text-gray-500">{current.blurb}</p>
+        <Component />
+      </section>
     </div>
   );
 }
