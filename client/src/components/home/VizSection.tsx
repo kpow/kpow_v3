@@ -8,15 +8,22 @@
 //
 // Copy comes from each app's own page (/vizbot, /vizspot/guide, /vizmac and
 // content/vizmac.ts). Keep it in step when those pages change.
-// Photos are from the build log, in client/public/images/home-viz/.
+// Photos and the vizBot clip are copies from the build log, in
+// client/public/images/home-viz/. They're committed here, not linked from
+// /buildlog/, so a rename in the content repo can't break the homepage.
+//
+// An app with `video` plays it in the big tile (muted loop, paused off screen,
+// poster only under reduced motion). On a phone the clip sits above the text
+// instead of behind it, so the 16:9 frame isn't cropped.
 
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import SectionHeader from "@/components/global/SectionHeader";
 
 type VizId = "vizmac" | "vizbot" | "vizspot";
 
-/** The app in the big tile. When vizMac isn't new any more, feature the next newest build. */
-const FEATURED: VizId = "vizmac";
+/** The app in the big tile. vizBot, for the fleet-on-a-WLED-sign clip. */
+const FEATURED: VizId = "vizbot";
 
 interface VizApp {
   id: VizId;
@@ -35,6 +42,8 @@ interface VizApp {
   buildHref: string;
   isNew: boolean;
   img: { src: string; alt: string; width: number; height: number };
+  /** A 16:9 clip for the big tile. `img` is still used on the small tile. */
+  video?: { src: string; poster: string; label: string };
   /** object-position classes, per tile shape. Literal strings so Tailwind sees them. */
   pos: { feature: string; tile: string };
   /** Accent classes: the chip dot and the button (fill, text, hover) */
@@ -77,8 +86,8 @@ const VIZ_APPS: VizApp[] = [
     eyebrow: "tiny desk robot",
     line: "An ESP32 screen with a face. Poke it and it pokes back.",
     pitch:
-      "Firmware that gives a little ESP32 screen a face. It makes faces and mutters in speech bubbles. It keeps an eye on the time and weather. Poke it and it pokes back.",
-    facts: ["25 expressions", "16 scenes", "4 boards"],
+      "Firmware that gives a little ESP32 screen a face. Poke it and it pokes back. A desk full of them find each other over ESP-NOW and say their piece on a WLED sign.",
+    facts: ["25 expressions", "16 scenes", "talks to WLED"],
     cta: "SAY HI",
     href: "/vizbot",
     buildHref: "/builds/vizbot",
@@ -88,6 +97,11 @@ const VIZ_APPS: VizApp[] = [
       alt: "vizBot in its lime-green case on a desk, a hologram vizBot beside it",
       width: 1000,
       height: 750,
+    },
+    video: {
+      src: `${IMG}/vizbot-fleet.mp4`,
+      poster: `${IMG}/vizbot-fleet.jpg`,
+      label: "A desk of vizBots, their words scrolling across a WLED sign above them",
     },
     pos: {
       feature: "object-[48%_50%] sm:object-[48%_80%]",
@@ -123,19 +137,89 @@ const VIZ_APPS: VizApp[] = [
 const chipCls =
   "rounded bg-black/70 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-white backdrop-blur-sm";
 
-/** The big tile: 2x2 on desktop. A div with a full-tile link, so it can hold the build log link too. */
-function FeatureTile({ app }: { app: VizApp }) {
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** The big tile's clip. Plays muted while on screen; the button pauses it for good. */
+function TileVideo({ video, className }: { video: NonNullable<VizApp["video"]>; className: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [paused, setPaused] = useState(prefersReducedMotion);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (paused) {
+      el.pause();
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? el.play().catch(() => {}) : el.pause()),
+      { threshold: 0.25 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [paused]);
+
   return (
-    <div className="group relative aspect-[4/5] overflow-hidden rounded-lg bg-[#0e1014] sm:aspect-[16/10] md:col-span-2 lg:row-span-2 lg:aspect-auto">
-      <img
-        src={app.img.src}
-        alt={app.img.alt}
-        width={app.img.width}
-        height={app.img.height}
-        decoding="async"
-        className={`absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${app.pos.feature}`}
+    <>
+      <video
+        ref={ref}
+        src={video.src}
+        poster={video.poster}
+        aria-label={video.label}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className={className}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 via-35% to-transparent to-65%" />
+      <button
+        type="button"
+        onClick={() => setPaused((p) => !p)}
+        aria-label={paused ? "Play video" : "Pause video"}
+        className={`absolute right-3 top-3 z-10 md:right-4 md:top-4 ${chipCls} hover:bg-black/85`}
+      >
+        {paused ? "▶ play" : "❚❚ pause"}
+      </button>
+    </>
+  );
+}
+
+/**
+ * The big tile: 2x2 on desktop. A div with a full-tile link, so it can hold the build log link too.
+ * With a video, a phone gets the clip on top and the text below it rather than over it.
+ */
+function FeatureTile({ app }: { app: VizApp }) {
+  const v = app.video;
+  const mediaCls = `h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${
+    v ? "object-top" : `absolute inset-0 ${app.pos.feature}`
+  }`;
+
+  return (
+    <div
+      className={`group relative overflow-hidden rounded-lg bg-[#0e1014] sm:aspect-[16/10] md:col-span-2 lg:row-span-2 lg:aspect-auto ${
+        v ? "flex flex-col sm:block" : "aspect-[4/5]"
+      }`}
+    >
+      {v ? (
+        <div className="relative aspect-video overflow-hidden sm:absolute sm:inset-0 sm:aspect-auto">
+          <TileVideo video={v} className={mediaCls} />
+        </div>
+      ) : (
+        <img
+          src={app.img.src}
+          alt={app.img.alt}
+          width={app.img.width}
+          height={app.img.height}
+          decoding="async"
+          className={mediaCls}
+        />
+      )}
+      <div
+        className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 via-35% to-transparent to-65% ${
+          v ? "hidden sm:block" : ""
+        }`}
+      />
       <div className="absolute inset-0 hidden bg-gradient-to-r from-black/55 via-black/10 via-45% to-transparent sm:block" />
 
       <Link href={app.href} className="absolute inset-0" aria-label={app.name} />
@@ -149,7 +233,11 @@ function FeatureTile({ app }: { app: VizApp }) {
         <span className={chipCls}>{app.eyebrow}</span>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 md:p-8">
+      <div
+        className={`pointer-events-none p-5 md:p-8 ${
+          v ? "relative sm:absolute sm:inset-x-0 sm:bottom-0" : "absolute inset-x-0 bottom-0"
+        }`}
+      >
         <h3 className="font-slackey text-4xl leading-none text-white md:text-5xl">{app.name}</h3>
         <p className="mt-3 max-w-[46ch] text-[15px] leading-snug text-white/90 md:text-base">{app.pitch}</p>
         <div className="mt-3 hidden flex-wrap gap-1.5 sm:flex">
