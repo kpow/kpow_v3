@@ -21,6 +21,7 @@ import Battle from "@/pages/Battle";
 import DonutShops from "@/pages/DonutShops";
 import LedArt from "@/pages/LedArt";
 import Builds from "@/pages/Builds";
+import Shows from "@/pages/Shows";
 import BuildDetail from "@/pages/BuildDetail";
 import Recently from "@/pages/Recently";
 import VizSpotGuide from "@/pages/VizSpotGuide";
@@ -59,6 +60,7 @@ function Router() {
         <Route path="/donut-tour/:city/:state" component={DonutShops} />
         <Route path="/itunez" component={ITunezPage} />
         <Route path="/led" component={LedArt} />
+        <Route path="/shows" component={Shows} />
         {/* /builds/recently must precede /builds/:slug — first match wins in wouter */}
         <Route path="/builds/recently" component={Recently} />
         {/* renamed builds: old URLs keep working (the server also 301s these) */}

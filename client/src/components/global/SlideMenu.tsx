@@ -27,6 +27,7 @@ import {
   History,
   ChevronDown,
   Keyboard,
+  Video,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -76,6 +77,7 @@ const GROUPS: NavGroup[] = [
     label: "music",
     icon: <Disc3 className="w-4 h-4" />,
     links: [
+      { icon: <Video className="w-4 h-4" />, label: "k-shows", href: "/shows", match: ["/shows"] },
       { icon: <Fish className="w-4 h-4" />, label: "phashboard", href: "/phashboard", match: ["/phashboard"] },
       { icon: <Music className="w-4 h-4" />, label: "pmonk", href: "/pmonk", match: ["/pmonk"] },
       { icon: <Music className="w-4 h-4" />, label: "itunez", href: "/itunez", match: ["/itunez"] },

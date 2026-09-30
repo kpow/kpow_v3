@@ -5,6 +5,7 @@ import { CubeFrame } from "@/components/home/cube-frame";
 import { BookFeed } from "@/components/home/BookFeed";
 import { GitHubSection } from "@/components/home/GitHubSection";
 import { BuildsSection } from "@/components/home/BuildsSection";
+import { ShowCarousel } from "@/components/showz/ShowCarousel";
 import { VizSection } from "@/components/home/VizSection";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -132,6 +133,17 @@ export default function Home() {
             linkHref="builds"
           />
           <BuildsSection />
+        </div>
+        <HorizontalDivider />
+
+        {/* {k-shows} */}
+        <div>
+          <SectionHeader
+            title="k-shows"
+            buttonText="more shows"
+            linkHref="shows"
+          />
+          <ShowCarousel />
         </div>
         <HorizontalDivider />
 

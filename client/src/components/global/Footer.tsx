@@ -27,7 +27,7 @@ export function Footer() {
           <h3 className="text-xl font-bold mb-1">Site</h3>
           <p className="text-sm text-gray-300 leading-relaxed">
             This is a Node.js site built with React.js, Shadcn-UI, React-Query,
-            and some content in Markdown. Using Instagram, GoodReads, Feedbin,
+            and some content in Markdown. Using GoodReads, Feedbin,
             Phish.net, Github and whatever other API's I'm playing with :)
           </p>
         </div>

@@ -14,9 +14,9 @@ import { registerMusicRoutes } from "./routes/music-routes";
 import { registerAdminRoutes } from "./routes/admin-routes";
 import { registerVizspotRoutes } from "./routes/vizspot-routes";
 import { registerVizbotRoutes } from "./routes/vizbot-routes";
+import { registerShowzRoutes } from "./routes/showz-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
-import instagramRoutes from "./routes/instagram-routes";
 import yelpRoutes from "./routes/yelp";
 import tableRoutes from "./routes/table";
 
@@ -55,12 +55,10 @@ export function registerRoutes(app: Express): Server {
   registerAdminRoutes(router);
   registerVizspotRoutes(router);   // vizSpot LED board phone pairing
   registerVizbotRoutes(router);    // vizBot firmware releases (GitHub, cached)
+  registerShowzRoutes(router);     // k-shows concert clips (Spaces, cached)
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);
-
-  // Register Instagram routes
-  router.use('/api/instagram', instagramRoutes);
 
   // Register Yelp routes
   router.use('/api/yelp', yelpRoutes);

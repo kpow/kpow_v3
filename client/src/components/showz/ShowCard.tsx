@@ -1,7 +1,4 @@
-import { Card } from "./ui/card";
-import { formatDistanceToNow } from "date-fns";
-
-interface InstagramCardProps {
+interface ShowCardProps {
   id: string;
   media_url: string;
   thumbnail_url?: string;
@@ -11,27 +8,29 @@ interface InstagramCardProps {
   onClick: () => void;
 }
 
-export function InstagramCard({
+export function ShowCard({
   media_url,
   thumbnail_url,
   caption,
   timestamp,
   media_type,
   onClick,
-}: InstagramCardProps) {
+}: ShowCardProps) {
   return (
     <div className="group relative aspect-[4/3] cursor-pointer">
       <div className="absolute inset-0 overflow-hidden rounded-lg">
         {media_type === "VIDEO" ? (
           <img
             src={thumbnail_url || media_url}
-            alt={caption || "Instagram video"}
+            alt={caption || "show clip"}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <img
             src={media_url}
-            alt={caption || "Instagram post"}
+            alt={caption || "show"}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         )}
