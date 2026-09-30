@@ -6,11 +6,16 @@ import type { Router } from "express";
 //
 // The namer's `node publish.mjs` writes shows.json and the web clips to the
 // kfiles Space, so new nights show up here without a redeploy. The file is
-// cached in memory for 5 minutes and a stale copy is served if the CDN fails.
+// cached in memory for 5 minutes and a stale copy is served if the Space fails.
+//
+// shows.json is read from the Space's origin, not its CDN: the CDN edge keeps
+// files for an hour whatever their Cache-Control says, and this file keeps the
+// same name on every publish. Clips and stills (new names each time) still come
+// from the CDN via `base` in the JSON.
 
 const SHOWZ_URL =
   process.env.SHOWZ_JSON_URL ||
-  "https://kfiles.atl1.cdn.digitaloceanspaces.com/showz/shows.json";
+  "https://kfiles.atl1.digitaloceanspaces.com/showz/shows.json";
 const TTL_MS = 5 * 60 * 1000;
 
 let cache: { at: number; body: unknown } | null = null;
