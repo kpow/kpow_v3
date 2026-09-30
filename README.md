@@ -82,7 +82,6 @@ PHISH_API_KEY=your_key
 LASTFM_API_KEY=your_key
 GOODREADS_API_KEY=your_key
 FEEDBIN_KEY=your_key
-INSTAGRAM_ACCESS_TOKEN=your_token
 
 # Database Configuration
 DATABASE_URL=your_postgresql_url

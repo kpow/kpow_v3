@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+// k-shows on the home page. This was the Instagram carousel; same look and
+// behaviour, now fed by the showz namer (see lib/showz.ts).
+import { useMemo, useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -8,51 +9,28 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InstagramCard } from "./InstagramCard";
-import { InstagramModal } from "./InstagramModal";
+import { ShowCard } from "./ShowCard";
+import { ShowModal } from "./ShowModal";
+import { toPosts, useShowz } from "@/lib/showz";
+import type { ShowPost } from "@/lib/showz";
 
-interface InstagramMediaChild {
-  id: string;
-  media_type: "IMAGE" | "VIDEO";
-  media_url: string;
-  thumbnail_url?: string;
+function shuffleArray<T>(array: T[]) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
 }
 
-interface InstagramMedia {
-  id: string;
-  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
-  media_url: string;
-  thumbnail_url?: string;
-  permalink: string;
-  caption?: string;
-  timestamp: string;
-  location?: {
-    id: string;
-    name: string;
-  };
-  children?: {
-    data: InstagramMediaChild[];
-  };
-}
-
-interface InstagramResponse {
-  posts: InstagramMedia[];
-}
-
-export function InstagramCarousel() {
+export function ShowCarousel() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
 
-  const { data, isLoading } = useQuery<InstagramResponse>({
-    queryKey: ["instagram-feed"],
-    queryFn: async () => {
-      const response = await fetch("/api/instagram/feed");
-      if (!response.ok) {
-        throw new Error("Failed to fetch Instagram feed");
-      }
-      return response.json();
-    }
-  });
+  const { data: showz, isLoading } = useShowz();
+  const data = useMemo(() => (showz ? { posts: toPosts(showz) } : undefined), [showz]);
+  // shuffled once per load, so opening a show doesn't reshuffle the row behind it
+  const shuffledPosts = useMemo(() => (data ? shuffleArray(data.posts) : []), [data]);
 
   if (isLoading) {
     return (
@@ -70,18 +48,7 @@ export function InstagramCarousel() {
     return null;
   }
 
-  const shuffleArray = (array: InstagramMedia[]) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  };
-
-  const shuffledPosts = shuffleArray(data.posts);
-
-  const handlePostClick = (post: InstagramMedia) => {
+  const handlePostClick = (post: ShowPost) => {
     const postIndex = data.posts.findIndex(p => p.id === post.id);
     if (postIndex !== -1) {
       setSelectedPostIndex(postIndex);
@@ -105,8 +72,8 @@ export function InstagramCarousel() {
           <CarouselContent>
             {shuffledPosts.map((post) => (
               <CarouselItem key={post.id} className="md:basis-1/3 lg:basis-1/4">
-                <div onClick={() => handlePostClick(post)}>
-                  <InstagramCard
+                <div>
+                  <ShowCard
                     id={post.id}
                     media_url={post.media_url}
                     thumbnail_url={post.thumbnail_url}
@@ -125,7 +92,7 @@ export function InstagramCarousel() {
       </div>
 
       {modalIsOpen && data.posts && selectedPostIndex !== null && (
-        <InstagramModal
+        <ShowModal
           posts={[data.posts[selectedPostIndex]]}
           initialPostIndex={0}
           isOpen={modalIsOpen}

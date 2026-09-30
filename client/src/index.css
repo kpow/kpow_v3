@@ -207,3 +207,9 @@
     @apply bg-background text-foreground;
   }
 }
+/* k-shows (/shows): hidden scrollbar strip, dashed "no shows" year, map ping */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+.gap-hatch { background: repeating-linear-gradient(135deg, #f5f5f5 0 6px, #fff 6px 12px); }
+@keyframes ks-ping { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(2.6); opacity: 0 } }
+.ks-ping { animation: ks-ping 1.2s ease-out infinite; transform-origin: center; transform-box: fill-box; }

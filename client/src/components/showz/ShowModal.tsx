@@ -2,39 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import type { ShowMediaChild, ShowPost } from '@/lib/showz';
 
-interface InstagramMediaChild {
-  id: string;
-  media_type: 'IMAGE' | 'VIDEO';
-  media_url: string;
-  thumbnail_url?: string;
-}
-
-interface InstagramMedia {
-  id: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
-  media_url: string;
-  thumbnail_url?: string;
-  permalink: string;
-  caption?: string;
-  timestamp: string;
-  location?: {
-    id: string;
-    name: string;
-  };
-  children?: {
-    data: InstagramMediaChild[];
-  };
-}
-
-interface InstagramModalProps {
-  posts: InstagramMedia[];
+interface ShowModalProps {
+  posts: ShowPost[];
   initialPostIndex?: number;
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-export const InstagramModal: React.FC<InstagramModalProps> = ({
+export const ShowModal: React.FC<ShowModalProps> = ({
   posts = [],
   initialPostIndex = 0,
   isOpen = false,
@@ -86,7 +63,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
     setCurrentMediaIndex(0);
   };
 
-  const renderMedia = (media: InstagramMedia | InstagramMediaChild | null, inModal: boolean = false) => {
+  const renderMedia = (media: ShowPost | ShowMediaChild | null, inModal: boolean = false) => {
     if (!media) return null;
 
     if (inModal) {
@@ -95,7 +72,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
           <video
             src={media.media_url}
             controls
-            className="w-full aspect-video object-contain bg-black"
+            className="w-full aspect-video max-h-[75vh] object-contain bg-black"
             poster={media.thumbnail_url}
           />
         );
@@ -105,7 +82,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
     return (
       <img
         src={media.media_url}
-        alt={('caption' in media && media.caption) || 'Instagram post'}
+        alt={('caption' in media && media.caption) || 'show'}
         className={inModal ? "w-full aspect-video object-contain bg-black" : "w-full h-full object-cover"}
       />
     );
@@ -122,8 +99,8 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
-      className="max-w-6xl mx-auto mt-10 bg-black rounded-lg overflow-hidden"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4"
+      className="w-full max-w-6xl mx-auto mt-10 bg-black rounded-lg overflow-hidden"
+      overlayClassName="fixed inset-0 z-[100] bg-black bg-opacity-90 flex items-center justify-center p-4"
     >
       {currentPost && currentMedia && (
         <div className="relative flex flex-col">
@@ -169,6 +146,7 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
                 </Button>
                 <span className="bg-black/50 text-white px-3 py-1 rounded">
                   {currentMediaIndex + 1} / {currentPost.children.data.length}
+                  {'artist' in currentMedia && currentMedia.artist && ` · ${currentMedia.artist}`}
                 </span>
                 <Button
                   variant="outline"
@@ -195,14 +173,6 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
                 {currentPost.caption}
               </span>
             </div>
-            <a
-              href={currentPost.permalink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline whitespace-nowrap"
-            >
-              View on Instagram
-            </a>
           </div>
         </div>
       )}
@@ -210,4 +180,4 @@ export const InstagramModal: React.FC<InstagramModalProps> = ({
   );
 };
 
-export default InstagramModal;
+export default ShowModal;

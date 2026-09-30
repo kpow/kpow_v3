@@ -50,7 +50,6 @@ Collect all required API keys and configuration values:
 - `GOOGLE_API_KEY` - For Google services integration
 - `LASTFM_API_KEY` - For music-related features
 - `YOUTUBE_API_KEY` - For YouTube integration
-- `INSTAGRAM_ACCESS_TOKEN` - For Instagram integration
 - Email configuration (if using nodemailer):
   - `SMTP_HOST`
   - `SMTP_PORT`
