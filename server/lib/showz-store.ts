@@ -172,19 +172,41 @@ export async function replaceAll(baseRev: number, nights: StoreNight[], by = "na
   try {
     await client.query("BEGIN");
     const rev = await bumpRev(client, baseRev);
-    for (const n of nights) await upsertNight(client, n, by);
-    const dates = nights.map((n) => n.night);
+    // Diff against what's stored and write only what changed: a namer save
+    // usually touches one night, and a full rewrite is ~800 round trips.
+    const [cn, cc] = await Promise.all([
+      client.query(`SELECT * FROM showz_nights`),
+      client.query(`SELECT * FROM showz_clips`),
+    ]);
+    const nightNow = new Map(cn.rows.map((r: any) => [r.night, r]));
+    const clipNow = new Map(cc.rows.map((r: any) => [r.id, r]));
+    const same = (a: unknown, b: unknown) =>
+      typeof a === "number" || typeof b === "number"
+        ? (a == null && b == null) || (a != null && b != null && Math.abs(Number(a) - Number(b)) < 0.01)
+        : (a ?? "") === (b ?? "");
+    const NIGHT_FIELDS = ["dow", "venue", "city", "lat", "lon", "venue_id", "notes", "reviewed",
+      "artist_candidates", "time_conf", "source", "hidden"] as const;
+    const CLIP_FIELDS = ["file", "artist", "local_time", "dur", "w", "h", "published"] as const;
+
+    for (const n of nights) {
+      const cur: any = nightNow.get(n.night);
+      if (!cur || NIGHT_FIELDS.some((f) => !same((n as any)[f] ?? (f === "reviewed" || f === "hidden" ? false : null), cur[f])))
+        await upsertNight(client, n, by);
+    }
     const ids = nights.flatMap((n) => n.clips.map((c) => c.id));
     await client.query(`DELETE FROM showz_clips WHERE NOT (id = ANY($1::text[]))`, [ids]);
     for (const n of nights)
-      for (const c of n.clips)
+      for (const c of n.clips) {
+        const cur: any = clipNow.get(c.id);
+        if (cur && cur.night === n.night && CLIP_FIELDS.every((f) => same((c as any)[f] ?? (f === "published" ? false : null), cur[f]))) continue;
         await client.query(
           `INSERT INTO showz_clips (id, night, file, artist, local_time, dur, w, h, published)
            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
            ON CONFLICT (id) DO UPDATE SET night=$2, file=$3, artist=$4, local_time=$5, dur=$6, w=$7, h=$8, published=$9`,
           [c.id, n.night, c.file, c.artist ?? "", c.local_time, c.dur, c.w, c.h, !!c.published],
         );
-    await client.query(`DELETE FROM showz_nights WHERE NOT (night = ANY($1::text[]))`, [dates]);
+      }
+    await client.query(`DELETE FROM showz_nights WHERE NOT (night = ANY($1::text[]))`, [nights.map((n) => n.night)]);
     await client.query("COMMIT");
     bust();
     return rev;
