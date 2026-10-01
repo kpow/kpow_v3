@@ -18,7 +18,6 @@ This site tracks my digital footprint and will serve as my launching point in th
   - Last.fm API
   - Goodreads API
   - Feedbin API
-  - Instagram Graph API
   - Youtube API
   - Google Mail API
 - Drizzle ORM with PostgreSQL
@@ -48,7 +47,7 @@ This site tracks my digital footprint and will serve as my launching point in th
 - Real-time Last.fm music tracking
 - Goodreads reading progress integration
 - Feedbin article curation system
-- Instagram feed integration
+- k-shows: concert phone clips with a band per clip, a stats + journal page at `/shows`, and a dark admin at `/admin/shows` (see CLAUDE.md)
 - Cross-platform content synchronization
 
 ### Interactive Features
@@ -82,6 +81,7 @@ PHISH_API_KEY=your_key
 LASTFM_API_KEY=your_key
 GOODREADS_API_KEY=your_key
 FEEDBIN_KEY=your_key
+SHOWZ_SYNC_TOKEN=shared_with_the_showz_namer
 
 # Database Configuration
 DATABASE_URL=your_postgresql_url

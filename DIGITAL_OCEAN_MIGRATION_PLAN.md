@@ -50,6 +50,7 @@ Collect all required API keys and configuration values:
 - `GOOGLE_API_KEY` - For Google services integration
 - `LASTFM_API_KEY` - For music-related features
 - `YOUTUBE_API_KEY` - For YouTube integration
+- `SHOWZ_SYNC_TOKEN` - Lets the showz namer sync k-shows data (/api/showz/sync)
 - Email configuration (if using nodemailer):
   - `SMTP_HOST`
   - `SMTP_PORT`
