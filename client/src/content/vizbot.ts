@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.4.2";
+export const DOC_VERSION = "3.6.0";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -83,7 +83,7 @@ export const BOARDS: Board[] = [
     sub: "CoreS3 + robot base",
     token: "stackchan",
     hint: "A CoreS3 on the robot base. The head moves.",
-    feats: ["Moving head", "12-LED ring", "Head touch", "Battery", "Voice (preview)"],
+    feats: ["Moving head", "12-LED ring", "Head touch", "Battery", "Voice", "Camera"],
     touch: true,
     notes: [
       "The head drifts around on its own and reacts when you touch the top of it.",
@@ -92,7 +92,8 @@ export const BOARDS: Board[] = [
       "Base LEDs and LED mode are in Settings › Light & sound. Battery is in System.",
       "Use the `stackchan` file, not `m5cores3`. It's a CoreS3 inside, but the firmware is different.",
       "Head stopped moving after an update? Power it fully off (hold the bottom button about 6 seconds) and back on.",
-      "**Talk to it (preview, firmware 3.5 and newer, coming in the next release).** Tap the **front** of its head, ask anything, and it answers out loud with a moving mouth. Tap the front again to stop it. The thinking runs in [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain), a small app on a Mac on the same WiFi, using Claude. It can also work your WLED lights and tell you the weather.",
+      "**Talk to it.** Tap the **front** of its head, ask anything, and it answers out loud with a moving mouth. Tap the front again to stop it. The thinking runs in [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain), a small app on a Mac on the same WiFi, using Claude. Without vizbrain, Stackchan works exactly as before.",
+      "**It sees, notices and remembers.** Ask \"what am I holding?\" and it takes a photo. Walk in after a few quiet minutes and it says hi; lean in close and it reacts. Tell it things to remember, or routines like \"every weekday at 9, good morning with the weather\". It can also work your WLED lights and the vizMac keyboard.",
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
     ],
   },
@@ -649,7 +650,7 @@ export const WEB_SECTIONS: WebSection[] = [
     w: 1070,
     h: 516,
     boards: ["stackchan"],
-    lead: "Talking to your Stackchan. Preview: needs firmware 3.5 or newer (coming in the next release) and [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain) running on a Mac. The card only shows up on firmware with voice.",
+    lead: "Talking to your Stackchan. Needs firmware 3.6 or newer and [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain) running on a Mac. The card only shows up on firmware with voice.",
     controls: [
       {
         k: "State line",
