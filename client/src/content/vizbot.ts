@@ -83,7 +83,7 @@ export const BOARDS: Board[] = [
     sub: "CoreS3 + robot base",
     token: "stackchan",
     hint: "A CoreS3 on the robot base. The head moves.",
-    feats: ["Moving head", "12-LED ring", "Head touch", "Battery"],
+    feats: ["Moving head", "12-LED ring", "Head touch", "Battery", "Voice (preview)"],
     touch: true,
     notes: [
       "The head drifts around on its own and reacts when you touch the top of it.",
@@ -92,6 +92,8 @@ export const BOARDS: Board[] = [
       "Base LEDs and LED mode are in Settings › Light & sound. Battery is in System.",
       "Use the `stackchan` file, not `m5cores3`. It's a CoreS3 inside, but the firmware is different.",
       "Head stopped moving after an update? Power it fully off (hold the bottom button about 6 seconds) and back on.",
+      "**Talk to it (preview, firmware 3.5 and newer, coming in the next release).** Tap the **front** of its head, ask anything, and it answers out loud with a moving mouth. Tap the front again to stop it. The thinking runs in [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain), a small app on a Mac on the same WiFi, using Claude. It can also work your WLED lights and tell you the weather.",
+      "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
     ],
   },
 ];
@@ -306,6 +308,16 @@ export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
   {
     title: "It's too bright at night",
     body: "Swipe up, **Light**, **Night**. On the 1.3 use Brightness in the web panel.",
+  },
+  {
+    title: "Stackchan says “My brain is offline”",
+    body: "It can't reach [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain). Check the Mac is awake and on the same WiFi, then look at the **Brain (voice)** card in the [web panel](/vizbot/web#brain). Blank host means it finds the brain on its own. You can also type the Mac's address there, like `192.168.1.20:4050`.",
+    boards: ["stackchan"],
+  },
+  {
+    title: "Stackchan says “I didn't hear anything”",
+    body: "It stops listening when it hears nothing for about 6 seconds. Tap the front of its head, wait for the **Listening...** bubble, then talk at a normal volume from about an arm's length.",
+    boards: ["stackchan"],
   },
   {
     title: "The Stackchan head stopped moving after an update",
@@ -605,7 +617,7 @@ export const WEB_SECTIONS: WebSection[] = [
     controls: [
       {
         k: "Head Control",
-        v: "**Left** and **Right** turn the head. **Up** and **Down** tilt it. **Center** brings it home. **Nod** and **Shake** are the moves it makes when you tap the top of its head.",
+        v: "**Left** and **Right** turn the head. **Up** and **Down** tilt it. **Center** brings it home. **Nod** and **Shake** are the moves it makes when you tap the front or back of its head (on firmware with voice, the front tap talks instead).",
       },
       { k: "Yaw", v: "Turn, −90° to 90°. The head moves when you let go of the slider." },
       { k: "Pitch", v: "Tilt, 25° to 85°. The 25° floor keeps the head off the base." },
@@ -628,6 +640,33 @@ export const WEB_SECTIONS: WebSection[] = [
         v: "Asks first. Then it turns off the servos, the ring and the screen and shuts down. It's the full power-off a stuck head needs after an update.",
       },
     ],
+  },
+  {
+    id: "brain",
+    name: "Brain (voice)",
+    card: "Brain (voice)",
+    shot: W + "web-brain.png",
+    w: 1070,
+    h: 516,
+    boards: ["stackchan"],
+    lead: "Talking to your Stackchan. Preview: needs firmware 3.5 or newer (coming in the next release) and [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain) running on a Mac. The card only shows up on firmware with voice.",
+    controls: [
+      {
+        k: "State line",
+        v: "What it's doing right now (**idle**, **listening**, **thinking**, **speaking**), where it found the brain, and how many conversations worked or failed. The last error shows here too.",
+      },
+      {
+        k: "Voice (front head tap)",
+        v: "On: tapping the front of its head starts listening. Off: the front tap nods like before.",
+      },
+      {
+        k: "Host · Set",
+        v: "Where vizbrain runs, like `192.168.1.20:4050`. Leave it blank and it finds the brain on its own. vizbrain also fills this in by itself when it starts.",
+      },
+      { k: "Listen now", v: "Same as tapping the front of its head. Handy from across the room." },
+      { k: "Heard", v: "The last thing it heard you say and the start of its answer." },
+    ],
+    note: "It stops listening about a second after you stop talking. Answers start about three seconds later and play while the rest is still being written.",
   },
 ];
 
