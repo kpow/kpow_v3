@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.7.5";
+export const DOC_VERSION = "3.7.11";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -39,13 +39,14 @@ export const BOARDS: Board[] = [
     sub: "ESP32-S3-Touch-LCD-1.69",
     token: "esp32s3-lcd169",
     hint: "Small portrait touch screen. Mine lives in a lime-green dino case.",
-    feats: ["Touch", "Portrait 240×280", "Motion sensor", "Buzzer"],
+    feats: ["Touch", "Portrait 240×280", "Motion sensor", "Buzzer", "LED ring (add-on)"],
     touch: true,
     notes: [
       "Everything in the guide applies. Sheets come up from the bottom.",
       "Shake it and it gets dizzy.",
       "It has a small buzzer: a boop when you tap the face, and short sounds for swipes, toggles and buttons. **Sound** and **Volume** are in Settings › Light.",
       "Leave it alone for 5 minutes and it chirps now and then with a matching face, every 4 to 12 minutes. Never between 10pm and 8am.",
+      "**Add an LED ring** to light up the inside of the case: an 8-LED WS2812B ring on GPIO17, powered from 5V (not the board's 3.3V pin). Its **Screen** mode copies the colors of the scene behind the face and moves the way it does, and tapping the face flashes it. **Ring** and **Ring mode** are in Settings › Light, and the web panel has an LED Ring card. No ring? Nothing changes.",
     ],
   },
   {
@@ -270,7 +271,7 @@ export const SETTINGS: { name: string; cat: Cat; desc: string }[] = [
   { name: "Look", cat: "look", desc: "Scene, palette, hi-res, kaleidoscope, face color, auto-cycle" },
   { name: "Mood", cat: "mood", desc: "Personality, rotation, expression" },
   { name: "Info", cat: "info", desc: "Weather, clock, time zone" },
-  { name: "Light", cat: "light", desc: "Screen brightness. Sound and Volume on the 1.69. Volume and Audio FX on CoreS3. Base LEDs on Stackchan" },
+  { name: "Light", cat: "light", desc: "Screen brightness. Sound, Volume, Ring and Ring mode on the 1.69. Volume and Audio FX on CoreS3. Base LEDs on Stackchan" },
   { name: "Connect", cat: "connect", desc: "Network, .local address, IP, signal, nearby bots. Hotspot steps when offline" },
   { name: "System", cat: "system", desc: "Version, name, uptime, memory, battery. Hold 1.5 s to Restart or Power off" },
 ];
@@ -628,7 +629,7 @@ export const WEB_SECTIONS: WebSection[] = [
       { k: "Pitch", v: "Tilt, 25° to 85°. The 25° floor keeps the head off the base." },
       {
         k: "Base LEDs",
-        v: "The 12-LED ring. Ten modes: Off, Breathing, Rainbow, Chase, Fire, Twinkle, Pulse, Aurora, Mood and Audio. **Mood** takes its color from the face's expression. **Audio** reacts to the mic.",
+        v: "The 12-LED ring. Eleven modes: Off, Breathing, Rainbow, Chase, Fire, Twinkle, Pulse, Aurora, Mood, Audio and Screen. **Mood** takes its color from the face's expression. **Audio** reacts to the mic. **Screen** copies the colors and motion of the scene behind the face.",
       },
       { k: "Brightness · Speed", v: "For the ring. 10 to 255 each, defaults 80 and 128." },
       {

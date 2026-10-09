@@ -273,7 +273,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              The 1.69 makes sounds: a boop when you tap it, sounds in the menus, and a little chirp when it's been left alone. Plus 23 new palettes shared with the Noodle console, and every bot rejoins WiFi on its own.
+              The 1.69 can light up from inside: add an 8-LED ring and it glows in the colors of the scene on screen, moves with it, and flashes when you tap the face.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
