@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.6.0";
+export const DOC_VERSION = "3.7.5";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -39,11 +39,13 @@ export const BOARDS: Board[] = [
     sub: "ESP32-S3-Touch-LCD-1.69",
     token: "esp32s3-lcd169",
     hint: "Small portrait touch screen. Mine lives in a lime-green dino case.",
-    feats: ["Touch", "Portrait 240×280", "Motion sensor"],
+    feats: ["Touch", "Portrait 240×280", "Motion sensor", "Buzzer"],
     touch: true,
     notes: [
       "Everything in the guide applies. Sheets come up from the bottom.",
       "Shake it and it gets dizzy.",
+      "It has a small buzzer: a boop when you tap the face, and short sounds for swipes, toggles and buttons. **Sound** and **Volume** are in Settings › Light.",
+      "Leave it alone for 5 minutes and it chirps now and then with a matching face, every 4 to 12 minutes. Never between 10pm and 8am.",
     ],
   },
   {
@@ -158,7 +160,7 @@ export const FEATURES: Feature[] = [
     screen: "s3scene",
     frame: "landscape",
     title: "Light shows behind the eyes",
-    body: "16 animated scenes behind the face, with 15 palettes and a kaleidoscope. Swipe sideways to change it or let it cycle. On a CoreS3 they react to music.",
+    body: "16 animated scenes behind the face, with 23 palettes and a kaleidoscope. Swipe sideways to change it or let it cycle. On a CoreS3 they react to music.",
     caption: "scene switcher · CoreS3",
   },
   {
@@ -268,7 +270,7 @@ export const SETTINGS: { name: string; cat: Cat; desc: string }[] = [
   { name: "Look", cat: "look", desc: "Scene, palette, hi-res, kaleidoscope, face color, auto-cycle" },
   { name: "Mood", cat: "mood", desc: "Personality, rotation, expression" },
   { name: "Info", cat: "info", desc: "Weather, clock, time zone" },
-  { name: "Light", cat: "light", desc: "Screen brightness. Volume and Audio FX on CoreS3. Base LEDs on Stackchan" },
+  { name: "Light", cat: "light", desc: "Screen brightness. Sound and Volume on the 1.69. Volume and Audio FX on CoreS3. Base LEDs on Stackchan" },
   { name: "Connect", cat: "connect", desc: "Network, .local address, IP, signal, nearby bots. Hotspot steps when offline" },
   { name: "System", cat: "system", desc: "Version, name, uptime, memory, battery. Hold 1.5 s to Restart or Power off" },
 ];
@@ -296,7 +298,7 @@ export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
   },
   {
     title: "It started its own hotspot again",
-    body: "It couldn't join your WiFi. Usually a changed password, a 5 GHz-only network, or it's too far from the router. Join `vizBot-XXXX` and set it up again.",
+    body: "It couldn't join your WiFi. Usually a changed password, a 5 GHz-only network, or it's too far from the router. Join `vizBot-XXXX` and set it up again. If your WiFi was only down for a while, wait: it keeps retrying and rejoins on its own.",
   },
   {
     title: "The update says “Wrong board type”",
@@ -374,6 +376,7 @@ export interface WebSection {
 }
 
 const MIC_BOARDS: BoardId[] = ["cores3", "stackchan"];
+const SOUND_BOARDS: BoardId[] = ["lcd169", "cores3", "stackchan"];
 
 export const WEB_SECTIONS: WebSection[] = [
   {
@@ -487,7 +490,7 @@ export const WEB_SECTIONS: WebSection[] = [
     lead: "Brightness, the clock and the firmware.",
     controls: [
       { k: "Brightness", v: "Screen brightness, 1 to 255. Default 15." },
-      { k: "Volume", v: "Speaker volume, 0 to 255. The Waveshare boards have no speaker.", boards: MIC_BOARDS },
+      { k: "Volume", v: "Sound volume, 0 to 255. The speaker on a CoreS3 or Stackchan, the buzzer on the 1.69. The 1.3 has neither.", boards: SOUND_BOARDS },
       { k: "Time Overlay", v: "Puts the clock on the face. Same as **Clock** in the dock." },
       {
         k: "Time Zone",
@@ -510,15 +513,16 @@ export const WEB_SECTIONS: WebSection[] = [
     shot: W + "web-sounds.png",
     w: 1070,
     h: 1108,
-    boards: MIC_BOARDS,
-    lead: "Every sound the bot makes, on buttons. The card only fills in on a CoreS3 or Stackchan.",
+    boards: SOUND_BOARDS,
+    lead: "Every sound the bot makes, on buttons. The card fills in on a CoreS3, Stackchan or 1.69.",
     controls: [
       {
         k: "MIDI Synth",
-        v: "Where sound goes. **MIDI Active**: a SAM2695 MIDI synth unit on a Grove port plays it. **Speaker**: the built-in speaker. **Off**: no sound.",
+        v: "Where sound goes. **MIDI Active**: a SAM2695 MIDI synth unit on a Grove port plays it. **Speaker**: the built-in speaker. **Buzzer**: the 1.69's buzzer, one note at a time. **Off**: no sound.",
       },
       {
         k: "Synth Port",
+        boards: MIC_BOARDS,
         v: "Which Grove port the synth is on: **Port C** (default) or **Port A**. It switches live, no restart. Port A is the I2C port too, so the synth and an I2C unit can't share it.",
       },
       {
