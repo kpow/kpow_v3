@@ -54,11 +54,11 @@ Main tables:
 
 ### Key Features
 1. **Donut Shop Explorer** - Interactive map-based search using Yelp API
-2. **Phashboard** - Phish show analytics and venue statistics
+2. **Phashboard** - Phish shows + PhantasyFish games (`/phashboard/:tab?`, see below)
 3. **Music Tracking** - Last.fm integration with play history
 4. **Book Management** - Goodreads integration with shelves
 5. **k-shows** - concert phone clips: `/shows` and the home carousel
-6. **Admin Panel** - one dark admin at `/admin` (Shows, Books, Music)
+6. **Admin Panel** - one dark admin at `/admin` (Shows, Books, Music, Phashboard)
 
 ### Development Notes
 - Environment variables required for all API integrations (see README)
@@ -129,3 +129,34 @@ iPhone -> namer on the Mac (import, name, publish)
   `SHOWZ_CDN_BASE`. Forgot the admin password? `node --env-file=.env scripts/set-password.mjs`.
 - DigitalOcean replaces a 503 from the app with its own "failed to forward"
   504 page; a 504 on `/api/showz/sync` usually means the token isn't set.
+
+## Phashboard (`/phashboard`, `/admin/phashboard`)
+
+Phish shows koolyp attended plus kpow's PhantasyFish games. No phish.net calls
+per page view: the server builds everything and caches it.
+
+```
+phish.net attendance (PHISH_API_KEY) ─┐
+phish.in v2 setlists/lengths/gaps     ├─ server/lib/phashboard/build.ts
+phantasyfish.net public API (user 6) ─┘        │
+                                   phashboard_cache (5 parts) + phashboard_http (upstream copies)
+                                               │
+GET /api/phashboard/{core,songs,shows,phantasy} · /api/phashboard/onthisday/MM-DD
+                                               │
+            client/src/pages/Phashboard.tsx + components/phashboard/* (d3)
+```
+
+- Tables are created on first use (CREATE TABLE IF NOT EXISTS). **Never run
+  `npm run db:push`.**
+- A part older than 6 h is served and rebuilt in the background; the first
+  request after a deploy with an empty cache waits for a full build (~1 min).
+  `/admin/phashboard` shows build times and has "Rebuild now".
+- Upstream responses are cached per URL in `phashboard_http`: shows older than
+  21 days for 30 days, recent ones for 3 h. A failed fetch falls back to the
+  last copy.
+- Env (optional): `PHASHBOARD_PHISHNET_USER` (koolyp), `PHASHBOARD_PF_USER` (6),
+  `PHANTASYFISH_URL` (https://phantasyfish.net).
+- Styles are scoped under `.phashboard` in `components/phashboard/phashboard.css`
+  (kpow.xyz palette). Tabs: overview, phantasy, songs, shows, venues, onthisday.
+- What's left in `routes/phish-routes.ts` serves only the home page's
+  guess-the-setlist game (`/api/shows/all`, `/api/setlists/:showId`).

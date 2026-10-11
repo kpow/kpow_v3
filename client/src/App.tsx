@@ -11,7 +11,7 @@ import { Layout } from "@/components/Layout";
 import { HelmetProvider } from "react-helmet-async";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
-import ShowStats from "@/pages/Phashboard";
+import Phashboard from "@/pages/Phashboard";
 import Books from "@/pages/Books";
 import StarredArticles from "@/pages/StarredArticles";
 import PMonk from "@/pages/PMonk";
@@ -44,7 +44,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
-        <Route path="/phashboard" component={ShowStats} />
+        <Route path="/phashboard/:tab?" component={Phashboard} />
         <Route path="/books/page/:page" component={Books} />
         <Route path="/books" component={Books} />
         <Route
