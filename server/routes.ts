@@ -15,6 +15,7 @@ import { registerAdminRoutes } from "./routes/admin-routes";
 import { registerVizspotRoutes } from "./routes/vizspot-routes";
 import { registerVizbotRoutes } from "./routes/vizbot-routes";
 import { registerShowzRoutes } from "./routes/showz-routes";
+import { registerPhashboardRoutes } from "./routes/phashboard-routes";
 import youtubeRoutes from "./routes/youtube-routes";
 import contactRoutes from "./routes/contact-routes";
 import yelpRoutes from "./routes/yelp";
@@ -56,6 +57,7 @@ export function registerRoutes(app: Express): Server {
   registerVizspotRoutes(router);   // vizSpot LED board phone pairing
   registerVizbotRoutes(router);    // vizBot firmware releases (GitHub, cached)
   registerShowzRoutes(router);     // k-shows concert clips (Spaces, cached)
+  registerPhashboardRoutes(router); // phashboard: phish.net + phish.in + phantasyfish, cached
 
   // Register YouTube routes
   router.use('/api/youtube', youtubeRoutes);

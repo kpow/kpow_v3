@@ -7,12 +7,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useRoute } from "wouter";
-import { Book, ChevronDown, Disc3, Video } from "lucide-react";
+import { Book, ChevronDown, Disc3, Fish, Video } from "lucide-react";
 import { AlbumLookup } from "@/components/admin/AlbumLookup";
 import { ITunesSearch } from "@/components/admin/iTunesSearch";
 import { BookManager } from "@/components/admin/BookManager";
 import { ShowsAdmin } from "@/components/admin/shows/ShowsAdmin";
 import { AdminChrome } from "@/components/admin/AdminChrome";
+import { PhashboardAdmin } from "@/components/admin/PhashboardAdmin";
 
 
 // The book and music tools were built for the light site; they sit on a light
@@ -25,6 +26,7 @@ const SECTIONS = [
   { id: "shows", label: "Shows", icon: Video, blurb: "k-shows nights, bands and venues" },
   { id: "books", label: "Books", icon: Book, blurb: "Goodreads shelves and book entries" },
   { id: "music", label: "Music", icon: Disc3, blurb: "Last.fm album lookup and iTunes search" },
+  { id: "phashboard", label: "Phashboard", icon: Fish, blurb: "Rebuild the Phish + PhantasyFish data" },
 ];
 
 export default function AdminPage() {
@@ -77,6 +79,7 @@ export default function AdminPage() {
         <div className="px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
           {current.id === "shows" && <ShowsAdmin date={night?.date} />}
           {current.id === "books" && <Light><BookManager /></Light>}
+          {current.id === "phashboard" && <PhashboardAdmin />}
           {current.id === "music" && (
             <Light>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
