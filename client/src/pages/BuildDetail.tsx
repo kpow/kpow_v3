@@ -87,7 +87,7 @@ export default function BuildDetail() {
 
   // The hero file is usually also attached to an entry; borrow that caption when
   // it has one. No caption means no bar, rather than a bar repeating the title.
-  const heroShot = build.picturesOverTime.find((p) => p.src === build.hero);
+  const heroShot = build.picturesOverTime.find((p) => p.src === build.hero || p.src === build.heroVideo);
 
   return (
     <BuildLogShell>
@@ -151,7 +151,8 @@ export default function BuildDetail() {
       {build.hero && (
         <figure className="hero-band">
           <Zoomable
-            src={build.hero}
+            src={build.heroVideo || build.hero}
+            poster={build.heroVideo ? build.hero : undefined}
             alt={build.title}
             caption={heroShot?.caption}
             kind={heroShot?.kind}
