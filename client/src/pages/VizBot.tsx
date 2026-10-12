@@ -273,7 +273,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              The 1.69 can light up from inside: add a 5×5 LED matrix and it shows a tiny copy of the scene on screen, and flashes when you tap the face.
+              The 1.69 runs on a battery now: press PWR to start it, hold PWR to turn it off, and switch on Low power to run with WiFi off.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
