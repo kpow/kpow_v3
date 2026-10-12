@@ -45,6 +45,8 @@ export interface Build {
   facts: Record<string, string>;
   repo: string | null;
   hero: string | null;
+  /** Optional clip for the build page's hero band. `hero` stays the still: index card, share image, poster. */
+  heroVideo?: string | null;
   links: { label: string; url: string }[];
   started: string | null;
   body: string;
