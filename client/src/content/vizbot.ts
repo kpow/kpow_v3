@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.7.20";
+export const DOC_VERSION = "3.7.31";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -50,6 +50,7 @@ export const BOARDS: Board[] = [
       "Built the 8-LED ring from 3.7.11? It still lights up, but Screen mode is laid out for the 5×5 panel now. Stay on 3.7.11 or swap in a panel.",
       "**Runs on a battery.** Press PWR to start it. To turn it off, hold PWR for 2 seconds or hold **Power off** in Settings › System. On USB it restarts instead. This is for the current board revision; the older one uses different power pins.",
       "**Low power** is for battery use: hold **Low power** in Settings › System. The bot restarts with WiFi off, the CPU slowed down and the screen at 60% of your brightness, and boots in about a second. The control page, cloud, weather, clock sync and updates stay off until you hold **Full power** in the same place.",
+      "**Battery level** shows as 0 to 4 bars at the top of the home screen and in Settings › System, or a bolt on USB. When the battery gets too low it shows \"Battery empty\" and turns itself off, instead of running the cell flat.",
     ],
   },
   {
@@ -98,8 +99,8 @@ export const BOARDS: Board[] = [
       "Base LEDs and LED mode are in Settings › Light & sound. Battery is in System.",
       "Use the `stackchan` file, not `m5cores3`. It's a CoreS3 inside, but the firmware is different.",
       "Head stopped moving after an update? Power it fully off (hold the bottom button about 6 seconds) and back on.",
-      "**Talk to it.** Tap the **front** of its head, ask anything, and it answers out loud with a moving mouth. Tap the front again to stop it. The thinking runs in [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain), a small app on a Mac on the same WiFi, using Claude. Without vizbrain, Stackchan works exactly as before.",
-      "**It sees, notices and remembers.** Ask \"what am I holding?\" and it takes a photo. Walk in after a few quiet minutes and it says hi; lean in close and it reacts. Tell it things to remember, or routines like \"every weekday at 9, good morning with the weather\". It can also work your WLED lights and the vizMac keyboard.",
+      "**Talk to it.** Tap the **front** of its head, ask anything, and it answers out loud with a moving mouth. Tap the front again to stop it. The thinking runs in [vizbrain](https://github.com/kpow/vizpow/blob/main/vizbrain/README.md), a small app on a Mac on the same WiFi, using Claude. vizbrain 1.1.0 needs firmware 3.7.31 or newer. Without vizbrain, Stackchan works exactly as before.",
+      "**It sees, notices and remembers.** Ask \"what am I holding?\" and it takes a photo. Walk in after a few quiet minutes and it says hi; lean in close and it reacts. Tell it things to remember, or routines like \"every weekday at 9, good morning with the weather\". It can also work WLED lights and Spotify, if you have them.",
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
     ],
   },
@@ -317,8 +318,8 @@ export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
     body: "Swipe up, **Light**, **Night**. On the 1.3 use Brightness in the web panel.",
   },
   {
-    title: "Stackchan says “My brain is offline”",
-    body: "It can't reach [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain). Check the Mac is awake and on the same WiFi, then look at the **Brain (voice)** card in the [web panel](/vizbot/web#brain). Blank host means it finds the brain on its own. You can also type the Mac's address there, like `192.168.1.20:4050`.",
+    title: "Stackchan can't find or reach its brain",
+    body: "**\"Can't find my brain\"**: [vizbrain](https://github.com/kpow/vizpow/blob/main/vizbrain/README.md) isn't running on the Mac. **\"Can't reach my brain\"**: the Mac is asleep, off, or on another WiFi. Any other message comes from vizbrain itself and says what to do. On the Mac, `vizbrain doctor` checks everything. Older firmware says \"My brain is offline\" for all of these. The **Brain (voice)** card in the [web panel](/vizbot/web#brain) shows where it is looking; blank means it finds the brain on its own.",
     boards: ["stackchan"],
   },
   {
@@ -658,7 +659,7 @@ export const WEB_SECTIONS: WebSection[] = [
     w: 1070,
     h: 516,
     boards: ["stackchan"],
-    lead: "Talking to your Stackchan. Needs firmware 3.6 or newer and [vizbrain](https://github.com/kpow/vizpow/tree/main/vizbrain) running on a Mac. The card only shows up on firmware with voice.",
+    lead: "Talking to your Stackchan. Needs [vizbrain](https://github.com/kpow/vizpow/blob/main/vizbrain/README.md) running on a Mac; vizbrain 1.1.0 needs firmware 3.7.31 or newer. The card only shows up on firmware with voice.",
     controls: [
       {
         k: "State line",
@@ -670,7 +671,7 @@ export const WEB_SECTIONS: WebSection[] = [
       },
       {
         k: "Host · Set",
-        v: "Where vizbrain runs, like `192.168.1.20:4050`. Leave it blank and it finds the brain on its own. vizbrain also fills this in by itself when it starts.",
+        v: "Where vizbrain runs, like `192.168.1.20:4050`. Leave it blank and it finds the brain on its own. vizbrain fills this in by itself and keeps it current, and if the Mac's address changes the bot looks for the brain again.",
       },
       { k: "Listen now", v: "Same as tapping the front of its head. Handy from across the room." },
       { k: "Heard", v: "The last thing it heard you say and the start of its answer." },
