@@ -26,6 +26,7 @@ export interface ShareImage {
 export interface PageMeta {
   /** Page title without the site name; `fullTitle()` adds it */
   title: string;
+  /** Empty means no description tags at all */
   description: string;
   image: ShareImage;
   /** og:type */
@@ -53,7 +54,7 @@ export const CARDS = {
   books: card("books", "book feed"),
   starred: card("starred", "star feed: starred articles"),
   videos: card("videos", "youtubez live"),
-  pmonk: card("pmonk", "pmonk: a gallery"),
+  pmonk: card("pmonk", "pmonk"),
   battle: card("battle", "battle: choose your champion"),
   donuts: card("donuts", "donut tour: a map of donut shops"),
 };
@@ -177,7 +178,8 @@ export const STATIC_PAGES: Record<string, PageMeta> = {
     "The latest videos from the YouTube channels I follow: music, tech and more.",
     CARDS.videos,
   ),
-  "/pmonk": page("pmonk", "A gallery of pmonk's work.", CARDS.pmonk),
+  // just the name, on purpose: those who know, know
+  "/pmonk": page("pmonk", "", CARDS.pmonk),
   "/battle": page(
     "battle: choose your champion",
     "Enter the arena and pit heroes and villains against each other, testing their combinations and powers.",
@@ -334,13 +336,13 @@ export function headTags(meta: PageMeta, path: string, origin: string): { tag: "
   const name = (name: string, content: string) => ({ tag: "meta" as const, attrs: { name, content } });
   const prop = (property: string, content: string) => ({ tag: "meta" as const, attrs: { property, content } });
   return [
-    name("description", meta.description),
+    ...(meta.description ? [name("description", meta.description)] : []),
     ...(meta.noindex ? [name("robots", "noindex, nofollow")] : [{ tag: "link" as const, attrs: { rel: "canonical", href: url } }]),
     prop("og:site_name", SITE.name),
     prop("og:locale", SITE.locale),
     prop("og:type", meta.type ?? "website"),
     prop("og:title", title),
-    prop("og:description", meta.description),
+    ...(meta.description ? [prop("og:description", meta.description)] : []),
     prop("og:url", url),
     prop("og:image", imgUrl),
     ...(imgUrl.startsWith("https:") ? [prop("og:image:secure_url", imgUrl)] : []),
@@ -348,7 +350,7 @@ export function headTags(meta: PageMeta, path: string, origin: string): { tag: "
     ...(img.alt ? [prop("og:image:alt", img.alt)] : []),
     name("twitter:card", "summary_large_image"),
     name("twitter:title", title),
-    name("twitter:description", meta.description),
+    ...(meta.description ? [name("twitter:description", meta.description)] : []),
     name("twitter:image", imgUrl),
     ...(img.alt ? [name("twitter:image:alt", img.alt)] : []),
   ];

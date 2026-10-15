@@ -28,7 +28,9 @@ const ROUTES = [
   ["/vizmac", 200], ["/vizmac/guide", 200], ["/vizmac/controller", 200],
   ["/auth", 200], ["/admin", 200], ["/admin/shows", 200], ["/no-such-page", 404],
 ];
-const REQUIRED = ["og:title", "og:description", "og:image", "og:url", "og:type", "og:site_name", "twitter:card", "twitter:image"];
+// pages that deliberately go out with only a name and title
+const NO_DESCRIPTION = new Set(["/pmonk"]);
+const REQUIRED = ["og:title", "og:image", "og:url", "og:type", "og:site_name", "twitter:card", "twitter:image"];
 
 const attr = (tag, name) => tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
 const unesc = (s) => s?.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
@@ -63,7 +65,9 @@ for (const [route, want] of ROUTES) {
   if (res.status !== want) issues.push(`status ${res.status}, want ${want}`);
   if (titles !== 1) issues.push(`${titles} <title> tags`);
   for (const k of REQUIRED) if (!tags[k]) issues.push(`no ${k}`);
-  if (!tags.description) issues.push("no description");
+  if (NO_DESCRIPTION.has(route)) {
+    if (tags.description || tags["og:description"]) issues.push("has a description, wants none");
+  } else if (!tags.description || !tags["og:description"]) issues.push("no description");
   const noindex = /noindex/.test(tags.robots || "");
   if (!noindex && !canonical) issues.push("no canonical");
   if (tags["og:image"]) {
