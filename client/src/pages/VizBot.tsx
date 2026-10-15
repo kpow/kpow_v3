@@ -273,7 +273,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              The 1.69 shows how much battery is left and turns itself off before the battery runs flat. Stackchan pairs with vizbrain 1.1.0 and says why when it can't reach it.
+              Stackchan listens for your answer when it asks you something, flashes the album cover when a new song starts (face still on, in the corner), and lets you pick its voice on its web page.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
