@@ -130,6 +130,26 @@ iPhone -> namer on the Mac (import, name, publish)
 - DigitalOcean replaces a 503 from the app with its own "failed to forward"
   504 page; a 504 on `/api/showz/sync` usually means the token isn't set.
 
+## Music plays (`/itunez`, home "listening", `/admin/music`)
+
+All plays live in `plays` (+ `songs`, `artists`), merged from three sources by
+`server/lib/music/`:
+
+- `plays.source` is `apple` | `spotify`; `plays.via` is `apple-export` (privacy
+  export, 2016 → Feb 2025, includes skips), `lastfm` (krakap scrobbles, taken as
+  Apple) or `spotify-api` (recently-played). Columns are added by
+  `ensureMusicTables()` (ALTER … IF NOT EXISTS), not in `db/schema.ts`.
+  **Never run `npm run db:push`.**
+- A listen = `LISTEN_SQL` (`via` lastfm/spotify-api, or >= 30 s). Every stats
+  query in `routes/music-routes.ts` uses it.
+- `sync.ts` polls every 15 min in production (`MUSIC_SYNC=on|off` to override):
+  Spotify first (its API only keeps the last 50), then Last.fm. A Spotify play
+  and its Last.fm scrobble (same artist + track within 10 min) become one row.
+- Home feed `/api/lastfm/recent-tracks` merges Last.fm + Spotify live (`recent.ts`).
+- Env: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`; connect once at
+  `/admin/music`. The Spotify app's redirect URI is
+  `https://kpow.xyz/api/admin/spotify/callback`.
+
 ## Phashboard (`/phashboard`, `/admin/phashboard`)
 
 Phish shows koolyp attended plus kpow's PhantasyFish games. No phish.net calls

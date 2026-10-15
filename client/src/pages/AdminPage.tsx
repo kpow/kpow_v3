@@ -14,6 +14,7 @@ import { BookManager } from "@/components/admin/BookManager";
 import { ShowsAdmin } from "@/components/admin/shows/ShowsAdmin";
 import { AdminChrome } from "@/components/admin/AdminChrome";
 import { PhashboardAdmin } from "@/components/admin/PhashboardAdmin";
+import { MusicSyncAdmin } from "@/components/admin/MusicSyncAdmin";
 
 
 // The book and music tools were built for the light site; they sit on a light
@@ -25,7 +26,7 @@ const Light = ({ children }: { children: ReactNode }) => (
 const SECTIONS = [
   { id: "shows", label: "Shows", icon: Video, blurb: "k-shows nights, bands and venues" },
   { id: "books", label: "Books", icon: Book, blurb: "Goodreads shelves and book entries" },
-  { id: "music", label: "Music", icon: Disc3, blurb: "Last.fm album lookup and iTunes search" },
+  { id: "music", label: "Music", icon: Disc3, blurb: "Spotify + Last.fm play sync, album lookup" },
   { id: "phashboard", label: "Phashboard", icon: Fish, blurb: "Rebuild the Phish + PhantasyFish data" },
 ];
 
@@ -81,12 +82,15 @@ export default function AdminPage() {
           {current.id === "books" && <Light><BookManager /></Light>}
           {current.id === "phashboard" && <PhashboardAdmin />}
           {current.id === "music" && (
+            <div className="space-y-6">
+            <MusicSyncAdmin />
             <Light>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-4"><AlbumLookup /></div>
                 <div className="space-y-4"><ITunesSearch /></div>
               </div>
             </Light>
+            </div>
           )}
         </div>
       </div>
