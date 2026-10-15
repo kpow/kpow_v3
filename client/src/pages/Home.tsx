@@ -96,11 +96,7 @@ export default function Home() {
 
   return (
     <>
-      <SEO
-        title="KPOW - Into the Singularity"
-        description="A comprehensive cross-domain media and location analytics platform featuring an interactive Phish setlist guessing game that provides an engaging music trivia experience."
-        image="/phash.jpg"
-      />
+      <SEO />
       <div className="space-y-8 mt-4">
         {/* viz family */}
         <VizSection />

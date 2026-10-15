@@ -143,11 +143,7 @@ function Step({ index, children }: { index: number; children: React.ReactNode })
 export default function VizSpotGuide() {
   return (
     <>
-      <SEO
-        title="vizSpot"
-        image="/images/vizspot-hero-poster.jpg"
-        description="vizSpot: a 64x64 LED board that shows what you're playing on Spotify, reacts to the music, and sets up from your phone."
-      />
+      <SEO />
 
       <div className="mx-auto max-w-4xl px-4 py-4">
         {/* HERO */}

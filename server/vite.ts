@@ -8,6 +8,7 @@ const __dirname = dirname(__filename);
 import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
+import { looksLikeFile, registerSitemap, renderIndex } from "./page-meta";
 
 const viteLogger = createLogger();
 
@@ -41,8 +42,10 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
+  registerSitemap(app, path.resolve(__dirname, "..", "client", "public"));
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+    if (looksLikeFile(req.originalUrl.split("?")[0])) return res.status(404).end();
 
     try {
       const clientTemplate = path.resolve(
@@ -55,8 +58,9 @@ export async function setupVite(app: Express, server: Server) {
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(`src="/src/main.tsx"`, `src="/src/main.tsx?v=${nanoid()}"`)
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      template = await vite.transformIndexHtml(url, template);
+      const { status, html } = await renderIndex(req, template, path.resolve(__dirname, "..", "client", "public"));
+      res.status(status).set({ "Content-Type": "text/html", "Cache-Control": "no-cache" }).end(html);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
@@ -73,10 +77,25 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  registerSitemap(app, distPath);
+  app.use(
+    express.static(distPath, {
+      // index.html goes out below with the page's own tags, never as a plain file
+      index: false,
+      // hashed bundles never change; everything else revalidates
+      setHeaders: (res, file) => {
+        if (file.includes(`${path.sep}assets${path.sep}`)) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      },
+    }),
+  );
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  // fall through to index.html, with this page's title and share tags, if the file doesn't exist
+  const template = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
+  app.use("*", async (req, res) => {
+    // a missing bundle or image is a 404, not the app: an old cached index.html
+    // asking for last deploy's bundle would otherwise get HTML back and go blank
+    if (looksLikeFile(req.originalUrl.split("?")[0])) return res.status(404).end();
+    const { status, html } = await renderIndex(req, template, distPath);
+    res.status(status).set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }).end(html);
   });
 }

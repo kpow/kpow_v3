@@ -254,12 +254,7 @@ function BigCard({
 export default function VizBot() {
   return (
     <>
-      <SEO
-        title="vizBot · a tiny desk robot"
-        description="vizBot is open-source firmware that gives a little ESP32 screen a face and a personality. Moods, speech bubbles, clock, weather and light shows on four boards."
-        image={HERO_POSTER}
-        keywords="vizBot, ESP32, desk robot, Stackchan, M5Stack CoreS3, Waveshare, firmware"
-      />
+      <SEO />
       <VizBotShell>
         <Hero />
         <BoardPhotos />

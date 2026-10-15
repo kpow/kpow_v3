@@ -146,7 +146,7 @@ export const PMonk = () => {
 
   return (
     <>
-      <SEO title="pmonk" /> {/* Added SEO component */}
+      <SEO />
       <div className="p-4">
         <PageTitle size="default" className="mb-6">
           pmonk

@@ -288,56 +288,12 @@ export default function DonutShops() {
   }, [data?.shops]);
 
   // =========================================================================
-  // HELPER FUNCTIONS FOR SEO AND DISPLAY
-  // =========================================================================
-
-  /**
-   * Generates page title based on search criteria
-   */
-  const getPageTitle = () => {
-    if (searchType === "city" && searchState.city && searchState.state) {
-      return `Donut Shops in ${searchState.city}, ${searchState.state}`;
-    }
-    if (searchType === "zipcode" && searchState.zipCode) {
-      return `Donut Shops near ${searchState.zipCode}`;
-    }
-    return "Find Local Donut Shops";
-  };
-
-  /**
-   * Generates page description for SEO
-   */
-  const getPageDescription = () => {
-    const shopCount = shops.length;
-    const locationText =
-      searchState.city && searchState.state
-        ? `${searchState.city}, ${searchState.state}`
-        : searchState.zipCode
-          ? `ZIP code ${searchState.zipCode}`
-          : "your area";
-
-    return `Discover ${shopCount} delicious donut shops in ${locationText}. Find ratings, reviews, and locations of the best donut shops near you.`;
-  };
-
-  /**
-   * Gets preview image for social sharing
-   */
-  const getPreviewImage = () => {
-    return shops[0]?.image_url ?? "/donut-placeholder.png";
-  };
-
-  // =========================================================================
   // RENDER COMPONENT
   // =========================================================================
   return (
     <>
       {/* SEO Metadata */}
-      <SEO
-        title={getPageTitle()}
-        description={getPageDescription()}
-        image={getPreviewImage()}
-        type="website"
-      />
+      <SEO />
 
       <div className="container mx-auto max-w-[1800px] flex flex-col min-h-screen">
         {/* Page Header */}

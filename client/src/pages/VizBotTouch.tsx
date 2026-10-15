@@ -190,12 +190,7 @@ export default function VizBotTouch() {
 
   return (
     <>
-      <SEO
-        title="vizBot touch screen"
-        description="How to drive vizBot from its touch screen: gestures, the quick dock, the scene, mood and light sheets, settings, and the CoreS3 and Stackchan layout."
-        image={SCREENS.dock}
-        keywords="vizBot, touch screen, gestures, ESP32, Stackchan, CoreS3, Waveshare 1.69"
-      />
+      <SEO />
       <VizBotShell>
         <DocHero
           eyebrow={`touch screen · firmware ${DOC_VERSION}`}

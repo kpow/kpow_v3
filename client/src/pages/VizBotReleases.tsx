@@ -11,7 +11,6 @@ import {
   DOC_VERSION,
   INSTALL_STEPS,
   RELEASES_URL,
-  SCREENS,
   USB_STEPS,
   factoryFileName,
   isBoardId,
@@ -591,12 +590,7 @@ export default function VizBotReleases() {
 
   return (
     <>
-      <SEO
-        title="vizBot downloads"
-        description="vizBot firmware for the Waveshare 1.69, Waveshare 1.3, M5Stack CoreS3 and Stackchan. Pick your board, grab one file, update over WiFi."
-        image={SCREENS.home}
-        keywords="vizBot, firmware, download, OTA, ESP32-S3, Stackchan, CoreS3, Waveshare"
-      />
+      <SEO />
       <VizBotShell>
         <section>
           <Eyebrow>downloads · firmware</Eyebrow>

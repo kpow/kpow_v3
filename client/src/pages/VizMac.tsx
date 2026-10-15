@@ -300,12 +300,7 @@ function BigCard({ href, icon, title, body, cta }: { href: string; icon: ReactNo
 export default function VizMac() {
   return (
     <>
-      <SEO
-        title="vizMac · one knob for the whole desk"
-        description="A desk macropad for the Mac. One knob and one button run per-key lighting on a ROCCAT Vulcan Pro TKL, Spotify and Music, a focus timer and your WLED lights."
-        image={PHOTOS.hero.src}
-        keywords="vizMac, macropad, ROCCAT Vulcan Pro TKL, per-key RGB, macOS, ESP32-S3, WLED, focus timer, Spotify"
-      />
+      <SEO />
       <VizMacShell>
         <Hero />
         <ModePhotos />

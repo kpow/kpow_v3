@@ -3,7 +3,6 @@
 // (vizbot.css). It sits inside the site's normal Layout card and adds the sub-nav.
 
 import type { ReactNode } from "react";
-import { Helmet } from "react-helmet-async";
 import { Link, useLocation } from "wouter";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -112,12 +111,6 @@ function SubNav() {
 export function VizMacShell({ children }: { children: ReactNode }) {
   return (
     <div className="vizmac mx-auto w-full max-w-6xl px-2 py-2 sm:px-4 sm:py-4">
-      <Helmet>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap"
-        />
-      </Helmet>
       <SubNav />
       {children}
     </div>

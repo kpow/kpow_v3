@@ -408,12 +408,7 @@ export default function VizMacController() {
 
   return (
     <>
-      <SEO
-        title="vizMac controller"
-        description="The vizMac desk controller: the knob and KO button, the mode picker, Keys, Now Playing, the Clock and focus timer, WLED, Wi-Fi setup from your phone, and updates."
-        image={PHOTOS.hero.src}
-        keywords="vizMac, controller, macropad, ESP32-S3, Now Playing, focus timer, WLED"
-      />
+      <SEO />
       <VizMacShell>
         <DocHero
           eyebrow={`the controller · firmware ${FW_LABEL}`}

@@ -13,7 +13,6 @@ import {
   MENUBAR_SHOT,
   MENU_GROUPS,
   PAIRING_STEPS,
-  PHOTOS,
   WEB_CONTROLLER,
   WEB_EFFECTS,
   WEB_KEYBOARD,
@@ -178,12 +177,7 @@ export default function VizMacGuide() {
 
   return (
     <>
-      <SEO
-        title="vizMac user guide"
-        description="The vizMac menu bar app and web UI: effects and palettes, the keyboard, Wi-Fi access and pairing, controller updates, WLED lights, and fixes for common problems."
-        image={PHOTOS.hero.src}
-        keywords="vizMac, user guide, ROCCAT Vulcan Pro TKL, macOS, menu bar, WLED"
-      />
+      <SEO />
       <VizMacShell>
         <DocHero
           eyebrow="user guide · the Mac side"

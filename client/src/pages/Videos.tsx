@@ -65,30 +65,9 @@ export default function Videos() {
     setLocation(newPage === 1 ? "/videos" : `/videos/page/${newPage}`);
   };
 
-  const getPageTitle = () => {
-    return `KPOW YouTube Videos ${page > 1 ? `- Page ${page}` : ''}`;
-  };
-
-  const getPageDescription = () => {
-    if (data?.items?.length > 0) {
-      const firstVideoTitles = data.items.slice(0, 3).map(video => video.title).join(', ');
-      return `Watch the latest videos including: ${firstVideoTitles}. Page ${page} of my video collection.`;
-    }
-    return "Explore my collection of YouTube videos featuring music, tech, and more.";
-  };
-
-  const getPreviewImage = () => {
-    return data?.items?.[0]?.thumbnail ?? "/video-placeholder.png";
-  };
-
   return (
     <>
-      <SEO
-        title={getPageTitle()}
-        description={getPageDescription()}
-        image={getPreviewImage()}
-        type="video.other"
-      />
+      <SEO />
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
           <PageTitle size="lg">youtubez live</PageTitle>

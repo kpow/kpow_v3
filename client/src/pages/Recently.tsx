@@ -12,11 +12,7 @@ export default function Recently() {
 
   return (
     <BuildLogShell>
-      <SEO
-        title="recently — build log — kpow"
-        description="The latest devlog entries across every kpow build, newest first."
-        keywords="devlog, build log, recently, ESP32, LED"
-      />
+      <SEO />
       <Crumbs here="recently" />
 
       <header className="detail-head">

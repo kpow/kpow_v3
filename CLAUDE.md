@@ -180,3 +180,20 @@ GET /api/phashboard/{core,songs,shows,phantasy} · /api/phashboard/onthisday/MM-
   (kpow.xyz palette). Tabs: overview, phantasy, songs, shows, venues, onthisday.
 - What's left in `routes/phish-routes.ts` serves only the home page's
   guess-the-setlist game (`/api/shows/all`, `/api/setlists/:showId`).
+
+## Page titles and link previews (`lib/page-meta.ts`)
+
+Crawlers (iMessage, Slack, Discord, X, Facebook) don't run JS, so the server
+writes each page's tags into index.html.
+
+- Copy for every route lives in `client/src/lib/page-meta.ts` (`STATIC_PAGES`,
+  plus `buildMeta` / `showsMeta` / `phashboardMeta` for pages with data). Pages
+  render `<SEO />` (or `<SEO meta={…} />`); never hard-code a title in a page.
+- `server/page-meta.ts` swaps the `<!--page-meta-->` block in `client/index.html`
+  (dev and production), 404s unknown routes and missing files, and serves
+  `/sitemap.xml`. Add a route to `App.tsx` → add it to `STATIC_PAGES` too, or it
+  goes out as a noindex 404.
+- Share images are 1200×630 cards in `client/public/og/`, drawn from page photos
+  by `node scripts/og-cards/serve.mjs` (open the URL it prints).
+- Check every route the way a crawler sees it:
+  `node scripts/check-page-meta.mjs http://localhost:5000` (or `https://kpow.xyz`).
