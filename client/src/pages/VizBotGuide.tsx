@@ -297,12 +297,7 @@ export default function VizBotGuide() {
 
   return (
     <>
-      <SEO
-        title="vizBot user guide"
-        description="Get vizBot on your WiFi, update the firmware, read the notes for your board, fix common problems."
-        image={SCREENS.dock}
-        keywords="vizBot, user guide, ESP32, Stackchan, CoreS3, firmware update"
-      />
+      <SEO />
       <VizBotShell>
         <DocHero
           eyebrow={`user guide · firmware ${DOC_VERSION}`}

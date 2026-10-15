@@ -168,12 +168,7 @@ export default function VizBotWeb() {
 
   return (
     <>
-      <SEO
-        title="vizBot web panel"
-        description="Every card on vizBot's web panel with screenshots: expressions, personality, appearance, WLED sprites, device, sounds, weather, WiFi, WLED display and Stackchan head control."
-        image={WEB_FULL.src}
-        keywords="vizBot, web panel, WLED, ESP32, Stackchan, CoreS3, hologram, kaleidoscope"
-      />
+      <SEO />
       <VizBotShell>
         <DocHero
           eyebrow={`web panel · firmware ${DOC_VERSION}`}

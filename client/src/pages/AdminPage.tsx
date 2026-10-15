@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useRoute } from "wouter";
+import { SEO } from "@/components/global/SEO";
 import { Book, ChevronDown, Disc3, Fish, Video } from "lucide-react";
 import { AlbumLookup } from "@/components/admin/AlbumLookup";
 import { ITunesSearch } from "@/components/admin/iTunesSearch";
@@ -49,6 +50,7 @@ export default function AdminPage() {
   return (
     <AdminChrome.Provider value={{ setCrumb }}>
       <div className="admin-dark mt-6 rounded-xl text-zinc-200">
+        <SEO />
         <div className="flex min-w-0 items-center gap-2 border-b border-zinc-800 px-3 py-3 sm:px-5 lg:px-6">
           <Link href="/admin/shows" className="shrink-0 font-slackey text-lg text-zinc-100">admin</Link>
           <span className="text-zinc-600">/</span>

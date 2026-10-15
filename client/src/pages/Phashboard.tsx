@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { SEO } from "@/components/global/SEO";
+import { phashboardMeta } from "@/lib/page-meta";
 import { useCore } from "@/components/phashboard/data";
 import { TABS, type Nav, type Tab } from "@/components/phashboard/nav";
 import { Failed, Loading } from "@/components/phashboard/parts";
@@ -34,15 +35,11 @@ export default function Phashboard() {
     show, game, query, setShow, setGame, setQuery,
   }), [show, game, query, setLocation]);
 
-  const s = core.data?.summary;
-  const pf = core.data?.pf_summary;
-  const description = s
-    ? `${s.shows} Phish shows over ${s.years_span} years: ${s.hours} hours, ${s.unique_songs} different songs, ${s.venues} venues${pf ? `, and ${pf.games} PhantasyFish games` : ""}.`
-    : "Phish shows, setlists, venues and PhantasyFish games.";
+  const meta = phashboardMeta(tab, core.data?.summary, core.data?.pf_summary);
 
   return (
     <div className="phashboard">
-      <SEO title="phashboard | kpow" description={description} image="/phash-stats.jpg" />
+      <SEO meta={meta} />
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <h1 style={{ fontSize: 36 }}>phashboard</h1>
         <span className="eb">koolyp on phish.net · kpow on phantasyfish{core.data ? ` · updated ${new Date(core.data.built_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}` : ""}</span>

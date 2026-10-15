@@ -128,12 +128,7 @@ function Step({ index, children }: { index: number; children: React.ReactNode })
 export default function LedArt() {
   return (
     <>
-      <SEO
-        title="led art"
-        description="Hand-built addressable-LED desktop art running WLED — ESP32 + WS2812B. Control colors and effects from any browser."
-        image="/phash.jpg"
-        type="website"
-      />
+      <SEO />
 
       <div className="mx-auto max-w-4xl px-4 py-4">
         {/* HERO */}

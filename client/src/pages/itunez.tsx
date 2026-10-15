@@ -41,11 +41,7 @@ export default function ITunezPage() {
 
   return (
     <>
-      <SEO
-        title="KPOW - Music Analytics"
-        description="Explore my music listening habits and favorite artists."
-        image="/tunes.jpg"
-      />
+      <SEO />
       <div className="container mx-auto py-0 space-y-8">
         <div className="flex items-center justify-between mb-8">
           <PageTitle size="lg">my itunez data</PageTitle>

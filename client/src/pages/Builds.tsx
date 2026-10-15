@@ -13,11 +13,7 @@ export default function Builds() {
 
   return (
     <BuildLogShell>
-      <SEO
-        title="build log — kpow"
-        description="Every thing kpow is building: LED instruments, handheld consoles, robots, and the devlog behind them."
-        keywords="build log, devlog, ESP32, LED, hardware, making"
-      />
+      <SEO />
       <Crumbs />
 
       <header className="detail-head">

@@ -212,14 +212,6 @@ export default function StarredArticles({
       excerpt: article.summary ?? "No excerpt available",
     })) ?? [];
 
-  // Get the first article's image for the SEO preview, if available
-  const previewImage = articles[0]?.imageSrc ?? getRandomDefaultImage();
-  const pageTitle = `Star Feed ${currentPage > 1 ? `- Page ${currentPage}` : ""}`;
-  const pageDescription = `Curated collection of starred articles. ${articles
-    .slice(0, 3)
-    .map((a) => a.title)
-    .join(", ")}`;
-
   function PaginationLoader() {
     return (
       <>
@@ -281,12 +273,7 @@ export default function StarredArticles({
 
   return (
     <>
-      <SEO
-        title={pageTitle}
-        description={pageDescription}
-        image={previewImage}
-        type="article"
-      />
+      <SEO />
       <div className="container mx-auto p-4">
         <div>
           <PageTitle size="lg" alignment="left">

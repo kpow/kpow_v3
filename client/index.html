@@ -3,12 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Slackey&display=swap" rel="stylesheet">
+    <!-- the server swaps this block for each page's own title and share tags (server/page-meta.ts) -->
+    <!--page-meta-->
+    <title>kpow · into the singularity</title>
+    <meta name="description" content="kpow.xyz: the viz family of LED and desk-robot builds, a build log, concert clips, Phish stats, and what's playing and being read." />
+    <meta property="og:image" content="https://kpow.xyz/og/home.jpg" />
+    <!--/page-meta-->
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- one request for every family the site uses; a family's files only download on pages that use it -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&family=Slackey&display=swap" rel="stylesheet" />
     <script defer src="https://cloud.umami.is/script.js" data-website-id="15a49ccf-e6b7-4f01-ad4b-b15cc7e64617"></script>
-    <title>KPOW</title>
   </head>
   <body>
     <div id="root"></div>

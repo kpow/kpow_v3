@@ -3,7 +3,6 @@
 // the site's normal Layout card and adds the shared sub-nav.
 
 import { useEffect, type ReactNode } from "react";
-import { Helmet } from "react-helmet-async";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { splitReleases, useVizbotReleases, versionOf } from "@/lib/vizbot";
@@ -120,12 +119,6 @@ export function useHashScroll(ready: unknown = true) {
 export function VizBotShell({ children }: { children: ReactNode }) {
   return (
     <div className="vizbot mx-auto w-full max-w-6xl px-2 py-2 sm:px-4 sm:py-4">
-      <Helmet>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap"
-        />
-      </Helmet>
       <SubNav />
       {children}
     </div>

@@ -850,11 +850,7 @@ export default function VizSpotControls() {
 
   return (
     <>
-      <SEO
-        title="vizSpot controls"
-        image="/images/vizspot-hero-poster.jpg"
-        description="A section-by-section guide to the vizSpot control page: modes, effects, microphone, Spotify, power and WiFi settings."
-      />
+      <SEO />
 
       <div className="mx-auto max-w-5xl px-4 py-4" onClick={onClick}>
         {/* HERO */}

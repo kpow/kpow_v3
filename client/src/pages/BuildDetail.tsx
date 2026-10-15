@@ -2,6 +2,7 @@
 
 import { useParams } from "wouter";
 import { SEO } from "@/components/global/SEO";
+import { buildMeta } from "@/lib/page-meta";
 import { shortDate, useBuildLog, type Build } from "@/lib/buildlog";
 import { BuildCard } from "@/components/buildlog/BuildCard";
 import { BuildLogError, BuildLogLoading, BuildLogShell } from "@/components/buildlog/BuildLogShell";
@@ -63,6 +64,7 @@ export default function BuildDetail() {
   if (isLoading) {
     return (
       <BuildLogShell>
+        <SEO />
         <BuildLogLoading />
       </BuildLogShell>
     );
@@ -70,6 +72,7 @@ export default function BuildDetail() {
   if (error) {
     return (
       <BuildLogShell>
+        <SEO />
         <BuildLogError message={(error as Error).message} />
       </BuildLogShell>
     );
@@ -79,6 +82,7 @@ export default function BuildDetail() {
   if (!build) {
     return (
       <BuildLogShell>
+        <SEO meta={buildMeta(null)} />
         <Crumbs here={slug} />
         <BuildLogError message={`No build called "${slug}".`} />
       </BuildLogShell>
@@ -91,12 +95,7 @@ export default function BuildDetail() {
 
   return (
     <BuildLogShell>
-      <SEO
-        title={`${build.title} — build log — kpow`}
-        description={build.summary}
-        image={build.hero || undefined}
-        keywords={[...build.tags, ...build.stack].join(", ")}
-      />
+      <SEO meta={buildMeta(build)} />
       <Crumbs here={build.title} />
 
       {/* title bar */}

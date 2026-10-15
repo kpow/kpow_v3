@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/global/SEO";
+import { showsMeta } from "@/lib/page-meta";
 import { ShowModal } from "@/components/showz/ShowModal";
 import { Numbers } from "@/components/showz/journal/Numbers";
 import type { Filter } from "@/components/showz/journal/Numbers";
@@ -72,11 +73,7 @@ export default function Shows() {
 
   return (
     <div className="mt-4 space-y-5">
-      <SEO
-        title="k-shows · KPOW"
-        description="Every night I pointed a phone at a stage since 2013: the numbers, then the story, with a map that follows along."
-        image={stats ? `${stats.base}/clips/${stats.records.mostClipsNight.clips[0].id}.jpg` : undefined}
-      />
+      <SEO meta={showsMeta(data)} />
 
       <div className="px-1">
         <h1 className="font-slackey text-3xl tracking-tight">k-shows</h1>

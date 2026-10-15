@@ -185,53 +185,6 @@ export default function Books({ params }: { params?: { page?: string } }) {
     gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
   });
 
-  // Helper functions for SEO and metadata
-  const getPageTitle = () => {
-    let title = "KPOW Book Collection";
-
-    if (searchQuery) {
-      title += ` - Search: ${searchQuery}`;
-    }
-
-    if (selectedShelf) {
-      title += ` - Shelf: ${selectedShelf}`;
-    }
-
-    if (currentPage > 1) {
-      title += ` - Page ${currentPage}`;
-    }
-
-    return title;
-  };
-
-  const getPageDescription = () => {
-    if (data?.GoodreadsResponse?.reviews?.[0]?.review) {
-      const recentBooks = data.GoodreadsResponse.reviews[0].review
-        .slice(0, 3)
-        .map((review: Book) => review.book[0]?.title?.[0])
-        .join(", ");
-
-      let desc = `Currently reading and recently finished books including: ${recentBooks}.`;
-
-      if (searchQuery) {
-        desc += ` Filtered by search: "${searchQuery}"`;
-      }
-
-      if (selectedShelf) {
-        desc += ` in shelf: ${selectedShelf}`;
-      }
-
-      return desc;
-    }
-    return "Explore my reading list and book recommendations. Updated regularly with new discoveries and favorite reads.";
-  };
-
-  const getPreviewImage = () => {
-    const firstBook =
-      data?.GoodreadsResponse?.reviews?.[0]?.review?.[0]?.book[0];
-    return firstBook?.image_url?.[0] ?? "/book-placeholder.png";
-  };
-
   // Render error state
   if (error) {
     return (
@@ -346,12 +299,7 @@ export default function Books({ params }: { params?: { page?: string } }) {
   // Render the main component
   return (
     <>
-      <SEO
-        title={getPageTitle()}
-        description={getPageDescription()}
-        image={getPreviewImage()}
-        type="books.reads"
-      />
+      <SEO />
       <div className="container mx-auto p-2">
         <div className="flex justify-between items-center flex-col sm:flex-row mb-4">
           <PageTitle size="lg" alignment="left">

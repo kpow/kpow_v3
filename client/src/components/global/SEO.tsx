@@ -1,49 +1,24 @@
-import { HelmetProvider, Helmet } from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
+import { useLocation } from "wouter";
+import { fullTitle, headTags, metaForPath, type PageMeta } from "@/lib/page-meta";
 
-interface SEOProps {
-  title?: string;
-  description?: string;
-  image?: string;
-  url?: string;
-  type?: string;
-  keywords?: string;
-}
-
-export function SEO({
-  title = "kpow - into the singularity",
-  description = "A comprehensive cross-domain media and location analytics platform featuring an interactive Phish setlist guessing game that provides an engaging music trivia experience.",
-  image = "/phash.jpg",
-  url = typeof window !== "undefined" ? window.location.href : "",
-  type = "website",
-  keywords = "Phish, Music, Analytics, Donut Shops, Media Dashboard",
-}: SEOProps) {
-  const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
-  const fullImageUrl = image.startsWith("http") ? image : `${siteUrl}${image}`;
+/**
+ * The page's title and share tags. Every page renders exactly one.
+ * With no `meta`, it uses the fixed entry for the current path in lib/page-meta.ts;
+ * pages with data (a build, k-shows, phashboard) pass the helper's result.
+ * The server writes the same tags into index.html for crawlers (server/page-meta.ts).
+ */
+export function SEO({ meta }: { meta?: PageMeta }) {
+  const [path] = useLocation();
+  const m = meta ?? metaForPath(path);
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
     <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-
-      {/* Open Graph Tags */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImageUrl} />
-      <meta property="og:url" content={url} />
-      <meta property="og:type" content={type} />
-
-      {/* Twitter Card Tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullImageUrl} />
-
-      {/* Additional Meta Tags */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta charSet="utf-8" />
-      <link rel="canonical" href={url} />
+      <title>{fullTitle(m)}</title>
+      {headTags(m, path, origin).map(({ tag, attrs }) =>
+        tag === "link" ? <link key={attrs.rel} {...attrs} /> : <meta key={attrs.name ?? attrs.property} {...attrs} />,
+      )}
     </Helmet>
   );
 }

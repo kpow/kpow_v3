@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Redirect } from "wouter";
+import { SEO } from "@/components/global/SEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
@@ -66,6 +67,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex">
+      <SEO />
       {/* Form Column */}
       <div className="w-full flex justify-center bg-background p-8">
         <div className="w-full max-w-md space-y-6">

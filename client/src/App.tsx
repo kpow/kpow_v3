@@ -34,13 +34,10 @@ import VizBotWeb from "@/pages/VizBotWeb";
 import VizMac from "@/pages/VizMac";
 import VizMacGuide from "@/pages/VizMacGuide";
 import VizMacController from "@/pages/VizMacController";
-import { Route as WouterRoute } from "wouter";
-import { SEO } from "@/components/global/SEO";
 
 function Router() {
   return (
     <Layout>
-      <SEO />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
