@@ -1,9 +1,78 @@
-import { Router } from "express";
+import type { NextFunction, Request, Response, Router } from "express";
+import { randomBytes } from "crypto";
 import { db } from "../../db";
 import { eq, desc, sql, and } from "drizzle-orm";
 import { artists, plays, songs } from "../../db/schema";
+import { LISTEN_SQL, ensureMusicTables } from "../lib/music/store";
+import { authorizeUrl, disconnect, exchangeCode, spotifyConfigured } from "../lib/music/spotify";
+import { musicStatus, startMusicSync, syncMusic } from "../lib/music/sync";
+
+// Plays come from the Apple export, Last.fm and Spotify (server/lib/music). An
+// Apple-export play under 30 s is a skip, so every count uses `isListen`.
+const isListen = sql.raw(LISTEN_SQL);
+
+function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!req.isAuthenticated()) return res.status(401).json({ error: "Not authenticated" });
+  if (!req.user?.approved) return res.status(403).json({ error: "Account not approved" });
+  next();
+}
+
+const callbackUri = (req: Request) =>
+  process.env.SPOTIFY_REDIRECT_URI || `${req.protocol}://${req.get("host")}/api/admin/spotify/callback`;
 
 export function registerMusicRoutes(router: Router) {
+  // The listen rule needs the new plays columns before any stats query runs.
+  router.use("/api/music", (_req, res, next) => {
+    ensureMusicTables().then(() => next(), (e) => res.status(503).json({ message: e.message }));
+  });
+  startMusicSync();
+
+  router.get("/api/admin/music", requireAdmin, async (_req, res) => {
+    try {
+      res.json(await musicStatus());
+    } catch (e) {
+      res.status(500).json({ error: (e as Error).message });
+    }
+  });
+
+  router.post("/api/admin/music/sync", requireAdmin, async (_req, res) => {
+    try {
+      await syncMusic();
+      res.json(await musicStatus());
+    } catch (e) {
+      res.status(502).json({ error: (e as Error).message });
+    }
+  });
+
+  // One-time Spotify login: /admin/music → Spotify → back here with a code.
+  router.get("/api/admin/spotify/connect", requireAdmin, (req, res) => {
+    if (!spotifyConfigured()) return res.status(503).send("Set SPOTIFY_CLIENT_ID first (the vizSpot Spotify app's Client ID).");
+    const state = randomBytes(16).toString("hex");
+    const { url, verifier } = authorizeUrl(callbackUri(req), state);
+    (req.session as any).spotifyAuth = { state, verifier };
+    res.redirect(url);
+  });
+
+  router.get("/api/admin/spotify/callback", requireAdmin, async (req, res) => {
+    const back = (q: string) => res.redirect(`/admin/music?${q}`);
+    const want = (req.session as any).spotifyAuth as { state: string; verifier: string } | undefined;
+    delete (req.session as any).spotifyAuth;
+    if (req.query.error) return back(`spotify=error&msg=${encodeURIComponent(String(req.query.error))}`);
+    if (!want || req.query.state !== want.state) return back("spotify=error&msg=state");
+    try {
+      await exchangeCode(String(req.query.code), callbackUri(req), want.verifier);
+      syncMusic().catch(() => {});
+      back("spotify=connected");
+    } catch (e) {
+      back(`spotify=error&msg=${encodeURIComponent((e as Error).message)}`);
+    }
+  });
+
+  router.post("/api/admin/spotify/disconnect", requireAdmin, async (_req, res) => {
+    await disconnect();
+    res.json(await musicStatus());
+  });
+
   // Get top artists by play count
   router.get("/api/music/top-artists", async (_req, res) => {
     try {
@@ -22,7 +91,7 @@ export function registerMusicRoutes(router: Router) {
         })
         .from(artists)
         .leftJoin(songs, eq(songs.artistId, artists.id))
-        .leftJoin(plays, eq(plays.songId, songs.id))
+        .leftJoin(plays, and(eq(plays.songId, songs.id), isListen))
         .groupBy(artists.id, artists.name, artists.bio, artists.imageUrl, artists.artistImageUrl, artists.listeners, artists.playcount, artists.lastUpdated)
         .orderBy(desc(sql`play_count`))
         .limit(500);
@@ -105,7 +174,7 @@ export function registerMusicRoutes(router: Router) {
         .innerJoin(songs, eq(plays.songId, songs.id))
         .innerJoin(artists, eq(songs.artistId, artists.id))
         .where(
-          sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`
+          and(isListen, sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`)
         )
         .groupBy(
           sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`,
@@ -166,6 +235,7 @@ export function registerMusicRoutes(router: Router) {
           year: sql<number>`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`,
         })
         .from(plays)
+        .where(isListen)
         .groupBy(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`)
         .orderBy(desc(sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer`));
 
@@ -198,6 +268,7 @@ export function registerMusicRoutes(router: Router) {
         .leftJoin(plays, eq(plays.songId, songs.id))
         .where(
           and(
+            isListen,
             sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer = ${year}`,
             sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`
           )
@@ -234,6 +305,7 @@ export function registerMusicRoutes(router: Router) {
         .innerJoin(artists, eq(songs.artistId, artists.id))
         .where(
           and(
+            isListen,
             sql`EXTRACT(YEAR FROM ${plays.startTimestamp})::integer = ${year}`,
             sql`${artists.name} != 'Unknown' AND ${artists.name} IS NOT NULL`
           )
@@ -279,7 +351,7 @@ export function registerMusicRoutes(router: Router) {
         })
         .from(songs)
         .leftJoin(artists, eq(songs.artistId, artists.id))
-        .leftJoin(plays, eq(plays.songId, songs.id))
+        .leftJoin(plays, and(eq(plays.songId, songs.id), isListen))
         .groupBy(songs.id, songs.name, songs.albumName, songs.mediaDurationMs, 
                 artists.id, artists.name, artists.artistImageUrl)
         .limit(pageSize)
