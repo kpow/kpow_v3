@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Kate's vizBot Upgrade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column of five "part" cards in vizBot's own web-page style (yellow, ink borders, offset shadows), with a sticky "you are here" bar. */
+:root {
+  --paper: #fbf8ef;
+  --card: #ffffff;
+  --ink: #17140d;
+  --muted: #5d574a;
+  --sun: #ffd23f;
+  --sun-soft: #fff2bf;
+  --leaf: #2f8f4e;
+  --leaf-soft: #ddf3e2;
+  --shadow: #17140d;
+  --code-bg: #f2eddc;
+  --display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15130e; --card: #201d16; --ink: #f4efdf; --muted: #b6ae99;
+    --sun: #ffd23f; --sun-soft: #3a3110; --leaf: #6fd08e; --leaf-soft: #17301f;
+    --shadow: #000000; --code-bg: #2b271d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15130e; --card: #201d16; --ink: #f4efdf; --muted: #b6ae99;
+  --sun: #ffd23f; --sun-soft: #3a3110; --leaf: #6fd08e; --leaf-soft: #17301f;
+  --shadow: #000000; --code-bg: #2b271d; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.55;
+  margin: 0;
+  padding: 0 16px calc(64px + env(safe-area-inset-bottom, 0px));
+}
+.wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: inherit; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+/* sticky "you are here" */
+.here {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  margin: 0 -16px; padding: 10px 16px;
+  background: var(--paper); border-bottom: 2px solid var(--ink);
+}
+.here-in { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.bar { flex: 1 1 180px; height: 14px; border: 2px solid var(--ink); border-radius: 99px; overflow: hidden; background: var(--card); }
+.bar i { display: block; height: 100%; width: 0; background: var(--sun); transition: width .3s; }
+.here-txt { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.here-txt a { font-weight: 400; }
+
+/* hero */
+.hero { padding-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+.eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.hero h1 { font-size: clamp(36px, 8vw, 56px); font-weight: 800; }
+.hero h1 mark { background: var(--sun); color: #17140d; padding: 0 .12em; }
+.lede { font-size: 19px; max-width: 34em; }
+.gets { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.get { border: 2px solid var(--ink); background: var(--card); padding: 12px 14px; border-radius: 10px; min-width: 0; }
+.get b { display: block; font-family: var(--display); font-size: 17px; margin-bottom: 2px; }
+.get span { font-size: 15px; color: var(--muted); }
+
+.howto { border-left: 6px solid var(--sun); padding: 4px 0 4px 14px; display: flex; flex-direction: column; gap: 6px; }
+.howto h2 { font-size: 20px; }
+.howto ul { margin: 0; padding-left: 20px; }
+
+/* part cards */
+.part {
+  background: var(--card); border: 2px solid var(--ink); border-radius: 12px;
+  box-shadow: 5px 5px 0 0 var(--shadow);
+  padding: 20px; display: flex; flex-direction: column; gap: 16px;
+  scroll-margin-top: 80px;
+}
+.part.done { background: var(--leaf-soft); }
+.phead { display: flex; gap: 14px; align-items: flex-start; }
+.pnum {
+  flex: none; width: 46px; height: 46px; border: 2px solid var(--ink); border-radius: 50%;
+  background: var(--sun); color: #17140d; display: grid; place-items: center;
+  font-family: var(--display); font-weight: 800; font-size: 22px;
+}
+.part.done .pnum { background: var(--leaf); color: var(--card); }
+.ptitle { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ptitle h2 { font-size: 26px; font-weight: 800; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.chip { border: 2px solid var(--ink); border-radius: 99px; padding: 1px 10px; font-weight: 700; background: var(--paper); }
+.chip.where { background: var(--sun-soft); }
+.why { color: var(--muted); }
+
+ol.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.step { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+.step input {
+  appearance: none; width: 26px; height: 26px; margin: 2px 0 0; cursor: pointer;
+  border: 2px solid var(--ink); border-radius: 6px; background: var(--card); display: grid; place-items: center;
+}
+.step input:checked { background: var(--leaf); border-color: var(--leaf); }
+.step input:checked::after { content: ""; width: 7px; height: 13px; border: solid var(--card); border-width: 0 3px 3px 0; transform: translateY(-2px) rotate(45deg); }
+.step label { cursor: pointer; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.step input:checked + label > .say { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--muted); }
+.say b { font-weight: 700; }
+.tip { font-size: 15px; color: var(--muted); }
+
+code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.cmd {
+  display: flex; align-items: stretch; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; background: var(--code-bg);
+}
+.cmd pre {
+  margin: 0; padding: 10px 12px; flex: 1; min-width: 0;
+  font-family: var(--mono); font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.cmd button {
+  flex: none; border: 0; border-left: 2px solid var(--ink); background: var(--sun); color: #17140d;
+  font-family: var(--body); font-weight: 700; font-size: 14px; padding: 0 14px; cursor: pointer; min-width: 74px;
+}
+.cmd button:active { transform: translateY(1px); }
+
+.check, .stuck { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.check { background: var(--sun-soft); border: 2px dashed var(--ink); }
+.check h3, .stuck h3 { font-family: var(--body); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.stuck { border: 2px solid var(--code-bg); }
+.stuck dl { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.stuck dt { font-weight: 700; font-size: 15px; }
+.stuck dd { margin: 0; font-size: 15px; }
+
+.win {
+  display: flex; gap: 10px; align-items: center; font-weight: 700;
+  border-top: 2px solid var(--ink); padding-top: 12px;
+}
+.win .stamp { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; border: 2px solid var(--ink); padding: 2px 8px; border-radius: 6px; background: var(--paper); flex: none; }
+.part.done .win .stamp { background: var(--leaf); color: var(--card); border-color: var(--leaf); }
+
+.break { text-align: center; font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+
+.finale { border: 2px solid var(--ink); border-radius: 12px; padding: 20px; background: var(--sun); color: #17140d; display: flex; flex-direction: column; gap: 8px; box-shadow: 5px 5px 0 0 var(--shadow); }
+.finale h2 { font-size: 28px; font-weight: 800; }
+.finale code { background: #fff6cf; }
+
+.help { display: flex; flex-direction: column; gap: 12px; }
+.help h2 { font-size: 24px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 2px solid var(--code-bg); }
+th { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+td:first-child { font-weight: 700; width: 42%; }
+.reset { align-self: flex-start; background: none; border: 2px solid var(--ink); border-radius: 6px; padding: 6px 12px; font: inherit; font-size: 14px; color: var(--ink); cursor: pointer; }
+.foot { font-size: 14px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  .part { padding: 16px; }
+  .ptitle h2 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="here" aria-live="polite">
+  <div class="here-in">
+    <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+    <div class="here-txt" id="hereTxt">0 of 22 steps · <a href="#p1">Start with Part 1</a></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">vizBrain 1.2.1 · vizBot firmware 3.7.36</div>
+  <h1>Kate's <mark>vizBot</mark> upgrade</h1>
+  <p class="lede">Five short parts, about 30 minutes in all. Do one part, take a break if you like, come back later. Tick the boxes as you go: this page remembers them on this computer.</p>
+  <div class="gets" aria-label="What you get">
+    <div class="get"><b>Spotify by voice</b><span>"Play some ska." "Add this to my Chill playlist." "Like this song."</span></div>
+    <div class="get"><b>Album covers</b><span>Each new song flashes its cover on his screen, with his face in the corner.</span></div>
+    <div class="get"><b>He asks, you answer</b><span>When he asks you a question, just answer. No head tap.</span></div>
+    <div class="get"><b>Pick his voice</b><span>Choose from about 30 voices on his web page.</span></div>
+  </div>
+</header>
+
+<section class="howto">
+  <h2>Before you start</h2>
+  <ul>
+    <li>Use your <b>Mac</b> (the one vizBot's brain runs on).</li>
+    <li>vizBot and your <b>vizSpot</b> are both switched on, on your home Wi-Fi.</li>
+    <li>Know your Spotify login. Part 3 asks you to sign in.</li>
+  </ul>
+</section>
+
+<!-- PART 1 -->
+<section class="part" id="p1" data-part="1">
+  <div class="phead">
+    <div class="pnum">1</div>
+    <div class="ptitle">
+      <h2>Update the brain</h2>
+      <div class="meta"><span class="chip">about 5 min</span><span class="chip where">Mac · Terminal</span></div>
+    </div>
+  </div>
+  <p class="why">The brain is the program on your Mac that listens and talks for vizBot. One command gets the new version.</p>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s1a"><label for="s1a"><span class="say">Open <b>Terminal</b>: press <b>Cmd + Space</b>, type <code>Terminal</code>, press <b>Return</b>.</span></label></li>
+    <li class="step"><input type="checkbox" id="s1b"><label for="s1b"><span class="say">Copy this, paste it into Terminal, press <b>Return</b>:</span>
+      <div class="cmd"><pre>vizbrain update</pre><button type="button" data-copy>Copy</button></div></label></li>
+    <li class="step"><input type="checkbox" id="s1c"><label for="s1c"><span class="say">Wait until it stops printing and you can type again. A minute or two. vizBot restarts his brain on his own.</span></label></li>
+    <li class="step"><input type="checkbox" id="s1d"><label for="s1d"><span class="say">Leave Terminal open. You'll use it again in Part 3.</span></label></li>
+  </ol>
+  <div class="check">
+    <h3>You'll know it worked when</h3>
+    <p>Terminal shows no message about a problem, and vizBot still answers when you tap his head and say hi.</p>
+  </div>
+  <div class="stuck">
+    <h3>If it doesn't</h3>
+    <dl>
+      <dt>"Your install link isn't active any more"</dt>
+      <dd>Your link expired. Ask Kevin for a fresh one, then run <code>vizbrain update</code> again.</dd>
+      <dt>"Couldn't reach the install site"</dt>
+      <dd>Check the Mac's internet, wait a minute, run it again.</dd>
+    </dl>
+  </div>
+  <div class="win"><span class="stamp">Part 1</span><span>Brain updated to 1.2.1.</span></div>
+</section>
+
+<p class="break">good place for a break</p>
+
+<!-- PART 2 -->
+<section class="part" id="p2" data-part="2">
+  <div class="phead">
+    <div class="pnum">2</div>
+    <div class="ptitle">
+      <h2>Update vizBot himself</h2>
+      <div class="meta"><span class="chip">about 5 min</span><span class="chip where">Mac · web browser</span></div>
+    </div>
+  </div>
+  <p class="why">New firmware lets him show album covers and listen for your answer after he asks a question.</p>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s2a"><label for="s2a"><span class="say">Open <a href="https://kpow.xyz/vizbot/releases" target="_blank" rel="noopener">kpow.xyz/vizbot/releases</a>, pick <b>Stackchan</b>, and click <b>Download for Stackchan</b>.</span>
+      <span class="tip">The file is <code>vizbot-stackchan-v3.7.36.bin</code>. If you see a file ending in <code>-factory.bin</code>, that's the wrong one.</span></label></li>
+    <li class="step"><input type="checkbox" id="s2b"><label for="s2b"><span class="say">Open vizBot's web page: <code>http://vizbot-xxxx.local</code>, with the 4-character code from his name in place of <code>xxxx</code>.</span>
+      <span class="tip">His name looks like vizBot-A1B2. It's in your browser history too.</span></label></li>
+    <li class="step"><input type="checkbox" id="s2c"><label for="s2c"><span class="say">Open the <b>Device</b> section. Next to <b>Firmware</b>, click the yellow <b>Update</b> button.</span></label></li>
+    <li class="step"><input type="checkbox" id="s2d"><label for="s2d"><span class="say">Choose the file you downloaded and start the upload. Wait for <b>"Update successful. Rebooting…"</b></span>
+      <span class="tip">About a minute. Don't close the page or unplug him while it runs.</span></label></li>
+    <li class="step"><input type="checkbox" id="s2e"><label for="s2e"><span class="say">Switch him fully off: <b>hold the bottom button for about 6 seconds</b>. Then turn him back on.</span>
+      <span class="tip">This step matters. Without a full off and on, his head won't move.</span></label></li>
+  </ol>
+  <div class="check">
+    <h3>You'll know it worked when</h3>
+    <p>His web page, in the <b>Device</b> section, says <b>Firmware v3.7.36</b>, and his head moves when he wakes up.</p>
+  </div>
+  <div class="stuck">
+    <h3>If it doesn't</h3>
+    <dl>
+      <dt>"Upload failed, check board type and file"</dt>
+      <dd>You picked another board's file or the <code>-factory</code> one. Download the Stackchan file again and retry.</dd>
+      <dt>His page won't open</dt>
+      <dd>Make sure the Mac is on the home Wi-Fi (not a guest network), and wait 30 seconds after he turns on.</dd>
+      <dt>His head doesn't move</dt>
+      <dd>Do the 6-second hold again, then turn him on.</dd>
+    </dl>
+  </div>
+  <div class="win"><span class="stamp">Part 2</span><span>vizBot is on 3.7.36. Covers and answer-back are switched on.</span></div>
+</section>
+
+<p class="break">good place for a break</p>
+
+<!-- PART 3 -->
+<section class="part" id="p3" data-part="3">
+  <div class="phead">
+    <div class="pnum">3</div>
+    <div class="ptitle">
+      <h2>Let your Mac talk to Spotify</h2>
+      <div class="meta"><span class="chip">about 10 min</span><span class="chip where">Mac · Terminal + browser</span></div>
+    </div>
+  </div>
+  <p class="why">This is the longest part. You install a small Spotify helper, then give it one approval so vizBot can edit playlists and like songs. It uses the same Spotify app your vizSpot already uses, so there's nothing new to create.</p>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s3a"><label for="s3a"><span class="say">In Terminal, paste this and press <b>Return</b>:</span>
+      <div class="cmd"><pre>uv tool install git+https://github.com/kpow/spotify-mcp</pre><button type="button" data-copy>Copy</button></div>
+      <span class="tip">Done when the last line mentions <code>spotify-mcp</code> being installed.</span></label></li>
+    <li class="step"><input type="checkbox" id="s3b"><label for="s3b"><span class="say">Open your vizSpot's page: <a href="http://vizspot.local" target="_blank" rel="noopener">http://vizspot.local</a>. Scroll to <b>Spotify</b> and copy the long code in the <b>client_id</b> box.</span>
+      <span class="tip">That code is the name tag of your own Spotify app. You'll match it in the next step.</span></label></li>
+    <li class="step"><input type="checkbox" id="s3c"><label for="s3c"><span class="say">Open <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> and log in. Click the app whose <b>Client ID</b> matches the code you copied.</span>
+      <span class="tip">If you only have one app there, that's it.</span></label></li>
+    <li class="step"><input type="checkbox" id="s3d"><label for="s3d"><span class="say">Click <b>Settings</b>, then <b>Edit</b>. Under <b>Redirect URIs</b>, paste this exactly, then click <b>Add</b>:</span>
+      <div class="cmd"><pre>http://127.0.0.1:8888/callback</pre><button type="button" data-copy>Copy</button></div></label></li>
+    <li class="step"><input type="checkbox" id="s3e"><label for="s3e"><span class="say">Scroll to the bottom and click <b>Save</b>.</span>
+      <span class="tip">Your vizSpot keeps working exactly as before. This only adds a second address.</span></label></li>
+    <li class="step"><input type="checkbox" id="s3f"><label for="s3f"><span class="say">Back in Terminal, paste this and press <b>Return</b>:</span>
+      <div class="cmd"><pre>spotify-mcp login</pre><button type="button" data-copy>Copy</button></div>
+      <span class="tip">A Spotify page opens in your browser. Click <b>Agree</b>.</span></label></li>
+  </ol>
+  <div class="check">
+    <h3>You'll know it worked when</h3>
+    <p>The browser says <b>"spotify-mcp is signed in. You can close this tab."</b> and Terminal says <b>"Signed in."</b></p>
+  </div>
+  <div class="stuck">
+    <h3>If it doesn't</h3>
+    <dl>
+      <dt><code>command not found: uv</code> or <code>spotify-mcp</code></dt>
+      <dd>Close Terminal, open a new Terminal window, and run the same line again.</dd>
+      <dt>Spotify says "redirect_uri: Not matching configuration"</dt>
+      <dd>The address isn't saved on that app yet. Redo steps 3 to 5. Check you clicked <b>Save</b>, and that the address has no space or slash at the end. Then run <code>spotify-mcp login</code> again.</dd>
+      <dt>The login can't find your vizSpot</dt>
+      <dd>Check that <a href="http://vizspot.local" target="_blank" rel="noopener">vizspot.local</a> opens. If not, power-cycle the vizSpot and try again.</dd>
+    </dl>
+  </div>
+  <div class="win"><span class="stamp">Part 3</span><span>Your Mac can play, queue, like and add to playlists. The hard part is behind you.</span></div>
+</section>
+
+<p class="break">good place for a break</p>
+
+<!-- PART 4 -->
+<section class="part" id="p4" data-part="4">
+  <div class="phead">
+    <div class="pnum">4</div>
+    <div class="ptitle">
+      <h2>Plug Spotify into vizBot</h2>
+      <div class="meta"><span class="chip">about 3 min</span><span class="chip where">Mac · Terminal</span></div>
+    </div>
+  </div>
+  <p class="why">One command tells vizBot's brain to use the Spotify helper. The second checks it.</p>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s4a"><label for="s4a"><span class="say">In Terminal, paste this (it's one long line) and press <b>Return</b>:</span>
+      <div class="cmd"><pre>vizbrain connectors add spotify --replaces music_play --action play --action queue --action control --action create_playlist --action add_to_playlist --action like -- spotify-mcp</pre><button type="button" data-copy>Copy</button></div>
+      <span class="tip">It says <b>"Added spotify"</b> and restarts vizBot's brain.</span></label></li>
+    <li class="step"><input type="checkbox" id="s4b"><label for="s4b"><span class="say">Then paste this and press <b>Return</b>:</span>
+      <div class="cmd"><pre>vizbrain connectors test spotify</pre><button type="button" data-copy>Copy</button></div></label></li>
+  </ol>
+  <div class="check">
+    <h3>You'll know it worked when</h3>
+    <p>The first line starts <b><code>spotify: ready</code></b> and says <b>10 tools</b>, followed by a list of them.</p>
+  </div>
+  <div class="stuck">
+    <h3>If it doesn't</h3>
+    <dl>
+      <dt>It says anything other than <code>ready</code></dt>
+      <dd>Run <code>spotify-mcp status</code>. It says where the Spotify sign-in comes from. If it mentions logging in, redo the last step of Part 3.</dd>
+    </dl>
+  </div>
+  <div class="win"><span class="stamp">Part 4</span><span>vizBot has Spotify. Time to play.</span></div>
+</section>
+
+<!-- PART 5 -->
+<section class="part" id="p5" data-part="5">
+  <div class="phead">
+    <div class="pnum">5</div>
+    <div class="ptitle">
+      <h2>Try it out</h2>
+      <div class="meta"><span class="chip">about 5 min</span><span class="chip where">vizBot + his web page</span></div>
+    </div>
+  </div>
+  <p class="why">The fun part. Open the <b>Spotify app</b> on your Mac first, so he has somewhere to play.</p>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s5a"><label for="s5a"><span class="say">Tap his head and say <b>"Play some ska."</b> (Or any artist, song or playlist you like.)</span>
+      <span class="tip">The album cover fills his screen for about 8 seconds, with his face in a little circle in the top corner.</span></label></li>
+    <li class="step"><input type="checkbox" id="s5b"><label for="s5b"><span class="say">Skip to the next song in Spotify. The new cover flashes on his screen.</span></label></li>
+    <li class="step"><input type="checkbox" id="s5c"><label for="s5c"><span class="say">Tap and say <b>"Like this song."</b> Then try <b>"Make a playlist called Kate's Faves and add this song."</b></span>
+      <span class="tip">New playlists start out private. They show up in your Spotify app straight away.</span></label></li>
+    <li class="step"><input type="checkbox" id="s5d"><label for="s5d"><span class="say">Tap and say <b>"Ask me what I want to listen to."</b> When he finishes his question, just answer out loud. No tap.</span>
+      <span class="tip">He listens for about 6 seconds after a question. Stay quiet and he goes back to sleep.</span></label></li>
+    <li class="step"><input type="checkbox" id="s5e"><label for="s5e"><span class="say">Pick his voice: on his web page, open <b>Brain (voice)</b>, then choose from <b>Speaking voice</b>.</span>
+      <span class="tip">He says a short line in the new voice so you can hear it. Change it as often as you like.</span></label></li>
+  </ol>
+  <div class="check">
+    <h3>You'll know it worked when</h3>
+    <p>Music plays, covers flash, and he hears your answer without a tap.</p>
+  </div>
+  <div class="stuck">
+    <h3>If it doesn't</h3>
+    <dl>
+      <dt>He says nothing is playing, or can't find a device</dt>
+      <dd>Open the Spotify app on the Mac and press play on anything once, then ask again.</dd>
+      <dt>He says Spotify needs Premium</dt>
+      <dd>Playing and skipping need Spotify Premium on your account.</dd>
+      <dt>No cover appears</dt>
+      <dd>Check Part 2's firmware number says v3.7.36.</dd>
+    </dl>
+  </div>
+  <div class="win"><span class="stamp">Part 5</span><span>All five parts done.</span></div>
+</section>
+
+<section class="finale" id="finale">
+  <h2>You upgraded your vizBot.</h2>
+  <p>Brain on 1.2.1, bot on 3.7.36, Spotify plugged in, and a voice you picked. All of it done by you.</p>
+  <p>Whenever something seems off later, <code>vizbrain doctor</code> in Terminal checks everything and says what to fix.</p>
+</section>
+
+<section class="help" id="help">
+  <h2>Anything else odd?</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>What you see</th><th>Do this</th></tr></thead>
+      <tbody>
+        <tr><td>Something isn't right and you don't know what</td><td>Run <code>vizbrain doctor</code> in Terminal. It checks the brain, the bot and Spotify, and says what to do.</td></tr>
+        <tr><td>Spotify questions don't work</td><td>Run <code>vizbrain connectors</code>. It should say <code>spotify</code> is ready.</td></tr>
+        <tr><td>He plays music on the wrong speaker</td><td>Spotify plays wherever it last played. Pick the Mac (or your speaker) in Spotify's device menu.</td></tr>
+        <tr><td>You'd rather ask someone</td><td>Copy what <code>vizbrain doctor</code> printed and send it to Kevin. That's everything he'd need.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <button type="button" class="reset" id="reset">Clear my checkmarks</button>
+  <p class="foot">Your ticks live only in this browser on this computer.</p>
+</section>
+
+</div>
+
+<script>
+(function () {
+  var KEY = "kate-upgrade-v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.step input[type="checkbox"]'));
+  var parts = Array.prototype.slice.call(document.querySelectorAll(".part"));
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { state = {}; }
+  boxes.forEach(function (b) { b.checked = !!state[b.id]; });
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function render() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    document.getElementById("barFill").style.width = (100 * done / boxes.length) + "%";
+    var next = null;
+    parts.forEach(function (p) {
+      var inside = Array.prototype.slice.call(p.querySelectorAll('.step input'));
+      var all = inside.every(function (b) { return b.checked; });
+      p.classList.toggle("done", all);
+      p.querySelector(".stamp").textContent = all ? "Done" : "Part " + p.dataset.part;
+      if (!next) {
+        var i = inside.findIndex(function (b) { return !b.checked; });
+        if (i >= 0) next = { part: p, step: i + 1 };
+      }
+    });
+    var txt = document.getElementById("hereTxt");
+    var lead = done + " of " + boxes.length + " steps · ";
+    if (!next) {
+      txt.innerHTML = lead + '<a href="#finale">All done. You did it.</a>';
+    } else {
+      var title = next.part.querySelector("h2").textContent;
+      txt.innerHTML = lead + 'Next: <a href="#' + next.part.id + '">Part ' + next.part.dataset.part + ", step " + next.step + "</a> · " + title;
+    }
+  }
+
+  boxes.forEach(function (b) {
+    b.addEventListener("change", function () { state[b.id] = b.checked; save(); render(); });
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    state = {}; save();
+    boxes.forEach(function (b) { b.checked = false; });
+    render();
+  });
+
+  // Selecting a command's text shouldn't tick the box it sits in.
+  document.querySelectorAll(".cmd").forEach(function (c) {
+    c.addEventListener("click", function (ev) { ev.preventDefault(); });
+  });
+
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      var pre = btn.parentNode.querySelector("pre");
+      var text = pre.textContent;
+      function ok() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1600); }
+      function fallback() {
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = "Cmd+C";
+        setTimeout(function () { btn.textContent = "Copy"; }, 2400);
+      }
+      try {
+        navigator.clipboard.writeText(text).then(ok, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
