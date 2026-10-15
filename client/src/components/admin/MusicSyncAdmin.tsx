@@ -79,7 +79,7 @@ export function MusicSyncAdmin() {
           </thead>
           <tbody>
             <Row name="Spotify" state={sp?.state ?? null}
-              note={!sp?.configured ? "SPOTIFY_CLIENT_ID / SECRET not set" : !sp.connected_at ? "not connected" : undefined} />
+              note={!sp?.configured ? "SPOTIFY_CLIENT_ID not set" : !sp.connected_at ? "not connected" : undefined} />
             <Row name="Last.fm" state={s?.lastfm.state ?? null} />
           </tbody>
         </table>

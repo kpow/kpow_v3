@@ -46,20 +46,21 @@ export function registerMusicRoutes(router: Router) {
 
   // One-time Spotify login: /admin/music → Spotify → back here with a code.
   router.get("/api/admin/spotify/connect", requireAdmin, (req, res) => {
-    if (!spotifyConfigured()) return res.status(503).send("Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET first.");
+    if (!spotifyConfigured()) return res.status(503).send("Set SPOTIFY_CLIENT_ID first (the vizSpot Spotify app's Client ID).");
     const state = randomBytes(16).toString("hex");
-    (req.session as any).spotifyState = state;
-    res.redirect(authorizeUrl(callbackUri(req), state));
+    const { url, verifier } = authorizeUrl(callbackUri(req), state);
+    (req.session as any).spotifyAuth = { state, verifier };
+    res.redirect(url);
   });
 
   router.get("/api/admin/spotify/callback", requireAdmin, async (req, res) => {
     const back = (q: string) => res.redirect(`/admin/music?${q}`);
-    const want = (req.session as any).spotifyState;
-    delete (req.session as any).spotifyState;
+    const want = (req.session as any).spotifyAuth as { state: string; verifier: string } | undefined;
+    delete (req.session as any).spotifyAuth;
     if (req.query.error) return back(`spotify=error&msg=${encodeURIComponent(String(req.query.error))}`);
-    if (!want || req.query.state !== want) return back("spotify=error&msg=state");
+    if (!want || req.query.state !== want.state) return back("spotify=error&msg=state");
     try {
-      await exchangeCode(String(req.query.code), callbackUri(req));
+      await exchangeCode(String(req.query.code), callbackUri(req), want.verifier);
       syncMusic().catch(() => {});
       back("spotify=connected");
     } catch (e) {

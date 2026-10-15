@@ -146,8 +146,8 @@ All plays live in `plays` (+ `songs`, `artists`), merged from three sources by
   Spotify first (its API only keeps the last 50), then Last.fm. A Spotify play
   and its Last.fm scrobble (same artist + track within 10 min) become one row.
 - Home feed `/api/lastfm/recent-tracks` merges Last.fm + Spotify live (`recent.ts`).
-- Env: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`; connect once at
-  `/admin/music`. The Spotify app's redirect URI is
+- Env: `SPOTIFY_CLIENT_ID`, the vizSpot Spotify app (PKCE, no secret); connect
+  once at `/admin/music`. That app also lists the redirect URI
   `https://kpow.xyz/api/admin/spotify/callback`.
 
 ## Phashboard (`/phashboard`, `/admin/phashboard`)
