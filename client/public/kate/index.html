@@ -256,9 +256,11 @@ code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); p
     <li class="step"><input type="checkbox" id="s3b"><label for="s3b"><span class="say">Open <a href="http://vizspot.local" target="_blank" rel="noopener">vizspot.local</a>, open <b>Spotify</b>, copy the code in the <b>first box</b>.</span>
       <figure class="shot"><img src="vizspot-clientid.jpg" width="712" height="352" alt="vizSpot's Spotify section; the first box holds the Client ID"><figcaption>Yours shows a long code where this one is hidden.</figcaption></figure></label></li>
     <li class="step"><input type="checkbox" id="s3c"><label for="s3c"><span class="say">Open <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> and click the app with that <b>Client ID</b>.</span>
-      <span class="tip">Only one app there? That's the one.</span></label></li>
+      <span class="tip">Only one app there? That's the one.</span>
+      <figure class="shot"><img src="spotify-clientid.jpg" width="1216" height="204" alt="The Spotify app page with the Client ID at the top left"><figcaption>The Client ID is at the top of the app's page.</figcaption></figure></label></li>
     <li class="step"><input type="checkbox" id="s3d"><label for="s3d"><span class="say"><b>Settings</b> → <b>Edit</b>. In <b>Redirect URIs</b>, paste this, click <b>Add</b>, then <b>Save</b> at the bottom.</span>
       <div class="cmd"><pre>http://127.0.0.1:8888/callback</pre><button type="button" data-copy>Copy</button></div>
+      <figure class="shot"><img src="spotify-redirect.jpg" width="1216" height="192" alt="Redirect URIs list showing https://kpow.xyz/vizspot/ and http://127.0.0.1:8888/callback"><figcaption>After Add, it looks like this. Then click Save.</figcaption></figure>
       <span class="tip">Your vizSpot keeps working. This just adds a second address.</span></label></li>
     <li class="step"><input type="checkbox" id="s3e"><label for="s3e"><span class="say">In Terminal, paste and press <b>Return</b>, then click <b>Agree</b> in the browser:</span>
       <div class="cmd"><pre>spotify-mcp login</pre><button type="button" data-copy>Copy</button></div></label></li>
