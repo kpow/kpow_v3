@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.7.35";
+export const DOC_VERSION = "3.7.36";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -101,7 +101,7 @@ export const BOARDS: Board[] = [
       "Head stopped moving after an update? Power it fully off (hold the bottom button about 6 seconds) and back on.",
       "**Talk to it.** Tap the **front** of its head, ask anything, and it answers out loud with a moving mouth. Tap the front again to stop it. The thinking runs in [vizbrain](https://github.com/kpow/vizpow/blob/main/vizbrain/README.md), a small app on a Mac on the same WiFi, using Claude. vizbrain 1.1 and newer need firmware 3.7.31 or newer. Without vizbrain, Stackchan works exactly as before.",
       "**It answers back.** With vizbrain 1.2.0 and firmware 3.7.35, when it ends on a question it beeps and listens for your answer, no tap needed (up to 3 in a row; say nothing and it shows \"Okay.\"). Pick its voice from a list on the [web panel](/vizbot/web#brain), American, British or a mix.",
-      "**It sees, notices and remembers.** Ask \"what am I holding?\" and it takes a photo. Walk in after a few quiet minutes and it says hi; lean in close and it reacts. Tell it things to remember, or routines like \"every weekday at 9, good morning with the weather\". It can also work WLED lights and Spotify, if you have them. With the Spotify connector it plays, queues, adds to playlists and likes songs, and shows the album cover on its screen for a few seconds.",
+      "**It sees, notices and remembers.** Ask \"what am I holding?\" and it takes a photo. Walk in after a few quiet minutes and it says hi; lean in close and it reacts. Tell it things to remember, or routines like \"every weekday at 9, good morning with the weather\". It can also work WLED lights and Spotify, if you have them. With the Spotify connector it plays, queues, adds to playlists and likes songs. Whenever a new song starts, the album cover shows on its screen for 8 seconds, with its face still on in a corner (firmware 3.7.36, vizbrain 1.2.1).",
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
     ],
   },
