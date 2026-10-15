@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Kate's vizBot Upgrade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column of five part cards in vizBot's own web-page style (yellow, ink borders, offset shadows), with a sticky "you are here" bar. */
+:root {
+  --paper: #fbf8ef;
+  --card: #ffffff;
+  --ink: #17140d;
+  --muted: #5d574a;
+  --sun: #ffd23f;
+  --sun-soft: #fff2bf;
+  --leaf: #2f8f4e;
+  --leaf-soft: #ddf3e2;
+  --shadow: #17140d;
+  --code-bg: #f2eddc;
+  --term-bg: #1d1b16;
+  --term-fg: #e9e4d4;
+  --term-ok: #7fdc9a;
+  --display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15130e; --card: #201d16; --ink: #f4efdf; --muted: #b6ae99;
+    --sun: #ffd23f; --sun-soft: #3a3110; --leaf: #6fd08e; --leaf-soft: #17301f;
+    --shadow: #000000; --code-bg: #2b271d; --term-bg: #0d0c09; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15130e; --card: #201d16; --ink: #f4efdf; --muted: #b6ae99;
+  --sun: #ffd23f; --sun-soft: #3a3110; --leaf: #6fd08e; --leaf-soft: #17301f;
+  --shadow: #000000; --code-bg: #2b271d; --term-bg: #0d0c09; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; height: auto; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.5;
+  margin: 0; padding: 0 16px calc(64px + env(safe-area-inset-bottom, 0px));
+}
+.wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: inherit; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+/* sticky "you are here" */
+.here {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  margin: 0 -16px; padding: 10px 16px;
+  background: var(--paper); border-bottom: 2px solid var(--ink);
+}
+.here-in { max-width: 680px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dots { display: flex; gap: 6px; flex: none; }
+.dots a {
+  width: 30px; height: 30px; border: 2px solid var(--ink); border-radius: 50%;
+  display: grid; place-items: center; text-decoration: none;
+  font-family: var(--display); font-weight: 800; font-size: 14px; background: var(--card);
+}
+.dots a.done { background: var(--leaf); border-color: var(--leaf); color: var(--card); }
+.dots a.now { background: var(--sun); color: #17140d; }
+.here-txt { font-size: 15px; font-weight: 700; min-width: 0; }
+
+/* hero */
+.hero { padding-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+.eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.hero h1 { font-size: clamp(36px, 8vw, 56px); font-weight: 800; }
+.hero h1 mark { background: var(--sun); color: #17140d; padding: 0 .12em; }
+.lede { font-size: 19px; }
+.gets { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.get { border: 2px solid var(--ink); background: var(--card); padding: 10px 12px; border-radius: 10px; min-width: 0; }
+.get b { display: block; font-family: var(--display); font-size: 16px; }
+.get span { font-size: 14px; color: var(--muted); }
+.ready { border-left: 6px solid var(--sun); padding: 2px 0 2px 14px; }
+
+/* part cards */
+.part {
+  background: var(--card); border: 2px solid var(--ink); border-radius: 12px;
+  box-shadow: 5px 5px 0 0 var(--shadow);
+  padding: 20px; display: flex; flex-direction: column; gap: 14px;
+  scroll-margin-top: 70px;
+}
+.part.done { background: var(--leaf-soft); }
+.phead { display: flex; gap: 14px; align-items: center; }
+.pnum {
+  flex: none; width: 46px; height: 46px; border: 2px solid var(--ink); border-radius: 50%;
+  background: var(--sun); color: #17140d; display: grid; place-items: center;
+  font-family: var(--display); font-weight: 800; font-size: 22px;
+}
+.part.done .pnum { background: var(--leaf); border-color: var(--leaf); color: var(--card); }
+.ptitle { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ptitle h2 { font-size: 26px; font-weight: 800; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.chip { border: 2px solid var(--ink); border-radius: 99px; padding: 0 10px; font-weight: 700; background: var(--paper); }
+.chip.where { background: var(--sun-soft); }
+
+ol.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.step { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+.step input {
+  appearance: none; width: 26px; height: 26px; margin: 1px 0 0; cursor: pointer;
+  border: 2px solid var(--ink); border-radius: 6px; background: var(--card); display: grid; place-items: center;
+}
+.step input:checked { background: var(--leaf); border-color: var(--leaf); }
+.step input:checked::after { content: ""; width: 7px; height: 13px; border: solid var(--card); border-width: 0 3px 3px 0; transform: translateY(-2px) rotate(45deg); }
+.step label { cursor: pointer; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.step input:checked + label > .say { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--muted); }
+.tip { font-size: 15px; color: var(--muted); }
+
+code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.cmd { display: flex; align-items: stretch; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; background: var(--code-bg); }
+.cmd pre {
+  margin: 0; padding: 10px 12px; flex: 1; min-width: 0; cursor: text;
+  font-family: var(--mono); font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.cmd button {
+  flex: none; border: 0; border-left: 2px solid var(--ink); background: var(--sun); color: #17140d;
+  font-family: var(--body); font-weight: 700; font-size: 14px; padding: 0 14px; cursor: pointer; min-width: 74px;
+}
+
+.shot { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.shot img { display: block; border: 2px solid var(--ink); border-radius: 8px; max-width: min(100%, 420px); }
+.shot figcaption { font-size: 14px; color: var(--muted); }
+
+.term {
+  background: var(--term-bg); color: var(--term-fg); border-radius: 8px; padding: 10px 12px;
+  font-family: var(--mono); font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0;
+}
+.term .ok { color: var(--term-ok); font-weight: 700; }
+.term .dim { opacity: .55; }
+
+.check { background: var(--sun-soft); border: 2px dashed var(--ink); border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+.check > b { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.stuck { font-size: 15px; display: flex; flex-direction: column; gap: 4px; }
+.stuck > b { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.stuck ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+
+.break { text-align: center; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+.finale { border: 2px solid var(--ink); border-radius: 12px; padding: 20px; background: var(--sun); color: #17140d; display: flex; flex-direction: column; gap: 8px; box-shadow: 5px 5px 0 0 var(--shadow); }
+.finale h2 { font-size: 28px; font-weight: 800; }
+.finale code { background: #fff6cf; }
+
+.foot { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.reset { background: none; border: 2px solid var(--ink); border-radius: 6px; padding: 5px 12px; font: inherit; font-size: 14px; color: var(--ink); cursor: pointer; }
+
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  .part { padding: 16px; }
+  .ptitle h2 { font-size: 22px; }
+  .dots a { width: 26px; height: 26px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<div class="here" aria-live="polite">
+  <div class="here-in">
+    <nav class="dots" aria-label="Parts">
+      <a href="#p1" data-dot="1">1</a><a href="#p2" data-dot="2">2</a><a href="#p3" data-dot="3">3</a><a href="#p4" data-dot="4">4</a><a href="#p5" data-dot="5">5</a>
+    </nav>
+    <div class="here-txt" id="hereTxt">Part 1 of 5: Update the brain</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">vizBrain 1.2.1 · vizBot 3.7.36</div>
+  <h1>Kate's <mark>vizBot</mark> upgrade</h1>
+  <p class="lede">5 parts, about 30 minutes. Do one, take a break, come back. Your ticks are saved.</p>
+  <div class="gets" aria-label="What you get">
+    <div class="get"><b>Spotify by voice</b><span>Play, skip, like, add to playlists</span></div>
+    <div class="get"><b>Album covers</b><span>On his screen for each new song</span></div>
+    <div class="get"><b>No re-tap</b><span>He asks, you just answer</span></div>
+    <div class="get"><b>His voice</b><span>Pick from about 30</span></div>
+  </div>
+  <p class="ready"><b>Have ready:</b> your Mac, vizBot and vizSpot switched on, your Spotify login.</p>
+</header>
+
+<!-- PART 1 -->
+<section class="part" id="p1" data-part="1" data-name="Update the brain">
+  <div class="phead">
+    <div class="pnum">1</div>
+    <div class="ptitle">
+      <h2>Update the brain</h2>
+      <div class="meta"><span class="chip">5 min</span><span class="chip where">Terminal</span></div>
+    </div>
+  </div>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s1a"><label for="s1a"><span class="say">Open <b>Terminal</b>: <b>Cmd + Space</b>, type <code>Terminal</code>, <b>Return</b>.</span></label></li>
+    <li class="step"><input type="checkbox" id="s1b"><label for="s1b"><span class="say">Paste this and press <b>Return</b>:</span>
+      <div class="cmd"><pre>vizbrain update</pre><button type="button" data-copy>Copy</button></div>
+      <span class="tip">Takes a minute or two. Done when you can type again.</span></label></li>
+  </ol>
+  <div class="check"><b>Worked if</b><p>No error, and he still answers when you tap his head.</p></div>
+  <div class="stuck"><b>If not</b><ul>
+    <li>"install link isn't active": ask Kevin for a new link, then run it again.</li>
+  </ul></div>
+</section>
+
+<p class="break">break here if you like</p>
+
+<!-- PART 2 -->
+<section class="part" id="p2" data-part="2" data-name="Update vizBot">
+  <div class="phead">
+    <div class="pnum">2</div>
+    <div class="ptitle">
+      <h2>Update vizBot</h2>
+      <div class="meta"><span class="chip">5 min</span><span class="chip where">Browser</span></div>
+    </div>
+  </div>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s2a"><label for="s2a"><span class="say">Go to <a href="https://kpow.xyz/vizbot/releases" target="_blank" rel="noopener">kpow.xyz/vizbot/releases</a>, pick <b>Stackchan</b>, click <b>Download</b>.</span>
+      <span class="tip">You want <code>vizbot-stackchan-v3.7.36.bin</code>, not the <code>-factory</code> one.</span></label></li>
+    <li class="step"><input type="checkbox" id="s2b"><label for="s2b"><span class="say">Open vizBot's web page. Under <b>Device</b>, click <b>Update</b>.</span>
+      <figure class="shot"><img src="bot-firmware.jpg" width="800" height="556" alt="vizBot's Device section with the Firmware line and a yellow Update button"><figcaption>Bottom right: the yellow Update button.</figcaption></figure></label></li>
+    <li class="step"><input type="checkbox" id="s2c"><label for="s2c"><span class="say"><b>Choose File</b>, pick the download, click <b>Upload</b>. Wait for "Rebooting".</span>
+      <figure class="shot"><img src="bot-update.jpg" width="730" height="590" alt="The Firmware Update page with Choose File and Upload buttons"></figure></label></li>
+    <li class="step"><input type="checkbox" id="s2d"><label for="s2d"><span class="say">Hold his <b>bottom button for 6 seconds</b> to switch him off. Then switch him on.</span>
+      <span class="tip">Don't skip this, or his head won't move.</span></label></li>
+  </ol>
+  <div class="check"><b>Worked if</b><p>Device says <b>Firmware v3.7.36</b>.</p></div>
+  <div class="stuck"><b>If not</b><ul>
+    <li>"Upload failed": wrong file. Download the Stackchan one again.</li>
+    <li>Head doesn't move: do the 6-second hold again.</li>
+  </ul></div>
+</section>
+
+<p class="break">break here if you like</p>
+
+<!-- PART 3 -->
+<section class="part" id="p3" data-part="3" data-name="Connect Spotify">
+  <div class="phead">
+    <div class="pnum">3</div>
+    <div class="ptitle">
+      <h2>Connect Spotify</h2>
+      <div class="meta"><span class="chip">10 min</span><span class="chip where">Terminal + browser</span></div>
+    </div>
+  </div>
+  <p class="tip">The longest part. It reuses your vizSpot's Spotify app, so there's nothing new to create.</p>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s3a"><label for="s3a"><span class="say">In Terminal, paste and press <b>Return</b>:</span>
+      <div class="cmd"><pre>uv tool install git+https://github.com/kpow/spotify-mcp</pre><button type="button" data-copy>Copy</button></div></label></li>
+    <li class="step"><input type="checkbox" id="s3b"><label for="s3b"><span class="say">Open <a href="http://vizspot.local" target="_blank" rel="noopener">vizspot.local</a>, open <b>Spotify</b>, copy the code in the <b>first box</b>.</span>
+      <figure class="shot"><img src="vizspot-clientid.jpg" width="712" height="352" alt="vizSpot's Spotify section; the first box holds the Client ID"><figcaption>Yours shows a long code where this one is hidden.</figcaption></figure></label></li>
+    <li class="step"><input type="checkbox" id="s3c"><label for="s3c"><span class="say">Open <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> and click the app with that <b>Client ID</b>.</span>
+      <span class="tip">Only one app there? That's the one.</span>
+      <figure class="shot"><img src="spotify-clientid.jpg" width="1216" height="204" alt="The Spotify app page with the Client ID at the top left"><figcaption>The Client ID is at the top of the app's page.</figcaption></figure></label></li>
+    <li class="step"><input type="checkbox" id="s3d"><label for="s3d"><span class="say"><b>Settings</b> → <b>Edit</b>. In <b>Redirect URIs</b>, paste this, click <b>Add</b>, then <b>Save</b> at the bottom.</span>
+      <div class="cmd"><pre>http://127.0.0.1:8888/callback</pre><button type="button" data-copy>Copy</button></div>
+      <figure class="shot"><img src="spotify-redirect.jpg" width="1216" height="192" alt="Redirect URIs list showing https://kpow.xyz/vizspot/ and http://127.0.0.1:8888/callback"><figcaption>After Add, it looks like this. Then click Save.</figcaption></figure>
+      <span class="tip">Your vizSpot keeps working. This just adds a second address.</span></label></li>
+    <li class="step"><input type="checkbox" id="s3e"><label for="s3e"><span class="say">In Terminal, paste and press <b>Return</b>, then click <b>Agree</b> in the browser:</span>
+      <div class="cmd"><pre>spotify-mcp login</pre><button type="button" data-copy>Copy</button></div></label></li>
+  </ol>
+  <div class="check"><b>Worked if</b><p>Terminal ends with:</p>
+    <pre class="term"><span class="ok">Signed in.</span> Saved to the Keychain (service spotify-mcp).</pre></div>
+  <div class="stuck"><b>If not</b><ul>
+    <li>"command not found": open a new Terminal window, try again.</li>
+    <li>"redirect_uri: Not matching configuration": redo step 4. Check you clicked <b>Save</b>.</li>
+    <li>vizspot.local won't open: switch the vizSpot off and on.</li>
+  </ul></div>
+</section>
+
+<p class="break">break here if you like</p>
+
+<!-- PART 4 -->
+<section class="part" id="p4" data-part="4" data-name="Plug it in">
+  <div class="phead">
+    <div class="pnum">4</div>
+    <div class="ptitle">
+      <h2>Plug it in</h2>
+      <div class="meta"><span class="chip">2 min</span><span class="chip where">Terminal</span></div>
+    </div>
+  </div>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s4a"><label for="s4a"><span class="say">Paste this (one long line) and press <b>Return</b>:</span>
+      <div class="cmd"><pre>vizbrain connectors add spotify --replaces music_play --action play --action queue --action control --action create_playlist --action add_to_playlist --action like -- spotify-mcp</pre><button type="button" data-copy>Copy</button></div></label></li>
+    <li class="step"><input type="checkbox" id="s4b"><label for="s4b"><span class="say">Then this:</span>
+      <div class="cmd"><pre>vizbrain connectors test spotify</pre><button type="button" data-copy>Copy</button></div></label></li>
+  </ol>
+  <div class="check"><b>Worked if</b><p>The first lines look like:</p>
+    <pre class="term">spotify: <span class="ok">ready</span> after 1.6 s, <span class="ok">10 tools</span>, 60 names
+<span class="dim">    spotify__add_to_playlist: Add a song to one of …
+    spotify__control: Pause, resume, skip or go back …</span></pre></div>
+  <div class="stuck"><b>If not</b><ul>
+    <li>Not "ready": run <code>spotify-mcp status</code>. If it mentions login, redo the last step of Part 3.</li>
+  </ul></div>
+</section>
+
+<!-- PART 5 -->
+<section class="part" id="p5" data-part="5" data-name="Try it">
+  <div class="phead">
+    <div class="pnum">5</div>
+    <div class="ptitle">
+      <h2>Try it</h2>
+      <div class="meta"><span class="chip">5 min</span><span class="chip where">vizBot</span></div>
+    </div>
+  </div>
+  <p class="tip">Open the <b>Spotify app</b> on your Mac first.</p>
+  <ol class="steps">
+    <li class="step"><input type="checkbox" id="s5a"><label for="s5a"><span class="say">Tap his head: <b>"Play some ska."</b> The cover shows for 8 seconds.</span></label></li>
+    <li class="step"><input type="checkbox" id="s5b"><label for="s5b"><span class="say">Skip a song in Spotify. A new cover flashes.</span></label></li>
+    <li class="step"><input type="checkbox" id="s5c"><label for="s5c"><span class="say"><b>"Like this song."</b> Then <b>"Make a playlist called Kate's Faves and add this."</b></span></label></li>
+    <li class="step"><input type="checkbox" id="s5d"><label for="s5d"><span class="say"><b>"Ask me what I want to hear."</b> Answer him without tapping.</span></label></li>
+    <li class="step"><input type="checkbox" id="s5e"><label for="s5e"><span class="say">On his web page: <b>Brain (voice)</b> → <b>Speaking voice</b>. Pick one; he says a line in it.</span>
+      <figure class="shot"><img src="bot-voice.jpg" width="800" height="258" alt="The Brain (voice) section with the Speaking voice menu"></figure></label></li>
+  </ol>
+  <div class="stuck"><b>If not</b><ul>
+    <li>"No active device": press play in Spotify once, then ask again.</li>
+    <li>"Premium required": playing and skipping need Spotify Premium.</li>
+  </ul></div>
+</section>
+
+<section class="finale" id="finale">
+  <h2>You did it.</h2>
+  <p>New brain, new firmware, Spotify connected, a voice you picked.</p>
+  <p>If anything acts up later, run <code>vizbrain doctor</code> in Terminal. It says what to fix.</p>
+</section>
+
+<div class="foot">
+  <button type="button" class="reset" id="reset">Clear my ticks</button>
+  <span>Ticks are saved in this browser only.</span>
+</div>
+
+</div>
+
+<script>
+(function () {
+  var KEY = "kate-upgrade-v2";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll(".step input"));
+  var parts = Array.prototype.slice.call(document.querySelectorAll(".part"));
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { state = {}; }
+  boxes.forEach(function (b) { b.checked = !!state[b.id]; });
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  function render() {
+    var next = null;
+    parts.forEach(function (p) {
+      var all = Array.prototype.slice.call(p.querySelectorAll(".step input")).every(function (b) { return b.checked; });
+      p.classList.toggle("done", all);
+      var dot = document.querySelector('[data-dot="' + p.dataset.part + '"]');
+      dot.classList.toggle("done", all);
+      dot.classList.remove("now");
+      if (!all && !next) next = p;
+    });
+    var txt = document.getElementById("hereTxt");
+    if (next) {
+      document.querySelector('[data-dot="' + next.dataset.part + '"]').classList.add("now");
+      txt.textContent = "Part " + next.dataset.part + " of 5: " + next.dataset.name;
+    } else {
+      txt.textContent = "All 5 parts done. You did it.";
+    }
+  }
+
+  boxes.forEach(function (b) {
+    b.addEventListener("change", function () { state[b.id] = b.checked; save(); render(); });
+  });
+
+  // Clicking a command or screenshot shouldn't tick the box it sits in.
+  document.querySelectorAll(".cmd, .shot").forEach(function (el) {
+    el.addEventListener("click", function (ev) { ev.preventDefault(); });
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    state = {}; save();
+    boxes.forEach(function (b) { b.checked = false; });
+    render();
+  });
+
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      var pre = btn.parentNode.querySelector("pre");
+      function ok() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1600); }
+      function fallback() {
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = "Cmd+C";
+        setTimeout(function () { btn.textContent = "Copy"; }, 2400);
+      }
+      try { navigator.clipboard.writeText(pre.textContent).then(ok, fallback); } catch (e) { fallback(); }
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
