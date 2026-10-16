@@ -30,6 +30,12 @@ export function Footer() {
             and some content in Markdown. Using GoodReads, Feedbin,
             Phish.net, Github and whatever other API's I'm playing with :)
           </p>
+          <a
+            href="/privacy"
+            className="inline-block mt-3 text-sm text-gray-300 underline hover:text-white"
+          >
+            privacy
+          </a>
         </div>
       </div>
     </footer>

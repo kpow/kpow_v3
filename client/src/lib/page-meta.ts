@@ -83,6 +83,11 @@ export const STATIC_PAGES: Record<string, PageMeta> = {
     CARDS.about,
     { type: "profile" },
   ),
+  "/privacy": page(
+    "privacy",
+    "Privacy policy for kpow-dash, Kevin's personal dashboard: what it reads from Google, where that data stays, and how to revoke access.",
+    CARDS.about,
+  ),
   "/builds": page(
     "build log",
     "Every thing kpow is building: LED instruments, handheld consoles, robots, and the devlog behind them.",
