@@ -80,11 +80,15 @@ export function RecentPlays() {
                   <CardContent className="p-0">
                     <div className="relative w-full">
                       <div className="relative aspect-square">
-                        <img
-                          src={track.image}
-                          alt={`${track.album} cover`}
-                          className="w-full h-full object-cover"
-                        />
+                        {track.image ? (
+                          <img
+                            src={track.image}
+                            alt={`${track.album} cover`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-muted" />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
                           <div className="absolute bottom-0 p-3 text-white">
                             <p className="font-semibold text-sm">

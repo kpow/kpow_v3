@@ -1,18 +1,22 @@
 import { pool } from "@db";
 import { fetchLastFmData } from "../../utils/api-utils";
 import { ensureMusicTables, getSyncValue, recordScrobble, recordSpotifyPlay, setSyncValue, type RecordResult } from "./store";
-import { spotifyConfigured, spotifyConnected, spotifyGet, type RecentlyPlayed } from "./spotify";
+import { SpotifyCooldown, albumArt, spotifyConfigured, spotifyConnected, spotifyCooldowns, spotifyGet, type RecentlyPlayed } from "./spotify";
 
-// Pulls new plays into Postgres every 15 minutes: Spotify's recently-played first
+// Pulls new plays into Postgres every 30 minutes: Spotify's recently-played first
 // (it only remembers the last 50 tracks, so it must be polled), then krakap's
 // Last.fm scrobbles (kept forever, so a missed run loses nothing). The first
 // Last.fm run backfills everything since the Apple export ends (Feb 2025).
+//
+// 30 minutes, not less: the Spotify app is shared and rate limited (spotify.ts), and
+// 50 tracks is ~3 hours of listening, so nothing is lost. While Spotify has
+// recently-played blocked (a 429), spotifyGet skips the call until Retry-After.
 //
 // Runs in production; MUSIC_SYNC=on runs it in dev too, MUSIC_SYNC=off stops it.
 // An advisory lock keeps two servers on the same database from syncing at once.
 
 export const LASTFM_USER = process.env.LASTFM_USER || "krakap";
-const EVERY_MS = 15 * 60_000;
+const EVERY_MS = 30 * 60_000;
 const LOCK_KEY = 0x6d75_7369; // "musi"
 
 interface SourceState {
@@ -51,6 +55,10 @@ async function syncSpotify(c: import("pg").PoolClient): Promise<SourceState | { 
         artist: i.track.artists[0].name,
         track: i.track.name,
         album: i.track.album?.name ?? null,
+        trackId: i.track.id ?? null,
+        artists: i.track.artists.map((a) => a.name).join(", "),
+        image: albumArt(i.track) || null,
+        url: i.track.external_urls?.spotify ?? null,
       })]++;
       st.cursor = Math.max(st.cursor ?? 0, +playedAt);
     }
@@ -58,7 +66,8 @@ async function syncSpotify(c: import("pg").PoolClient): Promise<SourceState | { 
     st.last_error = null;
   } catch (e) {
     st.last_error = (e as Error).message;
-    console.error("[music] spotify sync:", e);
+    if (e instanceof SpotifyCooldown) console.log(`[music] spotify sync: skipped, ${e.message}`);
+    else console.error("[music] spotify sync:", e);
   }
   st.last_counts = n;
   await setSyncValue("spotify", st);
@@ -148,6 +157,7 @@ export async function musicStatus() {
       configured: spotifyConfigured(),
       connected_at: auth?.connected_at ?? null,
       state: await getSyncValue<SourceState>("spotify"),
+      rate_limited_until: await spotifyCooldowns(),
     },
     lastfm: { user: LASTFM_USER, state: await getSyncValue<SourceState>("lastfm") },
     syncing: !!running,

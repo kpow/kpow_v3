@@ -6,6 +6,7 @@ import { artists, plays, songs } from "../../db/schema";
 import { LISTEN_SQL, ensureMusicTables } from "../lib/music/store";
 import { authorizeUrl, disconnect, exchangeCode, spotifyConfigured } from "../lib/music/spotify";
 import { musicStatus, startMusicSync, syncMusic } from "../lib/music/sync";
+import { listening, type PlaysSource } from "../lib/music/plays";
 
 // Plays come from the Apple export, Last.fm and Spotify (server/lib/music). An
 // Apple-export play under 30 s is a skip, so every count uses `isListen`.
@@ -26,6 +27,24 @@ export function registerMusicRoutes(router: Router) {
     ensureMusicTables().then(() => next(), (e) => res.status(503).json({ message: e.message }));
   });
   startMusicSync();
+
+  // kpow's listening mirror for kpow-dash, kpow-mcp and spotify-mcp, so they never call
+  // Spotify themselves (server/lib/music/plays.ts). Public: the home page shows the same.
+  router.get("/api/music/plays", async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    const limit = Number(req.query.limit ?? 50);
+    const since = req.query.since ? new Date(String(req.query.since)) : null;
+    const source = String(req.query.source ?? "all") as PlaysSource;
+    if (!Number.isInteger(limit) || limit < 1 || limit > 200) return res.status(400).json({ error: "limit must be 1-200" });
+    if (since && isNaN(+since)) return res.status(400).json({ error: "since must be an ISO time" });
+    if (!["spotify", "apple", "all"].includes(source)) return res.status(400).json({ error: "source must be spotify, apple or all" });
+    try {
+      const body = await listening({ limit, since, source });
+      res.set("Cache-Control", "public, max-age=30").json(body);
+    } catch (e) {
+      res.status(500).json({ error: (e as Error).message });
+    }
+  });
 
   router.get("/api/admin/music", requireAdmin, async (_req, res) => {
     try {

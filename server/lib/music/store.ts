@@ -12,6 +12,9 @@ import type { PoolClient } from "pg";
 //             'spotify-api'     Spotify's recently-played (a listen of >= 30 s).
 //   external_key  'spotify:<played_at>' for Spotify rows, unique
 //   lastfm_uts    the scrobble's timestamp, unique, so a re-poll never doubles it
+// songs.spotify_id / spotify_artists / image_url / spotify_url  Spotify's track id,
+//   all artists joined with ", ", album art and track link, saved by the sync for
+//   /api/music/plays and the home feed (plays.ts), which read from here, not Spotify.
 //
 // One listen can arrive twice: as a Spotify play and as a Spotify→Last.fm scrobble.
 // The two are paired when artist + track match within PAIR_WINDOW; the Spotify row wins
@@ -36,6 +39,10 @@ export function ensureMusicTables(): Promise<void> {
          ALTER TABLE plays ADD COLUMN IF NOT EXISTS via text;
          ALTER TABLE plays ADD COLUMN IF NOT EXISTS external_key text;
          ALTER TABLE plays ADD COLUMN IF NOT EXISTS lastfm_uts bigint;
+         ALTER TABLE songs ADD COLUMN IF NOT EXISTS image_url text;
+         ALTER TABLE songs ADD COLUMN IF NOT EXISTS spotify_id text;
+         ALTER TABLE songs ADD COLUMN IF NOT EXISTS spotify_artists text;
+         ALTER TABLE songs ADD COLUMN IF NOT EXISTS spotify_url text;
          CREATE UNIQUE INDEX IF NOT EXISTS plays_external_key_uq ON plays (external_key);
          CREATE UNIQUE INDEX IF NOT EXISTS plays_lastfm_uts_uq ON plays (lastfm_uts);
          CREATE INDEX IF NOT EXISTS plays_start_timestamp_idx ON plays (start_timestamp);
@@ -175,6 +182,20 @@ export interface SpotifyPlay {
   artist: string;
   track: string;
   album: string | null;
+  trackId: string | null;
+  artists: string | null; // all artists, joined with ", "
+  image: string | null;
+  url: string | null;
+}
+
+// Keep Spotify's newest id, artists, art and link on the song the play `key` points at.
+async function saveSpotifyMeta(c: PoolClient, key: string, p: SpotifyPlay) {
+  await c.query(
+    `UPDATE songs SET spotify_id = coalesce($2, spotify_id), spotify_artists = coalesce($3, spotify_artists),
+                      image_url = coalesce($4, image_url), spotify_url = coalesce($5, spotify_url)
+      WHERE id = (SELECT song_id FROM plays WHERE external_key = $1)`,
+    [key, p.trackId, p.artists, p.image, p.url],
+  );
 }
 
 // One Spotify recently-played item. Claims the matching Last.fm scrobble (stored as
@@ -195,6 +216,7 @@ export async function recordSpotifyPlay(c: PoolClient, p: SpotifyPlay): Promise<
         WHERE id = $1`,
       [nearest(rows, start).id, key, start, p.playedAt, p.durationMs],
     );
+    await saveSpotifyMeta(c, key, p);
     return "paired";
   }
 
@@ -204,5 +226,6 @@ export async function recordSpotifyPlay(c: PoolClient, p: SpotifyPlay): Promise<
      VALUES ($1, $2, $3, $4, 'spotify', 'spotify-api', $5)`,
     [song, start, p.playedAt, p.durationMs, key],
   );
+  await saveSpotifyMeta(c, key, p);
   return "inserted";
 }

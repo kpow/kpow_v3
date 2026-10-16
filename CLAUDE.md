@@ -142,10 +142,18 @@ All plays live in `plays` (+ `songs`, `artists`), merged from three sources by
   **Never run `npm run db:push`.**
 - A listen = `LISTEN_SQL` (`via` lastfm/spotify-api, or >= 30 s). Every stats
   query in `routes/music-routes.ts` uses it.
-- `sync.ts` polls every 15 min in production (`MUSIC_SYNC=on|off` to override):
+- `sync.ts` polls every 30 min in production (`MUSIC_SYNC=on|off` to override):
   Spotify first (its API only keeps the last 50), then Last.fm. A Spotify play
   and its Last.fm scrobble (same artist + track within 10 min) become one row.
-- Home feed `/api/lastfm/recent-tracks` merges Last.fm + Spotify live (`recent.ts`).
+- `GET /api/music/plays` (`plays.ts`, public, CORS open) is the listening mirror
+  kpow-dash, kpow-mcp and spotify-mcp read instead of Spotify: plays from Postgres
+  + one shared currently-playing call, cached 2 min. The home feed
+  `/api/lastfm/recent-tracks` (`recent.ts`) uses the same data, merged with live
+  Last.fm. Never add a Spotify call to a request path. The vizSpot control page
+  (`client/public/vizspot/`) talks to Spotify itself: leave it alone.
+- The Spotify app is shared (vizSpot board, kpow-dash, spotify-mcp) and rate
+  limited. `spotifyGet` honors 429 + Retry-After per endpoint, kept in
+  `music_sync` row `spotify_cooldown`; `/api/admin/music` shows `rate_limited_until`.
 - Env: `SPOTIFY_CLIENT_ID`, the vizSpot Spotify app (PKCE, no secret); connect
   once at `/admin/music`. That app also lists the redirect URI
   `https://kpow.xyz/api/admin/spotify/callback`.
