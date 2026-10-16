@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.7.36";
+export const DOC_VERSION = "3.7.37";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -102,6 +102,7 @@ export const BOARDS: Board[] = [
       "**Talk to it.** Tap the **front** of its head, ask anything, and it answers out loud with a moving mouth. Tap the front again to stop it. The thinking runs in [vizbrain](https://github.com/kpow/vizpow/blob/main/vizbrain/README.md), a small app on a Mac on the same WiFi, using Claude. vizbrain 1.1 and newer need firmware 3.7.31 or newer. Without vizbrain, Stackchan works exactly as before.",
       "**It answers back.** With vizbrain 1.2.0 and firmware 3.7.35, when it ends on a question it beeps and listens for your answer, no tap needed (up to 3 in a row; say nothing and it shows \"Okay.\"). Pick its voice from a list on the [web panel](/vizbot/web#brain), American, British or a mix.",
       "**It sees, notices and remembers.** Ask \"what am I holding?\" and it takes a photo. Walk in after a few quiet minutes and it says hi; lean in close and it reacts. Tell it things to remember, or routines like \"every weekday at 9, good morning with the weather\". It can also work WLED lights and Spotify, if you have them. With the Spotify connector it plays, queues, adds to playlists and likes songs. Whenever a new song starts, the album cover shows on its screen for 8 seconds, with its face still on in a corner (firmware 3.7.36, vizbrain 1.2.1).",
+      "**Louder, through the Mac.** Its own speaker is small. With vizbrain 1.3.0 and firmware 3.7.37, turn on **Talk through the Mac's speaker** on the [web panel](/vizbot/web#brain) and its voice plays on the Mac's sound output, such as a Bluetooth speaker paired to the Mac, while it still moves its mouth. Stackchan can't play to a Bluetooth speaker itself: its chip has Bluetooth Low Energy only.",
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
     ],
   },
@@ -673,6 +674,10 @@ export const WEB_SECTIONS: WebSection[] = [
       {
         k: "Speaking voice",
         v: "Its voice, from a list: every English Kokoro voice, American and British, plus a few mixes. Pick one and it says a sample line in it, then keeps it. Firmware 3.7.35 and vizbrain 1.2.0; shows \"brain offline\" when vizbrain can't be reached.",
+      },
+      {
+        k: "Talk through the Mac's speaker",
+        v: "On: its voice plays on the Mac's sound output (pick the speaker in the Mac's Sound settings, such as a paired Bluetooth speaker), and it moves its mouth with its own speaker muted. A front head tap stops the Mac too. Off: its own speaker. Firmware 3.7.37 and vizbrain 1.3.0; if one is too old, the card says what's missing.",
       },
       {
         k: "Host · Set",
