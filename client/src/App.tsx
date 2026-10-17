@@ -34,6 +34,8 @@ import VizBotTouch from "@/pages/VizBotTouch";
 import VizBotWeb from "@/pages/VizBotWeb";
 import VizMac from "@/pages/VizMac";
 import VizMacGuide from "@/pages/VizMacGuide";
+import EightByEight from "@/pages/EightByEight";
+import EightByEightGuide from "@/pages/EightByEightGuide";
 import VizMacController from "@/pages/VizMacController";
 
 function Router() {
@@ -78,6 +80,9 @@ function Router() {
         <Route path="/vizmac/guide" component={VizMacGuide} />
         <Route path="/vizmac/controller" component={VizMacController} />
         <Route path="/vizmac" component={VizMac} />
+        {/* specific /8x8/* routes before /8x8, as above */}
+        <Route path="/8x8/guide" component={EightByEightGuide} />
+        <Route path="/8x8" component={EightByEight} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
         <ProtectedRoute path="/admin/:section" component={AdminPage} />

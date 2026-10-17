@@ -22,6 +22,7 @@ const ROUTES = [
   ["/videos", 200], ["/videos/page/2", 200], ["/pmonk", 200], ["/battle", 200],
   ["/donut-tour", 200], ["/donut-tour/portland/or", 200], ["/itunez", 200], ["/led", 200], ["/shows", 200],
   ["/builds", 200], ["/builds/recently", 200], ["/builds/vizbot", 200], ["/builds/8x8", 200], ["/builds/radar", 200],
+  ["/8x8", 200], ["/8x8/guide", 200],
   ["/builds/no-such-build", 404],
   ["/vizspot/guide", 200], ["/vizspot/controls", 200],
   ["/vizbot", 200], ["/vizbot/guide", 200], ["/vizbot/touch", 200], ["/vizbot/web", 200], ["/vizbot/releases", 200],

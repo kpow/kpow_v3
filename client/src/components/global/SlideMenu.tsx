@@ -27,6 +27,7 @@ import {
   History,
   ChevronDown,
   Keyboard,
+  Grid3x3,
   Video,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
@@ -69,6 +70,7 @@ const GROUPS: NavGroup[] = [
       { icon: <Bot className="w-4 h-4" />, label: "vizBot", href: "/vizbot", match: ["/vizbot"] },
       { icon: <AudioLines className="w-4 h-4" />, label: "vizSpot", href: "/vizspot/guide", match: ["/vizspot"] },
       { icon: <Keyboard className="w-4 h-4" />, label: "vizMac", href: "/vizmac", match: ["/vizmac"] },
+      { icon: <Grid3x3 className="w-4 h-4" />, label: "8x8 labz", href: "/8x8", match: ["/8x8"] },
       { icon: <Lightbulb className="w-4 h-4" />, label: "led art", href: "/led", match: ["/led"] },
     ],
   },

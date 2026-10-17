@@ -47,6 +47,7 @@ export const CARDS = {
   vizbot: card("vizbot", "vizBot: a tiny desk robot with a face"),
   vizspot: card("vizspot", "vizSpot: a 64×64 LED board showing what Spotify is playing"),
   vizmac: card("vizmac", "vizMac: a lit keyboard and the desk controller showing Now Playing"),
+  labz: card("8x8", "8x8 labz: a handheld for drawing 8×8 pixel icons, with its LED matrix lit"),
   led: card("led", "LED art: pixel grids running WLED"),
   shows: card("shows", "k-shows: concert clips"),
   phashboard: card("phashboard", "phashboard: Phish shows and PhantasyFish games"),
@@ -147,6 +148,16 @@ export const STATIC_PAGES: Record<string, PageMeta> = {
     "vizMac controller",
     "The vizMac desk controller: the knob and KO button, the mode picker, Keys, Now Playing, the Clock and focus timer, WLED, Wi-Fi setup from your phone, and updates.",
     CARDS.vizmac,
+  ),
+  "/8x8": page(
+    "8x8 labz: an 8×8 sketchbook that glows",
+    "A handheld for drawing 8×8 pixel icons. One web app holds the catalog, the handheld carries it in your pocket, and every icon lights up on a real 8×8 LED matrix as you draw it.",
+    CARDS.labz,
+  ),
+  "/8x8/guide": page(
+    "8x8 labz user guide",
+    "Setting up the 8x8 labz handheld: WiFi and the catalog, browsing icons, the touch pixel editor, the LED screen saver and its 16 patterns, every setting, and updating over WiFi.",
+    CARDS.labz,
   ),
   "/led": page(
     "led art",
