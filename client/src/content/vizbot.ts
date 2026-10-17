@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.7.37";
+export const DOC_VERSION = "3.7.38";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -50,6 +50,7 @@ export const BOARDS: Board[] = [
       "Built the 8-LED ring from 3.7.11? It still lights up, but Screen mode is laid out for the 5×5 panel now. Stay on 3.7.11 or swap in a panel.",
       "**Runs on a battery.** Press PWR to start it. To turn it off, hold PWR for 2 seconds or hold **Power off** in Settings › System. On USB it restarts instead. This is for the current board revision; the older one uses different power pins.",
       "**Low power** is for battery use: hold **Low power** in Settings › System. The bot restarts with WiFi off, the CPU slowed down and the screen at 60% of your brightness, and boots in about a second. The control page, cloud, weather, clock sync and updates stay off until you hold **Full power** in the same place.",
+      "**Shake it in low power.** With WiFi off there's no weather to flip to, so a shake gets you a reaction instead: it winds up dizzy the longer you keep shaking (the LED matrix flashes along), or tells you a fortune, or rerolls the palette and LED effect — whichever it feels like. Four reactions in two minutes, then it ignores shakes for three minutes: worn on a lanyard it shakes all day, and it shouldn't perform the whole way down the block. Out of low power a shake still flips to weather, same as before (3.7.38).",
       "**Battery level** shows as 0 to 4 bars at the top of the home screen and in Settings › System, or a bolt on USB. When the battery gets too low it shows \"Battery empty\" and turns itself off, instead of running the cell flat.",
     ],
   },
@@ -314,6 +315,16 @@ export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
   {
     title: "The update stopped partway",
     body: "Nothing changes until the whole file lands, so it keeps the old version. Reload and try again.",
+  },
+  {
+    title: "My 1.69 stopped reacting when I shake it",
+    body: "In **Low power** it only gives you four reactions every two minutes, then ignores shakes for three minutes. Wait a few minutes and shake it again. That cap is deliberate — on a lanyard it gets shaken all day.",
+    boards: ["lcd169"],
+  },
+  {
+    title: "I can't update a 1.69 that's in low power",
+    body: "Low power keeps WiFi off, so there's no `/update` page to open. Turn on **Hotspot** in **Settings › Connect** — that brings the control page up for one session without leaving low power — then join `vizBot-XXXX` and update as usual. Or hold **Full power** in Settings › System, update, and put it back.",
+    boards: ["lcd169"],
   },
   {
     title: "It's too bright at night",

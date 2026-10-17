@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Stackchan can talk through your Mac's speaker, such as a Bluetooth speaker paired to the Mac, when its own is too quiet for the room.
+              Shake a 1.69 in low power mode and it reacts — a dizzy spell, a fortune, a new palette — instead of flipping to a weather page with no WiFi to fill it.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
