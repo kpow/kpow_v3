@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              New eyes on every board: all 25 faces are redrawn with real lids that squint, droop and glare, and the face eases from one mood to the next instead of snapping.
+              Party mode: the light show takes the whole screen and vizBot shrinks into a little blob in a corner. Poke him and he runs to another one. Turn it on under Settings › Look.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →

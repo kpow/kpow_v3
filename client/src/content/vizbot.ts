@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.7.39";
+export const DOC_VERSION = "3.8.0";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -168,7 +168,7 @@ export const FEATURES: Feature[] = [
     screen: "s3scene",
     frame: "landscape",
     title: "Light shows behind the eyes",
-    body: "16 animated scenes behind the face, with 23 palettes and a kaleidoscope. Swipe sideways to change it or let it cycle. On a CoreS3 they react to music.",
+    body: "16 animated scenes behind the face, with 23 palettes and a kaleidoscope. Swipe sideways to change it or let it cycle. On a CoreS3 they react to music. Party mode gives the show the whole screen and shrinks the face into a little blob in a corner.",
     caption: "scene switcher · CoreS3",
   },
   {
@@ -275,7 +275,7 @@ export const SHEETS: { screen: ScreenKey; name: string; body: string }[] = [
 ];
 
 export const SETTINGS: { name: string; cat: Cat; desc: string }[] = [
-  { name: "Look", cat: "look", desc: "Scene, palette, hi-res, kaleidoscope, face color, auto-cycle" },
+  { name: "Look", cat: "look", desc: "Scene, party mode and its size, palette, hi-res, kaleidoscope, face color, auto-cycle" },
   { name: "Mood", cat: "mood", desc: "Personality, rotation, expression" },
   { name: "Info", cat: "info", desc: "Weather, clock, time zone" },
   { name: "Light", cat: "light", desc: "Screen brightness. Sound, Volume, LEDs and LED mode on the 1.69. Volume and Audio FX on CoreS3. Base LEDs on Stackchan" },
@@ -455,6 +455,10 @@ export const WEB_SECTIONS: WebSection[] = [
       {
         k: "Stop Auto / Auto",
         v: "Auto moves to a new scene every 20 seconds and a new palette every 5. The button reads **Stop Auto** while it cycles and **Auto** when it's stopped.",
+      },
+      {
+        k: "Party mode",
+        v: "Gives the scene the whole screen and shrinks the face into a black blob in a corner. Tap the blob and he runs to another corner. **Small**, **Medium** and **Large** show under the switch while it's on.",
       },
       {
         k: "Audio FX",
