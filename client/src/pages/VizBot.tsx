@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Shake a 1.69 in low power mode and it reacts — a dizzy spell, a fortune, a new palette — instead of flipping to a weather page with no WiFi to fill it.
+              New eyes on every board: all 25 faces are redrawn with real lids that squint, droop and glare, and the face eases from one mood to the next instead of snapping.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →

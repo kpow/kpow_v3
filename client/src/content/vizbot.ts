@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.7.38";
+export const DOC_VERSION = "3.7.39";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -161,7 +161,7 @@ export const FEATURES: Feature[] = [
     screen: "mood",
     frame: "dino",
     title: "A face with moods",
-    body: "25 expressions and three personalities: Chill, Hyper and Grumpy. Left alone it looks around, blinks and mutters in speech bubbles. Poke it and it reacts.",
+    body: "25 expressions and three personalities: Chill, Hyper and Grumpy. The eyes have real lids, so it can squint, droop, glare or go soft, and the pupils turn into hearts or stars when it's smitten. Left alone it looks around, blinks and mutters in speech bubbles. Poke it and it reacts.",
     caption: "mood sheet · 1.69",
   },
   {
