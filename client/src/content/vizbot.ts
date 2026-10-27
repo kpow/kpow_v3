@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.9.1";
+export const DOC_VERSION = "3.10.0";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -104,6 +104,7 @@ export const BOARDS: Board[] = [
       "**It answers back.** With vizbrain 1.2.0 and firmware 3.7.35, when it ends on a question it beeps and listens for your answer, no tap needed (up to 3 in a row; say nothing and it shows \"Okay.\"). Pick its voice from a list on the [web panel](/vizbot/web#brain), American, British or a mix.",
       "**It sees, notices and remembers.** Ask \"what am I holding?\" and it takes a photo. Walk in after a few quiet minutes and it says hi; lean in close and it reacts. Tell it things to remember, or routines like \"every weekday at 9, good morning with the weather\". It can also work WLED lights and Spotify, if you have them. With the Spotify connector it plays, queues, adds to playlists and likes songs. Whenever a new song starts, the album cover shows on its screen for 8 seconds, with its face still on in a corner (firmware 3.7.36, vizbrain 1.2.1).",
       "**Louder, through the Mac.** Its own speaker is small. With vizbrain 1.3.0 and firmware 3.7.37, turn on **Talk through the Mac's speaker** on the [web panel](/vizbot/web#brain) and its voice plays on the Mac's sound output, such as a Bluetooth speaker paired to the Mac, while it still moves its mouth. Stackchan can't play to a Bluetooth speaker itself: its chip has Bluetooth Low Energy only.",
+      "**It knows how it works.** With vizbrain 1.4.0, firmware 3.10.0 and the vizself connector, ask how it blinks, why its head gets stuck or what chip it has, and it looks it up in its own code. While it digs, its face turns into a big ink drop reading a scrolling wall of code, it cracks a corny joke every few seconds, then says \"found it\" and explains. Setup is in [the vizself README](https://github.com/kpow/vizpow/blob/main/vizself/README.md).",
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
     ],
   },
