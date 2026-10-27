@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.9.0";
+export const DOC_VERSION = "3.9.1";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -458,7 +458,7 @@ export const WEB_SECTIONS: WebSection[] = [
       },
       {
         k: "Party mode",
-        v: "Gives the scene the whole screen and shrinks the face into a black ferrofluid blob in a corner. He reaches into the show with tentacles, flicks droplets that flow back, and grows magnet-style spike patterns, sometimes two at once. Tap the show and a tentacle reaches for your finger; tap the blob and he slingshots to another corner. **Small**, **Medium** and **Large** show under the switch while it's on.",
+        v: "Gives the scene the whole screen and shrinks the face into a black ferrofluid blob in a corner. He reaches into the show with tentacles, flicks droplets that flow back, and grows magnet-style spike patterns, sometimes two at once. Tap the show and a tentacle reaches for your finger; tap the blob and he slingshots to another corner. Speech bubbles stay hidden while it's on, except on a Stackchan talking to vizBot Brain: its listening, thinking and reply bubbles show beside the blob, and the blob itself perks up to listen, swirls while it thinks and swells as it talks. **Small**, **Medium** and **Large** show under the switch while it's on.",
       },
       {
         k: "Audio FX",

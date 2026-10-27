@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Party mode goes ferrofluid: tentacles that reach into the show, droplets that fly off and flow back, a jigglier body, and spike patterns that stack. The 1.69 also runs about twice as smoothly. Turn it on under Settings › Look.
+              Talk to a Stackchan in party mode and its speech bubbles show beside the blob again. The blob shows what the brain is doing too: it perks up to listen, swirls while it thinks and swells as it talks.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
