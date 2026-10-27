@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Talk to a Stackchan in party mode and its speech bubbles show beside the blob again. The blob shows what the brain is doing too: it perks up to listen, swirls while it thinks and swells as it talks.
+              Ask a Stackchan how it works and it looks it up in its own code. While it digs it turns into an ink drop reading a wall of code, cracks a joke now and then, and says “found it” before it explains.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
