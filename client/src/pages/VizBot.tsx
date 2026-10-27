@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Party mode: the light show takes the whole screen and vizBot shrinks into a little blob in a corner. Poke him and he runs to another one. Turn it on under Settings › Look.
+              Party mode goes ferrofluid: tentacles that reach into the show, droplets that fly off and flow back, a jigglier body, and spike patterns that stack. The 1.69 also runs about twice as smoothly. Turn it on under Settings › Look.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
