@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Build Log density comps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&family=Slackey&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink: #0A0A0A; --g1: #374151; --g2: #6B7280; --g3: #9CA3AF; --border: #E5E7EB; --am: #7C3AED; --amd: #5B21B6; --tint: #F5F3FF; --tintb: #DDD6FE;
+    --mono: "SFMono-Regular", "Roboto Mono", ui-monospace, Menlo, monospace; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.55 Roboto, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; background: #fafafa;
+    background-image: radial-gradient(1000px 520px at 12% -10%, #F3EEFF 0%, rgba(243,238,255,0) 60%); }
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+  .eyebrow { font: 600 11px/1.4 var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--g2); margin: 0; }
+  h1 { font: 400 34px/1.1 Slackey, cursive; margin: 8px 0 10px; }
+  h2 { font: 400 22px/1.2 Slackey, cursive; margin: 0; }
+  p { margin: 0 0 10px; color: var(--g1); max-width: 72ch; }
+  a { color: var(--amd); }
+  .problem { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0 26px; }
+  .problem div { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 13.5px; color: var(--g1); }
+  .problem b { display: block; font: 700 10.5px/1.6 var(--mono); letter-spacing: .8px; text-transform: uppercase; color: var(--amd); }
+  .rec { background: var(--tint); border: 1px solid var(--tintb); border-left: 3px solid var(--am); border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 0 0 26px; }
+  .rec p { margin: 6px 0 0; }
+  .opts { display: grid; gap: 16px; }
+  .opt { background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) 380px; }
+  .opt .txt { padding: 18px 22px 20px; }
+  .opt .top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .opt .letter { font: 400 15px/1 Slackey, cursive; color: #fff; background: var(--ink); border-radius: 7px; padding: 5px 9px; }
+  .opt .tag { font: 600 10.5px/1 var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--amd); background: var(--tint); border: 1px solid var(--tintb);
+    border-radius: 999px; padding: 4px 9px; }
+  dl { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 5px 12px; margin: 12px 0 14px; font-size: 13.5px; }
+  dt { font: 600 10.5px/1.9 var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--g3); }
+  dd { margin: 0; color: var(--g1); }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { font: 500 13px/1 Roboto, sans-serif; text-decoration: none; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--tintb); background: var(--tint); color: var(--amd); }
+  .btn.primary { background: var(--am); border-color: var(--am); color: #fff; }
+  .opt .shot { background: #111; border-left: 1px solid var(--border); position: relative; min-height: 260px; }
+  .opt .shot iframe { position: absolute; top: 0; left: 0; width: 390px; height: 1400px; border: 0; transform-origin: 0 0; background: #fafafa; pointer-events: none; }
+  .opt .shot .lab { position: absolute; z-index: 1; right: 10px; bottom: 10px; font: 600 10px/1 var(--mono); letter-spacing: .6px; text-transform: uppercase; color: #fff;
+    background: rgba(17,17,17,.7); border-radius: 999px; padding: 5px 9px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 12px; }
+  th, td { padding: 8px 12px; text-align: left; border-top: 1px solid var(--border); vertical-align: top; }
+  th { font: 600 10.5px/1.6 var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--amd); background: var(--tint); border-top: 0; }
+  .note { font-size: 13px; color: var(--g2); margin-top: 22px; }
+  .wrap { overflow-x: auto; }
+  @media (max-width: 900px) { .opt { grid-template-columns: 1fr; } .opt .shot { border-left: 0; border-top: 1px solid var(--border); height: 420px; } .problem { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { h1 { font-size: 26px; } dl { grid-template-columns: 1fr; gap: 0 0; } dt { margin-top: 6px; } .opt .txt { padding: 16px; } }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">kpow.xyz · build log · comps</p>
+  <h1>Keep the devlog usable at 40+ entries</h1>
+  <p>Three ways to make <code>/builds/:slug</code> shorter and easier to scan. Each one uses vizBot's real 43 entries and photos, the section's current purple styles (the real <code>buildlog.css</code> is inlined), and keeps the page top exactly as it is today. Every comp works at phone width.</p>
+
+  <div class="problem">
+    <div><b>Today</b>vizBot's devlog renders all 43 entries in full (about 5,100 words). The devlog alone is about 21,000 px tall on a laptop and 28,000 px on a phone.</div>
+    <div><b>Photos</b>Each photo is its own 220 px figure in a 360 px-wide column, so an entry with 3 photos adds about 750 px of mostly empty width.</div>
+    <div><b>Video</b>Every mp4 in the devlog autoplays inline (about 5 MB each). All three comps show the poster with a play button and play it in the lightbox.</div>
+  </div>
+
+  <section class="rec">
+    <p class="eyebrow" style="color:var(--amd)">recommended</p>
+    <h2>A · Ledger</h2>
+    <p>It does the most for length: the devlog goes from about 21,000 px to about 3,100 px (newest entry open), or 2,400 px with every entry closed. It keeps the spine, the dates and the tag chips, so it still looks like today's page. The same row also works for <code>/builds/recently</code> (139 entries), which has the same problem and is worse. Option C's “first paragraph” teaser could be added later as a second line on each row.</p>
+  </section>
+
+  <div class="opts">
+    <article class="opt">
+      <div class="txt">
+        <div class="top"><span class="letter">A</span><h2>Ledger</h2><span class="tag">most compact</span><span class="tag">also /recently</span></div>
+        <p>Every entry is one row on the purple spine (date · title · tags · up to 3 small thumbs) and opens in place. Month markers on the spine show the counts. The newest entry starts open.</p>
+        <dl>
+          <dt>Density</dt><dd>About 46 px per closed row on a laptop and about 75 px on a phone. The devlog is about 3,100 px with the newest entry open (today it is about 21,000 px).</dd>
+          <dt>Roll-up</dt><dd>Each entry opens and closes on its own (a native <code>&lt;details&gt;</code>). Expand all / Collapse all. A <code>#e-…</code> link opens one entry directly.</dd>
+          <dt>Photos</dt><dd>A mosaic: 1 photo is wide, 2 sit side by side, 3 or more show one large photo and two small ones, with “+N more” on the last. The lightbox steps through all of them.</dd>
+          <dt>Tradeoff</dt><dd>Closed, you see no text at all, so you have to open a row to read it. Good for scanning, but you click more to read in order.</dd>
+        </dl>
+        <div class="btns"><a class="btn primary" href="option-a-ledger.html">Open A · /builds/vizbot</a><a class="btn" href="option-a-ledger.html#recently">A · /builds/recently</a></div>
+      </div>
+      <div class="shot"><iframe src="option-a-ledger.html#devlog" loading="lazy" title="Option A preview" tabindex="-1"></iframe><span class="lab">390 px live</span></div>
+    </article>
+
+    <article class="opt">
+      <div class="txt">
+        <div class="top"><span class="letter">B</span><h2>Chapters</h2><span class="tag">browse by month</span></div>
+        <p>Entries are grouped by month. A closed month is one band showing its counts, its photos, the first few titles and its top tags. Open months show the entries as two columns of cards, with each card's text clamped. A sticky month bar jumps to any month.</p>
+        <dl>
+          <dt>Density</dt><dd>All 9 months closed come to about 1,700 px. By default (October open, 20 entries) it is about 5,400 px, and about 9,800 px with every month open, because two columns hold about twice as many entries per screen.</dd>
+          <dt>Roll-up</dt><dd>By month (the newest month starts open). Open all / Close all, and a Full text switch for the clamped cards.</dd>
+          <dt>Photos</dt><dd>One lead photo with a row of thumbs under it. Tap a thumb to swap the lead; tap the lead to open the lightbox.</dd>
+          <dt>Tradeoff</dt><dd>Drops the timeline spine, so the cards read in a zigzag. Months are uneven (October has 20 entries, April 1), so one open month can still be long.</dd>
+        </dl>
+        <div class="btns"><a class="btn primary" href="option-b-chapters.html">Open B</a></div>
+      </div>
+      <div class="shot"><iframe src="option-b-chapters.html#devlog" loading="lazy" title="Option B preview" tabindex="-1"></iframe><span class="lab">390 px live</span></div>
+    </article>
+
+    <article class="opt">
+      <div class="txt">
+        <div class="top"><span class="letter">C</span><h2>Teaser timeline</h2><span class="tag">smallest change</span></div>
+        <p>Today's timeline, kept as it is. Each entry shows only its first paragraph, with “Read the rest · N words”. Photos sit in one strip of short tiles. The list shows 10 entries at a time, using the same “Show more” button as WIP Pix.</p>
+        <dl>
+          <dt>Density</dt><dd>The first 10 entries take about 2,650 px. All 43 as teasers come to about 11,400 px, about half of today's height.</dd>
+          <dt>Roll-up</dt><dd>Each entry's text opens on its own, with Expand all / Collapse all text. Older entries load in pages of 10, or all at once with Show all.</dd>
+          <dt>Photos</dt><dd>One horizontal strip of 140 px tiles with one-line captions. It scrolls sideways (with snap) on a phone.</dd>
+          <dt>Tradeoff</dt><dd>The least work and the least change, but it still runs long once you page through, and older entries are not on the page until you load them.</dd>
+        </dl>
+        <div class="btns"><a class="btn primary" href="option-c-teaser.html">Open C</a></div>
+      </div>
+      <div class="shot"><iframe src="option-c-teaser.html#devlog" loading="lazy" title="Option C preview" tabindex="-1"></iframe><span class="lab">390 px live</span></div>
+    </article>
+  </div>
+
+  <h2 style="margin-top:30px">Effort in the real React components</h2>
+  <div class="wrap"><table>
+    <tr><th>Option</th><th>Hours</th><th>What changes</th></tr>
+    <tr><td><b>A</b> Ledger</td><td>6–9 h</td><td>Rewrite <code>Timeline.tsx</code> as month groups of <code>&lt;details&gt;</code> rows, add a <code>MediaMosaic</code> component, a gallery mode for <code>Lightbox.tsx</code> (prev/next), a poster + play tile, and the toolbar. <code>Recently.tsx</code> gets build filter chips (+1–2 h).</td></tr>
+    <tr><td><b>B</b> Chapters</td><td>9–12 h</td><td>New <code>MonthChapter</code>, card and lead-photo components, a sticky month bar with scroll-spy, line clamping that measures each card, and the same lightbox gallery work.</td></tr>
+    <tr><td><b>C</b> Teaser</td><td>3–5 h</td><td>Split each body into its first block and the rest in <code>Timeline.tsx</code>, add the photo strip CSS, reuse the WIP Pix paging, and add the poster tile.</td></tr>
+  </table></div>
+  <p class="note">The <code>/builds</code> index (a 3-column grid of 10 cards) is already compact, so no option changes it. The prev/next lightbox and the poster-instead-of-autoplay change work with any of the three and could ship first.</p>
+</main>
+<script>
+  // scale each live phone preview to fill its frame width
+  const fit = () => document.querySelectorAll(".opt .shot").forEach((s) => {
+    const f = s.querySelector("iframe"); const k = s.clientWidth / 390;
+    f.style.transform = `scale(${k})`; f.style.height = `${s.clientHeight / k}px`;
+  });
+  addEventListener("resize", fit); fit();
+</script>
+</body>
+</html>
