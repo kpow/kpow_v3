@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Ask a Stackchan how it works and it looks it up in its own code. While it digs it turns into an ink drop reading a wall of code, cracks a joke now and then, and says “found it” before it explains.
+              The 1.69's inside LED matrix now lights whether it's wired to GPIO17 or GPIO3: the firmware drives both, nothing to set.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
