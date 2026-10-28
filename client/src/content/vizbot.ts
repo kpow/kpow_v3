@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.10.0";
+export const DOC_VERSION = "3.10.1";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -46,7 +46,7 @@ export const BOARDS: Board[] = [
       "Shake it and it gets dizzy.",
       "It has a small buzzer: a boop when you tap the face, and short sounds for swipes, toggles and buttons. **Sound** and **Volume** are in Settings › Light.",
       "Leave it alone for 5 minutes and it chirps now and then with a matching face, every 4 to 12 minutes. Never between 10pm and 8am.",
-      "**Add an LED matrix** to light up the inside of the case: a 5×5 WS2812B panel (25 LEDs, zig-zag wired) on GPIO17, powered from 5V (not the board's 3.3V pin). Its **Screen** mode shows a tiny 5×5 copy of the scene behind the face, and tapping the face flashes it. **LEDs** and **LED mode** are in Settings › Light, and the web panel has an LED Matrix card. No matrix? Nothing changes.",
+      "**Add an LED matrix** to light up the inside of the case: a 5×5 WS2812B panel (25 LEDs, zig-zag wired) on GPIO17 or GPIO3 (firmware 3.10.1 drives both, so either works), powered from 5V (not the board's 3.3V pin). Its **Screen** mode shows a tiny 5×5 copy of the scene behind the face, and tapping the face flashes it. **LEDs** and **LED mode** are in Settings › Light, and the web panel has an LED Matrix card. No matrix? Nothing changes.",
       "Built the 8-LED ring from 3.7.11? It still lights up, but Screen mode is laid out for the 5×5 panel now. Stay on 3.7.11 or swap in a panel.",
       "**Runs on a battery.** Press PWR to start it. To turn it off, hold PWR for 2 seconds or hold **Power off** in Settings › System. On USB it restarts instead. This is for the current board revision; the older one uses different power pins.",
       "**Low power** is for battery use: hold **Low power** in Settings › System. The bot restarts with WiFi off, the CPU slowed down and the screen at 60% of your brightness, and boots in about a second. The control page, cloud, weather, clock sync and updates stay off until you hold **Full power** in the same place.",
