@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import type { Build } from "@/lib/buildlog";
-import { Zoomable } from "./Lightbox";
+import { MediaTile, type Shot } from "./Lightbox";
 
 const PAGE = 12;
 
@@ -18,6 +18,8 @@ export function Filmstrip({ shots, buildTitle }: { shots: Build["picturesOverTim
   const sorted = order === "oldest" ? shots : [...shots].reverse();
   const visible = sorted.slice(0, shown);
   const left = sorted.length - visible.length;
+  // the lightbox steps through what's on the sheet, in the order shown
+  const gallery: Shot[] = visible.map((shot) => ({ ...shot, alt: `${buildTitle} — ${shot.date}` }));
 
   return (
     <section className="wippix">
@@ -43,15 +45,9 @@ export function Filmstrip({ shots, buildTitle }: { shots: Build["picturesOverTim
         )}
       </div>
       <div className="filmstrip">
-        {visible.map((shot) => (
+        {visible.map((shot, i) => (
           <figure className="frame" key={`${shot.date}-${shot.src}`}>
-            <Zoomable
-              src={shot.src}
-              alt={`${buildTitle} — ${shot.date}`}
-              poster={shot.poster}
-              caption={shot.caption}
-              kind={shot.kind}
-            />
+            <MediaTile gallery={gallery} index={i} />
             <figcaption className="frame-meta">
               <div className="frame-date">{shot.date}</div>
               {shot.caption && <div className="frame-cap">{shot.caption}</div>}

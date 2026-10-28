@@ -8,10 +8,10 @@ import { BuildCard } from "@/components/buildlog/BuildCard";
 import { BuildLogError, BuildLogLoading, BuildLogShell } from "@/components/buildlog/BuildLogShell";
 import { Crumbs } from "@/components/buildlog/Crumbs";
 import { Filmstrip } from "@/components/buildlog/Filmstrip";
+import { Ledger } from "@/components/buildlog/Ledger";
 import { Markdown } from "@/components/buildlog/Markdown";
 import { SectionHead } from "@/components/buildlog/SectionHead";
 import { StatusPill } from "@/components/buildlog/StatusPill";
-import { Timeline } from "@/components/buildlog/Timeline";
 import { Zoomable } from "@/components/buildlog/Lightbox";
 
 /** stats first, then whatever `facts` this build happens to carry, then the range. */
@@ -174,7 +174,7 @@ export default function BuildDetail() {
       {!!build.entries.length && (
         <>
           <SectionHead title="Devlog" count={`${build.entries.length} entries`} />
-          <Timeline entries={build.entries} />
+          <Ledger entries={build.entries} openFirst key={build.slug} />
         </>
       )}
 
