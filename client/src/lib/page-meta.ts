@@ -48,6 +48,7 @@ export const CARDS = {
   vizspot: card("vizspot", "vizSpot: a 64×64 LED board showing what Spotify is playing"),
   vizmac: card("vizmac", "vizMac: a lit keyboard and the desk controller showing Now Playing"),
   labz: card("8x8", "8x8 labz: a handheld for drawing 8×8 pixel icons, with its LED matrix lit"),
+  tinyradar: card("tinyradar", "tinyradar: a small white cabinet with a round radar screen and a red range button"),
   led: card("led", "LED art: pixel grids running WLED"),
   shows: card("shows", "k-shows: concert clips"),
   phashboard: card("phashboard", "phashboard: Phish shows and PhantasyFish games"),
@@ -158,6 +159,21 @@ export const STATIC_PAGES: Record<string, PageMeta> = {
     "8x8 labz user guide",
     "Setting up the 8x8 labz handheld: WiFi and the catalog, browsing icons, the touch pixel editor, the LED screen saver and its 16 patterns, every setting, and updating over WiFi.",
     CARDS.labz,
+  ),
+  "/tinyradar": page(
+    "tinyradar: the sky over your house, on your desk",
+    "A little cabinet with a round radar screen that shows the planes flying around your home right now, on a map of your town. Set up from a phone, updates over Wi-Fi.",
+    CARDS.tinyradar,
+  ),
+  "/tinyradar/guide": page(
+    "tinyradar user guide",
+    "Setting up tinyradar: Wi-Fi from your phone, your location and map, its web page at tinyradar.local, the range button, the seven looks, updates, fixes and factory reset.",
+    CARDS.tinyradar,
+  ),
+  "/tinyradar/update": page(
+    "tinyradar updates",
+    "The newest tinyradar firmware, what's in it, and how to install it from the radar's own web page in about 2 minutes.",
+    CARDS.tinyradar,
   ),
   "/led": page(
     "led art",

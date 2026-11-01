@@ -29,6 +29,7 @@ import {
   Keyboard,
   Grid3x3,
   Video,
+  Radar,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -71,6 +72,7 @@ const GROUPS: NavGroup[] = [
       { icon: <AudioLines className="w-4 h-4" />, label: "vizSpot", href: "/vizspot/guide", match: ["/vizspot"] },
       { icon: <Keyboard className="w-4 h-4" />, label: "vizMac", href: "/vizmac", match: ["/vizmac"] },
       { icon: <Grid3x3 className="w-4 h-4" />, label: "8x8 labz", href: "/8x8", match: ["/8x8"] },
+      { icon: <Radar className="w-4 h-4" />, label: "tinyradar", href: "/tinyradar", match: ["/tinyradar"] },
       { icon: <Lightbulb className="w-4 h-4" />, label: "led art", href: "/led", match: ["/led"] },
     ],
   },

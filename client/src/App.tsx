@@ -36,6 +36,9 @@ import VizMac from "@/pages/VizMac";
 import VizMacGuide from "@/pages/VizMacGuide";
 import EightByEight from "@/pages/EightByEight";
 import EightByEightGuide from "@/pages/EightByEightGuide";
+import TinyRadar from "@/pages/TinyRadar";
+import TinyRadarGuide from "@/pages/TinyRadarGuide";
+import TinyRadarUpdate from "@/pages/TinyRadarUpdate";
 import VizMacController from "@/pages/VizMacController";
 
 function Router() {
@@ -83,6 +86,11 @@ function Router() {
         {/* specific /8x8/* routes before /8x8, as above */}
         <Route path="/8x8/guide" component={EightByEightGuide} />
         <Route path="/8x8" component={EightByEight} />
+        {/* specific /tinyradar/* routes before /tinyradar, as above. Plane Radar was its old name. */}
+        <Route path="/tinyradar/guide" component={TinyRadarGuide} />
+        <Route path="/tinyradar/update" component={TinyRadarUpdate} />
+        <Route path="/tinyradar" component={TinyRadar} />
+        <Route path="/plane-radar">{() => <Redirect to="/tinyradar" />}</Route>
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
         <ProtectedRoute path="/admin/:section" component={AdminPage} />
