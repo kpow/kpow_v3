@@ -205,3 +205,22 @@ writes each page's tags into index.html.
   by `node scripts/og-cards/serve.mjs` (open the URL it prints).
 - Check every route the way a crawler sees it:
   `node scripts/check-page-meta.mjs http://localhost:5000` (or `https://kpow.xyz`).
+
+## tinyradar (`/tinyradar`, `/tinyradar/guide`, `/tinyradar/update`)
+
+The desk plane radar, called Plane Radar until Nov 2026 (its repo is still the
+private kpow/ESP32-Plane-Radar). Copy lives in `client/src/content/tinyradar.ts`,
+checked against the radar repo; styles are scoped under `.tinyradar`
+(`components/tinyradar/tinyradar.css`, green accent).
+
+- The radar's own web page (`http://tinyradar.local`) reads
+  `https://kpow.xyz/tinyradar/firmware/manifest.json` and downloads the `.bin`
+  it names. Older firmware reads `/plane-radar/firmware/`. `server/routes/tinyradar-routes.ts`
+  serves `client/public/tinyradar/firmware/` at both paths with
+  `Access-Control-Allow-Origin: *` (the radar's page is `http://` on the home
+  network). Keep both paths working: gift radars depend on them.
+- Publishing a release: `node scripts/publish-tinyradar-firmware.mjs vX.Y.Z`
+  (uses your `gh` login, checks size and md5), then commit on a branch. Merging to
+  main redeploys and every radar offers the update next time its page opens.
+- Never put Wi-Fi names, IPs, MACs or home coordinates on these pages, and no
+  screenshots of the bench radar's map: it shows the owner's home.

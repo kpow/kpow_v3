@@ -1,0 +1,43 @@
+/* tinyradar section (/tinyradar, /tinyradar/guide, /tinyradar/update).
+   The shared building blocks come from ../vizbot/vizbot.css, scoped to
+   :is(.vizbot, .vizmac, .labz, .tinyradar). This file sets the same --vb-*
+   variables to tinyradar's accent, the green of the radar's own web page and
+   setup hotspot (#1DFF86). Everything stays under .tinyradar, so the rest of
+   kpow.xyz keeps its blue. */
+
+.tinyradar {
+  --vb-yellow: #1dff86;      /* the accent: fills only, always with ink text on it */
+  --vb-accent-hi: #5cffa8;   /* primary button hover */
+  --vb-yellow-ink: #166534;  /* green-800: accent text on white */
+  --vb-tint: #f0fdf4;        /* green-50 */
+  --vb-tint-border: #bbf7d0; /* green-200 */
+  --vb-ink: #0a0a0a;
+  --vb-stage: #0e1014;
+  --vb-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  color: var(--vb-ink);
+}
+
+/* The brand mark: a tiny round scope with a sweep, like the radar's screen. */
+.tinyradar .tr-scope {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle, transparent 31%, rgba(29, 255, 134, 0.45) 32%, transparent 34%),
+    radial-gradient(circle, transparent 63%, rgba(29, 255, 134, 0.45) 64%, transparent 66%),
+    conic-gradient(from 0deg, rgba(29, 255, 134, 0.75), transparent 22%),
+    #030605;
+  box-shadow: 0 0 0 1.5px #0a0a0a;
+}
+.tinyradar .tr-scope::after {
+  content: "";
+  position: absolute;
+  left: 62%;
+  top: 30%;
+  width: 14%;
+  height: 14%;
+  border-radius: 9999px;
+  background: #1dff86;
+}
