@@ -8,13 +8,15 @@ import path from "path";
 //   GET /plane-radar/firmware/*               the same files, for radars on firmware
 //                                             from before the tinyradar rename
 //
-// The files are committed in client/public/tinyradar/firmware/ by
-// scripts/publish-tinyradar-firmware.mjs. The radar's page is an http:// page on
-// the home network, so it can only read them with CORS: both paths send
-// Access-Control-Allow-Origin: *, and no-cache so a new release shows up at once.
+// The files are committed in firmware/tinyradar/ by
+// scripts/publish-tinyradar-firmware.mjs. Not in client/public: a tinyradar/
+// folder there makes the production static server 301 /tinyradar to /tinyradar/.
+// The radar's page is an http:// page on the home network, so it can only read
+// them with CORS: both paths send Access-Control-Allow-Origin: *, and no-cache
+// so a new release shows up at once.
 // A missing file is a plain 404, never the app's index.html.
 
-const DIR = path.join(process.cwd(), "client", "public", "tinyradar", "firmware");
+const DIR = path.join(process.cwd(), "firmware", "tinyradar");
 
 const cors: express.RequestHandler = (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

@@ -216,7 +216,7 @@ checked against the radar repo; styles are scoped under `.tinyradar`
 - The radar's own web page (`http://tinyradar.local`) reads
   `https://kpow.xyz/tinyradar/firmware/manifest.json` and downloads the `.bin`
   it names. Older firmware reads `/plane-radar/firmware/`. `server/routes/tinyradar-routes.ts`
-  serves `client/public/tinyradar/firmware/` at both paths with
+  serves `firmware/tinyradar/` at both paths with
   `Access-Control-Allow-Origin: *` (the radar's page is `http://` on the home
   network). Keep both paths working: gift radars depend on them.
 - Publishing a release: `node scripts/publish-tinyradar-firmware.mjs vX.Y.Z`
