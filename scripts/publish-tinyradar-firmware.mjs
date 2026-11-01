@@ -6,7 +6,7 @@
 // The radar repo (kpow/ESP32-Plane-Radar) is private, so its GitHub release can't
 // be read by the radar or the site. This downloads the release's manifest.json and
 // the OTA .bin it names (with your `gh` login), checks size and md5, and writes
-// both to client/public/tinyradar/firmware/, replacing the previous release.
+// both to firmware/tinyradar/, replacing the previous release.
 // Commit and ship it like any change: a push to main redeploys kpow.xyz, and every
 // radar's page offers the update the next time someone opens it.
 
@@ -18,7 +18,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const REPO = "kpow/ESP32-Plane-Radar";
-const OUT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "client", "public", "tinyradar", "firmware");
+const OUT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "firmware", "tinyradar");
 
 const args = process.argv.slice(2);
 const tag = args.find((a) => !a.startsWith("--"));
@@ -50,7 +50,7 @@ try {
   copyFileSync(join(tmp, build.url), join(OUT, build.url));
   writeFileSync(join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 
-  console.log(`\ntinyradar ${manifest.version} is in client/public/tinyradar/firmware/:`);
+  console.log(`\ntinyradar ${manifest.version} is in firmware/tinyradar/:`);
   console.log(`  manifest.json  notes: ${JSON.stringify(manifest.notes ?? "")}`);
   console.log(`  ${build.url}  ${bin.length} bytes  md5 ${md5}`);
   console.log("\nNext: commit it on a branch and open a PR. Merging to main redeploys kpow.xyz.");

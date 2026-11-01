@@ -21,7 +21,7 @@ import { formatSize } from "@/lib/vizbot";
 // with CORS) and streams the .bin to the radar. This page says what's new, how
 // to install it, and offers the file for "Install from a file". The private
 // GitHub releases never show up here: scripts/publish-tinyradar-firmware.mjs
-// copies a release's files into client/public/tinyradar/firmware/.
+// copies a release's files into firmware/tinyradar/.
 
 /** null = no release published yet (404). */
 async function fetchManifest(): Promise<Manifest | null> {
