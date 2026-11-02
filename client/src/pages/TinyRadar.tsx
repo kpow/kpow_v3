@@ -13,14 +13,15 @@ import {
   HOST,
   PAGE_PART,
   PHOTOS,
+  WALKAROUND,
   RADAR_PART,
   SCREEN,
   type Part,
 } from "@/content/tinyradar";
 
 // tinyradar overview. Built from the same pieces as the vizMac and 8x8 labz
-// overviews; the long version is /tinyradar/guide. Pictures are renders of the
-// v2 case until photos of the printed gift units are in.
+// overviews; the long version is /tinyradar/guide. Pictures are of the first
+// finished unit, from the build log.
 
 function Hero() {
   return (
@@ -51,7 +52,7 @@ function Hero() {
         </div>
         <p className="vb-mono mt-4 text-xs text-muted-foreground">up to 64 planes · 6 ranges · 7 looks · updates over Wi-Fi</p>
       </div>
-      <Shot photo={PHOTOS.hero} priority caption="the v2 case · render" />
+      <Shot photo={PHOTOS.front} priority ratio="aspect-[4/5]" caption="the first one, with planes over its town" />
     </section>
   );
 }
@@ -115,12 +116,12 @@ function Parts() {
           part={RADAR_PART}
           art={
             <img
-              src={PHOTOS.section.src}
-              width={PHOTOS.section.w}
-              height={PHOTOS.section.h}
-              alt={PHOTOS.section.alt}
+              src={PHOTOS.threeQuarter.src}
+              width={PHOTOS.threeQuarter.w}
+              height={PHOTOS.threeQuarter.h}
+              alt={PHOTOS.threeQuarter.alt}
               loading="lazy"
-              className="block aspect-[4/3] w-full bg-[#0e1014] object-cover"
+              className="block aspect-[4/3] w-full bg-[#0e1014] object-cover object-[center_42%]"
             />
           }
         />
@@ -148,14 +149,14 @@ function ButtonBand() {
       <div className="grid items-center gap-7 rounded-2xl bg-[#0e1014] px-5 py-6 text-white shadow-[0_18px_50px_rgba(0,0,0,.28)] md:px-11 md:py-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
         <div>
           <Eyebrow className="text-[#1DFF86]">the controls</Eyebrow>
-          <h2 className="font-slackey text-[28px] font-normal leading-tight text-white md:text-4xl">One red button.</h2>
+          <h2 className="font-slackey text-[28px] font-normal leading-tight text-white md:text-4xl">One green button.</h2>
           <p className="mt-3 max-w-[50ch] text-[15px] leading-relaxed text-gray-300 md:text-base">
             Everything else is on its web page. The button is for the one thing you do most: look farther or closer.
           </p>
           <ul className="mt-5 grid gap-2.5">
             {BUTTON_ROWS.slice(0, 2).map((r) => (
               <li key={r.k} className="flex items-start gap-3 text-[15px] text-gray-200">
-                <span className="mt-0.5 grid h-[30px] w-[30px] flex-none place-items-center rounded-full bg-[#c62828] shadow-[inset_0_-3px_0_rgba(0,0,0,.35)]" aria-hidden="true" />
+                <span className="mt-0.5 grid h-[30px] w-[30px] flex-none place-items-center rounded-full bg-[#22c55e] shadow-[inset_0_-3px_0_rgba(0,0,0,.35)]" aria-hidden="true" />
                 <span>
                   <b className="font-bold text-white">{r.k}</b> <span className="text-gray-400">·</span> {r.v}
                 </span>
@@ -168,7 +169,21 @@ function ButtonBand() {
             </Btn>
           </div>
         </div>
-        <Shot photo={PHOTOS.button} caption={<span className="text-gray-400">its spot in the deck · render</span>} />
+        <figure className="m-0">
+          <video
+            src={WALKAROUND.src}
+            poster={WALKAROUND.poster}
+            width={WALKAROUND.w}
+            height={WALKAROUND.h}
+            aria-label={WALKAROUND.label}
+            controls
+            muted
+            playsInline
+            preload="none"
+            className="block aspect-video h-auto w-full rounded-xl bg-black"
+          />
+          <figcaption className="vb-mono mt-2.5 text-center text-xs text-gray-400">a press, then round the back · 33 s</figcaption>
+        </figure>
       </div>
     </section>
   );
@@ -212,7 +227,13 @@ function Case() {
       <SectionHeading>The case</SectionHeading>
       <Lead>Printed in four parts and held together with screws, so it can be opened again.</Lead>
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <Shot photo={PHOTOS.back} caption="the back: four screws hold the faceplate · render" />
+        <div className="grid gap-4">
+          <Shot photo={PHOTOS.faceplate} caption="the faceplate: carbon-fibre texture and a lime ring" />
+          <div className="grid grid-cols-2 gap-4">
+            <Shot photo={PHOTOS.wiring} ratio="aspect-square" caption="opened up: the wiring" />
+            <Shot photo={PHOTOS.testBodies} ratio="aspect-square" caption="the first case and three test bodies" />
+          </div>
+        </div>
         <Rows rows={CASE_FACTS} cols="sm:grid-cols-[120px_1fr]" />
       </div>
     </section>

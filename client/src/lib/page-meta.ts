@@ -48,7 +48,7 @@ export const CARDS = {
   vizspot: card("vizspot", "vizSpot: a 64×64 LED board showing what Spotify is playing"),
   vizmac: card("vizmac", "vizMac: a lit keyboard and the desk controller showing Now Playing"),
   labz: card("8x8", "8x8 labz: a handheld for drawing 8×8 pixel icons, with its LED matrix lit"),
-  tinyradar: card("tinyradar", "tinyradar: a small white cabinet with a round radar screen and a red range button"),
+  tinyradar: card("tinyradar", "tinyradar: a small black cabinet with a round radar screen showing planes, and a green range button"),
   led: card("led", "LED art: pixel grids running WLED"),
   shows: card("shows", "k-shows: concert clips"),
   phashboard: card("phashboard", "phashboard: Phish shows and PhantasyFish games"),

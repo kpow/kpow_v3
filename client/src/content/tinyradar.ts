@@ -35,37 +35,51 @@ export const FIRMWARE_DIR = "/tinyradar/firmware/";
 export const MANIFEST_URL = FIRMWARE_DIR + "manifest.json";
 
 // ------------------------------------------------------------------ images
-// The build log's renders of the v2 case (client/public/buildlog/radar/media),
-// reused here until photos of the printed gift units are in.
+// Photos of the first finished unit, from the build log
+// (client/public/buildlog/radar/media, synced from kpow-buildlog).
 
 const M = "/buildlog/radar/media/";
 
 export const PHOTOS = {
-  hero: {
-    src: M + "case-v2-hero.jpg",
-    w: 1600,
-    h: 1200,
-    alt: "A render of the tinyradar case: a small white cabinet with a round screen, a red range button and a printed keyboard on the deck",
+  front: {
+    src: M + "tinyradar-front.jpg",
+    w: 1200,
+    h: 1600,
+    alt: "tinyradar on a cutting mat: a small black cabinet with a lime ring round its screen, planes on a map of the town, a green range button and a lime keyboard on the deck",
   },
-  section: {
-    src: M + "case-v2-section.jpg",
-    w: 1600,
-    h: 1200,
-    alt: "A side cut through the case: the round screen tilted back in the faceplate, the board on the floor, vents in the side",
+  threeQuarter: {
+    src: M + "tinyradar-three-quarter.jpg",
+    w: 1200,
+    h: 1600,
+    alt: "tinyradar from the side: the carbon-fibre faceplate, the round screen with planes on it, the green button and the vents in the side",
   },
-  back: {
-    src: M + "case-v2-back.jpg",
+  faceplate: {
+    src: M + "faceplate.jpg",
     w: 1600,
     h: 1200,
-    alt: "The back of the case, with the four screw holes",
+    alt: "The faceplate held in a hand: carbon-fibre texture, a lime ring round the screen hole and lime rivets",
   },
-  button: {
-    src: M + "case-v2-button-recess.jpg",
+  wiring: {
+    src: M + "case-v2-wiring.jpg",
+    w: 1200,
+    h: 1600,
+    alt: "The open back of the body, with the wiring and its small white plugs",
+  },
+  testBodies: {
+    src: M + "case-v2-test-bodies.jpg",
     w: 1600,
     h: 1200,
-    alt: "The square recess in the deck that holds the range button",
+    alt: "The white first case beside three black test bodies of the new one",
   },
 } as const;
+
+export const WALKAROUND = {
+  src: M + "tinyradar-walkaround.mp4",
+  poster: M + "tinyradar-walkaround.jpg",
+  w: 1280,
+  h: 720,
+  label: "A walk round tinyradar: a press of the range button, then the back with its USB-C port",
+};
 
 // ------------------------------------------------------------------ overview
 
@@ -82,7 +96,7 @@ export const RADAR_PART: Part = {
     { k: "Screen", v: "a 1.28\" round display, 240 × 240, behind a ring in the faceplate." },
     { k: "Brain", v: "an ESP32-S3 with 8 MB of flash, on your home Wi-Fi." },
     { k: "Planes", v: "from adsb.fi's public feed, every 3 seconds. Up to 64 at once. No antenna or receiver." },
-    { k: "One button", v: "the red range button on the deck. Press it to see farther or closer." },
+    { k: "One button", v: "the green range button on the deck. Press it to see farther or closer." },
   ],
 };
 
