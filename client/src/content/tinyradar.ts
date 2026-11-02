@@ -355,7 +355,7 @@ export const RESET_NOTE =
 export interface Manifest {
   version: string;
   notes?: string;
-  builds: { s3?: { url: string; size: number; md5: string } };
+  builds: { "s3-4mb"?: { url: string; size: number; md5: string } };
 }
 
 export const INSTALL_STEPS: string[] = [

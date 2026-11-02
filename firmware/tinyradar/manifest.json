@@ -1,11 +1,11 @@
 {
-  "version": "1.0.0",
-  "notes": "First tinyradar release: the new name, a boot intro, and it starts straight on the radar once it knows where it is.",
+  "version": "1.1.0",
+  "notes": "Light ring support: 8 lights round the radar with radar and ambient effects. Built for the 4 MB tinyradar board.",
   "builds": {
-    "s3": {
-      "url": "tinyradar-s3-v1.0.0.bin",
-      "size": 1589200,
-      "md5": "285a836ccb14a18dcbe7a1717064c061"
+    "s3-4mb": {
+      "url": "tinyradar-s3-4mb-v1.1.0.bin",
+      "size": 1602112,
+      "md5": "1547db66179b189b696d219e814a7dd0"
     }
   }
 }
