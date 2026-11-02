@@ -295,6 +295,41 @@
 }
 .buildlog .hero-band .media-badge { top: 12px; left: 12px; }
 
+/* Hero shape, from the asset's own aspect ratio (set in BuildDetail).
+   wide: the banner above. tall / square: the hero sits beside the body,
+   shown whole at its natural ratio instead of being cropped to a strip. */
+.buildlog .hero-layout.wide .hero-band img,
+.buildlog .hero-layout.wide .hero-band video {
+  height: auto;
+  aspect-ratio: 16 / 7;
+  max-height: 440px;
+}
+.buildlog .hero-layout.tall,
+.buildlog .hero-layout.square {
+  display: grid;
+  grid-template-columns: minmax(0, var(--hero-w)) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.buildlog .hero-layout.tall { --hero-w: 340px; }
+.buildlog .hero-layout.square { --hero-w: 480px; }
+.buildlog .hero-layout.tall .hero-band img,
+.buildlog .hero-layout.tall .hero-band video,
+.buildlog .hero-layout.square .hero-band img,
+.buildlog .hero-layout.square .hero-band video {
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+}
+.buildlog .hero-layout.tall .build-body,
+.buildlog .hero-layout.square .build-body { margin-top: 16px; }
+@media (max-width: 760px) {
+  .buildlog .hero-layout.tall,
+  .buildlog .hero-layout.square { display: block; }
+  .buildlog .hero-layout.tall .hero-band,
+  .buildlog .hero-layout.square .hero-band { max-width: 360px; margin-inline: auto; }
+}
+
 /* ---------- Body copy (markdown) ---------- */
 .buildlog .build-body { max-width: var(--measure); margin: 24px 0 8px; }
 .buildlog .build-body p { color: var(--gray-1); margin: 0 0 14px; }
@@ -936,6 +971,7 @@
   width: 100%;
   height: 118px;
   object-fit: cover;
+  object-position: center 35%;
   background: var(--tint);
   border-bottom: 1px solid var(--border);
 }
@@ -1096,8 +1132,8 @@
 }
 @media (max-width: 720px) {
   .buildlog .detail-title { font-size: 24px; }
-  .buildlog .hero-band img,
-  .buildlog .hero-band video { height: 240px; }
+  .buildlog .hero-layout.wide .hero-band img,
+  .buildlog .hero-layout.wide .hero-band video { max-height: 240px; }
 }
 @media (max-width: 460px) {
   .buildlog .index-grid { grid-template-columns: 1fr; }

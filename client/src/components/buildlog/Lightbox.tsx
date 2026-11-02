@@ -138,6 +138,7 @@ export function Zoomable({
   poster,
   kind,
   className,
+  onRatio,
 }: {
   src: string;
   /** Never rendered on screen. Required so no call site can drop the accessible name. */
@@ -146,6 +147,8 @@ export function Zoomable({
   poster?: string;
   kind?: MediaKind;
   className?: string;
+  /** Reports width / height once the media's real size is known. */
+  onRatio?: (ratio: number) => void;
 }) {
   const open = useLightbox();
   const label = caption || alt;
@@ -166,9 +169,17 @@ export function Zoomable({
           aria-label={label}
           className={className}
           onClick={zoom}
+          onLoadedMetadata={(e) => onRatio?.(e.currentTarget.videoWidth / e.currentTarget.videoHeight)}
         />
       ) : (
-        <img src={src} alt={label} loading="lazy" className={className} onClick={zoom} />
+        <img
+          src={src}
+          alt={label}
+          loading="lazy"
+          className={className}
+          onClick={zoom}
+          onLoad={(e) => onRatio?.(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)}
+        />
       )}
       {badge && <span className="media-badge">{badge}</span>}
     </span>

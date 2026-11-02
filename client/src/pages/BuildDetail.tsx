@@ -1,5 +1,6 @@
 // /builds/:slug — one build: title bar, hero, Project Info, WIP Pix, devlog.
 
+import { useState } from "react";
 import { useParams } from "wouter";
 import { SEO } from "@/components/global/SEO";
 import { buildMeta } from "@/lib/page-meta";
@@ -60,6 +61,8 @@ function StatStrip({ build }: { build: Build }) {
 export default function BuildDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, error } = useBuildLog();
+  // width / height of the hero asset, known once it loads; wide until then
+  const [heroRatio, setHeroRatio] = useState({ slug: "", r: 2 });
 
   if (isLoading) {
     return (
@@ -91,6 +94,8 @@ export default function BuildDetail() {
 
   // The hero file is usually also attached to an entry; borrow that caption when
   // it has one. No caption means no bar, rather than a bar repeating the title.
+  const r = heroRatio.slug === slug ? heroRatio.r : 2;
+  const shape = r >= 1.6 ? "wide" : r < 0.9 ? "tall" : "square";
   const heroShot = build.picturesOverTime.find((p) => p.src === build.hero || p.src === build.heroVideo);
 
   return (
@@ -146,7 +151,8 @@ export default function BuildDetail() {
         </div>
       </div>
 
-      {/* hero */}
+      {/* hero: wide ones run full width; tall and square ones sit beside the body */}
+      <div className={`hero-layout ${shape}`}>
       {build.hero && (
         <figure className="hero-band">
           <Zoomable
@@ -155,6 +161,7 @@ export default function BuildDetail() {
             alt={build.title}
             caption={heroShot?.caption}
             kind={heroShot?.kind}
+            onRatio={(r) => r > 0 && setHeroRatio({ slug, r })}
           />
           {heroShot?.caption && (
             <figcaption className="hero-cap">
@@ -166,6 +173,7 @@ export default function BuildDetail() {
 
       {/* evergreen body */}
       {build.body && <Markdown className="build-body">{build.body}</Markdown>}
+      </div>
 
       {/* WIP pix */}
       <Filmstrip shots={build.picturesOverTime} buildTitle={build.title} />
