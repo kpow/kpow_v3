@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "notes": "First tinyradar release: the new name, a boot intro, and it starts straight on the radar once it knows where it is.",
+  "builds": {
+    "s3": {
+      "url": "tinyradar-s3-v1.0.0.bin",
+      "size": 1589200,
+      "md5": "285a836ccb14a18dcbe7a1717064c061"
+    }
+  }
+}
