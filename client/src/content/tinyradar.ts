@@ -210,7 +210,7 @@ export const PASTE_NOTE =
   "**Paste coordinates instead.** In Google Maps or Apple Maps, press and hold on your home, copy the numbers, and paste them into **Or paste coordinates**. Like `43.0731, -89.4012`.";
 
 export const LOCATION_NOTES: string[] = [
-  "The radar shows nothing until it has a location. The round screen keeps saying **Set your location** until then.",
+  "Until it has a location, the radar shows its rings and sweep but no planes, with a small **Set your location** card. The card goes away once you save a location.",
   "Drawing the map needs internet on your phone or laptop. **Skip, draw it later** is fine: the planes still show, just without the map.",
   "The map is only used by the **Day** and **Dusk** looks.",
   "Moved? Settings › **Location** › **Change location…**. Saving a new spot redraws the map.",
