@@ -83,7 +83,7 @@ function PlugIn() {
             <Rich text={PLUGIN_NOTE} />
           </Callout>
         </div>
-        <Shot photo={PHOTOS.hero} caption="the v2 case · render" />
+        <Shot photo={PHOTOS.threeQuarter} ratio="aspect-[3/4]" caption="a finished tinyradar" />
       </div>
     </section>
   );
@@ -139,7 +139,7 @@ function Button() {
   return (
     <section id="button" className={cn("mt-14 md:mt-16", sectionCls)}>
       <SectionHeading num={5}>the range button</SectionHeading>
-      <Lead>The red button on the deck. It decides how far the radar looks.</Lead>
+      <Lead>The green button on the deck. It decides how far the radar looks.</Lead>
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div className="min-w-0">
           <Rows rows={BUTTON_ROWS} cols="sm:grid-cols-[150px_1fr]" />
@@ -147,7 +147,7 @@ function Button() {
             <Rich text={BUTTON_NOTE} />
           </Callout>
         </div>
-        <Shot photo={PHOTOS.button} caption="the button's spot in the deck · render" />
+        <Shot photo={PHOTOS.front} ratio="aspect-[3/4]" caption="the range button, left of the keyboard" />
       </div>
     </section>
   );
