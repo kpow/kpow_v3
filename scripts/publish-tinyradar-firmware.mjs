@@ -34,8 +34,9 @@ const gh = (...a) => execFileSync("gh", a, { stdio: ["ignore", "inherit", "inher
 try {
   gh("release", "download", tag, "-R", REPO, "-p", "manifest.json", "-D", tmp);
   const manifest = JSON.parse(readFileSync(join(tmp, "manifest.json"), "utf8"));
-  const build = manifest.builds?.s3;
-  if (!build?.url || build.url.includes("/")) throw new Error("manifest.json has no plain builds.s3.url");
+  // "s3-4mb" = the 4 MB S3FH4R2 (every radar from v1.1.0; the 8 MB "s3" build is retired).
+  const build = manifest.builds?.["s3-4mb"];
+  if (!build?.url || build.url.includes("/")) throw new Error('manifest.json has no plain builds["s3-4mb"].url');
   if (manifest.version !== tag.slice(1)) throw new Error(`manifest says ${manifest.version}, tag is ${tag}`);
 
   gh("release", "download", tag, "-R", REPO, "-p", build.url, "-D", tmp);

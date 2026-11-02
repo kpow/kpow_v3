@@ -86,7 +86,7 @@ function FilePanel({ m, state }: { m: Manifest | null | undefined; state: "loadi
       </div>
     );
   }
-  const b = m?.builds.s3;
+  const b = m?.builds["s3-4mb"];
   if (!m || !b) {
     return (
       <div>
