@@ -14,7 +14,9 @@ import "./tinyradar.css";
 // `short` is the phone label.
 const TABS = [
   { name: "overview", short: "overview", href: "/tinyradar" },
-  { name: "user guide", short: "guide", href: "/tinyradar/guide" },
+  { name: "set up", short: "set up", href: "/tinyradar/guide" },
+  { name: "use", short: "use", href: "/tinyradar/use" },
+  { name: "help", short: "help", href: "/tinyradar/help" },
   { name: "updates", short: "updates", href: "/tinyradar/update" },
 ];
 

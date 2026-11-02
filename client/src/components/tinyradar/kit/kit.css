@@ -1,0 +1,190 @@
+/* The tinyradar guide kit (Option A, "storyboard"): the radar with its light
+   ring, the round status screens, the phone, the picture cards, the ring
+   playground and the photo placeholders. All scoped under .tinyradar. */
+
+/* ---------- the radar: screen + 8-LED ring ---------- */
+.tinyradar .trd { --s: 200px; position: relative; width: calc(var(--s) * 1.36); aspect-ratio: 1; display: grid; place-items: center; flex: none; }
+.tinyradar .trd.trd-plain { width: var(--s); }
+.tinyradar .trd-face { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #2a2d31, #121417 60%, #0b0c0e); box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 10px 30px -12px rgba(0,0,0,.6); }
+.tinyradar .trd.bare .trd-face { background: none; box-shadow: none; }
+.tinyradar .trd-lime { position: absolute; inset: calc(var(--s) * .06); border-radius: 50%; border: calc(var(--s) * .028) solid #d7e34a; opacity: .9; }
+.tinyradar .trd.bare .trd-lime { display: none; }
+.tinyradar .trd-scr { position: relative; width: var(--s); height: var(--s); border-radius: 50%; overflow: hidden; background: #000; box-shadow: 0 0 0 calc(var(--s) * .035) #050607, 0 0 0 calc(var(--s) * .045) #2b2f33; }
+.tinyradar .trd-plain .trd-scr { box-shadow: 0 0 0 1.5px #0a0a0a; }
+.tinyradar .trd-scr canvas { display: block; width: 100%; height: 100%; }
+.tinyradar .trd-led { position: absolute; left: 50%; top: 50%; width: calc(var(--s) * .085); height: calc(var(--s) * .085); margin: calc(var(--s) * -.0425); border-radius: 50%; background: #191c1f; box-shadow: inset 0 -2px 3px rgba(0,0,0,.6), inset 0 1px 1px rgba(255,255,255,.08); }
+/* the board's status light: a rainbow pulse while it starts and during setup */
+.tinyradar .trd-status { position: absolute; right: 4%; bottom: 4%; width: 14px; height: 14px; border-radius: 50%; animation: trStatus 3s linear infinite; }
+@keyframes trStatus {
+  0% { background: #ff3b3b; box-shadow: 0 0 10px 3px #ff3b3b88; }
+  25% { background: #ffd23b; box-shadow: 0 0 4px 1px #ffd23b55; }
+  50% { background: #3bff7a; box-shadow: 0 0 10px 3px #3bff7a88; }
+  75% { background: #3b8bff; box-shadow: 0 0 4px 1px #3b8bff55; }
+  100% { background: #ff3b3b; box-shadow: 0 0 10px 3px #ff3b3b88; }
+}
+/* a lone round screen (keys, strips) */
+.tinyradar .trd-solo { --s: 64px; position: relative; display: block; flex: none; width: var(--s); height: var(--s); border-radius: 50%; overflow: hidden; background: #000; box-shadow: 0 0 0 1.5px #0a0a0a, 0 0 0 calc(var(--s) * .05) #2b2f33; }
+
+/* ---------- round status screens (src/ui/status_screens.cpp) ---------- */
+.tinyradar .rs { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font-family: "Helvetica Neue", Arial, sans-serif; font-weight: 700; line-height: 1.18; font-size: calc(var(--s) * .062); }
+.tinyradar .rs.y { background: #FFE000; color: #0a0a0a; }
+.tinyradar .rs.k { background: #000; color: #fff; }
+.tinyradar .rs.clear { background: transparent; }
+.tinyradar .rs .t { font-size: 1.2em; }
+.tinyradar .rs .t.g { color: #1DFF86; }
+.tinyradar .rs .e { font-size: 1.1em; }
+.tinyradar .rs .n { font-weight: 500; }
+.tinyradar .rs .n.b { font-weight: 700; }
+.tinyradar .rs .sm { font-size: .85em; }
+.tinyradar .rs .big { font-size: 2em; color: #1DFF86; margin: .1em 0; }
+.tinyradar .rs.ring::after { content: ""; position: absolute; inset: 2px; border-radius: 50%; border: calc(var(--s) * .015 + 1px) solid #7C4DFF; }
+.tinyradar .rs.boot { background: radial-gradient(circle, transparent 44%, rgba(31,58,43,.9) 45%, transparent 46.5%), radial-gradient(circle, transparent 23%, rgba(31,58,43,.9) 24%, transparent 25.5%), #030605; color: #EAFFF3; font-size: calc(var(--s) * .15); }
+.tinyradar .rs.boot b { color: #1DFF86; font-weight: 400; }
+.tinyradar .rs.upd svg { position: absolute; inset: 6%; width: 88%; height: 88%; }
+.tinyradar .rs-card { background: rgba(3,6,5,.92); border: calc(var(--s) * .01 + 1px) solid #7C4DFF; border-radius: calc(var(--s) * .05); padding: .45em .7em; color: #EAFFF3; }
+.tinyradar .rs-card .n { color: #B69CFF; }
+.tinyradar .rs-spinwrap { position: absolute; inset: 0; animation: trSpin 1.2s linear infinite; }
+.tinyradar .rs-spinwrap i { position: absolute; width: 7%; height: 7%; margin: -3.5%; border-radius: 50%; background: #00ff00; }
+@keyframes trSpin { to { transform: rotate(360deg); } }
+.tinyradar .rs.off { background: #050607; }
+
+/* ---------- phone (drawn at 200px wide, scaled by PhoneMock) ---------- */
+.tinyradar .pm-box { position: relative; flex: none; }
+.tinyradar .pm { width: 200px; height: 422px; transform-origin: 0 0; border-radius: 28px; background: #0d0f12; padding: 7px; box-shadow: 0 0 0 1.5px #3a3f45 inset, 0 18px 40px -18px rgba(0,0,0,.55); }
+.tinyradar .pm-scr { width: 100%; height: 100%; border-radius: 22px; overflow: hidden; background: #f2f2f7; position: relative; font: 13px/1.35 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; color: #111; text-align: left; }
+.tinyradar .pm-scr::before { content: ""; position: absolute; top: 7px; left: 50%; width: 30%; height: 14px; margin-left: -15%; border-radius: 10px; background: #000; z-index: 3; }
+.tinyradar .pm-scr.dark { background: #030605; color: #EAFFF3; }
+.tinyradar .pm-scr > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.tinyradar .pm-sb { height: 30px; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; font-size: 11px; font-weight: 600; }
+.tinyradar .pm-sig { display: inline-flex; gap: 1.5px; align-items: flex-end; }
+.tinyradar .pm-sig i { width: 2.5px; background: currentColor; border-radius: 1px; }
+.tinyradar .pm-back { padding: 2px 12px; color: #007aff; font-size: 12px; }
+.tinyradar .pm-wl h4 { margin: 6px 14px 10px; font: 800 22px/1.2 -apple-system, system-ui, sans-serif; }
+.tinyradar .pm-grp { margin: 0 10px 12px; background: #fff; border-radius: 10px; overflow: hidden; }
+.tinyradar .pm-r { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-top: 1px solid #e5e5ea; font-size: 13px; color: #111; }
+.tinyradar .pm-r:first-child { border-top: 0; }
+.tinyradar .pm-r .pm-sig { color: #8e8e93; }
+.tinyradar .pm-cap { margin: 0 22px 4px; font-size: 10px; color: #6b6b70; text-transform: uppercase; letter-spacing: .04em; }
+.tinyradar .pm-r.hit { background: #e8f9ef; font-weight: 700; }
+.tinyradar .pm-sw { width: 30px; height: 18px; border-radius: 9px; background: #34c759; position: relative; }
+.tinyradar .pm-sw::after { content: ""; position: absolute; right: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+.tinyradar .pm-url { margin: 120px 12px 0; text-align: center; color: #555; font-size: 12px; display: grid; gap: 8px; }
+.tinyradar .pm-url b { background: #fff; border-radius: 10px; padding: 10px; font: 700 15px ui-monospace, Menlo, monospace; color: #111; box-shadow: 0 1px 3px #0002; }
+.tinyradar .pm-url small { font-size: 11px; color: #777; }
+/* the setup page (wifi_setup.cpp portal, recreated) */
+.tinyradar .pm-portal { padding: 6px 12px; color: #EAFFF3; font-size: 12px; }
+.tinyradar .pm-portal h1 { font: 800 20px/1.2 -apple-system, system-ui, sans-serif; margin: 2px 0; color: #EAFFF3; }
+.tinyradar .pm-portal h1 b { color: #1DFF86; }
+.tinyradar .pm-portal .lead { color: #8FAA9B; margin: 0 0 8px; font-size: 11.5px; }
+.tinyradar .pm-portal .lead b { color: #EAFFF3; }
+.tinyradar .pm-portal .net { background: #08100C; border: 1px solid #1F3A2B; border-radius: 7px; margin: 0 0 4px; padding: 7px 9px; display: flex; justify-content: space-between; font-weight: 600; }
+.tinyradar .pm-portal .net.on { border-color: #7C4DFF; }
+.tinyradar .pm-portal label { display: block; color: #8FAA9B; font-size: 11px; margin-top: 6px; }
+.tinyradar .pm-portal .in { background: #08100C; border: 1px solid #1F3A2B; border-radius: 7px; padding: 8px; margin: 3px 0 4px; color: #EAFFF3; }
+.tinyradar .pm-portal .in.f { outline: 2px solid #7C4DFF; border-color: #7C4DFF; }
+.tinyradar .pm-portal .btn { background: #7C4DFF; color: #fff; border-radius: 7px; height: 36px; line-height: 36px; text-align: center; font-weight: 700; font-size: 13px; margin-top: 8px; }
+.tinyradar .pm-portal .btn.o { background: none; border: 1px solid #1F3A2B; color: #EAFFF3; font-weight: 600; }
+.tinyradar .pm-portal .msg { background: #08100C; border: 1px solid #1F3A2B; border-left: 4px solid #7C4DFF; border-radius: 7px; padding: 10px; margin-top: 10px; }
+.tinyradar .pm-portal .msg .big { display: block; font-weight: 800; font-size: 17px; color: #1DFF86; margin: 0 0 6px; }
+.tinyradar .pm-portal .msg .addr { display: block; font: 700 15px ui-monospace, Menlo, monospace; color: #B69CFF; margin: 5px 0; }
+/* the radar's own page: "Where is your radar?" (web/index.html, recreated with a made-up map) */
+.tinyradar .pm-loc { padding: 4px 12px; color: #EAFFF3; font-size: 11px; }
+.tinyradar .pm-loc h1 { font: 400 17px/1.15 Slackey, system-ui; margin: 4px 0 4px; color: #EAFFF3; }
+.tinyradar .pm-loc .lede { color: #8FAA9B; margin: 0 0 8px; }
+.tinyradar .pm-loc .lbl { font: 600 10px "Roboto Mono", monospace; color: #8FAA9B; margin: 6px 0 3px; }
+.tinyradar .pm-loc .in { display: flex; justify-content: space-between; background: #000; border: 1px solid #1F3A2B; border-radius: 6px; padding: 6px 8px; color: #6b7b72; font: 500 10px "Roboto Mono", monospace; }
+.tinyradar .pm-loc .in b { color: #9AFFC8; text-decoration: underline; }
+.tinyradar .pm-loc .map { position: relative; height: 128px; border-radius: 6px; overflow: hidden; border: 1px solid #1F3A2B; }
+.tinyradar .pm-loc .map svg { display: block; width: 100%; height: 100%; }
+.tinyradar .pm-loc .seg { display: flex; gap: 4px; margin-top: 4px; }
+.tinyradar .pm-loc .seg span { border: 1px solid #1F3A2B; border-radius: 6px; padding: 4px 8px; font: 600 10px "Roboto Mono", monospace; color: #9AFFC8; }
+.tinyradar .pm-loc .seg span.on { border-color: #1DFF86; }
+.tinyradar .pm-loc .go { margin-top: 8px; border: 1px solid #1DFF86; border-radius: 7px; text-align: center; padding: 7px; font: 700 11px "Roboto Mono", monospace; color: #1DFF86; }
+
+/* ---------- picture cards (StepBoard) ---------- */
+.tinyradar .sb-board { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 14px; position: relative; }
+.tinyradar .sb-card { background: #fff; border: 1.5px solid #0a0a0a; border-radius: 16px; box-shadow: 3px 3px 0 #0a0a0a; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.tinyradar .sb-stage { height: 250px; display: grid; place-items: center; align-content: center; background: radial-gradient(circle at 50% 40%, #fff, #eef2f0); border-bottom: 1.5px solid #0a0a0a; position: relative; overflow: hidden; }
+.tinyradar .sb-stage.top { align-content: start; padding-top: 22px; }
+.tinyradar .sb-stage.dk { background: radial-gradient(circle at 50% 40%, #1b2420, #0b0f0d); }
+.tinyradar .sb-stage.photo { padding: 0; }
+.tinyradar .sb-stage.photo > img, .tinyradar .sb-stage.photo > video { width: 100%; height: 100%; object-fit: cover; }
+.tinyradar .sb-body { padding: 22px 14px 14px; position: relative; flex: 1; }
+.tinyradar .sb-num { position: absolute; top: -17px; left: 12px; }
+.tinyradar .sb-body h3 { margin: 0 0 4px; font: 700 15.5px/1.3 Roboto, system-ui, sans-serif; color: #0a0a0a; }
+.tinyradar .sb-body p { margin: 0; font-size: 13.5px; color: #4b5563; line-height: 1.45; }
+.tinyradar .sb-tag { position: absolute; bottom: 10px; right: 10px; z-index: 2; font: 700 10.5px var(--vb-mono); background: #fff; border: 1.5px solid #0a0a0a; border-radius: 6px; padding: 2px 6px; color: #0a0a0a; }
+.tinyradar .sb-tag.p { background: #7C4DFF; color: #fff; border-color: #7C4DFF; }
+.tinyradar .sb-arrow { position: absolute; top: 114px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: #0a0a0a; color: #1DFF86; display: grid; place-items: center; font: 700 13px Roboto; z-index: 2; pointer-events: none; }
+.tinyradar .sb-dots { display: none; }
+.tinyradar .tr-num { width: 34px; height: 34px; border-radius: 50%; background: #1DFF86; border: 1.5px solid #0a0a0a; display: grid; place-items: center; font: 700 15px Roboto, system-ui; box-shadow: 2px 2px 0 #0a0a0a; flex: none; color: #0a0a0a; }
+.tinyradar .tr-num.sm { width: 26px; height: 26px; font-size: 12.5px; box-shadow: 1.5px 1.5px 0 #0a0a0a; }
+@media (max-width: 1023px) {
+  .tinyradar .sb-board { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin: 0 -16px; padding: 4px 16px 14px; scrollbar-width: none; }
+  .tinyradar .sb-board::-webkit-scrollbar { display: none; }
+  .tinyradar .sb-card { flex: none; width: 74vw; max-width: 290px; scroll-snap-align: center; }
+  .tinyradar .sb-arrow { display: none; }
+  .tinyradar .sb-dots { display: flex; gap: 6px; justify-content: center; margin-top: 2px; }
+  .tinyradar .sb-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 4px; background: #d1d5db; transition: width .2s; }
+  .tinyradar .sb-dots button.on { background: #0a0a0a; width: 18px; }
+}
+
+/* ---------- bordered cards and pictures ---------- */
+.tinyradar .tr-card { border: 1.5px solid #0a0a0a; border-radius: 16px; box-shadow: 3px 3px 0 #0a0a0a; background: #fff; overflow: hidden; }
+.tinyradar .tr-dark { background: radial-gradient(circle at 50% 45%, #1c2622, #070908 70%); }
+.tinyradar .tr-shot { margin: 0; }
+.tinyradar .tr-shot img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1.5px solid #0a0a0a; background: #030605; }
+.tinyradar .tr-shot figcaption { font: 500 12px var(--vb-mono); color: #6b7280; margin-top: 6px; }
+.tinyradar .tr-shots { display: flex; gap: 14px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x mandatory; }
+.tinyradar .tr-shots .tr-shot { flex: none; width: 250px; scroll-snap-align: start; }
+.tinyradar .tr-mark { position: absolute; transform: translate(-50%, -50%); width: 24px; height: 24px; border-radius: 50%; background: #1DFF86; border: 1.5px solid #0a0a0a; box-shadow: 1.5px 1.5px 0 #0a0a0a; display: grid; place-items: center; font: 700 12px Roboto, system-ui; color: #0a0a0a; }
+.tinyradar .tr-crumb { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; font: 500 12.5px var(--vb-mono); background: #0a0a0a; color: #EAFFF3; border-radius: 8px; padding: 3px 9px; vertical-align: middle; }
+.tinyradar .tr-crumb i { color: #1DFF86; font-style: normal; }
+
+/* ---------- light ring playground ---------- */
+.tinyradar .rp { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); border: 1.5px solid #0a0a0a; border-radius: 20px; box-shadow: 4px 4px 0 #0a0a0a; overflow: hidden; background: #fff; }
+.tinyradar .rp-dev { background: radial-gradient(circle at 50% 45%, #1c2622, #070908 70%); display: grid; place-items: center; padding: 70px 10px 26px; position: relative; }
+.tinyradar .rp-now { position: absolute; left: 16px; top: 14px; right: 16px; font: 600 12px var(--vb-mono); color: #9AFFC8; }
+.tinyradar .rp-now small { display: block; color: #8FAA9B; font: 400 13px/1.4 Roboto, system-ui; max-width: 280px; margin-top: 4px; }
+.tinyradar .rp-play { position: absolute; right: 12px; bottom: 12px; font: 600 11.5px var(--vb-mono); background: #0a0a0a; color: #9AFFC8; border: 1px solid #1F3A2B; border-radius: 8px; padding: 5px 9px; cursor: pointer; }
+.tinyradar .rp-ctl { padding: 20px 22px; }
+.tinyradar .rp-grp { margin-bottom: 16px; }
+.tinyradar .rp-grp > .rp-lbl { display: block; font: 600 11px var(--vb-mono); letter-spacing: .08em; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
+.tinyradar .rp-seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.tinyradar .rp-seg button { font: 500 13.5px Roboto, system-ui; border: 1.5px solid #0a0a0a; background: #fff; color: #0a0a0a; border-radius: 9px; padding: 6px 12px; cursor: pointer; }
+.tinyradar .rp-seg button[aria-pressed="true"] { background: #1DFF86; box-shadow: 2px 2px 0 #0a0a0a; }
+.tinyradar .rp-seg .def::after { content: " · default"; font: 500 10px var(--vb-mono); color: #166534; }
+.tinyradar .rp-pals { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; }
+.tinyradar .rp-pals button { border: 0; background: none; padding: 0; cursor: pointer; text-align: center; font: 500 10.5px Roboto, system-ui; color: #374151; }
+.tinyradar .rp-pals i { display: block; aspect-ratio: 1; border-radius: 50%; margin: 0 auto 3px; width: 100%; max-width: 34px; -webkit-mask: radial-gradient(circle, transparent 52%, #000 54%); mask: radial-gradient(circle, transparent 52%, #000 54%); }
+.tinyradar .rp-pals button[aria-pressed="true"] i { outline: 2px solid #0a0a0a; outline-offset: 2px; }
+.tinyradar .rp-sl { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.tinyradar .rp-sl input { flex: 1; accent-color: #16a34a; min-width: 0; }
+.tinyradar .rp-sl output { font: 600 12px var(--vb-mono); width: 38px; text-align: right; }
+.tinyradar .rp-where { font-size: 13px; color: #4b5563; border-top: 1px dashed #e5e7eb; padding-top: 12px; margin-top: 4px; }
+.tinyradar .rp-alert-top { display: flex; gap: 14px; align-items: center; padding: 14px; }
+.tinyradar .rp-alert-top .t { color: #EAFFF3; font-size: 13px; }
+.tinyradar .rp-pill { font: 700 10.5px var(--vb-mono); border-radius: 6px; padding: 2px 7px; border: 1.5px solid #0a0a0a; }
+.tinyradar .rp-pill.on { background: #1DFF86; }
+.tinyradar .rp-pill.off { background: #fff; color: #4b5563; }
+.tinyradar .rp-sq { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.tinyradar .rp-sq span { font: 600 12px var(--vb-mono); background: #fff1f0; border: 1px solid #fecaca; color: #b91c1c; border-radius: 6px; padding: 2px 7px; }
+.tinyradar .rp-tbtn { font: 600 12px var(--vb-mono); background: #0a0a0a; color: #9AFFC8; border: 1px solid #1F3A2B; border-radius: 8px; padding: 6px 10px; cursor: pointer; margin-top: 8px; }
+.tinyradar .rp-align { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; padding: 18px; }
+.tinyradar .rp-ok { font: 600 13px var(--vb-mono); padding: 6px 10px; border-radius: 8px; display: inline-block; margin-top: 10px; }
+.tinyradar .rp-ok.y { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.tinyradar .rp-ok.n { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+@media (max-width: 1023px) {
+  .tinyradar .rp { grid-template-columns: 1fr; }
+  .tinyradar .rp-pals { grid-template-columns: repeat(5, 1fr); }
+  .tinyradar .rp-align { grid-template-columns: 1fr; justify-items: center; }
+}
+
+/* ---------- photo / clip placeholder ---------- */
+.tinyradar .tr-need { display: grid; place-items: center; text-align: center; padding: 14px; border: 2px dashed #e0457b; border-radius: 14px; color: #a3194d; background: repeating-linear-gradient(45deg, #fff0f5, #fff0f5 10px, #ffe3ee 10px, #ffe3ee 20px); font: 600 12px/1.35 var(--vb-mono); }
+.tinyradar .tr-need b { display: block; font-size: 11px; letter-spacing: .08em; margin-bottom: 4px; }
+.tinyradar .tr-need code { display: block; margin-top: 6px; font-size: 10.5px; color: #be185d; opacity: .8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tinyradar .trd-status, .tinyradar .rs-spinwrap { animation: none; }
+}

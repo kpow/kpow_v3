@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ArrowRight, BookOpen, Box, Download, Hammer, Map, MapPin, Power, RefreshCw, Smartphone } from "lucide-react";
+import { ArrowRight, BookOpen, Box, Download, Hammer, LifeBuoy, Lightbulb, Map, MapPin, Power, RefreshCw, Smartphone } from "lucide-react";
 import { SEO } from "@/components/global/SEO";
 import { TinyRadarShell, Scope } from "@/components/tinyradar/TinyRadarShell";
 import { Rows, Shot } from "@/components/labz/bits";
@@ -38,7 +38,7 @@ function Hero() {
         </p>
         <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
           <Btn href="/tinyradar/guide" icon={<BookOpen className="h-[17px] w-[17px]" />}>
-            Read the guide
+            Set it up
           </Btn>
           <Btn href="/tinyradar/update" kind="outline" icon={<Download className="h-[17px] w-[17px]" />}>
             Updates
@@ -164,7 +164,7 @@ function ButtonBand() {
             ))}
           </ul>
           <div className="mt-[22px]">
-            <Btn href="/tinyradar/guide#button" kind="ondark" iconRight={<ArrowRight className="h-4 w-4" />}>
+            <Btn href="/tinyradar/use#button" kind="ondark" iconRight={<ArrowRight className="h-4 w-4" />}>
               The range button
             </Btn>
           </div>
@@ -245,8 +245,20 @@ function Next() {
     {
       href: "/tinyradar/guide",
       icon: <BookOpen className="h-6 w-6 text-[var(--vb-yellow-ink)]" />,
-      t: "The user guide",
-      d: "Plugging it in, Wi-Fi from your phone, your location, the web page, and what to do when something's off.",
+      t: "Set it up",
+      d: "Plug it in, Wi-Fi from your phone, tell it where it is. About five minutes.",
+    },
+    {
+      href: "/tinyradar/use",
+      icon: <Lightbulb className="h-6 w-6 text-[var(--vb-yellow-ink)]" />,
+      t: "Make it yours",
+      d: "Read the screen, the range button, seven looks, the new light ring.",
+    },
+    {
+      href: "/tinyradar/help",
+      icon: <LifeBuoy className="h-6 w-6 text-[var(--vb-yellow-ink)]" />,
+      t: "Fix it",
+      d: "Short answers to what usually goes wrong.",
     },
     {
       href: "/tinyradar/update",
@@ -262,7 +274,7 @@ function Next() {
     },
   ];
   return (
-    <section className="mt-12 grid gap-4 md:mt-14 lg:grid-cols-3">
+    <section className="mt-12 grid gap-4 md:mt-14 md:grid-cols-2 xl:grid-cols-3">
       {cards.map((c) => (
         <VbLink
           key={c.href}
