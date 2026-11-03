@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Clock, Download, ShieldCheck, Usb } from "lucide-react";
 import { SEO } from "@/components/global/SEO";
@@ -5,7 +6,7 @@ import { useHashScroll } from "@/components/vizbot/VizBotShell";
 import { TinyRadarShell } from "@/components/tinyradar/TinyRadarShell";
 import { Bullets } from "@/components/labz/bits";
 import { Callout, Code, Eyebrow, Lead, NumBadge, Rich, SectionHeading, VbLink, linkCls } from "@/components/vizbot/bits";
-import { FixList, Media, Shot, SubHead } from "@/components/tinyradar/kit/bits";
+import { FixList, Media, Shot, SubHead, showSlot } from "@/components/tinyradar/kit/bits";
 import { RingDevice } from "@/components/tinyradar/kit/RingDevice";
 import {
   CAPTURES,
@@ -164,7 +165,7 @@ function Looks() {
     <section className="mt-12 md:mt-14">
       <SectionHeading>what you'll see</SectionHeading>
       <Lead>A dot on Settings, one button, then the round screen counts it in.</Lead>
-      <div className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={cn("grid items-start gap-5 sm:grid-cols-2", showSlot("updating") && "lg:grid-cols-3")}>
         <Shot img={CAPTURES.updateReady} caption="1 · Settings › Updates" className="mx-auto w-full max-w-[280px]" />
         <figure className="m-0">
           <div className="tr-card tr-dark grid place-items-center px-4 py-8">
@@ -172,10 +173,12 @@ function Looks() {
           </div>
           <figcaption className="vb-mono mt-1.5 text-[12px] text-gray-500">2 · the round screen: Updating, Don't unplug</figcaption>
         </figure>
-        <figure className="m-0">
-          <Media id="updating" ratio="1 / 1" />
-          <figcaption className="vb-mono mt-1.5 text-[12px] text-gray-500">3 · on the desk</figcaption>
-        </figure>
+        {showSlot("updating") ? (
+          <figure className="m-0">
+            <Media id="updating" ratio="1 / 1" />
+            <figcaption className="vb-mono mt-1.5 text-[12px] text-gray-500">3 · on the desk</figcaption>
+          </figure>
+        ) : null}
       </div>
     </section>
   );

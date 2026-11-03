@@ -1,9 +1,10 @@
+import { cn } from "@/lib/utils";
 import { SEO } from "@/components/global/SEO";
 import { useHashScroll } from "@/components/vizbot/VizBotShell";
 import { TinyRadarShell } from "@/components/tinyradar/TinyRadarShell";
 import { Callout, Rich, VbLink, linkCls } from "@/components/vizbot/bits";
 import { JumpBar, useActiveSection } from "@/components/vizbot/docs";
-import { Crumb, GuideHero, GuideSection, Media, MiniSteps, NextCards, Num, OnThisPage, Shot, SubHead } from "@/components/tinyradar/kit/bits";
+import { Crumb, GuideHero, GuideSection, Media, MiniSteps, NextCards, Num, OnThisPage, Shot, SubHead, showSlot } from "@/components/tinyradar/kit/bits";
 import { RingDevice, Scope } from "@/components/tinyradar/kit/RingDevice";
 import { RoundScreen } from "@/components/tinyradar/kit/RoundScreen";
 import { AlertCards, LineItUp, RingPlayground } from "@/components/tinyradar/kit/RingPlayground";
@@ -161,6 +162,7 @@ function Looks() {
 }
 
 function Ring() {
+  const clips = (["ringBeam", "ringRadarFx", "ringAmbient"] as const).filter(showSlot);
   return (
     <GuideSection
       id="ring"
@@ -171,11 +173,13 @@ function Ring() {
     >
       <RingPlayground />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <Media id="ringBeam" ratio={null} className="aspect-[3/1] sm:aspect-[16/10]" />
-        <Media id="ringRadarFx" ratio={null} className="aspect-[3/1] sm:aspect-[16/10]" />
-        <Media id="ringAmbient" ratio={null} className="aspect-[3/1] sm:aspect-[16/10]" />
-      </div>
+      {clips.length ? (
+        <div className={cn("mt-5 grid gap-3", clips.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>
+          {clips.map((id) => (
+            <Media key={id} id={id} ratio={null} className="aspect-[3/1] sm:aspect-[16/10]" />
+          ))}
+        </div>
+      ) : null}
 
       <SubHead>On your phone</SubHead>
       <p className="m-0 mb-3 max-w-[640px] text-[15px] text-gray-700">

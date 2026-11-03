@@ -126,10 +126,16 @@ export function Shot({ img, caption, className, children }: { img: Img; caption?
   );
 }
 
-/** A photo or clip that's still to come: a marked box until SLOTS[id].src is set. */
+/** True once SLOTS[id] has a file. In dev, empty slots show too, as marked boxes. */
+export function showSlot(id: keyof typeof SLOTS): boolean {
+  return Boolean(SLOTS[id].src) || import.meta.env.DEV;
+}
+
+/** A photo or clip that's still to come: a marked box in dev until SLOTS[id].src is set, nothing in production. */
 /** `ratio: null` leaves the shape to `className`. */
 export function Media({ id, className, ratio }: { id: keyof typeof SLOTS; className?: string; ratio?: string | null }) {
   const s: Slot = SLOTS[id];
+  if (!showSlot(id)) return null;
   const style = ratio === null ? undefined : { aspectRatio: ratio ?? `${s.w} / ${s.h}` };
   if (s.src) {
     return s.kind === "clip" ? (
