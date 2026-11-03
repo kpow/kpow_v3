@@ -206,13 +206,20 @@ writes each page's tags into index.html.
 - Check every route the way a crawler sees it:
   `node scripts/check-page-meta.mjs http://localhost:5000` (or `https://kpow.xyz`).
 
-## tinyradar (`/tinyradar`, `/tinyradar/guide`, `/tinyradar/update`)
+## tinyradar (`/tinyradar`, `/tinyradar/guide`, `/use`, `/help`, `/update`)
 
 The desk plane radar, called Plane Radar until Nov 2026 (its repo is still the
 private kpow/ESP32-Plane-Radar). Copy lives in `client/src/content/tinyradar.ts`,
 checked against the radar repo; styles are scoped under `.tinyradar`
 (`components/tinyradar/tinyradar.css`, green accent).
 
+- The guide is three pages: `/tinyradar/guide` (set it up), `/use` (make it yours,
+  incl. the light ring playground) and `/help` (fix it). Old `/tinyradar/guide#anchors`
+  redirect via `MOVED_ANCHORS`. Their pieces are in `components/tinyradar/kit/`:
+  `ring.ts` is a port of the firmware's `led_ring.cpp` (keep it in step), plus
+  RingDevice, RoundScreen (status_screens.cpp words), PhoneMock and StepBoard.
+  Captures live in `client/public/images/tinyradar/`; photos still to shoot are
+  `SLOTS` in the content file (`src: null` shows a marked placeholder).
 - The radar's own web page (`http://tinyradar.local`) reads
   `https://kpow.xyz/tinyradar/firmware/manifest.json` and downloads the `.bin`
   it names. Older firmware reads `/plane-radar/firmware/`. `server/routes/tinyradar-routes.ts`

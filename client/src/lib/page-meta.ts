@@ -166,8 +166,18 @@ export const STATIC_PAGES: Record<string, PageMeta> = {
     CARDS.tinyradar,
   ),
   "/tinyradar/guide": page(
-    "tinyradar user guide",
-    "Setting up tinyradar: Wi-Fi from your phone, your location and map, its web page at tinyradar.local, the range button, the seven looks, updates, fixes and factory reset.",
+    "Set up tinyradar",
+    "From the box to the planes in about five minutes: plug it in, Wi-Fi from your phone, then tell it where it is on tinyradar.local.",
+    CARDS.tinyradar,
+  ),
+  "/tinyradar/use": page(
+    "Make tinyradar yours",
+    "Reading tinyradar's round screen, the range button, its seven looks, the new light ring (try every effect here) and its web page at tinyradar.local.",
+    CARDS.tinyradar,
+  ),
+  "/tinyradar/help": page(
+    "tinyradar help",
+    "Short fixes for tinyradar: the setup network, tinyradar.local, no planes, no map, a new router, restart and factory reset.",
     CARDS.tinyradar,
   ),
   "/tinyradar/update": page(

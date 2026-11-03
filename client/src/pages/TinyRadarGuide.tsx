@@ -1,308 +1,229 @@
-import { ChevronDown } from "lucide-react";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 import { SEO } from "@/components/global/SEO";
 import { useHashScroll } from "@/components/vizbot/VizBotShell";
 import { TinyRadarShell } from "@/components/tinyradar/TinyRadarShell";
-import { Bullets, Rows, Shot } from "@/components/labz/bits";
-import { Callout, Code, Lead, Rich, SectionHeading, Step, SubHead, VbLink, linkCls } from "@/components/vizbot/bits";
-import { DocHero, JumpBar, Toc, sectionCls, useActiveSection } from "@/components/vizbot/docs";
+import { Callout, Rich, VbLink, linkCls } from "@/components/vizbot/bits";
+import { JumpBar, useActiveSection } from "@/components/vizbot/docs";
+import { GuideHero, GuideSection, Media, MiniSteps, NextCards, OnThisPage, SubHead } from "@/components/tinyradar/kit/bits";
+import { StepBoard, type Board } from "@/components/tinyradar/kit/StepBoard";
+import { RingDevice, Scope } from "@/components/tinyradar/kit/RingDevice";
+import { lookOf } from "@/components/tinyradar/kit/looks";
+import { RoundScreen } from "@/components/tinyradar/kit/RoundScreen";
+import { PhoneMock } from "@/components/tinyradar/kit/PhoneMock";
 import {
-  BUTTON_NOTE,
-  BUTTON_ROWS,
-  CHANGE_WIFI_NOTE,
-  CHANGE_WIFI_STEPS,
-  FIXES,
+  CAPTURES,
+  DONE_CARDS,
   GUIDE_TOC,
-  HOST,
-  HOTSPOT,
-  HOTSPOT_IP,
-  LOCATION_NOTES,
+  LOCAL_NOTE,
   LOCATION_STEPS,
-  LOOKS,
-  LOOK_STEPS,
-  MAP_CREDIT,
-  PAGE_NOTES,
-  PAGE_TABS,
+  MOVED_ANCHORS,
   PASTE_NOTE,
-  PHOTOS,
+  PHONE_SHOTS,
+  PLUGIN_CARDS,
   PLUGIN_NOTE,
-  PLUGIN_STEPS,
-  RESET_NOTE,
-  RESET_STEPS,
-  SETTINGS_ROWS,
-  UPDATE_SAFE,
-  UPDATE_STEPS,
-  WIFI_SCREEN,
-  WIFI_STEPS,
+  SLOTS,
+  WIFI_CARDS,
+  WIFI_KEY,
+  WIFI_NOTE,
 } from "@/content/tinyradar";
 import { cn } from "@/lib/utils";
+import "@/components/tinyradar/kit/kit.css";
 
-// tinyradar user guide: from the box to the planes, then the web page, the
-// button, the looks, updates and fixes. The overview is /tinyradar.
-// Layout on vizBot's doc frame: DocHero, sticky Toc, JumpBar.
+// tinyradar, part 1 of the guide: set it up. Plug in, Wi-Fi from a phone,
+// location, done. Making it yours is /tinyradar/use, fixes are /tinyradar/help.
+// Old anchors (#page, #button, #looks, #help, #reset, #update) moved: see
+// MOVED_ANCHORS.
 
-function Steps({ items }: { items: readonly string[] }) {
-  return (
-    <div className="grid gap-2.5">
-      {items.map((s, i) => (
-        <Step key={i} n={i + 1}>
-          <Rich text={s} />
-        </Step>
-      ))}
-    </div>
-  );
-}
-
-/** The round screen's yellow setup screen, in words, as the radar draws it. */
-function SetupScreen() {
-  return (
-    <figure className="m-0">
-      <div className="mx-auto grid aspect-square w-full max-w-[240px] place-items-center rounded-full bg-[#FFE000] p-6 text-center text-[#0a0a0a] shadow-[0_0_0_10px_#0e1014,0_0_0_12px_#6b7280]">
-        <div className="leading-snug">
-          <p className="text-[17px] font-bold">Wi-Fi setup</p>
-          <p className="mt-1 text-[13px]">1. Join network:</p>
-          <p className="text-[15px] font-bold">{HOTSPOT}</p>
-          <p className="mt-1 text-[13px]">2. Open in browser:</p>
-          <p className="text-[15px] font-bold">{HOST}</p>
-          <p className="text-[12px]">or {HOTSPOT_IP}</p>
-        </div>
-      </div>
-      <figcaption className="vb-mono mt-5 text-center text-xs text-muted-foreground">the round screen, first time</figcaption>
-    </figure>
-  );
+/** Sends old /tinyradar/guide#anchors to the page that has them now. */
+function useMovedAnchors() {
+  const [, navigate] = useLocation();
+  useEffect(() => {
+    const check = () => {
+      const to = MOVED_ANCHORS[window.location.hash.slice(1)];
+      if (to) navigate(to, { replace: true });
+    };
+    check();
+    window.addEventListener("hashchange", check);
+    return () => window.removeEventListener("hashchange", check);
+  }, [navigate]);
 }
 
 function PlugIn() {
+  const items: Board[] = [
+    {
+      bg: "photo",
+      stage: <img src={CAPTURES.back.src} width={CAPTURES.back.w} height={CAPTURES.back.h} alt={CAPTURES.back.alt} loading="lazy" />,
+      ...PLUGIN_CARDS[0],
+    },
+    SLOTS.bootClip.src
+      ? { bg: "photo", stage: <Media id="bootClip" className="h-full !rounded-none !border-0" />, ...PLUGIN_CARDS[1] }
+      : { bg: "dark", stage: <RingDevice size={140} screen="boot" />, ...PLUGIN_CARDS[1] },
+    { bg: "dark", stage: <RingDevice size={140} screen="setup" status />, tag: { text: "Wi-Fi setup" }, ...PLUGIN_CARDS[2] },
+  ];
   return (
-    <section id="plugin" className={cn("mt-9 lg:mt-10", sectionCls)}>
-      <SectionHeading num={1}>plug it in</SectionHeading>
-      <Lead>You need the radar, a USB-C cable, a USB charger and your phone.</Lead>
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="min-w-0">
-          <Steps items={PLUGIN_STEPS} />
-          <Callout className="mt-3.5">
-            <Rich text={PLUGIN_NOTE} />
-          </Callout>
-        </div>
-        <Shot photo={PHOTOS.threeQuarter} ratio="aspect-[3/4]" caption="a finished tinyradar" />
+    <GuideSection
+      id="plugin"
+      num={1}
+      title="plug it in"
+      lead="You need the radar, a USB-C cable, a USB charger and your phone."
+      chips={["10 seconds", "USB-C cable", "any USB charger"]}
+    >
+      <div className="lg:max-w-[760px]">
+        <StepBoard items={items} label="Plugging it in" />
       </div>
-    </section>
+      <Callout className="mt-4 max-w-[760px]">
+        <Rich text={PLUGIN_NOTE} />
+      </Callout>
+    </GuideSection>
   );
 }
 
 function Wifi() {
+  const items: Board[] = [
+    { bg: "top", stage: <PhoneMock kind="wifi" src={PHONE_SHOTS.wifi} width={165} />, ...WIFI_CARDS[0] },
+    { bg: "top", stage: <PhoneMock kind="portal" src={PHONE_SHOTS.portal} width={165} />, tag: { text: "2.4 GHz only" }, ...WIFI_CARDS[1] },
+    { bg: "top", stage: <PhoneMock kind="saved" src={PHONE_SHOTS.saved} width={165} />, ...WIFI_CARDS[2] },
+    { bg: "dark", stage: <RingDevice size={140} screen="connecting" />, ...WIFI_CARDS[3] },
+    { bg: "dark", stage: <RingDevice size={140} screen="location" />, tag: { text: "you're online", purple: true }, ...WIFI_CARDS[4] },
+  ];
   return (
-    <section id="wifi" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={2}>Wi-Fi setup</SectionHeading>
-      <Lead>The radar makes its own little Wi-Fi network for setup. Your phone joins it for a minute to tell it your home Wi-Fi.</Lead>
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_260px]">
-        <div className="min-w-0">
-          <Steps items={WIFI_STEPS} />
-        </div>
-        <SetupScreen />
-      </div>
+    <GuideSection
+      id="wifi"
+      num={2}
+      title="Wi-Fi from your phone"
+      lead="The radar makes its own little Wi-Fi network. Your phone joins it for a minute to tell it your home Wi-Fi."
+      chips={["about 2 minutes", "your phone", "a 2.4 GHz home Wi-Fi"]}
+    >
+      <StepBoard items={items} label="Wi-Fi setup" />
+
       <SubHead>What the round screen says</SubHead>
-      <Rows rows={WIFI_SCREEN} cols="sm:grid-cols-[150px_1fr]" />
-    </section>
+      <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
+        {WIFI_KEY.map((r) => (
+          <li
+            key={r.k}
+            className={cn(
+              "flex items-center gap-3 rounded-[14px] border px-3 py-2.5",
+              r.bad ? "border-amber-200 bg-amber-50" : "border-gray-200 bg-white",
+            )}
+          >
+            <RoundScreen kind={r.screen} size={64} />
+            <div className="min-w-0">
+              <b className="block text-[14px] text-gray-900">{r.k}</b>
+              <span className="block text-[13px] leading-snug text-gray-600">
+                <Rich text={r.v} />
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <Callout className="mt-4">
+        <Rich text={WIFI_NOTE} />
+      </Callout>
+      <p className="mt-3 text-[14px] text-gray-600">
+        Still stuck?{" "}
+        <VbLink href="/tinyradar/help#setting-up" className={linkCls}>
+          Setting up, on the help page
+        </VbLink>
+      </p>
+    </GuideSection>
   );
 }
 
 function Location() {
   return (
-    <section id="location" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={3}>your location and map</SectionHeading>
-      <Lead>The radar needs to know where it is. This happens on its web page, from any phone or laptop on your Wi-Fi.</Lead>
-      <Steps items={LOCATION_STEPS} />
-      <Callout className="mt-3.5">
-        <Rich text={PASTE_NOTE} />
-      </Callout>
-      <Bullets className="mt-5" items={LOCATION_NOTES} />
-    </section>
-  );
-}
-
-function Page() {
-  return (
-    <section id="page" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={4}>the web page</SectionHeading>
-      <Lead>
-        <Code>http://{HOST}</Code> is the radar's own page. It runs on the radar, so it only opens on the same Wi-Fi.
-      </Lead>
-      <Rows rows={PAGE_TABS} cols="sm:grid-cols-[110px_1fr]" />
-      <SubHead>Settings</SubHead>
-      <Rows rows={SETTINGS_ROWS} cols="sm:grid-cols-[150px_1fr]" />
-      <Bullets className="mt-5" items={PAGE_NOTES} />
-    </section>
-  );
-}
-
-function Button() {
-  return (
-    <section id="button" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={5}>the range button</SectionHeading>
-      <Lead>The green button on the deck. It decides how far the radar looks.</Lead>
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+    <GuideSection
+      id="location"
+      num={3}
+      title="tell it where it is"
+      lead="The radar needs to know where it is. You tell it on its own web page, from any phone or laptop on your Wi-Fi."
+      chips={["about 1 minute", "phone or laptop", "same Wi-Fi as the radar"]}
+    >
+      <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-10">
         <div className="min-w-0">
-          <Rows rows={BUTTON_ROWS} cols="sm:grid-cols-[150px_1fr]" />
-          <Callout className="mt-3.5">
-            <Rich text={BUTTON_NOTE} />
-          </Callout>
-        </div>
-        <Shot photo={PHOTOS.front} ratio="aspect-[3/4]" caption="the range button, left of the keyboard" />
-      </div>
-    </section>
-  );
-}
-
-function Looks() {
-  return (
-    <section id="looks" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={6}>looks</SectionHeading>
-      <Lead>Seven of them. Day and Dusk put your map under the planes. The other five are classic radar screens.</Lead>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-        {LOOKS.map((l) => (
-          <li key={l.name} className="rounded-xl border border-gray-200 bg-white p-3 text-center">
-            <span
-              className="mx-auto block aspect-square w-full max-w-[84px] rounded-full"
-              style={{
-                background: `radial-gradient(circle, ${l.plane} 0 5%, transparent 6%), radial-gradient(circle, transparent 46%, ${l.ring} 47% 49%, transparent 50%), ${
-                  l.water ? `linear-gradient(160deg, transparent 58%, ${l.water} 59% 72%, transparent 73%), ` : ""
-                }${l.bg}`,
-                boxShadow: "0 0 0 1.5px #0a0a0a",
-              }}
-              aria-hidden="true"
-            />
-            <span className="mt-2 block text-[14px] font-bold text-gray-900">{l.name}</span>
-            <span className="block text-[12px] text-muted-foreground">{l.note}</span>
-          </li>
-        ))}
-      </ul>
-      <SubHead>Change it</SubHead>
-      <Steps items={LOOK_STEPS} />
-      <p className="mt-3.5 text-[13px] text-muted-foreground">{MAP_CREDIT}</p>
-    </section>
-  );
-}
-
-function Update() {
-  return (
-    <section id="update" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={7}>updates</SectionHeading>
-      <Lead>
-        New versions install from the radar's web page, over Wi-Fi. What's new is on{" "}
-        <VbLink href="/tinyradar/update" className={linkCls}>
-          the updates page
-        </VbLink>
-        .
-      </Lead>
-      <Steps items={UPDATE_STEPS} />
-      <SubHead>If something goes wrong</SubHead>
-      <Bullets items={UPDATE_SAFE} />
-    </section>
-  );
-}
-
-function Help() {
-  return (
-    <section id="help" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={8}>if something's off</SectionHeading>
-      <Lead>What usually goes wrong, and what to do about it.</Lead>
-      {/* phones: disclosures; wider: cards */}
-      <div className="mt-[18px] grid gap-2 md:hidden">
-        {FIXES.map((f, i) => (
-          <details key={f.title} open={i === 0} className="rounded-[10px] border border-gray-200 bg-white">
-            <summary className="flex cursor-pointer items-center justify-between gap-2.5 px-3.5 py-[13px] text-[15px] font-bold text-gray-900">
-              {f.title}
-              <ChevronDown className="vb-chev h-4 w-4 flex-none text-gray-600" />
-            </summary>
-            <p className="px-3.5 pb-3.5 text-sm leading-relaxed text-gray-700">
-              <Rich text={f.body} />
+          <MiniSteps items={LOCATION_STEPS} />
+          <details className="mt-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
+            <summary className="cursor-pointer text-[14.5px] font-bold text-gray-900">Tip: paste coordinates instead</summary>
+            <p className="m-0 mt-1.5 text-[14px] leading-relaxed text-gray-700">
+              <Rich text={PASTE_NOTE} />
             </p>
           </details>
-        ))}
+          <Callout className="mt-3">
+            <Rich text={LOCAL_NOTE} />
+          </Callout>
+        </div>
+        <figure className="m-0 grid justify-items-center gap-2 rounded-2xl border-[1.5px] border-[#0a0a0a] bg-[radial-gradient(circle_at_50%_40%,#fff,#eef2f0)] p-5 shadow-[3px_3px_0_#0a0a0a]">
+          <PhoneMock kind="location" src={PHONE_SHOTS.location} width={200} />
+          <figcaption className="vb-mono text-center text-[11.5px] text-gray-500">tinyradar.local, the first time</figcaption>
+        </figure>
       </div>
-      <div className="mt-5 hidden gap-3.5 md:grid md:grid-cols-2">
-        {FIXES.map((f) => (
-          <div key={f.title} className="rounded-xl border border-gray-200 bg-white p-[18px]">
-            <h3 className="vb-plain mb-1.5 text-[15px] font-bold text-gray-900">{f.title}</h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              <Rich text={f.body} />
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
+    </GuideSection>
   );
 }
 
-function Reset() {
+function Done() {
   return (
-    <section id="reset" className={cn("mt-14 md:mt-16", sectionCls)}>
-      <SectionHeading num={9}>change Wi-Fi or start over</SectionHeading>
-      <Lead>Both are in the radar's Settings. Neither needs a cable or a button inside the case.</Lead>
-      <SubHead>Change Wi-Fi</SubHead>
-      <Steps items={CHANGE_WIFI_STEPS} />
-      <Callout className="mt-3.5">
-        <Rich text={CHANGE_WIFI_NOTE} />
-      </Callout>
-      <SubHead>Factory reset</SubHead>
-      <Steps items={RESET_STEPS} />
-      <Callout className="mt-3.5">
-        <Rich text={RESET_NOTE} />
-      </Callout>
-    </section>
+    <GuideSection id="done" num={4} title="you're done" lead="Give it a few seconds. The rings fill with the planes around you.">
+      <div className="tr-card tr-dark mb-6 flex flex-col items-center justify-center gap-5 px-4 py-7 sm:flex-row sm:gap-10">
+        <figure className="m-0 grid justify-items-center gap-2">
+          <RingDevice size={130} screen="nolocation" ring={{ fx: "Breathe" }} />
+          <figcaption className="vb-mono text-[11.5px] text-gray-400">before: no location yet</figcaption>
+        </figure>
+        <span className="font-slackey text-2xl text-[#1DFF86] max-sm:rotate-90" aria-hidden="true">
+          →
+        </span>
+        <figure className="m-0 grid justify-items-center gap-2">
+          <RingDevice size={130} ring={{ fx: "Breathe" }} tOff={2} />
+          <figcaption className="vb-mono text-[11.5px] text-gray-400">after: your planes</figcaption>
+        </figure>
+      </div>
+      <NextCards
+        cards={DONE_CARDS.map((c, i) => ({
+          ...c,
+          art:
+            i === 1 ? (
+              <RingDevice size={34} bare ring={{ fx: "Comet", pal: "Rainbow" }} still={3} label="" />
+            ) : (
+              <Scope size={44} look={lookOf(i === 0 ? "Day" : "Amber")} label="" />
+            ),
+        }))}
+      />
+    </GuideSection>
   );
 }
 
 export default function TinyRadarGuide() {
-  const active = useActiveSection(GUIDE_TOC);
+  useMovedAnchors();
   useHashScroll();
+  const active = useActiveSection(GUIDE_TOC);
 
   return (
     <>
       <SEO />
       <TinyRadarShell>
-        <DocHero
-          eyebrow="user guide · tinyradar"
+        <GuideHero
+          eyebrow="set it up · tinyradar"
           title="From the box to the planes."
           lead={
             <>
-              Plugging it in, Wi-Fi from your phone, telling it where it is, and everything on its web page. The
-              overview is on <span className="vb-mono text-[.92em]">/tinyradar</span>.
+              Four steps, about five minutes. After that it just runs. Then{" "}
+              <VbLink href="/tinyradar/use" className={linkCls}>
+                make it yours
+              </VbLink>
+              , or{" "}
+              <VbLink href="/tinyradar/help" className={linkCls}>
+                fix something
+              </VbLink>
+              .
             </>
           }
-          quick={[
-            { t: "Wi-Fi setup", d: "Join TinyRadar-Setup from your phone.", href: "wifi", n: 2 },
-            { t: "Your location", d: "Find your town, draw the map.", href: "location", n: 3 },
-            { t: "Stuck?", d: "Common problems and fixes.", href: "help", n: 8 },
-          ]}
         />
+        <OnThisPage items={GUIDE_TOC} />
         <JumpBar items={GUIDE_TOC} active={active} />
-        <div className="mt-2 grid gap-14 lg:grid-cols-[220px_minmax(0,1fr)]">
-          <Toc
-            items={GUIDE_TOC}
-            active={active}
-            label="Guide sections"
-            footer={
-              <VbLink
-                href="/tinyradar/update"
-                className="mt-3 flex items-center gap-2 px-2 py-1 text-[13px] text-gray-600 no-underline hover:text-gray-900"
-              >
-                Updates and downloads
-              </VbLink>
-            }
-          />
-          <div className="min-w-0">
-            <PlugIn />
-            <Wifi />
-            <Location />
-            <Page />
-            <Button />
-            <Looks />
-            <Update />
-            <Help />
-            <Reset />
-          </div>
-        </div>
+        <PlugIn />
+        <Wifi />
+        <Location />
+        <Done />
       </TinyRadarShell>
     </>
   );
