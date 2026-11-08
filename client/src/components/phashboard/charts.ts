@@ -357,7 +357,9 @@ export function mapChart(host: HTMLElement, venues: Row[], shows: Row[]) {
   const sh = shows.filter((s) => s.lat != null).sort((a, b) => a.date.localeCompare(b.date));
   const proj = d3.geoMercator().fitExtent([[40, 30], [W - 40, H - 30]], { type: "MultiPoint", coordinates: vs.map((v) => [v.lon, v.lat]) } as any);
   const path = d3.geoPath(proj);
-  svg.append("path").datum(d3.geoGraticule().step([5, 5])()).attr("d", path).attr("fill", "none").attr("stroke", C.grid);
+  const clipId = "pb-map-clip";
+  svg.append("clipPath").attr("id", clipId).append("rect").attr("width", W).attr("height", H);
+  svg.append("path").datum(d3.geoGraticule().step([5, 5])()).attr("d", path).attr("fill", "none").attr("stroke", C.grid).attr("clip-path", `url(#${clipId})`);
   const legs: any[] = [];
   for (let i = 1; i < sh.length; i++) {
     const a = sh[i - 1], b = sh[i];
