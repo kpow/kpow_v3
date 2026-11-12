@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>StackChan servo freeze: test report</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&family=Slackey&display=swap">
+<style>
+/* A one-off page in kpow.xyz's own look: hex-pattern page, black bar, one white card, Slackey headings, yellow vizBot badges. Not linked from the site. */
+:root {
+  --ink: #0a0a0a;
+  --muted: #525252;
+  --line: #e5e7eb;
+  --soft: #f3f4f6;
+  --yellow: #ffd23f;
+  --yellow-soft: #fff6d1;
+  --yellow-ink: #854d0e;
+  --blue: #0097fb;
+  --blue-ink: #0369a1;
+  --red: #c81e1e;
+  --red-soft: #fdecec;
+  --green: #15803d;
+  --green-soft: #e7f6ec;
+  --display: "Slackey", system-ui, sans-serif;
+  --body: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  background-color: #fafafa;
+  background-image:
+    linear-gradient(30deg, #ebebeb 12%, transparent 12.5%, transparent 87%, #ebebeb 87.5%, #ebebeb),
+    linear-gradient(150deg, #ebebeb 12%, transparent 12.5%, transparent 87%, #ebebeb 87.5%, #ebebeb),
+    linear-gradient(30deg, #ebebeb 12%, transparent 12.5%, transparent 87%, #ebebeb 87.5%, #ebebeb),
+    linear-gradient(150deg, #ebebeb 12%, transparent 12.5%, transparent 87%, #ebebeb 87.5%, #ebebeb),
+    linear-gradient(60deg, #ebebeb77 25%, transparent 25.5%, transparent 75%, #ebebeb77 75%, #ebebeb77),
+    linear-gradient(60deg, #ebebeb77 25%, transparent 25.5%, transparent 75%, #ebebeb77 75%, #ebebeb77);
+  background-size: 40px 69.282px;
+  background-position: 0 0, 0 0, 20px 34.641px, 20px 34.641px, 0 0, 20px 34.641px;
+}
+img, video { max-width: 100%; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.12; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--blue-ink); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, video:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+code {
+  font-family: var(--mono); font-size: .825em; background: var(--soft);
+  border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; overflow-wrap: anywhere;
+}
+
+.bar { background: rgba(0, 0, 0, .95); color: #fff; }
+.bar-in { max-width: 1024px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: baseline; gap: 12px; }
+.bar .mark { font-family: var(--display); font-size: 22px; }
+.bar .tag { font-family: var(--mono); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #a3a3a3; }
+
+main { max-width: 1024px; margin: 0 auto; padding: 24px 16px 48px; }
+.sheet {
+  background: #fff; border-radius: 8px; padding: 20px 16px 28px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
+  display: flex; flex-direction: column; gap: 44px;
+}
+@media (min-width: 768px) { .sheet { padding: 36px 40px 44px; } }
+
+.eyebrow { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--yellow-ink); }
+.hero { display: flex; flex-direction: column; gap: 14px; }
+.hero h1 { font-size: clamp(30px, 6vw, 46px); max-width: 18ch; }
+.lede { font-size: 18px; max-width: 62ch; color: #262626; }
+
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 6px; }
+@media (min-width: 768px) { .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.stat { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+.stat b { font-family: var(--display); font-weight: 400; font-size: clamp(24px, 7vw, 34px); line-height: 1.1; white-space: nowrap; }
+.stat span { font-size: 14px; color: var(--muted); }
+.stat.bad { border-color: #f3b8b8; background: var(--red-soft); }
+.stat.bad b { color: var(--red); }
+
+section { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.head { display: flex; align-items: center; gap: 12px; }
+.badge {
+  flex: none; width: 30px; height: 30px; display: grid; place-items: center;
+  font-family: var(--display); font-size: 13px; background: var(--yellow);
+  border: 1.5px solid var(--ink); border-radius: 8px;
+}
+h2 { font-size: clamp(22px, 4vw, 30px); }
+h3 { font-size: 18px; }
+.note { color: var(--muted); font-size: 15px; max-width: 70ch; }
+.body { max-width: 70ch; }
+ul.plain { margin: 0; padding-left: 20px; max-width: 70ch; display: flex; flex-direction: column; gap: 6px; }
+
+.clips { display: grid; gap: 20px; }
+@media (min-width: 900px) { .clips { grid-template-columns: 1fr 1fr; } }
+.clip { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.clip video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; }
+.clip-in { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.clip-meta { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.jumps { display: flex; flex-direction: column; gap: 6px; }
+.jump {
+  display: flex; align-items: baseline; gap: 10px; text-align: left; width: 100%;
+  font: inherit; font-size: 15px; color: var(--ink); background: #fff; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+}
+.jump:hover { border-color: var(--ink); }
+.jump time { flex: none; font-family: var(--mono); font-size: 13px; font-weight: 500; min-width: 3.4em; color: var(--blue-ink); }
+.jump .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; align-self: center; background: #a3a3a3; }
+.jump .dot.red { background: var(--red); }
+.jump .dot.green { background: var(--green); }
+.jump .dot.off { background: var(--ink); }
+
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); background: #fafafa; white-space: nowrap; }
+td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.mono { font-family: var(--mono); font-size: 13.5px; white-space: nowrap; }
+.pill { display: inline-block; font-size: 13px; font-weight: 500; border-radius: 999px; padding: 1px 9px; white-space: nowrap; }
+.pill.red { background: var(--red-soft); color: var(--red); }
+.pill.green { background: var(--green-soft); color: var(--green); }
+.pill.grey { background: var(--soft); color: #404040; }
+
+.files { display: grid; gap: 12px; }
+@media (min-width: 768px) { .files { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.file { display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; text-decoration: none; color: var(--ink); min-width: 0; }
+.file:hover { border-color: var(--ink); }
+.file b { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--blue-ink); overflow-wrap: anywhere; }
+.file span { font-size: 14px; color: var(--muted); }
+
+.callout { border: 1.5px solid var(--ink); background: var(--yellow-soft); border-radius: 12px; padding: 14px 16px; max-width: 70ch; }
+
+footer { max-width: 1024px; margin: 0 auto; padding: 0 16px 40px; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="bar-in">
+  <span class="mark">kpow</span>
+  <span class="tag">support report</span>
+</div></div>
+
+<main><div class="sheet">
+
+  <div class="hero">
+    <p class="eyebrow">StackChan · test of 12 November 2026</p>
+    <h1>Both head servos freeze, and the unit shuts itself off</h1>
+    <p class="lede">M5Stack support asked for a ribbon-cable check, then a video if the fault was still there. The check did not fix it. This page has the videos, the log and the test program.</p>
+    <div class="stats">
+      <div class="stat bad"><b>6</b><span>servo freezes</span></div>
+      <div class="stat"><b>12 min</b><span>of running, in 4 runs</span></div>
+      <div class="stat bad"><b>2</b><span>times the unit shut itself off</span></div>
+      <div class="stat"><b>4.0 V</b><span>battery at each start, USB unplugged</span></div>
+    </div>
+  </div>
+
+  <section id="videos">
+    <div class="head"><span class="badge">1</span><h2>The videos</h2></div>
+    <p class="note">The screen shows a test clock (<code>T+</code>), a freeze counter and each servo's reply status, so the video can be matched to the log second by second. The videos have no sound. Use the buttons to jump to each event.</p>
+    <div class="clips">
+
+      <div class="clip">
+        <video id="v1" controls playsinline preload="metadata" poster="run4-shutdown.jpg" src="run4-shutdown.mp4"></video>
+        <div class="clip-in">
+          <p class="clip-meta">Video 1 · run 4 · 2 min 08 s</p>
+          <h3>A freeze, then the unit shuts off</h3>
+          <div class="jumps">
+            <button class="jump" data-v="v1" data-t="4"><time>0:04</time><span class="dot"></span><span>Waiting screen: USB unplugged, battery 4.05 V</span></button>
+            <button class="jump" data-v="v1" data-t="21"><time>0:23</time><span class="dot green"></span><span>Test starts (T+ 0:00)</span></button>
+            <button class="jump" data-v="v1" data-t="73"><time>1:16</time><span class="dot red"></span><span>Both servos stop answering (T+ 0:53)</span></button>
+            <button class="jump" data-v="v1" data-t="101"><time>1:46</time><span class="dot off"></span><span>Servo power is cycled and the unit shuts off (T+ 1:23)</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="clip">
+        <video id="v2" controls playsinline preload="metadata" poster="run5-recovery.jpg" src="run5-recovery.mp4"></video>
+        <div class="clip-in">
+          <p class="clip-meta">Video 2 · run 5 · 5 min 36 s</p>
+          <h3>Two freezes, two recoveries</h3>
+          <div class="jumps">
+            <button class="jump" data-v="v2" data-t="0"><time>0:02</time><span class="dot green"></span><span>Test starts (T+ 0:00)</span></button>
+            <button class="jump" data-v="v2" data-t="146"><time>2:29</time><span class="dot red"></span><span>Both servos stop answering (T+ 2:27)</span></button>
+            <button class="jump" data-v="v2" data-t="176"><time>3:00</time><span class="dot green"></span><span>Servo power is cycled and they come back (T+ 2:58)</span></button>
+            <button class="jump" data-v="v2" data-t="295"><time>4:58</time><span class="dot red"></span><span>Both stop answering again (T+ 4:56)</span></button>
+            <button class="jump" data-v="v2" data-t="323"><time>5:26</time><span class="dot green"></span><span>They come back by themselves (T+ 5:24)</span></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="asked">
+    <div class="head"><span class="badge">2</span><h2>What support asked for</h2></div>
+    <div class="scroll"><table>
+      <thead><tr><th>M5's step (9 November)</th><th>Done</th></tr></thead>
+      <tbody>
+        <tr><td>Fully charge</td><td>Charged to 100% (4.17 V, charger stopped) on 11 November</td></tr>
+        <tr><td>Power off, disconnect USB</td><td>Yes</td></tr>
+        <tr><td>Press the black 7-pin ribbon cable down at the marked spot</td><td>Yes, on 12 November before the first run</td></tr>
+        <tr><td>Power on and check</td><td>Runs 2 to 5 below, all on battery with USB unplugged</td></tr>
+        <tr><td>Send a video if it persists</td><td>The two videos above</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="program">
+    <div class="head"><span class="badge">3</span><h2>The test program</h2></div>
+    <p class="body">It uses only M5Stack's own libraries: M5Unified 0.2.29, M5GFX 0.2.36 and StackChan-BSP at commit <code>8d4d6fc</code>. No WiFi, audio, LEDs or camera.</p>
+    <ul class="plain">
+      <li>Head motion goes through <code>M5StackChan.Motion.move()</code> and nothing else. A new random pose every 3 seconds: yaw ±60°, pitch 15° to 50° above the BSP's default zero, speed 400.</li>
+      <li>Both servos are pinged every 500 ms. No reply to two pings in a row counts as a freeze.</li>
+      <li>During a freeze the program keeps sending moves. After 30 seconds it switches servo power off for 500 ms and on again.</li>
+      <li>Power is left as <code>M5.begin()</code> sets it (5 V output on) for the whole test.</li>
+    </ul>
+    <div class="files">
+      <a class="file" href="stackchan-servo-test-1.2-src.zip" download><b>stackchan-servo-test-1.2-src.zip</b><span>Source: one .cpp file, platformio.ini and a README. 11 KB.</span></a>
+      <a class="file" href="stackchan-servo-test-1.2-factory.bin" download><b>stackchan-servo-test-1.2-factory.bin</b><span>Ready to flash to a CoreS3 at offset 0x0. 810 KB.</span></a>
+      <a class="file" href="servotest-2026-11-12.csv" download><b>servotest-2026-11-12.csv</b><span>The unit's own log: one row a second, plus a row for every event. 92 KB.</span></a>
+    </div>
+  </section>
+
+  <section id="runs">
+    <div class="head"><span class="badge">4</span><h2>The runs</h2></div>
+    <p class="note">All four started from a battery reading of 4.02 to 4.09 V with USB unplugged. Run 1 in the log is a setup run from 11 November on a discharged battery and is not part of these results.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Run</th><th>Start</th><th>Length</th><th class="num">Freezes</th><th>How it ended</th></tr></thead>
+      <tbody>
+        <tr><td>2</td><td class="mono">08:13:10</td><td class="num">3 min 24 s</td><td class="num">2</td><td><span class="pill grey">Stopped with the power button</span></td></tr>
+        <tr><td>3</td><td class="mono">08:17:50</td><td class="num">16 s</td><td class="num">1</td><td><span class="pill red">Unit shut itself off</span> during the freeze</td></tr>
+        <tr><td>4 (video 1)</td><td class="mono">08:27:55</td><td class="num">1 min 23 s</td><td class="num">1</td><td><span class="pill red">Unit shut itself off</span> as servo power was cycled</td></tr>
+        <tr><td>5 (video 2)</td><td class="mono">08:31:23</td><td class="num">7 min 06 s</td><td class="num">2</td><td><span class="pill grey">Stopped with the power button</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="freezes">
+    <div class="head"><span class="badge">5</span><h2>Every freeze</h2></div>
+    <p class="note">In all six, the yaw and pitch servos stopped answering in the same second, within 3 seconds of a new move command.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Run</th><th>Clock</th><th>Test time</th><th>Silent for</th><th>How it ended</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2</td><td class="mono">08:14:49</td><td class="mono">T+ 1:39</td><td class="num">1.6 s</td><td><span class="pill green">Came back by itself</span></td></tr>
+        <tr><td>2</td><td>2</td><td class="mono">08:15:31</td><td class="mono">T+ 2:21</td><td class="num">31.9 s</td><td><span class="pill green">Servo power cycle</span></td></tr>
+        <tr><td>3</td><td>3</td><td class="mono">08:17:57</td><td class="mono">T+ 0:07</td><td class="num">9 s or more</td><td><span class="pill red">Unit shut itself off</span></td></tr>
+        <tr><td>4</td><td>4</td><td class="mono">08:28:49</td><td class="mono">T+ 0:54</td><td class="num">30 s</td><td><span class="pill red">Unit shut itself off</span> at the servo power cycle</td></tr>
+        <tr><td>5</td><td>5</td><td class="mono">08:33:50</td><td class="mono">T+ 2:27</td><td class="num">31.9 s</td><td><span class="pill green">Servo power cycle</span></td></tr>
+        <tr><td>6</td><td>5</td><td class="mono">08:36:19</td><td class="mono">T+ 4:56</td><td class="num">28.7 s</td><td><span class="pill green">Came back by itself</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="shutdowns">
+    <div class="head"><span class="badge">6</span><h2>The two shutdowns</h2></div>
+    <ul class="plain">
+      <li>After each one, AXP2101 register <code>0x21</code> (power-off source) read <code>0x08</code>: system voltage (VSYS) under-voltage.</li>
+      <li>The base battery read 3.49 V (run 3) and 3.50 V (run 4) one second before, drawing 0.9 A. The charge level read 86% and 89% afterwards.</li>
+      <li>The run after each shutdown records it in its <code>START</code> row (<code>off_src 08</code>), and the waiting screen shows it as <code>last shutdown: power chip: system voltage too low</code>. Video 1 opens on that screen.</li>
+    </ul>
+  </section>
+
+  <section id="measurements">
+    <div class="head"><span class="badge">7</span><h2>Measurements</h2></div>
+    <div class="scroll"><table>
+      <thead><tr><th>What</th><th>Reading</th></tr></thead>
+      <tbody>
+        <tr><td>Battery at rest, before each run</td><td>4.02 to 4.09 V at 0.13 to 0.16 A</td></tr>
+        <tr><td>Battery during the test</td><td>3.24 to 3.86 V at 0.6 to 1.4 A</td></tr>
+        <tr><td>Battery current during a freeze</td><td>0.7 to 0.9 A, the same as while the servos hold a pose</td></tr>
+        <tr><td>Servo supply, as the servos report it</td><td>5.1 to 5.4 V in every reading up to each freeze. One reading of 4.4 V, in the first second after a servo power cycle</td></tr>
+        <tr><td>Servo temperature</td><td>16 to 31 °C</td></tr>
+        <tr><td>Servo status byte</td><td>0 in every reading</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The battery voltage and current come from the base's INA226, once a second. A dip shorter than that would not show.</p>
+
+    <h3>Charging, measured the same morning</h3>
+    <p class="note">USB plugged in, unit idle.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>CoreS3 5 V output</th><th>USB voltage seen by the AXP2101</th><th>Battery</th></tr></thead>
+      <tbody>
+        <tr><td>Off (<code>M5.Power.setExtOutput(false)</code>)</td><td class="num">4.66 V</td><td>Charging at 0.33 A</td></tr>
+        <tr><td>On (the state <code>M5.begin()</code> leaves it in)</td><td class="num">0 V</td><td>Discharging at 0.36 A</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="next">
+    <div class="head"><span class="badge">8</span><h2>Only this unit</h2></div>
+    <p class="callout"><b>My other StackChans are fine.</b> I have two other StackChans, and they do not show this behavior at all.</p>
+    <p class="body"><b>Before the cable check.</b> A 2-hour run on 6 November with my own firmware logged 29 freezes on this unit, each cleared by a servo power cycle.</p>
+  </section>
+
+</div></main>
+
+<footer>Kevin Power · kpow.xyz · written 12 November 2026</footer>
+
+<script>
+// Jump buttons: seek that video to just before the event and play.
+document.querySelectorAll(".jump").forEach(function (b) {
+  b.addEventListener("click", function () {
+    var v = document.getElementById(b.dataset.v);
+    v.currentTime = Number(b.dataset.t);
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {});
+    v.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
+});
+</script>
+</body>
+</html>
