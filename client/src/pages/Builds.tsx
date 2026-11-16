@@ -5,6 +5,7 @@ import { SEO } from "@/components/global/SEO";
 import { useBuildLog } from "@/lib/buildlog";
 import { BuildCard } from "@/components/buildlog/BuildCard";
 import { BuildLogError, BuildLogLoading, BuildLogShell } from "@/components/buildlog/BuildLogShell";
+import { LatestEntries } from "@/components/buildlog/LatestEntries";
 import { Crumbs } from "@/components/buildlog/Crumbs";
 import { SectionHead } from "@/components/buildlog/SectionHead";
 
@@ -42,6 +43,8 @@ export default function Builds() {
 
       {data && (
         <>
+          <SectionHead title="On the bench now" count="latest from each build" />
+          <LatestEntries recent={data.recent} builds={data.builds} />
           <SectionHead
             title="All builds"
             count={`${data.builds.length} project${data.builds.length === 1 ? "" : "s"}`}
