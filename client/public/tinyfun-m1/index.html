@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>tinyFun M1 in 3D · kpow.xyz</title>
+<meta name="description" content="Spin, explode and take apart the tinyFun M1 module carrier: real KiCad copper and silkscreen with every module modelled.">
+<meta property="og:title" content="tinyFun M1 in 3D">
+<meta property="og:description" content="Spin, explode and take apart the tinyFun M1 module carrier.">
+<meta property="og:image" content="https://kpow.xyz/tinyfun-m1/share.jpg">
+<meta property="og:url" content="https://kpow.xyz/tinyfun-m1/index.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&family=Slackey&display=swap">
+<style>
+/* kpow.xyz look: hex-pattern page, black bar, one white sheet, Slackey headings, yellow active state.
+   The 3D stage stays dark so the green board and the lit screen read. */
+:root{
+  --ink:#0a0a0a; --muted:#525252; --line:#e5e7eb; --soft:#f3f4f6;
+  --yellow:#ffd23f; --yellow-ink:#854d0e; --blue:#0097fb; --blue-ink:#0369a1;
+  --stage-a:#2b3530; --stage-b:#0c100e; --stage-ink:#9fb0a6; --tip:#0a0a0a; --tip-ink:#fafafa;
+  --display:"Slackey",system-ui,sans-serif; --body:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Roboto Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-color:#fafafa;
+  background-image:
+    linear-gradient(30deg,#ebebeb 12%,transparent 12.5%,transparent 87%,#ebebeb 87.5%,#ebebeb),
+    linear-gradient(150deg,#ebebeb 12%,transparent 12.5%,transparent 87%,#ebebeb 87.5%,#ebebeb),
+    linear-gradient(30deg,#ebebeb 12%,transparent 12.5%,transparent 87%,#ebebeb 87.5%,#ebebeb),
+    linear-gradient(150deg,#ebebeb 12%,transparent 12.5%,transparent 87%,#ebebeb 87.5%,#ebebeb),
+    linear-gradient(60deg,#ebebeb77 25%,transparent 25.5%,transparent 75%,#ebebeb77 75%,#ebebeb77),
+    linear-gradient(60deg,#ebebeb77 25%,transparent 25.5%,transparent 75%,#ebebeb77 75%,#ebebeb77);
+  background-size:40px 69.282px;
+  background-position:0 0,0 0,20px 34.641px,20px 34.641px,0 0,20px 34.641px}
+h1,h2{font-family:var(--display);font-weight:400;line-height:1.1;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:var(--blue-ink);text-decoration-thickness:1.5px;text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.bar{background:rgba(0,0,0,.95);color:#fff}
+.bar-in{max-width:1240px;margin:0 auto;padding:12px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.bar .mark{font-family:var(--display);font-size:22px;color:#fff;text-decoration:none}
+.bar .tag{font-family:var(--mono);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#a3a3a3}
+.bar .tag a{color:#a3a3a3}
+main{max-width:1240px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.sheet{background:#fff;border-radius:8px;padding:20px 16px 24px;box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);display:flex;flex-direction:column;gap:20px}
+@media (min-width:768px){.sheet{padding:32px 36px 36px}}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 24px}
+.eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow-ink)}
+h1{font-size:clamp(30px,6vw,46px);margin-top:6px}
+.lede{font-size:17px;max-width:62ch;color:#262626;margin-top:8px}
+.views{display:flex;flex-wrap:wrap;gap:6px}
+button.v{font:500 14px var(--body);color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+button.v:hover{border-color:var(--ink)}
+button.v[aria-pressed="true"]{background:var(--yellow);border-color:var(--ink)}
+.work{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}
+#stage{position:relative;border-radius:12px;overflow:hidden;min-height:620px;background:radial-gradient(120% 90% at 50% 35%,var(--stage-a),var(--stage-b));touch-action:none}
+#c{display:block;width:100%;height:100%;position:absolute;inset:0;cursor:grab}
+#c:active{cursor:grabbing}
+.hint{position:absolute;left:14px;bottom:12px;font:12px var(--mono);color:var(--stage-ink);pointer-events:none}
+.load{position:absolute;right:14px;bottom:12px;font:12px var(--mono);color:var(--stage-ink)}
+#tip{position:absolute;pointer-events:none;background:var(--tip);color:var(--tip-ink);font:13px/1.35 var(--body);padding:7px 10px;border-radius:6px;max-width:240px;transform:translate(12px,12px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#tip b{display:block;font-weight:500}
+#tip i{font-style:normal;opacity:.7;font-family:var(--mono);font-size:11.5px}
+aside{border:1px solid var(--line);border-radius:12px;padding:14px 14px 16px;display:flex;flex-direction:column;gap:14px;min-width:0;max-height:620px;overflow:auto}
+aside h2{font:500 11px var(--mono);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.row{display:grid;grid-template-columns:18px 12px minmax(0,1fr);align-items:start;gap:8px;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
+.row:first-of-type{border-top:0}
+.row input{margin:3px 0 0;accent-color:var(--ink)}
+.sw{width:12px;height:12px;border-radius:3px;margin-top:4px;border:1px solid rgba(0,0,0,.3)}
+.row .n{font-size:15px;font-weight:500}
+.row .d{font:12px/1.4 var(--mono);color:var(--muted)}
+.row .tag{font:500 10px var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--yellow-ink);background:#fff6d1;border-radius:4px;padding:1px 5px;margin-left:6px}
+.ctl{display:flex;flex-direction:column;gap:8px}
+.ctl label{display:flex;justify-content:space-between;font-size:15px;font-weight:500}
+.ctl output{font:12px var(--mono);color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--ink)}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.facts{font:12px/1.65 var(--mono);color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.foot{font-size:14px;color:var(--muted)}
+@media (max-width:860px){
+  .work{grid-template-columns:1fr}
+  #stage{min-height:0;aspect-ratio:4/5;max-width:100%}
+  aside{max-height:none}
+}
+</style>
+</head>
+<body>
+<div class="bar"><div class="bar-in">
+  <a class="mark" href="/">kpow</a>
+  <span class="tag"><a href="/builds/kfun">builds / kfun</a> / tinyfun m1</span>
+</div></div>
+<main>
+<div class="sheet">
+  <div class="top">
+    <div>
+      <div class="eyebrow">kFun · module carrier · 34 × 70 mm</div>
+      <h1>tinyFun M1</h1>
+      <p class="lede">The board as ordered from JLC, with every module that gets soldered onto it. Drag to spin it, pull it apart with Explode, and hover any part to see what it is.</p>
+    </div>
+    <div class="views" role="group" aria-label="Camera view">
+      <button class="v" id="v-iso" aria-pressed="true">3/4</button>
+      <button class="v" id="v-front" aria-pressed="false">Front</button>
+      <button class="v" id="v-back" aria-pressed="false">Back</button>
+      <button class="v" id="v-side" aria-pressed="false">Side</button>
+      <button class="v" id="v-spin" aria-pressed="false">Spin</button>
+    </div>
+  </div>
+  <div class="work">
+    <div id="stage">
+      <canvas id="c" aria-label="3D model of the tinyFun M1 board"></canvas>
+      <div id="tip" hidden></div>
+      <div class="hint">drag to orbit · pinch or scroll to zoom</div>
+      <div class="load" id="load">loading board copper…</div>
+    </div>
+    <aside>
+      <div class="ctl">
+        <label for="explode">Explode <output id="exo">0 mm</output></label>
+        <input type="range" id="explode" min="0" max="1" step="0.01" value="0">
+        <div class="toggles">
+          <button class="v" id="t-screen" aria-pressed="true">Screen on</button>
+          <button class="v" id="t-xray" aria-pressed="false">See-through board</button>
+        </div>
+      </div>
+      <div id="list"></div>
+      <div class="facts">
+        2-layer FR-4 · 1.6 mm · green mask · HASL<br>
+        JLC fits 12 parts, 7 modules hand-soldered<br>
+        board copper and silk exported from KiCad
+      </div>
+    </aside>
+  </div>
+  <p class="foot">Part of the <a href="/builds/kfun">kFun build log</a>.</p>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
+<script>
+(function(){
+/* Board frame: mm, origin = board bottom-left (front view), z = 0 is the front copper face. */
+const CX=17, CY=35;
+const GROUPS=[
+ {id:'board',n:'Carrier PCB',d:'34 × 70 × 1.6, real KiCad copper + silk',side:'Board',lv:0,c:'#1f7a45'},
+ {id:'factory',n:'Factory parts',d:'5 buttons, 6 passives, Schottky D1',side:'Board',lv:0,c:'#2a2d2c',tag:'JLC'},
+ {id:'scr',n:'Screen',d:'1.3" IPS 240×240, ST7789',side:'Front',lv:3,c:'#1d56a8'},
+ {id:'hdr',n:'Screen header',d:'7 pins on 2 spacers, 5 mm gap',side:'Front',lv:1.8,c:'#232323'},
+ {id:'tp',n:'TP4056 charger',d:'HW-373, USB-C, under the screen',side:'Front',lv:1,c:'#2a64b4'},
+ {id:'mcu',n:'ESP32-S3 SuperMini',d:'castellated, USB-C out the bottom',side:'Back',lv:1,c:'#191b1d'},
+ {id:'amp',n:'MAX98357A amp',d:'17.8 × 19.4, on Kapton',side:'Back',lv:1,c:'#5a3294'},
+ {id:'spk',n:'Speaker',d:'1609, 8 Ω 1 W, on the amp',side:'Back',lv:2.2,c:'#3b3b3e'},
+ {id:'sw',n:'Power switch',d:'SS12D06, glued + wired',side:'Back',lv:1,c:'#8d9196'},
+ {id:'bat',n:'LiPo cell',d:'500 mAh, 30 × 20 × 10',side:'Back',lv:1.6,c:'#b8bec4'},
+ {id:'hap',n:'Haptic + motor',d:'optional, not fitted yet',side:'Back',lv:1.3,c:'#2f7d4c',off:true},
+];
+const REF={SW2:'UP button',SW3:'DOWN button',SW4:'LEFT button',SW5:'RIGHT button',SW6:'OK button',
+ C1:'C1 · 22 µF amp bulk',C2:'C2 · 100 nF battery-sense filter',C3:'C3 · 1 µF screen reset',
+ R1:'R1 · 1 MΩ battery divider',R2:'R2 · 1 MΩ battery divider',R3:'R3 · 10 kΩ screen reset',D1:'D1 · B5819W Schottky (band up)'};
+
+const canvas=document.getElementById('c'), stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=0.82;
+renderer.physicallyCorrectLights=true;
+const scene=new THREE.Scene();
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(new THREE.RoomEnvironment(),0.04).texture;
+const key=new THREE.DirectionalLight(0xffffff,2.2); key.position.set(60,90,140); scene.add(key);
+const rim=new THREE.DirectionalLight(0xffffff,1.1); rim.position.set(-90,-30,-130); scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xffffff,0x6c7570,0.6));
+
+const cam=new THREE.PerspectiveCamera(28,1,1,3000);
+const ctl=new THREE.OrbitControls(cam,canvas);
+ctl.enableDamping=true; ctl.dampingFactor=.08; ctl.minDistance=35; ctl.maxDistance=420; ctl.target.set(0,0,-2);
+ctl.autoRotateSpeed=1.6;
+
+const groups={}, pickables=[];
+GROUPS.forEach(g=>{const o=new THREE.Group();o.userData.g=g;o.visible=!g.off;groups[g.id]=o;scene.add(o)});
+
+/* ---------- materials ---------- */
+const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:0},o));
+const mat={
+ black:M(0x18191b,{roughness:.45}), chip:M(0x1b1c1e,{roughness:.35}), plastic:M(0x222326,{roughness:.6}),
+ tin:M(0xd2d5d8,{metalness:1,roughness:.28}), gold:M(0xd8b464,{metalness:1,roughness:.3}),
+ steel:M(0xb9bec4,{metalness:1,roughness:.38}), cer:M(0xb79b68,{roughness:.6}), white:M(0xeeeeea,{roughness:.5}),
+ resTop:M(0x111111,{roughness:.5}), ferrite:M(0x2b2b2b,{roughness:.8}),
+ ledR:M(0xe0443a,{roughness:.25,emissive:0x5a0b06,emissiveIntensity:1}), ledB:M(0x4f8dff,{roughness:.25,emissive:0x0a1f55,emissiveIntensity:1}),
+ ledW:M(0xf4f1e6,{roughness:.3}), kapton:M(0xd88a1a,{roughness:.35,transparent:true,opacity:.55}),
+ foam:M(0xf2f2ee,{roughness:.95}), wireR:M(0xc8281f,{roughness:.45}), wireK:M(0x1c1c1c,{roughness:.45}),
+ wireY:M(0xe8c22a,{roughness:.45}), wireW:M(0xe9e9e4,{roughness:.45}), solder:M(0xc7cacd,{metalness:1,roughness:.22}),
+ fpc:M(0xc77a18,{roughness:.4,transparent:true,opacity:.92}), glass:new THREE.MeshPhysicalMaterial({color:0x07090c,roughness:.06,metalness:0,clearcoat:1,clearcoatRoughness:.04}),
+ bezel:M(0xcfd3d6,{metalness:.9,roughness:.35}), pouch:M(0xc9ced3,{metalness:.85,roughness:.42}),
+ pcbBlue:M(0x1c56a6,{roughness:.42}), pcbTp:M(0x2462b8,{roughness:.42}), pcbBlack:M(0x15171a,{roughness:.4}),
+ pcbPurple:M(0x4e2a86,{roughness:.42}), pcbGreen:M(0x1f6b3c,{roughness:.42}), cone:M(0x141416,{roughness:.75}),
+ frame:M(0xe9e7e1,{roughness:.55}), brass:M(0xc8a24a,{metalness:1,roughness:.3})
+};
+
+/* ---------- helpers ---------- */
+function put(gid,label,geo,material,x,y,z){
+  const m=new THREE.Mesh(geo,material); m.position.set(x-CX,y-CY,z);
+  m.userData.label=label; m.userData.gid=gid; groups[gid].add(m); return m;
+}
+// axis-aligned box from board-frame extents
+function box(gid,label,x0,x1,y0,y1,z0,z1,material,r){
+  const w=x1-x0,h=y1-y0,d=Math.abs(z1-z0);
+  const geo=r?new THREE.RoundedBoxGeometry(w,h,d,3,Math.min(r,w/2,h/2,d/2)):new THREE.BoxGeometry(w,h,d);
+  return put(gid,label,geo,material,(x0+x1)/2,(y0+y1)/2,(z0+z1)/2);
+}
+// flat texture on a face. side 'f' faces +z, 'b' faces -z. draw(ctx,P,mm) works in mm; P(X,Y) maps board coords → canvas mm.
+function decal(gid,label,x0,x1,y0,y1,z,side,draw,ppm,opts){
+  ppm=ppm||22; const w=x1-x0,h=y1-y0;
+  const cv=document.createElement('canvas'); cv.width=Math.ceil(w*ppm); cv.height=Math.ceil(h*ppm);
+  const ctx=cv.getContext('2d'); ctx.scale(cv.width/w,cv.height/h);
+  const P=side==='f'?(X,Y)=>[X-x0,y1-Y]:(X,Y)=>[x1-X,y1-Y];
+  draw(ctx,P,{w,h});
+  const tex=new THREE.CanvasTexture(cv); tex.encoding=THREE.sRGBEncoding; tex.anisotropy=8;
+  const mm=new THREE.MeshStandardMaterial(Object.assign({map:tex,transparent:true,roughness:.5,metalness:0,depthWrite:false,
+    polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2},opts||{}));
+  const m=put(gid,label,new THREE.PlaneGeometry(w,h),mm,(x0+x1)/2,(y0+y1)/2,z);
+  if(side==='b') m.rotation.y=Math.PI;
+  return {mesh:m,tex,ctx,cv,P};
+}
+const SANS='"Helvetica Neue",Arial,sans-serif';
+function txt(ctx,s,u,v,size,color,align,weight,rot){
+  ctx.save(); ctx.translate(u,v); if(rot) ctx.rotate(rot);
+  ctx.font=`${weight||700} ${size}px ${SANS}`; ctx.fillStyle=color||'#f2f2f2'; ctx.textAlign=align||'center'; ctx.textBaseline='middle';
+  ctx.fillText(s,0,0); ctx.restore();
+}
+function rrect(ctx,u,v,w,h,r){ctx.beginPath();ctx.moveTo(u+r,v);ctx.arcTo(u+w,v,u+w,v+h,r);ctx.arcTo(u+w,v+h,u,v+h,r);ctx.arcTo(u,v+h,u,v,r);ctx.arcTo(u,v,u+w,v,r);ctx.closePath()}
+// chip with top marking. dir +1 grows toward +z (front), -1 toward -z (back). kind: 'qfn' | 'sop' | 'sot'
+function chip(gid,label,x,y,w,h,t,zb,dir,lines,kind,lw){
+  const z0=zb, z1=zb+dir*t;
+  box(gid,label,x-w/2,x+w/2,y-h/2,y+h/2,z0,z1,mat.chip,.12);
+  if(kind==='sop'||kind==='sot'){
+    const n=kind==='sop'?4:3, pitch=kind==='sop'?1.27:0.95, len=lw||0.9;
+    for(let i=0;i<n;i++){const yy=y-(n-1)*pitch/2+i*pitch;
+      [[x-w/2-len,x-w/2],[x+w/2,x+w/2+len]].forEach(([a,b])=>box(gid,label,a,b,yy-.2,yy+.2,z0,z0+dir*.35,mat.tin));}
+  }
+  if(kind==='qfn'){const n=Math.round(w/0.5)-2;for(let i=0;i<n;i++){const o=-((n-1)*.4)/2+i*.4;
+    box(gid,label,x+o-.1,x+o+.1,y-h/2-.06,y-h/2+.02,z0,z0+dir*.2,mat.tin);box(gid,label,x+o-.1,x+o+.1,y+h/2-.02,y+h/2+.06,z0,z0+dir*.2,mat.tin);}}
+  if(lines&&lines.length){
+    decal(gid,label,x-w/2,x+w/2,y-h/2,y+h/2,z1+dir*.005,dir>0?'f':'b',(c,P,s)=>{
+      const fs=Math.min(s.h/(lines.length+1.2),s.w/ (Math.max(...lines.map(l=>l.length))*0.62));
+      lines.forEach((l,i)=>txt(c,l,s.w/2,s.h/2+(i-(lines.length-1)/2)*fs*1.15,fs,'#b9bbbd','center',500));
+      c.fillStyle='#8d8f91';c.beginPath();c.arc(s.w*.14,s.h*.82,Math.min(s.w,s.h)*.06,0,7);c.fill();
+    },40,{depthWrite:false});
+  }
+}
+// two-terminal SMD (resistor / cap / led). along: 'x' or 'y'
+function smd(gid,label,x,y,L,W,t,zb,dir,body,along){
+  const hx=along==='y'?W/2:L/2, hy=along==='y'?L/2:W/2, cap=L*.22;
+  box(gid,label,x-hx,x+hx,y-hy,y+hy,zb,zb+dir*t,body);
+  if(along==='y'){box(gid,label,x-hx-.01,x+hx+.01,y-hy-.01,y-hy+cap,zb,zb+dir*(t+.01),mat.tin);box(gid,label,x-hx-.01,x+hx+.01,y+hy-cap,y+hy+.01,zb,zb+dir*(t+.01),mat.tin);}
+  else{box(gid,label,x-hx-.01,x-hx+cap,y-hy-.01,y+hy+.01,zb,zb+dir*(t+.01),mat.tin);box(gid,label,x+hx-cap,x+hx+.01,y-hy-.01,y+hy+.01,zb,zb+dir*(t+.01),mat.tin);}
+}
+function wire(gid,label,pts,r,material){
+  const curve=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(p[0]-CX,p[1]-CY,p[2])));
+  return put(gid,label,new THREE.TubeGeometry(curve,48,r||.35,8,false),material,CX,CY,0);
+}
+function cyl(gid,label,r,len,x,y,z,axis,material,seg){
+  const g=new THREE.CylinderGeometry(r,r,len,seg||24);
+  if(axis==='x') g.rotateZ(Math.PI/2); if(axis==='z') g.rotateX(Math.PI/2);
+  return put(gid,label,g,material,x,y,z);
+}
+// USB-C receptacle: rounded tube. opening faces -x ('x') or -y ('y'). (cx,cy) = centre in plane, z0..z1 height span.
+function usbc(gid,label,a0,a1,cx,cy,zc,along){
+  const W=8.94,H=3.2,len=a1-a0;
+  const s=new THREE.Shape(); const r=1.6;
+  s.absarc(-W/2+r,0,r,Math.PI/2,Math.PI*1.5,false); s.absarc(W/2-r,0,r,-Math.PI/2,Math.PI/2,false);
+  const hole=new THREE.Path(); const ir=1.3; hole.absarc(-W/2+r,0,ir,Math.PI/2,Math.PI*1.5,false); hole.absarc(W/2-r,0,ir,-Math.PI/2,Math.PI/2,false); s.holes.push(hole);
+  const g=new THREE.ExtrudeGeometry(s,{depth:len,bevelEnabled:false,curveSegments:14});
+  const back=new THREE.ShapeGeometry((()=>{const t=new THREE.Shape();t.absarc(-W/2+r,0,ir,Math.PI/2,Math.PI*1.5,false);t.absarc(W/2-r,0,ir,-Math.PI/2,Math.PI/2,false);return t})());
+  const m=new THREE.Mesh(g,mat.steel), b=new THREE.Mesh(back,mat.black), tongue=new THREE.Mesh(new THREE.BoxGeometry(6.6,.7,len*.8),M(0x2a2a2a));
+  b.position.z=len*.6; tongue.position.z=len*.5;
+  const o=new THREE.Group(); o.add(m,b,tongue);
+  [m,b,tongue].forEach(q=>{q.userData.label=label;q.userData.gid=gid});
+  const V=(a,b,c)=>new THREE.Vector3(a,b,c);
+  if(along==='x'){ o.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(V(0,1,0),V(0,0,1),V(1,0,0))); o.position.set(a0-CX,cy-CY,zc);}
+  else{ o.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(V(1,0,0),V(0,0,-1),V(0,1,0))); o.position.set(cx-CX,a0-CY,zc);}
+  groups[gid].add(o); return o;
+}
+
+/* ===================== SCREEN (front) ===================== */
+const S={x0:3.11,x1:30.89,y0:30.78,y1:70,z0:5,z1:6.6};
+box('scr','Screen breakout PCB',S.x0,S.x1,S.y0,S.y1,S.z0,S.z1,mat.pcbBlue,.25);
+decal('scr','Screen breakout PCB',S.x0,S.x1,S.y0,S.y1,S.z1+.004,'f',(c,P)=>{
+  // pin pads + labels
+  ['GND','VCC','SCL','SDA','RES','DC','BLK'].forEach((n,i)=>{const [u,v]=P(9.38+i*2.54,68);
+    c.fillStyle='#d9b768';c.beginPath();c.arc(u,v,.85,0,7);c.fill();c.fillStyle='#1a1a1a';c.beginPath();c.arc(u,v,.45,0,7);c.fill();
+    txt(c,n,u,v+1.55,.72,'#f4f4f0','center',700);});
+  const [a,b]=P(4.2,34.4); txt(c,'1.3" IPS 240×240',a,b,.85,'#f4f4f0','left',600);
+  const [a2,b2]=P(30,32.0); txt(c,'ST7789',a2,b2,.8,'#f4f4f0','right',600);
+  c.strokeStyle='#f4f4f0';c.lineWidth=.12;const [r0,r1]=P(8.2,69.4);rrect(c,r0,r1,17.6,1.4*1+0.2,.3);c.stroke();
+});
+// backlight frame + glass + picture
+box('scr','LCD backlight frame',4.4,29.6,35.78,65,S.z1,S.z1+.75,mat.bezel,.25);
+box('scr','LCD glass',4.55,29.45,35.9,64.9,S.z1+.75,S.z1+1.4,mat.glass,.12);
+const scrDecal=decal('scr','Picture area 23.4 × 23.4 mm',5.3,28.7,40.27,63.67,S.z1+1.405,'f',()=>{},10.257,
+  {emissive:0xffffff,emissiveIntensity:1.0,roughness:.15,transparent:false,depthWrite:true});
+scrDecal.cv.width=240;scrDecal.cv.height=240;scrDecal.ctx=scrDecal.cv.getContext('2d');
+scrDecal.tex.magFilter=THREE.NearestFilter; scrDecal.tex.minFilter=THREE.LinearFilter; scrDecal.mesh.material.emissiveMap=scrDecal.tex;
+// FPC tail + small parts below the glass
+box('scr','Display flex cable',11,23,34.4,35.95,S.z1+.02,S.z1+.18,mat.fpc);
+smd('scr','Backlight resistor',8.2,33.2,1.6,.8,.45,S.z1,1,mat.resTop,'x');
+smd('scr','Decoupling cap',25.8,33.2,1.6,.8,.7,S.z1,1,mat.cer,'x');
+chip('scr','Backlight transistor',22.2,33.0,2.9,1.3,.9,S.z1,1,null,'sot',.4);
+// underside parts (face the carrier)
+chip('scr','3.3 V regulator (under the breakout)',17,33.5,2.9,1.6,1.0,S.z0,-1,null,'sot',.4);
+
+/* ===================== HEADER + SPACERS (front) ===================== */
+[0,2.5].forEach((z,k)=>box('hdr',`Header spacer ${k+1} of 2`,8.11,25.89,66.75,69.25,z+.02,z+2.48,mat.plastic,.2));
+for(let i=0;i<7;i++){const x=9.38+i*2.54;
+  box('hdr','Header pin',x-.32,x+.32,68-.32,68+.32,-1.6,S.z1+1.4,mat.gold);
+  const cone=new THREE.Mesh(new THREE.ConeGeometry(.85,.7,16),mat.solder);cone.rotation.x=Math.PI/2;cone.position.set(x-CX,68-CY,S.z1+.35);
+  cone.userData={label:'Solder joint',gid:'hdr'};groups.hdr.add(cone);
+}
+
+/* ===================== TP4056 HW-373 (front, under the screen) ===================== */
+const T={x0:5.35,x1:33.05,y0:28.55,y1:45.85,z0:.1,z1:1.1};
+box('tp','Kapton under the USB shell',3.6,11,32.4,42,0,.1,mat.kapton);
+box('tp','TP4056 module PCB',T.x0,T.x1,T.y0,T.y1,T.z0,T.z1,mat.pcbTp,.2);
+decal('tp','TP4056 module PCB',T.x0,T.x1,T.y0,T.y1,T.z1+.004,'f',(c,P)=>{
+  const pads=[['IN+',7.15,44.4],['IN-',7.15,30.0],['B+',30.25,40.8],['B-',30.25,33.6],['OUT+',30.25,44.15],['OUT-',30.25,30.25]];
+  pads.forEach(([n,x,y])=>{const [u,v]=P(x,y);c.fillStyle='#dcbc6c';rrect(c,u-.9,v-1.3,1.8,2.6,.5);c.fill();
+    txt(c,n,u+(x<20?2.4:-2.4),v,.95,'#f3f3ef','center',700);});
+  const [u,v]=P(19,29.4); txt(c,'HW-373  TYPE-C',u,v,.85,'#f3f3ef','center',600);
+  const [u2,v2]=P(12.5,37.2); txt(c,'CHRG  STDBY',u2,v2,.6,'#f3f3ef','center',600,-Math.PI/2);
+  // a few visible traces
+  c.strokeStyle='rgba(120,170,240,.55)';c.lineWidth=.35;c.beginPath();
+  let [a,b]=P(11,37.2);c.moveTo(a,b);[b]=[b];[a,b]=P(15,37.2);c.lineTo(a,b);[a,b]=P(22,40.5);c.moveTo(a,b);[a,b]=P(28.5,40.8);c.lineTo(a,b);
+  [a,b]=P(22,34);c.moveTo(a,b);[a,b]=P(28.5,33.6);c.lineTo(a,b);c.stroke();
+});
+usbc('tp','TP4056 USB-C (unused; charge through the SuperMini)',3.35,10.65,0,37.2,T.z1+1.6,'x');
+chip('tp','TP4056 charger IC',17.6,37.2,4.9,3.9,1.5,T.z1,1,['TP4056','2342'],'sop',.9);
+chip('tp','DW01A battery protection',24.0,40.6,2.9,1.6,1.1,T.z1,1,['2A'],'sot',.5);
+chip('tp','FS8205A dual MOSFET',24.6,34.2,3.0,4.4,1.0,T.z1,1,['8205A'],'sop',.6);
+smd('tp','Charge LED (red)',12.6,40.6,1.6,.8,.6,T.z1,1,mat.ledR,'y');
+smd('tp','Done LED (blue)',12.6,33.8,1.6,.8,.6,T.z1,1,mat.ledB,'y');
+smd('tp','RPROG 1.2 kΩ → swap for 4.7 kΩ',14.9,34.2,1.6,.8,.45,T.z1,1,mat.resTop,'y');
+smd('tp','Input cap 10 µF',14.9,41.4,2.0,1.25,.8,T.z1,1,mat.cer,'y');
+smd('tp','Battery cap',28.0,37.2,1.6,.8,.7,T.z1,1,mat.cer,'y');
+smd('tp','Resistor',21.0,42.6,1.6,.8,.45,T.z1,1,mat.resTop,'x');
+smd('tp','Resistor',21.0,31.8,1.6,.8,.45,T.z1,1,mat.resTop,'x');
+// solder fillets at the 6 pads
+[[7.15,44.4],[7.15,30],[30.25,40.8],[30.25,33.6],[30.25,44.15],[30.25,30.25]].forEach(([x,y])=>box('tp','Solder joint',x-.85,x+.85,y-1.2,y+1.2,T.z1,T.z1+.18,mat.solder,.15));
+
+/* ===================== SUPERMINI (back) ===================== */
+const U={x0:8,x1:26,y0:0,y1:23.5,z0:-1.6,z1:-2.6};
+box('mcu','ESP32-S3 SuperMini PCB',U.x0,U.x1,U.y0,U.y1,U.z0-.001,U.z1,mat.pcbBlack,.2);
+decal('mcu','ESP32-S3 SuperMini PCB',U.x0,U.x1,U.y0,U.y1,U.z1-.004,'b',(c,P)=>{
+  const L=['TX','RX','1','2','3','4','5','6','7'], R=['5V','G','3V3','13','12','11','10','9','8'];
+  for(let i=0;i<9;i++){const y=1.59+i*2.54;
+    [[8,L[i]],[26,R[i]]].forEach(([x,n])=>{const [u,v]=P(x,y);c.fillStyle='#dcbc6c';
+      c.beginPath();c.arc(u,v,.95,0,7);c.fill();c.fillStyle='#0d0e0f';c.beginPath();c.arc(u,v,.4,0,7);c.fill();
+      const [lu]=P(x+(x<17?1.9:-1.9),y); txt(c,n,lu,v,.78,'#ededea','center',700);});
+  }
+  let [u,v]=P(17,17.3); txt(c,'ESP32-S3',u,v,.9,'#ededea','center',700);
+  [u,v]=P(17,7.2); txt(c,'SuperMini',u,v,.75,'#ededea','center',600);
+  [u,v]=P(11.1,2.2); txt(c,'BOOT',u,v,.62,'#ededea','center',700);
+  [u,v]=P(22.9,2.2); txt(c,'RST',u,v,.62,'#ededea','center',700);
+});
+usbc('mcu','SuperMini USB-C (power + flashing)',-1.2,6.2,17,0,U.z1-1.6,'y');
+chip('mcu','ESP32-S3FH4R2 (4 MB flash + 2 MB PSRAM)',17,12.4,7,7,.9,U.z1,-1,['ESP32-S3','FH4R2','2350'],'qfn');
+box('mcu','2.4 GHz chip antenna',13.4,20.6,20.6,22.6,U.z1,U.z1-1.1,M(0x2d2f33,{roughness:.4}),.15);
+box('mcu','40 MHz crystal',21.5,24.7,15.2,17.7,U.z1,U.z1-.8,mat.steel,.2);
+chip('mcu','3.3 V regulator',11.3,7.6,2.9,1.6,1.1,U.z1,-1,['K5'],'sot',.45);
+[[11.1,3.9,'BOOT button'],[22.9,3.9,'RESET button']].forEach(([x,y,n])=>{
+  box('mcu',n,x-1.6,x+1.6,y-1.1,y+1.1,U.z1,U.z1-1.0,mat.steel,.15); box('mcu',n,x-.7,x+.7,y-.5,y+.5,U.z1-1.0,U.z1-1.4,mat.white,.15);});
+box('mcu','RGB LED (GPIO48)',20.9,22.4,7.3,8.8,U.z1,U.z1-.6,mat.ledW,.12);
+smd('mcu','Power LED',12.0,16.8,1.0,.5,.35,U.z1,-1,mat.ledR,'y');
+[[13.3,17.4],[20.7,17.4],[12.2,11],[21.9,11],[21.9,13.4],[12.2,13.6],[18.4,19.2],[15.6,19.2]].forEach(([x,y],i)=>smd('mcu','Passive',x,y,1.0,.5,.4,U.z1,-1,i%2?mat.cer:mat.resTop,i<2?'x':'y'));
+for(let i=0;i<9;i++){const y=1.59+i*2.54;[8,26].forEach(x=>box('mcu','Castellated joint',x-1.1,x+1.1,y-.6,y+.6,U.z0,U.z0-.55,mat.solder,.2));}
+
+/* ===================== AMP (back) ===================== */
+const A={x0:.3,x1:19.7,y0:29.4,y1:47.2,z0:-1.7,z1:-3.3};
+box('amp','Kapton under the amp',.4,19.6,29.5,47.1,-1.6,-1.7,mat.kapton);
+box('amp','MAX98357A breakout PCB',A.x0,A.x1,A.y0,A.y1,A.z0,A.z1,mat.pcbPurple,.25);
+decal('amp','MAX98357A breakout PCB',A.x0,A.x1,A.y0,A.y1,A.z1-.004,'b',(c,P)=>{
+  ['LRC','BCLK','DIN','GAIN','SD','GND','Vin'].forEach((n,i)=>{const y=30.68+i*2.54;const [u,v]=P(2.6,y);
+    c.fillStyle='#dcbc6c';c.beginPath();c.arc(u,v,.85,0,7);c.fill(); const [lu]=P(5.2,y); txt(c,n,lu,v,.85,'#f1eef7','center',700);});
+  [[18.2,36.55,'+'],[18.2,40.05,'−']].forEach(([x,y,n])=>{const [u,v]=P(x,y);c.fillStyle='#dcbc6c';c.beginPath();c.arc(u,v,1.0,0,7);c.fill();
+    c.fillStyle='#22163a';c.beginPath();c.arc(u,v,.55,0,7);c.fill(); const [lu]=P(16.4,y); txt(c,n,lu,v,1.2,'#f1eef7','center',700);});
+  let [u,v]=P(10.5,45.6); txt(c,'I2S 3W Class D Amp',u,v,.9,'#f1eef7','center',600);
+  [u,v]=P(10.5,31.0); txt(c,'MAX98357A',u,v,.95,'#f1eef7','center',700);
+});
+chip('amp','MAX98357A amplifier IC',10.6,38.3,3,3,.75,A.z1,-1,['98357','A'],'qfn');
+smd('amp','10 µF supply cap',13.6,42.6,2.0,1.25,1.0,A.z1,-1,mat.cer,'x');
+smd('amp','0.1 µF cap',7.9,42.6,1.6,.8,.7,A.z1,-1,mat.cer,'x');
+smd('amp','SD pull-up 1 MΩ',7.9,34.2,1.6,.8,.45,A.z1,-1,mat.resTop,'x');
+smd('amp','Gain resistor',13.6,34.2,1.6,.8,.45,A.z1,-1,mat.resTop,'x');
+smd('amp','Output ferrite',15.4,36.55,2.0,1.25,.9,A.z1,-1,mat.ferrite,'x');
+smd('amp','Output ferrite',15.4,40.05,2.0,1.25,.9,A.z1,-1,mat.ferrite,'x');
+for(let i=0;i<7;i++){const y=30.68+i*2.54;
+  box('amp','Header pin (through both boards, trimmed)',2.6-.32,2.6+.32,y-.32,y+.32,.25,A.z1-.9,mat.gold);
+  const cone=new THREE.Mesh(new THREE.ConeGeometry(.85,.6,16),mat.solder);cone.rotation.x=-Math.PI/2;cone.position.set(2.6-CX,y-CY,A.z1-.3);
+  cone.userData={label:'Solder joint',gid:'amp'};groups.amp.add(cone);
+  const c2=cone.clone();c2.rotation.x=Math.PI/2;c2.position.z=.2;groups.amp.add(c2);}
+
+/* ===================== SPEAKER 1609 (back, on the amp) ===================== */
+const K={x0:1.5,x1:17.5,y0:30,y1:39,z0:-4.6,z1:-7.6};
+box('spk','Speaker frame (1609, 16 × 9 × 3 mm)',K.x0,K.x1,K.y0,K.y1,K.z0,K.z0-1.2,mat.black,.4);
+box('spk','Speaker frame (1609, 16 × 9 × 3 mm)',K.x0+.3,K.x1-.3,K.y0+.3,K.y1-.3,K.z0-1.2,K.z1,mat.frame,.5);
+box('spk','Speaker cone, 8 Ω 1 W',K.x0+1.3,K.x1-1.3,K.y0+1.2,K.y1-1.2,K.z1+.15,K.z1-.05,mat.cone,1.6);
+box('spk','Speaker dome',K.x0+5.5,K.x1-5.5,K.y0+2.9,K.y1-2.9,K.z1-.05,K.z1-.35,M(0x2b2b2e,{roughness:.35}),.9);
+wire('spk','Speaker + wire',[[17.5,35.6,-5.4],[19.2,36,-5.2],[18.6,36.55,-3.6],[18.2,36.55,-3.3]],.3,mat.wireR);
+wire('spk','Speaker − wire',[[17.5,33.6,-5.6],[19.6,35.6,-5.6],[18.7,40.05,-3.8],[18.2,40.05,-3.3]],.3,mat.wireK);
+
+/* ===================== POWER SWITCH SS12D06 (back) ===================== */
+box('sw','SS12D06 switch body',27.6,34.1,5.6,18.4,-1.75,-8.3,mat.plastic,.3);
+box('sw','Switch metal cover',27.5,34.2,5.5,18.5,-1.7,-2.4,mat.steel,.15);
+box('sw','Switch metal cover',33.6,34.2,5.5,18.5,-1.7,-8.4,mat.steel,.1);
+box('sw','Power switch knob (slides along the edge; up = ON)',34.2,39.2,11.15,15.05,-3.1,-7.0,mat.black,.35);
+[7.2,12,16.8].forEach((y,i)=>box('sw',['OFF leg','Common leg','ON leg'][i],30.5,31.2,y-.5,y+.5,-8.3,-10.3,mat.tin));
+wire('sw','Wire: ON leg → ON hole',[[30.85,16.8,-10.1],[30.6,19,-10],[31.2,20.02,-4],[31.6,20.02,-1.6]],.32,mat.wireY);
+wire('sw','Wire: common leg → C hole',[[30.85,12,-10.2],[29.3,17,-10.6],[30.6,22.56,-4.5],[31.6,22.56,-1.6]],.32,mat.wireW);
+
+/* ===================== LIPO CELL (back) ===================== */
+box('bat','Double-sided foam tape',4,30,51,67,-1.6,-2.1,mat.foam);
+box('bat','LiPo pouch, 3.7 V 500 mAh',2,32,49,69,-2.1,-12.1,mat.pouch,1.2);
+box('bat','Protection circuit, under Kapton',3.5,30.5,48.6,50.4,-4.2,-10,M(0xd8961e,{roughness:.35,transparent:true,opacity:.92}),.4);
+decal('bat','LiPo pouch, 3.7 V 500 mAh',3.2,30.8,51,67.4,-12.105,'b',(c,P,s)=>{
+  c.fillStyle='#21344f';rrect(c,0,0,s.w,s.h,1.2);c.fill();
+  c.fillStyle='#e7edf3';txt(c,'LP102030',s.w/2,3.2,2.3,'#e7edf3','center',700);
+  txt(c,'3.7 V  500 mAh  1.85 Wh',s.w/2,6.6,1.45,'#e7edf3','center',600);
+  c.fillStyle='#f0b42a';c.fillRect(2,9.2,s.w-4,.35);
+  txt(c,'Li-polymer · do not puncture',s.w/2,11.2,1.05,'#c3ccd6','center',500);
+  txt(c,'+  red   −  black',s.w/2,13.6,1.05,'#c3ccd6','center',500);
+},16);
+wire('bat','Battery + (red) → B+ pad',[[25.5,49,-6],[25.9,46.6,-6.2],[25.5,44.6,-3.2],[25.5,44.6,-1.6]],.42,mat.wireR);
+wire('bat','Battery − (black) → B− pad',[[21.5,49,-6.6],[21.0,46.4,-6.6],[21.5,44.6,-3.4],[21.5,44.6,-1.6]],.42,mat.wireK);
+[[25.5,44.6],[21.5,44.6]].forEach(([x,y])=>box('bat','Solder joint',x-.9,x+.9,y-1.2,y+1.2,-1.6,-1.95,mat.solder,.3));
+
+/* ===================== HAPTIC (back, optional) ===================== */
+box('hap','Kapton',20.8,26.4,31.1,41.9,-1.6,-1.7,mat.kapton);
+box('hap','Haptic driver module (AO3400)',20.7,26.5,31,42,-1.7,-2.7,mat.pcbGreen,.2);
+chip('hap','AO3400 MOSFET',23.6,37.4,2.9,1.6,1.1,-2.7,-1,['A09T'],'sot',.4);
+smd('hap','Flyback diode',23.6,34.2,2.6,1.6,1.1,-2.7,-1,mat.chip,'x');
+smd('hap','Gate pull-down 100 kΩ',23.6,39.9,1.6,.8,.45,-2.7,-1,mat.resTop,'x');
+cyl('hap','Coreless vibration motor 6 × 10',3,10,10,44.5,-7.7,'x',mat.steel,32);
+cyl('hap','Motor eccentric weight',1.9,2.2,3.6,44.5,-7.7,'x',mat.brass,24);
+wire('hap','Motor wire',[[15,45.2,-7.2],[18,44,-6],[22,42.4,-3.2],[22.6,41.4,-2.8]],.25,mat.wireR);
+wire('hap','Motor wire',[[15,43.8,-8.2],[18.4,42.4,-6.4],[24.4,42.6,-3.3],[24.6,41.4,-2.8]],.25,mat.wireK);
+
+/* ===================== CARRIER BOARD (real KiCad export) ===================== */
+const boardRoot=new THREE.Group(); boardRoot.rotation.x=Math.PI/2; boardRoot.scale.setScalar(1000); boardRoot.position.set(-CX,-CY,-1.6);
+groups.board.add(boardRoot);
+const near=(c,r,g,b)=>Math.abs(c.r-r)<.03&&Math.abs(c.g-g)<.03&&Math.abs(c.b-b)<.03;
+const boardMats=[]; let xray=false;
+new THREE.GLTFLoader().load('board.glb',gltf=>{
+  const root=gltf.scene; boardRoot.add(root); scene.updateMatrixWorld(true);
+  const moves=[];
+  root.traverse(o=>{
+    if(REF[o.name]) moves.push(o);
+    if(o.isMesh){
+      const m=o.material, c=m.color;
+      if(near(c,.70,.61,0)){ o.material=new THREE.MeshStandardMaterial({color:0xd6d8da,metalness:1,roughness:.3}); }         // pads → lead-free HASL
+      else if(near(c,.08,.20,.14)){ o.material=new THREE.MeshStandardMaterial({color:0x08401f,roughness:.3,metalness:0,transparent:true,opacity:.95,envMapIntensity:.6}); } // solder mask
+      else if(near(c,1,1,1)){ o.material=new THREE.MeshStandardMaterial({color:0xf3f3ee,roughness:.6}); }                   // silkscreen
+      else if(near(c,.42,.45,.29)){ o.material=new THREE.MeshStandardMaterial({color:0xb9b38a,roughness:.7}); }             // FR-4
+      o.userData.label='Carrier PCB'; o.userData.gid='board';
+      if(o.material.transparent||o.material.color.getHex()===0xb9b38a) boardMats.push(o.material);
+    }
+  });
+  moves.forEach(o=>{ groups.factory.attach(o); o.traverse(q=>{if(q.isMesh){q.userData.label=REF[o.name];q.userData.gid='factory';}}); });
+  document.getElementById('load').hidden=true; applyXray();
+},undefined,()=>{document.getElementById('load').textContent='board copper could not load';});
+function applyXray(){ boardMats.forEach(m=>{ m.transparent=true; m.opacity=xray?(m.color.getHex()===0xb9b38a?.22:.35):(m.color.getHex()===0xb9b38a?1:.95); m.depthWrite=!xray; m.needsUpdate=true; }); }
+
+/* ===================== SCREEN CONTENT: snake on the 240×240 panel ===================== */
+const sctx=scrDecal.ctx; const cell=12, gx0=0, gy0=24, cols=20, rows=18;
+const loop=[]; (()=>{ // a closed path that winds over the grid
+  const pts=[[1,1],[18,1],[18,6],[4,6],[4,10],[18,10],[18,16],[1,16]];
+  for(let i=0;i<pts.length;i++){const [a,b]=pts[i],[c,d]=pts[(i+1)%pts.length];const dx=Math.sign(c-a),dy=Math.sign(d-b);
+    let x=a,y=b;while(x!==c||y!==d){loop.push([x,y]);x+=dx;y+=dy;}}
+})();
+let head=12, len=9, score=7, apple=40, screenOn=true;
+function drawScreen(){
+  const c=sctx; c.imageSmoothingEnabled=false;
+  c.fillStyle=screenOn?'#0b1410':'#030404'; c.fillRect(0,0,240,240);
+  if(!screenOn){scrDecal.tex.needsUpdate=true;return;}
+  c.fillStyle='#12241b'; c.fillRect(0,0,240,22);
+  c.font='bold 13px monospace'; c.textBaseline='middle'; c.fillStyle='#7cf0a8'; c.textAlign='left'; c.fillText('tinyFun',8,11);
+  c.textAlign='right'; c.fillStyle='#e8f5ec'; c.fillText('SNAKE  '+String(score).padStart(3,'0'),232,11);
+  c.fillStyle='#10201a'; for(let x=0;x<cols;x++)for(let y=0;y<rows;y++) if((x+y)%2) c.fillRect(gx0+x*cell,gy0+y*cell,cell,cell);
+  const [ax,ay]=loop[apple%loop.length]; c.fillStyle='#ff5a4e'; c.fillRect(gx0+ax*cell+2,gy0+ay*cell+2,cell-4,cell-4);
+  c.fillStyle='#5be08f'; c.fillRect(gx0+ax*cell+5,gy0+ay*cell,2,3);
+  for(let i=0;i<len;i++){const [x,y]=loop[(head-i+loop.length*4)%loop.length];
+    c.fillStyle=i===0?'#c9ffd9':(i%2?'#46d17f':'#3bbd71'); c.fillRect(gx0+x*cell+1,gy0+y*cell+1,cell-2,cell-2);}
+  c.fillStyle='#0b1410'; const [hx,hy]=loop[head%loop.length]; c.fillRect(gx0+hx*cell+3,gy0+hy*cell+3,2,2); c.fillRect(gx0+hx*cell+7,gy0+hy*cell+3,2,2);
+  scrDecal.tex.needsUpdate=true;
+}
+const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+setInterval(()=>{ if(reduce||!screenOn) return; head=(head+1)%loop.length;
+  if(head===apple%loop.length){score++; len=Math.min(len+1,26); apple=(head+11+Math.floor(Math.random()*30))%loop.length;}
+  drawScreen(); },140);
+drawScreen();
+
+/* ===================== UI ===================== */
+const list=document.getElementById('list');
+['Board','Front','Back'].forEach(side=>{
+  const sec=document.createElement('div'); const h=document.createElement('h2'); h.textContent=side==='Board'?'Board':side+' side'; sec.appendChild(h);
+  GROUPS.filter(g=>g.side===side).forEach(g=>{
+    const row=document.createElement('label'); row.className='row'; row.htmlFor='g-'+g.id;
+    row.innerHTML=`<input type="checkbox" id="g-${g.id}" ${g.off?'':'checked'}><span class="sw" style="background:${g.c}"></span>
+      <span><span class="n">${g.n}</span>${g.tag?`<span class="tag">${g.tag}</span>`:''}${g.off?'<span class="tag">optional</span>':''}<br><span class="d">${g.d}</span></span>`;
+    row.querySelector('input').addEventListener('change',e=>{groups[g.id].visible=e.target.checked;});
+    sec.appendChild(row);
+  });
+  list.appendChild(sec);
+});
+const ex=document.getElementById('explode'), exo=document.getElementById('exo');
+function explode(){const k=+ex.value; exo.textContent=Math.round(k*14)+' mm';
+  GROUPS.forEach(g=>{const s=g.side==='Front'?1:g.side==='Back'?-1:0; groups[g.id].position.z=s*g.lv*k*14;});}
+ex.addEventListener('input',explode);
+const tScreen=document.getElementById('t-screen');
+tScreen.addEventListener('click',()=>{screenOn=!screenOn;tScreen.setAttribute('aria-pressed',screenOn);tScreen.textContent=screenOn?'Screen on':'Screen off';
+  scrDecal.mesh.material.emissiveIntensity=screenOn?1:0; drawScreen();});
+const tX=document.getElementById('t-xray');
+tX.addEventListener('click',()=>{xray=!xray;tX.setAttribute('aria-pressed',xray);applyXray();});
+
+const VIEWS={iso:[118,-92,128],front:[0,0,182],back:[0,0,-182],side:[182,0,-4]};
+let tween=null;
+function go(name){
+  document.querySelectorAll('.views button').forEach(b=>{if(b.id!=='v-spin')b.setAttribute('aria-pressed',b.id==='v-'+name)});
+  const to=new THREE.Vector3(...VIEWS[name]); const from=cam.position.clone(); const t0=performance.now(), dur=reduce?1:650;
+  tween=(now)=>{const t=Math.min(1,(now-t0)/dur), e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; cam.position.lerpVectors(from,to,e);
+    if(name==='front'||name==='back') cam.position.y+=0.0001; if(t>=1) tween=null;};
+}
+['iso','front','back','side'].forEach(n=>document.getElementById('v-'+n).addEventListener('click',()=>go(n)));
+const spin=document.getElementById('v-spin');
+spin.addEventListener('click',()=>{ctl.autoRotate=!ctl.autoRotate;spin.setAttribute('aria-pressed',ctl.autoRotate);});
+cam.position.set(...VIEWS.iso);
+
+// hover / tap labels
+const tip=document.getElementById('tip'), ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
+let down=null, tipTimer=null;
+function visibleMeshes(){const out=[];Object.values(groups).forEach(g=>{if(g.visible)g.traverse(o=>{if(o.isMesh&&o.userData.label)out.push(o)})});return out;}
+function pickAt(ev){
+  const r=canvas.getBoundingClientRect(); ndc.set(((ev.clientX-r.left)/r.width)*2-1,-((ev.clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(ndc,cam); const hit=ray.intersectObjects(visibleMeshes(),false)[0];
+  if(!hit){tip.hidden=true;return;}
+  const g=GROUPS.find(q=>q.id===hit.object.userData.gid);
+  tip.innerHTML=`<b>${hit.object.userData.label}</b><i>${g?g.n:''}</i>`;
+  tip.style.left=(ev.clientX-r.left)+'px'; tip.style.top=(ev.clientY-r.top)+'px'; tip.hidden=false;
+  const tr=tip.getBoundingClientRect(); if(tr.right>r.right) tip.style.left=(ev.clientX-r.left-tr.width-24)+'px';
+}
+canvas.addEventListener('pointermove',ev=>{ if(ev.pointerType==='mouse'&&!ev.buttons) pickAt(ev); else if(ev.buttons) tip.hidden=true; });
+canvas.addEventListener('pointerleave',()=>{tip.hidden=true});
+canvas.addEventListener('pointerdown',ev=>{down=[ev.clientX,ev.clientY]; if(tween) tween=null;});
+canvas.addEventListener('pointerup',ev=>{ if(down&&Math.hypot(ev.clientX-down[0],ev.clientY-down[1])<6){pickAt(ev);clearTimeout(tipTimer);
+  if(ev.pointerType!=='mouse') tipTimer=setTimeout(()=>tip.hidden=true,2600);} down=null;});
+
+function resize(){const w=stage.clientWidth,h=stage.clientHeight; renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix();
+  const far=w/h<.9?1.25:1; ctl.maxDistance=420; cam.zoom=1/far; cam.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage); resize();
+function frame(now){ requestAnimationFrame(frame); if(tween) tween(now); ctl.update(); renderer.render(scene,cam); }
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
