@@ -231,3 +231,21 @@ checked against the radar repo; styles are scoped under `.tinyradar`
   main redeploys and every radar offers the update next time its page opens.
 - Never put Wi-Fi names, IPs, MACs or home coordinates on these pages, and no
   screenshots of the bench radar's map: it shows the owner's home.
+
+## tinyfun (`/tinyfun`, `/tinyfun/update`)
+
+The tiny three-button game console from the kFun repo (private, kpow/kfun; the
+tinyfun app over `common/`). Copy lives in `client/src/content/tinyfun.ts`,
+checked against that repo; styles are scoped under `.tinyfun`
+(`components/tinyfun/tinyfun.css`, lime accent). Readers are kids and friends
+who got one as a gift: keep it short and plain.
+
+- tinyfun has no internet. `/tinyfun/update` offers the `.bin` from
+  `/tinyfun/firmware/manifest.json` (`{version, notes, builds.s3.{url,size,md5}}`);
+  the phone then joins the console's own hotspot and uploads it at `192.168.4.1`.
+  `server/routes/tinyfun-routes.ts` serves `firmware/tinyfun/` (not client/public:
+  a folder there makes production 301 the page route).
+- Publishing a release: `node scripts/publish-tinyfun-firmware.mjs tinyfun-vX.Y.Z [--notes "…"]`
+  (uses your `gh` login, checks size and md5), then commit on a branch.
+- `/tinyfun-m1/index.html` is a separate static 3D page in `client/public/`; link
+  it with a plain `<a>` and the `index.html` (no directory index is served).

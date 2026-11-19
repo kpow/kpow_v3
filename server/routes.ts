@@ -15,6 +15,7 @@ import { registerAdminRoutes } from "./routes/admin-routes";
 import { registerVizspotRoutes } from "./routes/vizspot-routes";
 import { registerVizbotRoutes } from "./routes/vizbot-routes";
 import { registerTinyradarRoutes } from "./routes/tinyradar-routes";
+import { registerTinyfunRoutes } from "./routes/tinyfun-routes";
 import { registerVizbrainRoutes } from "./routes/vizbrain-routes";
 import { registerShowzRoutes } from "./routes/showz-routes";
 import { registerPhashboardRoutes } from "./routes/phashboard-routes";
@@ -59,6 +60,7 @@ export function registerRoutes(app: Express): Server {
   registerVizspotRoutes(router);   // vizSpot LED board phone pairing
   registerVizbotRoutes(router);    // vizBot firmware releases (GitHub, cached)
   registerTinyradarRoutes(router); // tinyradar firmware for the radar's own page (CORS)
+  registerTinyfunRoutes(router);   // tinyfun firmware for /tinyfun/update
   registerVizbrainRoutes(router);  // vizbrain install links (/vb/<code>, by invitation)
   registerShowzRoutes(router);     // k-shows concert clips (Spaces, cached)
   registerPhashboardRoutes(router); // phashboard: phish.net + phish.in + phantasyfish, cached
