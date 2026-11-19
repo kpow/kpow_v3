@@ -49,6 +49,8 @@ export const CARDS = {
   vizmac: card("vizmac", "vizMac: a lit keyboard and the desk controller showing Now Playing"),
   labz: card("8x8", "8x8 labz: a handheld for drawing 8×8 pixel icons, with its LED matrix lit"),
   tinyradar: card("tinyradar", "tinyradar: a small black cabinet with a round radar screen showing planes, and a green range button"),
+  // No drawn card yet: a build-log photo (scripts/og-cards can make a proper 1200x630 one).
+  tinyfun: { src: "/buildlog/kfun/media/tinyfun-v2-three.jpg", w: 1600, h: 1200, alt: "Three tinyfun handhelds: a little screen over three buttons" },
   led: card("led", "LED art: pixel grids running WLED"),
   shows: card("shows", "k-shows: concert clips"),
   phashboard: card("phashboard", "phashboard: Phish shows and PhantasyFish games"),
@@ -184,6 +186,16 @@ export const STATIC_PAGES: Record<string, PageMeta> = {
     "tinyradar updates",
     "The newest tinyradar firmware, what's in it, and how to install it from the radar's own web page in about 2 minutes.",
     CARDS.tinyradar,
+  ),
+  "/tinyfun": page(
+    "tinyfun: six games in your pocket",
+    "How to use tinyfun, the tiny three-button game console: turning it on, the buttons, and how to play Tetris, Breakout, Snake, Invaders, SkyGrid and Backgammon.",
+    CARDS.tinyfun,
+  ),
+  "/tinyfun/update": page(
+    "tinyfun updates",
+    "The newest tinyfun firmware, and how to put it on your tinyfun from a phone over tinyfun's own Wi-Fi in about 2 minutes.",
+    CARDS.tinyfun,
   ),
   "/led": page(
     "led art",

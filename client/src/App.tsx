@@ -41,6 +41,8 @@ import TinyRadarGuide from "@/pages/TinyRadarGuide";
 import TinyRadarHelp from "@/pages/TinyRadarHelp";
 import TinyRadarUse from "@/pages/TinyRadarUse";
 import TinyRadarUpdate from "@/pages/TinyRadarUpdate";
+import TinyFun from "@/pages/TinyFun";
+import TinyFunUpdate from "@/pages/TinyFunUpdate";
 import VizMacController from "@/pages/VizMacController";
 
 function Router() {
@@ -95,6 +97,8 @@ function Router() {
         <Route path="/tinyradar/update" component={TinyRadarUpdate} />
         <Route path="/tinyradar" component={TinyRadar} />
         <Route path="/plane-radar">{() => <Redirect to="/tinyradar" />}</Route>
+        <Route path="/tinyfun/update" component={TinyFunUpdate} />
+        <Route path="/tinyfun" component={TinyFun} />
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/admin" component={AdminPage} />
         <ProtectedRoute path="/admin/:section" component={AdminPage} />

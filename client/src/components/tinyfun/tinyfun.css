@@ -1,0 +1,73 @@
+/* tinyfun section (/tinyfun, /tinyfun/update). The shared building blocks come
+   from ../vizbot/vizbot.css, scoped to :is(.vizbot, .vizmac, .labz, .tinyradar,
+   .tinyfun). This file sets the same --vb-* variables to tinyfun's accent, the
+   lime of its case. Everything stays under .tinyfun, so the rest of kpow.xyz
+   keeps its blue. */
+
+.tinyfun {
+  --vb-yellow: #c8f02c;      /* the accent: fills only, always with ink text on it */
+  --vb-accent-hi: #d8f765;   /* primary button hover */
+  --vb-yellow-ink: #3f6212;  /* lime-800: accent text on white */
+  --vb-tint: #f7fee7;        /* lime-50 */
+  --vb-tint-border: #d9f99d; /* lime-200 */
+  --vb-ink: #0a0a0a;
+  --vb-stage: #0e1014;
+  --vb-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  color: var(--vb-ink);
+}
+
+/* The brand mark: a tiny console, screen over three buttons. */
+.tinyfun .tf-mark {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  border-radius: 22%;
+  background: var(--vb-yellow);
+  box-shadow: 0 0 0 1.5px #0a0a0a;
+}
+.tinyfun .tf-mark::before {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 14%;
+  height: 46%;
+  border-radius: 12%;
+  background: #0e1014;
+}
+.tinyfun .tf-mark::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 68%;
+  height: 18%;
+  background: radial-gradient(circle, #0a0a0a 42%, transparent 48%) 0 0 / 33.333% 100% repeat-x;
+}
+
+/* A key cap: L, OK, R. */
+.tinyfun .tf-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 7px;
+  border: 1.5px solid #0a0a0a;
+  background: var(--vb-yellow);
+  box-shadow: 0 2px 0 #0a0a0a;
+  font: 700 12.5px/1 var(--vb-mono);
+  color: #0a0a0a;
+  white-space: nowrap;
+}
+
+/* The 128x128 screen, for a game's card. */
+.tinyfun .tf-screen {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: #050607;
+  box-shadow: 0 0 0 1.5px #0a0a0a, inset 0 0 0 5px #15181c;
+}

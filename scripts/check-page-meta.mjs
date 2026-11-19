@@ -24,6 +24,7 @@ const ROUTES = [
   ["/builds", 200], ["/builds/recently", 200], ["/builds/vizbot", 200], ["/builds/8x8", 200], ["/builds/radar", 200],
   ["/8x8", 200], ["/8x8/guide", 200],
   ["/tinyradar", 200], ["/tinyradar/guide", 200], ["/tinyradar/use", 200], ["/tinyradar/help", 200], ["/tinyradar/update", 200],
+  ["/tinyfun", 200], ["/tinyfun/update", 200],
   ["/builds/no-such-build", 404],
   ["/vizspot/guide", 200], ["/vizspot/controls", 200],
   ["/vizbot", 200], ["/vizbot/guide", 200], ["/vizbot/touch", 200], ["/vizbot/web", 200], ["/vizbot/releases", 200],
