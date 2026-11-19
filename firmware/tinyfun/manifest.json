@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "notes": "First release for owners: six games, backgammon match play, Wi-Fi updates",
+  "builds": {
+    "s3": {
+      "url": "tinyfun-s3-v1.0.0.bin",
+      "size": 1517664,
+      "md5": "fdd45f921108b9eee64cf8b411a544f3"
+    }
+  }
+}

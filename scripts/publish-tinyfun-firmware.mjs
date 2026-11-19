@@ -23,7 +23,7 @@ const OUT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "firmware", "
 const args = process.argv.slice(2);
 const notesAt = args.indexOf("--notes");
 const notes = notesAt >= 0 ? args[notesAt + 1] : undefined;
-const tag = args.find((a, i) => !a.startsWith("--") && i !== notesAt + 1);
+const tag = args.find((a, i) => !a.startsWith("--") && (notesAt < 0 || i !== notesAt + 1));
 if (!tag || !/^tinyfun-v\d+\.\d+\.\d+$/.test(tag)) {
   console.error('usage: node scripts/publish-tinyfun-firmware.mjs tinyfun-vX.Y.Z [--notes "…"]');
   process.exit(1);
