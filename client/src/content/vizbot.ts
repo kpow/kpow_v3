@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.12.1";
+export const DOC_VERSION = "3.12.2";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -108,6 +108,7 @@ export const BOARDS: Board[] = [
       "**It knows how it works.** With vizbrain 1.4.0, firmware 3.10.0 and the vizself connector, ask how it blinks, why its head gets stuck or what chip it has, and it looks it up in its own code. While it digs, its face turns into a big ink drop reading a scrolling wall of code, it cracks a corny joke every few seconds, then says \"found it\" and explains. Setup is in [the vizself README](https://github.com/kpow/vizpow/blob/main/vizself/README.md).",
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
       "**Battery care.** The base battery charges to 4.1 V. When it runs low the head parks and the servos and LED ring turn off, and they come back once it recovers. Near empty and not charging, it switches off (3.12.0).",
+      "**Quiet start.** It starts its 5 V output the way M5's own firmware does, so there are no phantom head touches after you power it on, and it charges from USB from the first second (3.12.2).",
     ],
   },
 ];
