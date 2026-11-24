@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.10.2";
+export const DOC_VERSION = "3.12.1";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -51,6 +51,7 @@ export const BOARDS: Board[] = [
       "**Runs on a battery.** Press PWR to start it. To turn it off, hold PWR for 2 seconds or hold **Power off** in Settings › System. On USB it restarts instead. This is for the current board revision; the older one uses different power pins.",
       "**Low power** is for battery use: hold **Low power** in Settings › System. The bot restarts with WiFi off, the CPU slowed down and the screen at 60% of your brightness, and boots in about a second. The control page, cloud, weather, clock sync and updates stay off until you hold **Full power** in the same place.",
       "**Shake it in low power.** With WiFi off there's no weather to flip to, so a shake gets you a reaction instead: it winds up dizzy the longer you keep shaking (the LED matrix flashes along), or tells you a fortune, or rerolls the palette and LED effect — whichever it feels like. Four reactions in two minutes, then it ignores shakes for three minutes: worn on a lanyard it shakes all day, and it shouldn't perform the whole way down the block. Out of low power a shake still flips to weather, same as before (3.7.38).",
+      "**Kaleido HD** is a background made for wearing it as a pendant: a slowly turning kaleidoscope. Pick **Kaleido HD** as the background on the bot's page; it stays off until you do. Worn in low power mode it ran about 12 hours on a full battery (3.12.0).",
       "**Battery level** shows as 0 to 4 bars at the top of the home screen and in Settings › System, or a bolt on USB. When the battery gets too low it shows \"Battery empty\" and turns itself off, instead of running the cell flat.",
     ],
   },
@@ -94,7 +95,7 @@ export const BOARDS: Board[] = [
     feats: ["Moving head", "12-LED ring", "Head touch", "Battery", "Voice", "Camera"],
     touch: true,
     notes: [
-      "The head drifts around on its own and reacts when you touch the top of it.",
+      "The head drifts around on its own and reacts when you touch the top of it. It holds still while your hand is on its head, so pats and holds always land (3.12.1).",
       "**Head** in the dock: Chill mode, Chill time, nod, shake, look up, look down, center.",
       "**Chill mode** parks the head and stops it moving. Hold the top of its head for 2 seconds, or use **Head › Chill mode**. **Chill time** sets how long: 10 min, 30 min, 1 hour or 2 hours. It remembers your pick.",
       "Base LEDs and LED mode are in Settings › Light & sound. Battery is in System.",
@@ -106,6 +107,7 @@ export const BOARDS: Board[] = [
       "**Louder, through the Mac.** Its own speaker is small. With vizbrain 1.3.0 and firmware 3.7.37, turn on **Talk through the Mac's speaker** on the [web panel](/vizbot/web#brain) and its voice plays on the Mac's sound output, such as a Bluetooth speaker paired to the Mac, while it still moves its mouth. Stackchan can't play to a Bluetooth speaker itself: its chip has Bluetooth Low Energy only.",
       "**It knows how it works.** With vizbrain 1.4.0, firmware 3.10.0 and the vizself connector, ask how it blinks, why its head gets stuck or what chip it has, and it looks it up in its own code. While it digs, its face turns into a big ink drop reading a scrolling wall of code, it cracks a corny joke every few seconds, then says \"found it\" and explains. Setup is in [the vizself README](https://github.com/kpow/vizpow/blob/main/vizself/README.md).",
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
+      "**Battery care.** The base battery charges to 4.1 V. When it runs low the head parks and the servos and LED ring turn off, and they come back once it recovers. Near empty and not charging, it switches off (3.12.0).",
     ],
   },
 ];

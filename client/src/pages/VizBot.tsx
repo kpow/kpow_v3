@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              With high-res off, the patterns now have a thin black grid between blocks, so the screen looks like a real LED panel.
+              Stackchan is rebuilt for stability: no phantom head taps, and pats and holds work while its head drifts. Every board now rejoins WiFi on its own when the router stops answering.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
