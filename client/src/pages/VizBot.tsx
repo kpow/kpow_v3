@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Stackchan is rebuilt for stability: no phantom head taps, and pats and holds work while its head drifts. Every board now rejoins WiFi on its own when the router stops answering.
+              Stackchan starts quietly: no phantom head touches after a power-on, and its voice stream no longer starves the WiFi of memory.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →
