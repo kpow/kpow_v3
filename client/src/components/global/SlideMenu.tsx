@@ -30,6 +30,7 @@ import {
   Grid3x3,
   Video,
   Radar,
+  Flower2,
 } from "lucide-react";
 import { ContactDialog } from "@/components/ContactDialog";
 
@@ -45,6 +46,8 @@ interface NavLink {
   /** Path prefixes that count as "here" for this link */
   match?: string[];
   external?: boolean;
+  /** A static page outside the React app (client/public): plain same-tab link, not a wouter Link */
+  plain?: boolean;
 }
 
 interface NavGroup {
@@ -75,6 +78,7 @@ const GROUPS: NavGroup[] = [
       { icon: <Radar className="w-4 h-4" />, label: "tinyradar", href: "/tinyradar", match: ["/tinyradar"] },
       { icon: <Gamepad2 className="w-4 h-4" />, label: "tinyfun", href: "/tinyfun", match: ["/tinyfun"] },
       { icon: <Lightbulb className="w-4 h-4" />, label: "led art", href: "/led", match: ["/led"] },
+      { icon: <Flower2 className="w-4 h-4" />, label: "phyllo sim", href: "/phyllo-sim/index.html", match: ["/phyllo-sim"], plain: true },
     ],
   },
   {
@@ -170,6 +174,13 @@ export function SlideMenu({ isOpen, onClose }: SlideMenuProps) {
         <span className="text-[13px]">{item.label}</span>
       </>
     );
+    if (item.plain) {
+      return (
+        <a key={item.label} href={item.href} onClick={onClose} className={cls}>
+          {body}
+        </a>
+      );
+    }
     return item.external ? (
       <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" onClick={onClose} className={cls}>
         {body}
