@@ -102,13 +102,14 @@ textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;line-h
         <summary style="cursor:pointer;font-weight:800">What you can use</summary>
         <p>Your code runs once per LED, every frame. Return <code>[r, g, b]</code> (0&ndash;255).</p>
         <ul>
-          <li><code>led.i</code> spiral index (0 = center)</li>
+          <li><code>led.i</code> layout index (0 = center for spirals and rings)</li>
           <li><code>led.chain</code> position on the data line</li>
           <li><code>led.r</code> 0&ndash;1 center to edge</li>
           <li><code>led.theta</code> radians, <code>led.angle</code> degrees</li>
           <li><code>led.nx</code>, <code>led.ny</code> &minus;1&hellip;1, <code>led.x</code>, <code>led.y</code> mm</li>
           <li><code>led.arm</code> 0&hellip;F&minus;1, <code>led.arm2</code> 0&hellip;G&minus;1 (the two Fibonacci arm families)</li>
           <li><code>led.armRank</code> arms in clockwise order around the board</li>
+          <li><code>led.sector</code> 0&hellip;k&minus;1 symmetry wedge, <code>led.ring</code> ring number (symmetric layouts: <code>arm</code> = sector, <code>arm2</code> = ring)</li>
           <li><code>led.n</code>, <code>led.F</code>, <code>led.G</code> counts</li>
           <li><code>t</code> seconds, <code>s</code> state that persists (<code>s.dt</code>, <code>s.frame</code>)</li>
           <li><code>hsv(h, s, v)</code> h in turns (0&ndash;1 wraps), s and v 0&ndash;1</li>
@@ -119,8 +120,15 @@ textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;line-h
 
     <div class="box">
       <h2>Board</h2>
+      <div class="row"><label for="lay">Layout</label><select id="lay">
+        <optgroup label="Sunflowers"><option value="golden">Golden sunflower</option><option value="lucas">Lucas sunflower</option><option value="custom">Sunflower, your angle</option></optgroup>
+        <optgroup label="Symmetric"><option value="rings">Concentric rings</option><option value="diamond">Diamond lattice</option><option value="polygon">Polygon rings</option><option value="lotus">Lotus</option><option value="galaxy">Galaxy swirl</option><option value="hex">Honeycomb</option><option value="penrose">Penrose star (5-fold)</option></optgroup>
+        <optgroup label="Spirals"><option value="arch">Archimedean spiral</option></optgroup>
+      </select><output></output></div>
+      <div class="row" id="kRow"><label for="kk">Symmetry k</label><input type="range" id="kk" min="3" max="24" step="1" value="10"><output id="kkO"></output></div>
+      <p class="note" id="layNote"></p>
       <div class="row"><label for="n">LED count</label><input type="range" id="n" min="20" max="600" step="1" value="150"><output id="nO"></output></div>
-      <div class="row"><label for="a">Angle</label><input type="range" id="a" min="135" max="140" step="0.1" value="137.5"><output id="aO"></output></div>
+      <div class="row"><label for="a">Angle</label><input type="range" id="a" min="20" max="180" step="0.1" value="137.5"><output id="aO"></output></div>
       <div class="row"><label for="c">Spacing c</label><input type="range" id="c" min="1.6" max="7" step="0.05" value="2.2"><output id="cO"></output></div>
       <label class="chk"><input type="checkbox" id="fit"> Fit to 62 mm board (auto spacing)</label>
       <div class="row"><label for="pkg">LED size</label><select id="pkg"><option value="5050">5050 &middot; 5.0 mm</option><option value="2020" selected>2020 &middot; 2.0 mm</option><option value="1515">1515 &middot; 1.5 mm</option><option value="1010">1010 &middot; 1.0 mm</option></select><output></output></div>
@@ -161,7 +169,7 @@ textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;line-h
 
 <script>
 const $=id=>document.getElementById(id);
-const S={N:150,A:137.5,c:2.2,rot:true,view:'pcb',chain:false,bright:60,speed:1,paused:false,mA:12,fit:false,mSt:'round',mW:1.2,mRim:'arms',mLed:true,pkg:'2020',real:false};
+const S={N:150,A:137.5,c:2.2,rot:true,view:'pcb',chain:false,bright:60,speed:1,paused:false,mA:12,fit:false,mSt:'round',mW:1.2,mRim:'arms',mLed:true,pkg:'2020',real:false,lay:'golden',k:10};
 const PKG={'5050':{mm:5.0,name:'WS2812B (5050)',lcsc:''},'2020':{mm:2.0,name:'WS2812B-2020',lcsc:'C965555'},'1515':{mm:1.5,name:'SK6805-EC15',lcsc:'C2890035'},'1010':{mm:1.0,name:'XL-1010RGBC-WS2812B',lcsc:'C5349953'}};
 const ledHalf=()=>PKG[S.pkg].mm/2,PXMM=96/25.4;
 const FIT_RMAX=26.9,FIT_R=31;
@@ -228,28 +236,116 @@ const v = s.v[led.i];
 return hsv(0.12, 0.35, v);`
 };
 
+// ---- layout generators: return unit-scale points (+ optional ring/sector/order)
+const LAYOUTS={
+ golden:{name:'Golden sunflower',group:'Sunflowers',uses:'N',angle:137.5},
+ lucas:{name:'Lucas sunflower',group:'Sunflowers',uses:'N',angle:99.5},
+ custom:{name:'Sunflower, your angle',group:'Sunflowers',uses:'NA'},
+ rings:{name:'Concentric rings',group:'Symmetric',uses:'Nk'},
+ diamond:{name:'Diamond lattice',group:'Symmetric',uses:'Nk'},
+ polygon:{name:'Polygon rings',group:'Symmetric',uses:'Nk'},
+ lotus:{name:'Lotus',group:'Symmetric',uses:'Nk'},
+ galaxy:{name:'Galaxy arms',group:'Symmetric',uses:'Nk'},
+ hex:{name:'Honeycomb',group:'Symmetric',uses:'N'},
+ penrose:{name:'Penrose star (5-fold)',group:'Symmetric',uses:'N'},
+ arch:{name:'Archimedean spiral',group:'Spirals',uses:'N'},
+};
+function genLayout(id,N,k,A){
+ const pts=[],P=(r,t,ring,sector)=>pts.push({x:r*Math.cos(t),y:r*Math.sin(t),t,ring,sector});
+ const TAU=Math.PI*2;let order=null,F=k,G=1,sym='',sunflower=false;
+ if(id==='golden'||id==='lucas'||id==='custom'){
+  const a=(id==='custom'?A:LAYOUTS[id].angle)*Math.PI/180;
+  for(let n=0;n<N;n++)P(Math.sqrt(n+0.5),n*a,0,0);sunflower=true;sym='none';
+ }else if(id==='rings'||id==='polygon'){
+  P(0,0,0,0);let i=1;
+  while(pts.length+k*i<=N+k*i/2){const m=k*i,off=(i%2)?Math.PI/m:0;
+   for(let j=0;j<m;j++){let t=TAU*j/m+off,r=i;
+    if(id==='polygon'){const e=Math.floor(j/i),f=(j%i)/i,a0=TAU*e/k+(i%2?Math.PI/k:0),a1=a0+TAU/k;
+     const x=i*((1-f)*Math.cos(a0)+f*Math.cos(a1)),y=i*((1-f)*Math.sin(a0)+f*Math.sin(a1));r=Math.hypot(x,y);t=Math.atan2(y,x);}
+    P(r,t,i,Math.floor(j*k/m));}
+   i++;}
+  G=i-1;sym=`${k}-fold`;
+ }else if(id==='diamond'){
+  const q=1+Math.PI/k;P(0,0,0,0);let r=1.25*k/TAU,j=0;
+  while(pts.length+k<=N+k/2){for(let s=0;s<k;s++)P(r,TAU*(s+(j%2)/2)/k,j+1,s);r*=q;j++;}
+  G=j;sym=`${k}-fold, ${k}+${k} crossing spirals`;
+ }else if(id==='galaxy'){
+  P(0,0,0,0);let i=1,rings=[];while(pts.length+k*i<=N+k*i/2){rings.push(i);for(let j=0;j<k*i;j++)pts.push(null);i++;}
+  pts.length=1;const tw=Math.PI*1.5/Math.max(1,rings.length);
+  rings.forEach(i=>{const m=k*i;for(let j=0;j<m;j++)P(i,TAU*j/m+tw*i,i,Math.floor(j*k/m));});
+  G=rings.length;sym=`${k} swirling arms`;
+ }else if(id==='lotus'){
+  const amp=0.16;P(0,0,0,0);let L=0;
+  for(let j=1;j<40;j++){const S=720,xy=[];let len=0;
+   for(let s=0;s<=S;s++){const t=TAU*s/S,r=j*(1+amp*Math.cos(k*t+(j%2?Math.PI:0)*0));xy.push([r*Math.cos(t),r*Math.sin(t)]);}
+   const cum=[0];for(let s=1;s<=S;s++){len+=Math.hypot(xy[s][0]-xy[s-1][0],xy[s][1]-xy[s-1][1]);cum.push(len);}
+   const m=Math.max(k,Math.round(len/1.0/k)*k);if(j>1&&pts.length+m>N+m/2)break;L=j;let s=0;
+   for(let q=0;q<m;q++){const target=len*q/m;while(cum[s+1]<target)s++;const f=(target-cum[s])/((cum[s+1]-cum[s])||1);
+    const x=xy[s][0]+(xy[s+1][0]-xy[s][0])*f,y=xy[s][1]+(xy[s+1][1]-xy[s][1])*f;P(Math.hypot(x,y),Math.atan2(y,x),j,Math.floor(q*k/m));}}
+  G=L;sym=`${k}-fold petals`;
+ }else if(id==='hex'){
+  const a=Math.sqrt(Math.PI/(N*Math.sqrt(3)/2)),rows=[];
+  for(let y=-14;y<=14;y++){const row=[];for(let x=-14;x<=14;x++){const px=(x+(y&1)/2)*a,py=y*a*Math.sqrt(3)/2;if(Math.hypot(px,py)<=1.0001)row.push([px,py]);}
+   if(row.length)rows.push(y%2?row.reverse():row);}
+  rows.forEach(row=>row.forEach(([x,y])=>P(Math.hypot(x,y),Math.atan2(y,x),0,0)));
+  pts.forEach(p=>{p.sector=Math.floor(((p.t+TAU)%TAU)/(TAU/6));p.ring=Math.round(p.r/a);});F=6;G=Math.max(...pts.map(p=>p.ring))+1;sym='6-fold';order=pts.map((_,i)=>i);
+ }else if(id==='penrose'){
+  const e=[...Array(5)].map((_,i)=>[Math.cos(TAU*i/5),Math.sin(TAU*i/5)]),g=0.3,M=Math.ceil(Math.sqrt(N)*0.9)+3,c=[],seen=new Set();
+  for(let i=0;i<5;i++)for(let j=i+1;j<5;j++)for(let ni=-M;ni<=M;ni++)for(let nj=-M;nj<=M;nj++){
+   const [a1,b1]=e[i],[a2,b2]=e[j],c1=ni+g,c2=nj+g,d=a1*b2-a2*b1,px=(c1*b2-c2*b1)/d,py=(a1*c2-a2*c1)/d;
+   let cx=(ni+0.5)*a1+(nj+0.5)*a2,cy=(ni+0.5)*b1+(nj+0.5)*b2;
+   for(let kk=0;kk<5;kk++){if(kk===i||kk===j)continue;const K=Math.ceil(px*e[kk][0]+py*e[kk][1]-g);cx+=K*e[kk][0];cy+=K*e[kk][1];}
+   const key=Math.round(cx*1e4)+','+Math.round(cy*1e4);if(seen.has(key))continue;seen.add(key);c.push([cx,cy]);}
+  c.sort((u,v)=>Math.hypot(...u)-Math.hypot(...v));const lim=Math.hypot(...c[Math.min(N,c.length)-1])+1e-6;
+  c.filter(p=>Math.hypot(...p)<=lim).forEach(([x,y])=>P(Math.hypot(x,y),Math.atan2(y,x),0,0));
+  pts.forEach(p=>{p.sector=Math.floor(((p.t+TAU+TAU/20)%TAU)/(TAU/5));p.ring=Math.round(p.r/0.9);});F=5;G=Math.max(...pts.map(p=>p.ring))+1;sym='5-fold quasicrystal';
+ }else if(id==='arch'){
+  const b=Math.sqrt(Math.PI/N);let th=TAU*0.35;
+  while(true){const r=b*th/TAU;if(r>1)break;P(r,th,Math.floor(th/TAU),0);th+=b/Math.sqrt(r*r+(b/TAU)**2);}
+  pts.forEach(p=>{p.sector=Math.floor(((p.t%TAU)+TAU)%TAU/(TAU/8));});F=8;G=Math.max(...pts.map(p=>p.ring))+1;sym='1 arm';order=pts.map((_,i)=>i);
+ }
+ // default chain for ringed layouts: ring by ring, alternating direction, each ring starting near the last LED
+ if(!order&&!sunflower){
+  const byRing={};pts.forEach((p,i)=>(byRing[p.ring]=byRing[p.ring]||[]).push(i));order=[];
+  Object.keys(byRing).map(Number).sort((a,b)=>b-a).forEach((rg,ri)=>{let ring=byRing[rg].sort((a,b)=>((pts[a].t+TAU)%TAU)-((pts[b].t+TAU)%TAU));
+   if(order.length){const last=pts[order[order.length-1]];let bi=0,bd=1e9;ring.forEach((idx,q)=>{const d=Math.hypot(pts[idx].x-last.x,pts[idx].y-last.y);if(d<bd){bd=d;bi=q;}});ring=ring.slice(bi).concat(ring.slice(0,bi));}
+   if(ri%2)ring=[ring[0]].concat(ring.slice(1).reverse());order.push(...ring);});
+ }
+ return {pts,order,F,G,sym,sunflower};
+}
+
 function build(){
  if(S.fit){S.c=FIT_RMAX/Math.sqrt(S.N-0.5);$('c').value=S.c;}
- const {N,A,c}=S;P=[];
- for(let n=0;n<N;n++){const r=c*Math.sqrt(n+0.5),th=n*A*Math.PI/180;P.push({i:n,x:r*Math.cos(th),y:r*Math.sin(th),rmm:r,spiral:th});}
- rmax=c*Math.sqrt(N-0.5);R=S.fit?FIT_R:rmax+3.2;
- let best=1e9,fi=3;
- for(let k=1;k<FIB.length;k++){const f=FIB[k];if(f>N/3)break;let s=0,m=0;for(let n=Math.floor(N/2);n+f<N;n++){s+=dist(P[n],P[n+f]);m++;}if(m&&s/m<best){best=s/m;fi=k;}}
- F=FIB[fi];G=FIB[fi-1];
- const rank=new Array(F);order=[];
- for(let k=0;k<F;k++){const r0=(k*G)%F;rank[r0]=k;const arm=[];for(let n=r0;n<N;n+=F)arm.push(n);if(k%2)arm.reverse();order.push(...arm);}
+ if(!LAYOUTS[S.lay])S.lay='golden';
+ if(S.lay==='golden'||S.lay==='lucas'){S.A=LAYOUTS[S.lay].angle;$('a').value=S.A;}
+ const c=S.c,gl=genLayout(S.lay,S.N,S.k,S.A);
+ const target=c*Math.sqrt(S.N-0.5),mx=Math.max(...gl.pts.map(p=>Math.hypot(p.x,p.y)))||1,sc=target/mx;
+ P=gl.pts.map((p,i)=>({i,x:p.x*sc,y:p.y*sc,rmm:Math.hypot(p.x,p.y)*sc,spiral:gl.sunflower?p.t:Math.atan2(p.y,p.x),ring:p.ring||0,sector:p.sector||0}));
+ const N=P.length;rmax=target;R=S.fit?FIT_R:rmax+3.2;
+ P.forEach((p,i)=>{let m=1e9;P.forEach((q,j)=>{if(j!==i){const d=(p.x-q.x)**2+(p.y-q.y)**2;if(d<m)m=d;}});p.nn=Math.sqrt(m);});
+ let rank;
+ if(gl.sunflower){
+  const cand=[];for(let s=2;s<=Math.min(89,Math.floor(N/3));s++){let sum=0,m=0;for(let n=Math.floor(N/2);n+s<N;n++){sum+=dist(P[n],P[n+s]);m++;}if(m)cand.push([sum/m,s]);}
+  cand.sort((a,b)=>a[0]-b[0]);const gcd=(a,b)=>b?gcd(b,a%b):a;F=cand.length?cand[0][1]:1;const gc=cand.find(q=>q[1]!==F&&gcd(q[1],F)===1);G=gc?gc[1]:1;
+  rank=new Array(F);order=[];
+  for(let k=0;k<F;k++){const r0=(k*G)%F;rank[r0]=k;const arm=[];for(let n=r0;n<N;n+=F)arm.push(n);if(k%2)arm.reverse();order.push(...arm);}
+  P.forEach(p=>{p.sector=p.i%F;p.ring=Math.round(p.rmm/rmax*8);});
+ }else{F=Math.max(1,gl.F);G=Math.max(1,gl.G);order=gl.order;}
  order.forEach((n,k)=>P[n].chain=k);
  let mn=1e9;for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=dx*dx+dy*dy;if(d<mn)mn=d;}
  minPitch=Math.sqrt(mn);
- P.forEach(p=>{p.nx=p.x/rmax;p.ny=p.y/rmax;p.r=p.rmm/rmax;let a=Math.atan2(p.y,p.x);if(a<0)a+=Math.PI*2;p.theta=a;p.angle=a*180/Math.PI;p.arm=p.i%F;p.arm2=p.i%G;p.armRank=rank[p.arm];p.n=N;p.F=F;p.G=G;});
+ P.forEach(p=>{p.nx=p.x/rmax;p.ny=p.y/rmax;p.r=p.rmm/rmax;let a=Math.atan2(p.y,p.x);if(a<0)a+=Math.PI*2;p.theta=a;p.angle=a*180/Math.PI;if(gl.sunflower){p.arm=p.i%F;p.arm2=p.i%G;p.armRank=rank[p.arm];}else{p.arm=p.sector%F;p.arm2=p.ring%G;p.armRank=p.arm;}p.n=N;p.F=F;p.G=G;});
  col=new Float32Array(N*3);us={};hov=-1;
  buildCells();
- $('nO').textContent=N;$('aO').textContent=S.A.toFixed(1)+'°';$('cO').textContent=S.c.toFixed(2)+'mm';
+ $('nO').textContent=N===S.N?N:S.N+'→'+N;$('kkO').textContent=S.k;$('lay').value=S.lay;
+ const usesK=['rings','diamond','polygon','lotus','galaxy'].includes(S.lay);$('kRow').style.opacity=usesK?1:.35;$('a').closest('.row').style.opacity=gl.sunflower?1:.35;
+ $('layNote').textContent=`${LAYOUTS[S.lay].name} · ${gl.sunflower?S.A.toFixed(1)+'° per LED':gl.sym}${N!==S.N?' · '+N+' LEDs fit this pattern':''}`;
+$('aO').textContent=S.A.toFixed(1)+'°';$('cO').textContent=S.c.toFixed(2)+'mm';
  $('sD').textContent=(2*R).toFixed(1)+' mm';
  $('sP').textContent=minPitch.toFixed(2)+' mm';$('sP').style.color=minPitch<PKG[S.pkg].mm+1?'#ff5a5a':'';
  const pk=PKG[S.pkg];$('pkgNote').textContent=`${pk.name} · ${pk.mm}×${pk.mm} mm · gap at closest pair ${(minPitch-pk.mm).toFixed(2)} mm${pk.lcsc?' · LCSC '+pk.lcsc:''}`;
  if(S.real)resize();
- $('sA').textContent=F+' / '+G;
+ $('sA').textContent=gl.sunflower?F+' / '+G:gl.sym;
  save();
 }
 
@@ -261,8 +357,9 @@ function clipHalf(poly,px,py,nx,ny){ // keep points q with (q-p)·n <= 0
  return out;}
 function buildCells(){
  const N=P.length;RC=rmax+S.c*0.62;const circ=[];for(let i=0;i<96;i++){const a=i/96*Math.PI*2;circ.push([RC*Math.cos(a),RC*Math.sin(a)]);}
- const lim=(S.c*3.5)**2;cells=[];
+ cells=[];
  for(let i=0;i<N;i++){let poly=circ;const p=P[i];
+  const lim=Math.max(S.c*3.5,p.nn*4.5)**2;
   for(let j=0;j<N&&poly.length;j++){if(j===i)continue;const q=P[j],dx=q.x-p.x,dy=q.y-p.y;if(dx*dx+dy*dy>lim)continue;
    poly=clipHalf(poly,(p.x+q.x)/2,(p.y+q.y)/2,dx,dy);}
   cells.push(poly);}
@@ -274,7 +371,9 @@ function buildCellPaths(){
    path.moveTo(m[m.length-1][0],m[m.length-1][1]);for(let k=0;k<Q.length;k++)path.quadraticCurveTo(Q[k][0],Q[k][1],m[k][0],m[k][1]);}
   else{const Q=insetPoly(Pl,p,w/2);path.moveTo(Q[0][0],Q[0][1]);for(let k=1;k<Q.length;k++)path.lineTo(Q[k][0],Q[k][1]);}
   path.closePath();return path;});
- latticePath=new Path2D();for(let n=0;n<P.length;n++)for(const k of [F,G])if(n+k<P.length){latticePath.moveTo(P[n].x,P[n].y);latticePath.lineTo(P[n+k].x,P[n+k].y);}
+ latticePath=new Path2D();
+ if(LAYOUTS[S.lay]&&['golden','lucas','custom'].includes(S.lay)){for(let n=0;n<P.length;n++)for(const k of [F,G])if(n+k<P.length){latticePath.moveTo(P[n].x,P[n].y);latticePath.lineTo(P[n+k].x,P[n+k].y);}}
+ else{for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const d=Math.hypot(P[i].x-P[j].x,P[i].y-P[j].y);if(d<1.3*Math.min(P[i].nn,P[j].nn)){latticePath.moveTo(P[i].x,P[i].y);latticePath.lineTo(P[j].x,P[j].y);}}}
  let small=1e9,touch=0;
  cells.forEach((Pl,i)=>{const p=P[i];let a=0;for(let k=0;k<Pl.length;k++){const u=Pl[k],v=Pl[(k+1)%Pl.length];a+=u[0]*v[1]-v[0]*u[1];}small=Math.min(small,Math.abs(a/2));
   const t=S.rot?p.spiral:0,hl=ledHalf(),cs=[[-hl,-hl],[hl,-hl],[hl,hl],[-hl,hl]].map(([u,v])=>[p.x+u*Math.cos(t)-v*Math.sin(t),p.y+u*Math.sin(t)+v*Math.cos(t)]);
@@ -375,7 +474,7 @@ function frame(now){
 
 cv.addEventListener('pointermove',e=>{
  const rc=cv.getBoundingClientRect(),s=(size/2-6)/R;const x=(e.clientX-rc.left-size/2)/s,y=(e.clientY-rc.top-size/2)/s;
- let bi=-1,bd=(S.c*0.9)**2;P.forEach((p,i)=>{const d=(p.x-x)**2+(p.y-y)**2;if(d<bd){bd=d;bi=i;}});hov=bi;
+ let bi=-1,bd=1e9;if(Math.hypot(x,y)<=R)P.forEach((p,i)=>{const d=(p.x-x)**2+(p.y-y)**2;if(d<bd&&d<(p.nn*0.9)**2){bd=d;bi=i;}});hov=bi;
  if(bi<0){$('hover').textContent='Hover an LED to inspect it';return;}
  const p=P[bi],c=[col[bi*3],col[bi*3+1],col[bi*3+2]].map(v=>Math.round(v));
  $('hover').textContent=`i ${p.i} · D${p.chain+1} · arm ${p.arm}/${F} · arm2 ${p.arm2}/${G} · r ${p.r.toFixed(2)} · ${p.angle.toFixed(0)}° · rgb(${c.join(', ')})`;
@@ -396,6 +495,9 @@ $('rot').addEventListener('change',()=>{S.rot=$('rot').checked;buildCellPaths();
 function setView(v){S.view=v;$('vPcb').classList.toggle('on',v==='pcb');$('vDif').classList.toggle('on',v==='dif');$('vMan').classList.toggle('on',v==='man');save();}
 $('vPcb').onclick=()=>setView('pcb');$('vDif').onclick=()=>setView('dif');$('vMan').onclick=()=>setView('man');
 $('pkg').addEventListener('change',()=>{S.pkg=$('pkg').value;build();});
+$('lay').addEventListener('change',()=>{S.lay=$('lay').value;const KD={rings:8,diamond:14,polygon:6,lotus:8,galaxy:8};if(KD[S.lay]){S.k=KD[S.lay];$('kk').value=S.k;}build();});
+$('kk').addEventListener('input',()=>{S.k=+$('kk').value;build();});
+['pointerdown','keydown'].forEach(ev=>$('a').addEventListener(ev,()=>{if(S.lay==='golden'||S.lay==='lucas'){S.lay='custom';$('lay').value='custom';}}));
 $('vReal').onclick=()=>{S.real=!S.real;$('vReal').classList.toggle('on',S.real);$('vReal').textContent=S.real?'Fit to screen':'Actual size';resize();};
 $('fit').addEventListener('change',()=>{S.fit=$('fit').checked;build();});
 $('c').addEventListener('input',()=>{if(S.fit){S.fit=false;$('fit').checked=false;build();}});
@@ -412,9 +514,9 @@ function exportFast(){
  const N=P.length,ph=order.map(n=>P[n]);
  const spiral=ph.map(p=>p.i),ang=ph.map(p=>Math.round(p.theta/(Math.PI*2)*256)%256),rad=ph.map(p=>Math.round(p.r*255)),
   xs=ph.map(p=>Math.round(p.nx*127)),ys=ph.map(p=>Math.round(p.ny*127)),arm=ph.map(p=>p.arm),rk=ph.map(p=>p.armRank);
- $('out').value=`// Phyllo Sim export — ${N} x ${PKG[S.pkg].name}, ${S.A.toFixed(1)}° golden angle, c = ${S.c.toFixed(1)} mm
+ $('out').value=`// Phyllo Sim export — ${N} x ${PKG[S.pkg].name}, ${LAYOUTS[S.lay].name}${['golden','lucas','custom'].includes(S.lay)?' '+S.A.toFixed(1)+'°':', k='+S.k}, c = ${S.c.toFixed(1)} mm
 // Every array is in PHYSICAL order: index 0 = first LED after DIN.
-// Chain runs along the ${F}-arm spiral family, serpentine, arms visited in spatial order.
+// Chain: ${['golden','lucas','custom'].includes(S.lay)?'along the '+F+'-arm spiral family, serpentine':'ring by ring (or along the arm), alternating direction'}.\n// Symmetric layouts: phylloArm = sector (0..ARMS-1), ARMS2 = number of rings.
 #pragma once
 #include <stdint.h>
 
@@ -462,10 +564,10 @@ function exportKicad(){
 $('xFast').onclick=exportFast;$('xKicad').onclick=exportKicad;
 $('xCopy').onclick=async()=>{const o=$('out');if(!o.value)exportFast();try{await navigator.clipboard.writeText(o.value);$('xCopy').textContent='Copied';}catch(e){o.select();$('xCopy').textContent='Selected — press Ctrl+C';}setTimeout(()=>$('xCopy').textContent='Copy',1600);};
 
-function save(){try{localStorage.setItem('phyllosim',JSON.stringify({S:{N:S.N,A:S.A,c:S.c,rot:S.rot,view:S.view,chain:S.chain,bright:S.bright,speed:S.speed,mA:S.mA,fit:S.fit,mSt:S.mSt,mW:S.mW,mRim:S.mRim,mLed:S.mLed,pkg:S.pkg},code:$('code').value,preset:activePreset}));}catch(e){}}
+function save(){try{localStorage.setItem('phyllosim',JSON.stringify({S:{N:S.N,A:S.A,c:S.c,rot:S.rot,view:S.view,chain:S.chain,bright:S.bright,speed:S.speed,mA:S.mA,fit:S.fit,mSt:S.mSt,mW:S.mW,mRim:S.mRim,mLed:S.mLed,pkg:S.pkg,lay:S.lay,k:S.k},code:$('code').value,preset:activePreset}));}catch(e){}}
 function load(){try{const d=JSON.parse(localStorage.getItem('phyllosim')||'null');if(!d)return false;Object.assign(S,d.S||{});
  $('n').value=S.N;$('a').value=S.A;$('c').value=S.c;$('rot').checked=S.rot;$('br').value=S.bright;$('sp').value=S.speed;$('ma').value=S.mA;
- $('fit').checked=S.fit;$('mSt').value=S.mSt;$('mW').value=S.mW;$('mRim').value=S.mRim;$('mLed').checked=S.mLed;$('pkg').value=S.pkg||'2020';if(!PKG[S.pkg])S.pkg='2020';S.real=false;
+ $('fit').checked=S.fit;$('mSt').value=S.mSt;$('mW').value=S.mW;$('mRim').value=S.mRim;$('mLed').checked=S.mLed;$('pkg').value=S.pkg||'2020';if(!PKG[S.pkg])S.pkg='2020';S.real=false;$('lay').value=S.lay||'golden';$('kk').value=S.k||10;
  if(d.code){$('code').value=d.code;activePreset=d.preset||'';document.querySelectorAll('#presets button').forEach(b=>b.classList.toggle('on',PRESETS[b.textContent]===d.code));}
  setView(S.view);$('vChain').classList.toggle('on',S.chain);return !!d.code;}catch(e){return false;}}
 
