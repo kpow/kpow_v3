@@ -74,6 +74,7 @@ textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;line-h
       <button id="vChain">Show data chain</button>
       <button id="pause">Pause</button>
       <button id="reset">Reset time</button>
+      <button id="vReal">Actual size</button>
     </div>
     <canvas id="cv"></canvas>
     <div class="hover" id="hover">Hover an LED to inspect it</div>
@@ -122,6 +123,8 @@ textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;line-h
       <div class="row"><label for="a">Angle</label><input type="range" id="a" min="135" max="140" step="0.1" value="137.5"><output id="aO"></output></div>
       <div class="row"><label for="c">Spacing c</label><input type="range" id="c" min="1.6" max="7" step="0.05" value="2.2"><output id="cO"></output></div>
       <label class="chk"><input type="checkbox" id="fit"> Fit to 62 mm board (auto spacing)</label>
+      <div class="row"><label for="pkg">LED size</label><select id="pkg"><option value="5050">5050 &middot; 5.0 mm</option><option value="2020" selected>2020 &middot; 2.0 mm</option><option value="1515">1515 &middot; 1.5 mm</option><option value="1010">1010 &middot; 1.0 mm</option></select><output></output></div>
+      <p class="note" id="pkgNote"></p>
       <label class="chk"><input type="checkbox" id="rot" checked> Rotate each LED to its spiral angle</label>
     </div>
 
@@ -158,7 +161,9 @@ textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;line-h
 
 <script>
 const $=id=>document.getElementById(id);
-const S={N:150,A:137.5,c:2.2,rot:true,view:'pcb',chain:false,bright:60,speed:1,paused:false,mA:12,fit:false,mSt:'round',mW:1.2,mRim:'arms',mLed:true};
+const S={N:150,A:137.5,c:2.2,rot:true,view:'pcb',chain:false,bright:60,speed:1,paused:false,mA:12,fit:false,mSt:'round',mW:1.2,mRim:'arms',mLed:true,pkg:'2020',real:false};
+const PKG={'5050':{mm:5.0,name:'WS2812B (5050)',lcsc:''},'2020':{mm:2.0,name:'WS2812B-2020',lcsc:'C965555'},'1515':{mm:1.5,name:'SK6805-EC15',lcsc:'C2890035'},'1010':{mm:1.0,name:'XL-1010RGBC-WS2812B',lcsc:'C5349953'}};
+const ledHalf=()=>PKG[S.pkg].mm/2,PXMM=96/25.4;
 const FIT_RMAX=26.9,FIT_R=31;
 const FIB=[2,3,5,8,13,21,34,55,89];
 let P=[],F=13,G=8,order=[],R=10,rmax=1,minPitch=0,cells=[],RC=10,cellPaths=[],latticePath=null;
@@ -241,7 +246,9 @@ function build(){
  buildCells();
  $('nO').textContent=N;$('aO').textContent=S.A.toFixed(1)+'°';$('cO').textContent=S.c.toFixed(2)+'mm';
  $('sD').textContent=(2*R).toFixed(1)+' mm';
- $('sP').textContent=minPitch.toFixed(2)+' mm';$('sP').style.color=minPitch<3?'#ff5a5a':'';
+ $('sP').textContent=minPitch.toFixed(2)+' mm';$('sP').style.color=minPitch<PKG[S.pkg].mm+1?'#ff5a5a':'';
+ const pk=PKG[S.pkg];$('pkgNote').textContent=`${pk.name} · ${pk.mm}×${pk.mm} mm · gap at closest pair ${(minPitch-pk.mm).toFixed(2)} mm${pk.lcsc?' · LCSC '+pk.lcsc:''}`;
+ if(S.real)resize();
  $('sA').textContent=F+' / '+G;
  save();
 }
@@ -270,7 +277,7 @@ function buildCellPaths(){
  latticePath=new Path2D();for(let n=0;n<P.length;n++)for(const k of [F,G])if(n+k<P.length){latticePath.moveTo(P[n].x,P[n].y);latticePath.lineTo(P[n+k].x,P[n+k].y);}
  let small=1e9,touch=0;
  cells.forEach((Pl,i)=>{const p=P[i];let a=0;for(let k=0;k<Pl.length;k++){const u=Pl[k],v=Pl[(k+1)%Pl.length];a+=u[0]*v[1]-v[0]*u[1];}small=Math.min(small,Math.abs(a/2));
-  const t=S.rot?p.spiral:0,cs=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([u,v])=>[p.x+u*Math.cos(t)-v*Math.sin(t),p.y+u*Math.sin(t)+v*Math.cos(t)]);
+  const t=S.rot?p.spiral:0,hl=ledHalf(),cs=[[-hl,-hl],[hl,-hl],[hl,hl],[-hl,hl]].map(([u,v])=>[p.x+u*Math.cos(t)-v*Math.sin(t),p.y+u*Math.sin(t)+v*Math.cos(t)]);
   let m=1e9;for(let k=0;k<Pl.length;k++){const A=Pl[k],B=Pl[(k+1)%Pl.length],dx=B[0]-A[0],dy=B[1]-A[1],L=dx*dx+dy*dy||1;
    for(const c of cs){const tt=clamp(((c[0]-A[0])*dx+(c[1]-A[1])*dy)/L,0,1);m=Math.min(m,Math.hypot(c[0]-A[0]-tt*dx,c[1]-A[1]-tt*dy));}}
   if(m<w/2+0.15)touch++;});
@@ -283,7 +290,7 @@ function drawMandala(s){
   const r=Math.min(255,col[k*3]*gain),g=Math.min(255,col[k*3+1]*gain),b=Math.min(255,col[k*3+2]*gain);
   if(r+g+b>2){ctx.fillStyle=`rgb(${r|0},${g|0},${b|0})`;ctx.fill(cellPaths[k]);}}
  if(S.mSt==='lattice'){ctx.strokeStyle='rgba(200,166,74,.35)';ctx.lineWidth=Math.max(0.12,S.mW*0.25);ctx.lineCap='round';ctx.stroke(latticePath);}
- if(S.mLed){ctx.fillStyle='rgba(236,232,220,.35)';for(const p of P){ctx.save();ctx.translate(p.x,p.y);if(S.rot)ctx.rotate(p.spiral);ctx.fillRect(-1,-1,2,2);ctx.restore();}}
+ if(S.mLed){ctx.fillStyle='rgba(236,232,220,.35)';for(const p of P){ctx.save();ctx.translate(p.x,p.y);if(S.rot)ctx.rotate(p.spiral);ctx.fillRect(-ledHalf(),-ledHalf(),ledHalf()*2,ledHalf()*2);ctx.restore();}}
  ctx.strokeStyle='#c8a64a';ctx.lineWidth=0.4;
  ctx.beginPath();ctx.arc(0,0,RC,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(0,0,R-0.6,0,Math.PI*2);ctx.stroke();
  if(S.mRim!=='plain'&&R-0.6>RC+0.8){const k=S.mRim==='arms2'?F*2:F,rr=(RC+R-0.6)/2,pr=Math.min(Math.PI*rr/k*0.95,(R-0.6-RC)/2+1.2);
@@ -302,7 +309,7 @@ function showErr(m){$('err').textContent=m;$('err').style.display='block';$('ok'
 const cv=$('cv'),ctx=cv.getContext('2d');let size=600,dpr=1;
 function resize(){
  const st=cv.parentElement;const w=st.clientWidth-24;const h=window.innerHeight-200;
- size=Math.max(300,Math.min(w,Math.max(h,420),900));dpr=window.devicePixelRatio||1;
+ size=S.real?Math.round(2*R*PXMM+12):Math.max(300,Math.min(w,Math.max(h,420),900));dpr=window.devicePixelRatio||1;
  cv.style.width=size+'px';cv.style.height=size+'px';cv.width=Math.round(size*dpr);cv.height=Math.round(size*dpr);
 }
 window.addEventListener('resize',resize);
@@ -330,9 +337,9 @@ function draw(){
  else if(S.view==='pcb'){
   for(let k=0;k<3;k++){const a=k*Math.PI*2/3+Math.PI/6,rr=(R-1.7)*s;ctx.beginPath();ctx.arc(Math.cos(a)*rr,Math.sin(a)*rr,Math.max(1.1*s,2),0,Math.PI*2);ctx.fillStyle='#000';ctx.fill();ctx.strokeStyle='#c8a64a';ctx.lineWidth=Math.max(0.45*s,1);ctx.stroke();}
   if(S.chain){ctx.beginPath();order.forEach((n,k)=>{const p=P[n];k?ctx.lineTo(p.x*s,p.y*s):ctx.moveTo(p.x*s,p.y*s);});ctx.strokeStyle='rgba(205,150,70,.8)';ctx.lineWidth=Math.max(0.3*s,1);ctx.stroke();}
-  const h=s;
+  const h=s*ledHalf();
   for(let k=0;k<N;k++){const p=P[k];ctx.save();ctx.translate(p.x*s,p.y*s);if(S.rot)ctx.rotate(p.spiral);
-   ctx.fillStyle='#c8a64a';for(const [u,v] of [[-1,-1],[1,-1],[-1,1],[1,1]])ctx.fillRect(u*h*0.9-0.27*s,v*h*0.9-0.27*s,0.54*s,0.54*s);
+   ctx.fillStyle='#c8a64a';for(const [u,v] of [[-1,-1],[1,-1],[-1,1],[1,1]])ctx.fillRect(u*h*0.9-0.27*h,v*h*0.9-0.27*h,0.54*h,0.54*h);
    ctx.fillStyle='#e9e5d8';ctx.fillRect(-h*0.85,-h*0.85,h*1.7,h*1.7);
    if(S.chain&&!S.rot){}
    const r=col[k*3],g=col[k*3+1],b=col[k*3+2],lum=Math.max(r,g,b)/255;
@@ -388,6 +395,8 @@ $('ma').addEventListener('input',()=>{S.mA=Math.max(0,+$('ma').value||0);save();
 $('rot').addEventListener('change',()=>{S.rot=$('rot').checked;buildCellPaths();save();});
 function setView(v){S.view=v;$('vPcb').classList.toggle('on',v==='pcb');$('vDif').classList.toggle('on',v==='dif');$('vMan').classList.toggle('on',v==='man');save();}
 $('vPcb').onclick=()=>setView('pcb');$('vDif').onclick=()=>setView('dif');$('vMan').onclick=()=>setView('man');
+$('pkg').addEventListener('change',()=>{S.pkg=$('pkg').value;build();});
+$('vReal').onclick=()=>{S.real=!S.real;$('vReal').classList.toggle('on',S.real);$('vReal').textContent=S.real?'Fit to screen':'Actual size';resize();};
 $('fit').addEventListener('change',()=>{S.fit=$('fit').checked;build();});
 $('c').addEventListener('input',()=>{if(S.fit){S.fit=false;$('fit').checked=false;build();}});
 $('mSt').addEventListener('change',()=>{S.mSt=$('mSt').value;buildCellPaths();if(S.view!=='man')setView('man');save();});
@@ -403,7 +412,7 @@ function exportFast(){
  const N=P.length,ph=order.map(n=>P[n]);
  const spiral=ph.map(p=>p.i),ang=ph.map(p=>Math.round(p.theta/(Math.PI*2)*256)%256),rad=ph.map(p=>Math.round(p.r*255)),
   xs=ph.map(p=>Math.round(p.nx*127)),ys=ph.map(p=>Math.round(p.ny*127)),arm=ph.map(p=>p.arm),rk=ph.map(p=>p.armRank);
- $('out').value=`// Phyllo Sim export — ${N} x WS2812B-2020, ${S.A.toFixed(1)}° golden angle, c = ${S.c.toFixed(1)} mm
+ $('out').value=`// Phyllo Sim export — ${N} x ${PKG[S.pkg].name}, ${S.A.toFixed(1)}° golden angle, c = ${S.c.toFixed(1)} mm
 // Every array is in PHYSICAL order: index 0 = first LED after DIN.
 // Chain runs along the ${F}-arm spiral family, serpentine, arms visited in spatial order.
 #pragma once
@@ -453,10 +462,10 @@ function exportKicad(){
 $('xFast').onclick=exportFast;$('xKicad').onclick=exportKicad;
 $('xCopy').onclick=async()=>{const o=$('out');if(!o.value)exportFast();try{await navigator.clipboard.writeText(o.value);$('xCopy').textContent='Copied';}catch(e){o.select();$('xCopy').textContent='Selected — press Ctrl+C';}setTimeout(()=>$('xCopy').textContent='Copy',1600);};
 
-function save(){try{localStorage.setItem('phyllosim',JSON.stringify({S:{N:S.N,A:S.A,c:S.c,rot:S.rot,view:S.view,chain:S.chain,bright:S.bright,speed:S.speed,mA:S.mA,fit:S.fit,mSt:S.mSt,mW:S.mW,mRim:S.mRim,mLed:S.mLed},code:$('code').value,preset:activePreset}));}catch(e){}}
+function save(){try{localStorage.setItem('phyllosim',JSON.stringify({S:{N:S.N,A:S.A,c:S.c,rot:S.rot,view:S.view,chain:S.chain,bright:S.bright,speed:S.speed,mA:S.mA,fit:S.fit,mSt:S.mSt,mW:S.mW,mRim:S.mRim,mLed:S.mLed,pkg:S.pkg},code:$('code').value,preset:activePreset}));}catch(e){}}
 function load(){try{const d=JSON.parse(localStorage.getItem('phyllosim')||'null');if(!d)return false;Object.assign(S,d.S||{});
  $('n').value=S.N;$('a').value=S.A;$('c').value=S.c;$('rot').checked=S.rot;$('br').value=S.bright;$('sp').value=S.speed;$('ma').value=S.mA;
- $('fit').checked=S.fit;$('mSt').value=S.mSt;$('mW').value=S.mW;$('mRim').value=S.mRim;$('mLed').checked=S.mLed;
+ $('fit').checked=S.fit;$('mSt').value=S.mSt;$('mW').value=S.mW;$('mRim').value=S.mRim;$('mLed').checked=S.mLed;$('pkg').value=S.pkg||'2020';if(!PKG[S.pkg])S.pkg='2020';S.real=false;
  if(d.code){$('code').value=d.code;activePreset=d.preset||'';document.querySelectorAll('#presets button').forEach(b=>b.classList.toggle('on',PRESETS[b.textContent]===d.code));}
  setView(S.view);$('vChain').classList.toggle('on',S.chain);return !!d.code;}catch(e){return false;}}
 
