@@ -268,7 +268,7 @@ export default function VizBot() {
               <span className="vb-mono mr-2 text-xs font-medium uppercase tracking-[1px] text-yellow-800">
                 new in {DOC_VERSION}
               </span>
-              Stackchan starts quietly: no phantom head touches after a power-on, and its voice stream no longer starves the WiFi of memory.
+              Your bots sleep at night, 23:00 to 08:00 by default. Hold them to wake them up, and set the times on the new Sleep card.
             </p>
             <VbLink href="/vizbot/releases#latest" className={`${linkCls} whitespace-nowrap`}>
               Release notes →

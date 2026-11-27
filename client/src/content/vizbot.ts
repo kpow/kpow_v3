@@ -9,7 +9,7 @@
 export type BoardId = "lcd169" | "lcd13" | "cores3" | "stackchan";
 
 /** The firmware version these pages describe. The live latest version comes from /api/vizbot/releases. */
-export const DOC_VERSION = "3.12.2";
+export const DOC_VERSION = "3.13.0";
 
 export const REPO_URL = "https://github.com/kpow/vizpow";
 export const RELEASES_URL = "https://github.com/kpow/vizpow/releases";
@@ -53,6 +53,7 @@ export const BOARDS: Board[] = [
       "**Shake it in low power.** With WiFi off there's no weather to flip to, so a shake gets you a reaction instead: it winds up dizzy the longer you keep shaking (the LED matrix flashes along), or tells you a fortune, or rerolls the palette and LED effect — whichever it feels like. Four reactions in two minutes, then it ignores shakes for three minutes: worn on a lanyard it shakes all day, and it shouldn't perform the whole way down the block. Out of low power a shake still flips to weather, same as before (3.7.38).",
       "**Kaleido HD** is a background made for wearing it as a pendant: a slowly turning kaleidoscope. Pick **Kaleido HD** as the background on the bot's page; it stays off until you do. Worn in low power mode it ran about 12 hours on a full battery (3.12.0).",
       "**Battery level** shows as 0 to 4 bars at the top of the home screen and in Settings › System, or a bolt on USB. When the battery gets too low it shows \"Battery empty\" and turns itself off, instead of running the cell flat.",
+      "**It sleeps at night.** From 23:00 to 08:00 by default: eyes shut with a Zzz, the screen dims to 8%, and the LED matrix and buzzer go quiet. Press and hold the screen to wake it. A quick tap only gets a sleepy peek. **Sleep**, **Bedtime**, **Wake up** and **Sleep now** are in Settings › Info, and the web panel has a [Sleep card](/vizbot/web#sleep). In low power mode it doesn't know the time, so it never falls asleep on its own (3.13.0).",
     ],
   },
   {
@@ -109,6 +110,7 @@ export const BOARDS: Board[] = [
       "On firmware with voice, the front tap talks instead of nodding. The back tap still shakes and the 2-second hold still chills.",
       "**Battery care.** The base battery charges to 4.1 V. When it runs low the head parks and the servos and LED ring turn off, and they come back once it recovers. Near empty and not charging, it switches off (3.12.0).",
       "**Quiet start.** It starts its 5 V output the way M5's own firmware does, so there are no phantom head touches after you power it on, and it charges from USB from the first second (3.12.2).",
+      "**It sleeps at night**, 23:00 to 08:00 by default, in deep rest: the head parks and the servos switch off, the base LEDs go dark, the screen dims and it stops listening for \"Hey vizBot\". Hold the top of its head to wake it, and it comes back with its head up. A quick tap only gets a sleepy peek. Set it on the [Sleep card](/vizbot/web#sleep) or in Settings › Info (3.13.0).",
     ],
   },
 ];
@@ -281,7 +283,7 @@ export const SHEETS: { screen: ScreenKey; name: string; body: string }[] = [
 export const SETTINGS: { name: string; cat: Cat; desc: string }[] = [
   { name: "Look", cat: "look", desc: "Scene, party mode and its size, palette, hi-res, kaleidoscope, face color, auto-cycle" },
   { name: "Mood", cat: "mood", desc: "Personality, rotation, expression" },
-  { name: "Info", cat: "info", desc: "Weather, clock, time zone" },
+  { name: "Info", cat: "info", desc: "Weather, clock, time zone. Sleep, Bedtime, Wake up and Sleep now on the 1.69 and Stackchan" },
   { name: "Light", cat: "light", desc: "Screen brightness. Sound, Volume, LEDs and LED mode on the 1.69. Volume and Audio FX on CoreS3. Base LEDs on Stackchan" },
   { name: "Connect", cat: "connect", desc: "Network, .local address, IP, signal, nearby bots. Hotspot steps when offline" },
   { name: "System", cat: "system", desc: "Version, name, uptime, memory, battery. Hold 1.5 s to Restart or Power off. Low power on the 1.69" },
@@ -333,6 +335,11 @@ export const FIXES: { title: string; body: string; boards?: BoardId[] }[] = [
   {
     title: "It's too bright at night",
     body: "Swipe up, **Light**, **Night**. On the 1.3 use Brightness in the web panel.",
+  },
+  {
+    title: "It's asleep and a tap won't wake it",
+    body: "That's on purpose: a tap only gets a sleepy peek. Press and hold the screen, or hold the top of a Stackchan's head. Or hit **Wake up** on the [Sleep card](/vizbot/web#sleep). Woken at night, it nods off again after 10 quiet minutes. Set **Nods off after** to **Never** to keep it up until morning, or turn **Sleep schedule** off.",
+    boards: ["lcd169", "stackchan"],
   },
   {
     title: "Stackchan can't find or reach its brain",
@@ -531,6 +538,31 @@ export const WEB_SECTIONS: WebSection[] = [
         v: "The version it's running. **Update** opens the update page at `/update`. The steps are in [updating firmware](/vizbot/guide#update).",
       },
     ],
+  },
+  {
+    id: "sleep",
+    name: "sleep",
+    card: "Sleep",
+    shot: W + "web-sleep.png",
+    w: 1070,
+    h: 697,
+    boards: ["lcd169", "stackchan"],
+    lead: "When it goes to bed and gets up. Asleep, its eyes shut with a Zzz and it stays quiet: no sayings, chirps, random faces or party visits. Firmware 3.13.0; the card only shows up on a 1.69 or a Stackchan.",
+    controls: [
+      { k: "Sleep schedule", v: "On by default. Off, it never falls asleep on its own. **Sleep now** still works." },
+      { k: "Bedtime", v: "When it falls asleep. Default 23:00. If you're playing with it at bedtime, it waits until you stop." },
+      { k: "Wake up", v: "When it gets up. Default 08:00." },
+      {
+        k: "Nods off after",
+        v: "Woken by hand at night, it falls back asleep after this many quiet minutes: 5, 10 (default), 20, 30 or 60. **Never** keeps it up until the wake time.",
+      },
+      {
+        k: "Status line",
+        v: "**Awake**, or **Asleep (schedule)** or **Asleep (manual)** when you put it to bed. **No clock** means it doesn't know the time yet, so the schedule waits.",
+      },
+      { k: "Sleep now · Wake up", v: "Puts it to bed or gets it up right away, whatever the schedule says." },
+    ],
+    note: "On the bot itself, a tap only gets a sleepy peek. Press and hold the screen, or the top of a Stackchan's head, to wake it. A Stackchan sleeps in deep rest: head parked, servos and base LEDs off, screen dimmed, not listening.",
   },
   {
     id: "sounds",
